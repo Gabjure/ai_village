@@ -140,7 +140,7 @@ export class PrayerSystem extends BaseSystem {
           magnitude: spiritComp?.magnitude ?? 'minor',
           totalRespect: spiritComp?.totalRespect ?? 0,
           ...spiritComp,
-        } as unknown as Spirit;
+        } as Spirit;
       });
 
     const nearbyDeities: Deity[] = nearbyEntities
@@ -150,7 +150,7 @@ export class PrayerSystem extends BaseSystem {
         return {
           id: e.id,
           ...deityComp,
-        } as unknown as Deity;
+        } as Deity;
       });
 
     // Use cosmology to resolve where this prayer should go

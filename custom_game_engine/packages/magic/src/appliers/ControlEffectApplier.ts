@@ -412,7 +412,7 @@ export class DebuffEffectApplier implements EffectApplier<DebuffEffect> {
     // Apply damage to target's health
     const needs = target.components.get('needs') as NeedsComponent | undefined;
     if (needs && 'health' in needs) {
-      const needsWithHealth = needs as unknown as NeedsComponentWithHealth;
+      const needsWithHealth = needs as NeedsComponentWithHealth;
       const currentHealth = needsWithHealth.health ?? 100;
       needsWithHealth.health = Math.max(0, currentHealth - damage);
     }

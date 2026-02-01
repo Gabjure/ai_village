@@ -145,22 +145,22 @@ export const MemoryView: DashboardView<MemoryViewData> = {
       }
 
       // Get components with type assertions
-      const identity = entity.components.get('identity') as unknown as { name?: string } | undefined;
-      const agent = entity.components.get('agent') as unknown as {
+      const identity = entity.components.get('identity') as { name?: string } | undefined;
+      const agent = entity.components.get('agent') as {
         personalGoal?: string;
         mediumTermGoal?: string;
         groupGoal?: string;
       } | undefined;
-      const episodicMemory = entity.components.get('episodic_memory') as unknown as {
+      const episodicMemory = entity.components.get('episodic_memory') as {
         episodicMemories?: MemoryEntry[];
       } | undefined;
-      const semanticMemory = entity.components.get('semantic_memory') as unknown as {
+      const semanticMemory = entity.components.get('semantic_memory') as {
         beliefs?: Belief[];
       } | undefined;
-      const reflection = entity.components.get('reflection') as unknown as {
+      const reflection = entity.components.get('reflection') as {
         reflections?: Reflection[];
       } | undefined;
-      const journal = entity.components.get('journal') as unknown as {
+      const journal = entity.components.get('journal') as {
         entries?: Array<{ text?: string }>;
       } | undefined;
 

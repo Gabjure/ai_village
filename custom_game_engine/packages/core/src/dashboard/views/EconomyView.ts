@@ -138,7 +138,7 @@ export const EconomyView: DashboardView<EconomyViewData> = {
         };
       }
 
-      const marketState = marketEntities[0]?.components.get('market_state') as unknown as {
+      const marketState = marketEntities[0]?.components.get('market_state') as {
         totalCurrency: number;
         dailyTransactionVolume: number;
         weeklyTransactionVolume: number;

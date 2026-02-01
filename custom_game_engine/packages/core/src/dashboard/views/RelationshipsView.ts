@@ -136,7 +136,7 @@ export const RelationshipsView: DashboardView<RelationshipsViewData> = {
         return emptyData;
       }
 
-      const agent = entity.components.get('agent') as unknown as {
+      const agent = entity.components.get('agent') as {
         name?: string;
       } | undefined;
 
@@ -145,7 +145,7 @@ export const RelationshipsView: DashboardView<RelationshipsViewData> = {
         return emptyData;
       }
 
-      const social = entity.components.get('social') as unknown as {
+      const social = entity.components.get('social') as {
         relationships?: Map<string, {
           strength: number;
           type: string;
@@ -155,7 +155,7 @@ export const RelationshipsView: DashboardView<RelationshipsViewData> = {
         }>;
       } | undefined;
 
-      const personality = entity.components.get('personality') as unknown as {
+      const personality = entity.components.get('personality') as {
         sociability?: number;
       } | undefined;
 
@@ -169,7 +169,7 @@ export const RelationshipsView: DashboardView<RelationshipsViewData> = {
           let targetName = 'Unknown';
           try {
             const targetEntity = world.getEntity(targetId);
-            const targetAgent = targetEntity?.components.get('agent') as unknown as { name?: string } | undefined;
+            const targetAgent = targetEntity?.components.get('agent') as { name?: string } | undefined;
             if (targetAgent?.name) {
               targetName = targetAgent.name;
             }

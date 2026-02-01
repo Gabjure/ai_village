@@ -746,14 +746,16 @@ export function buildBehaviorWithContext(ctx: import('../BehaviorContext.js').Be
     tick: ctx.tick,
     getEntity: (id: string) => {
       const entity = ctx.getEntity(id);
-      // Cast required: BehaviorContext.getEntity returns Entity, but we need EntityImpl for mutation methods
-      return entity as EntityImpl | undefined;
+      if (!entity) return undefined;
+      // BehaviorContext.getEntity returns Entity interface, cast to EntityImpl for implementation access
+      return entity as EntityImpl;
     },
     eventBus: {
       emit: (e) => ctx.emit(e),
     },
   };
 
-  // Cast required: BuildBehavior expects full World interface but only uses tick/getEntity/eventBus
-  return behavior.execute(ctx.entity, worldAdapter as unknown as World);
+  // Delegate to BuildBehavior class - it only uses tick/getEntity/eventBus from world
+  // Using world adapter to avoid exposing full World interface to behaviors
+  return behavior.execute(ctx.entity, worldAdapter as World);
 }

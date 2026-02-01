@@ -100,7 +100,7 @@ export class CrossRealmPhoneSystem extends BaseSystem {
 
     // Update all phones
     for (const entity of ctx.activeEntities) {
-      const phoneComp = entity.getComponent('cross_realm_phone') as unknown as CrossRealmPhoneComponent;
+      const phoneComp = entity.getComponent('cross_realm_phone') as CrossRealmPhoneComponent;
 
       // Handle charging
       this.updateCharging(phoneComp, currentTick);
@@ -348,7 +348,7 @@ export class CrossRealmPhoneSystem extends BaseSystem {
     this.phoneDirectory.clear();
 
     for (const entity of entities) {
-      const phoneComp = entity.getComponent('cross_realm_phone') as unknown as CrossRealmPhoneComponent;
+      const phoneComp = entity.getComponent('cross_realm_phone') as CrossRealmPhoneComponent;
       this.phoneDirectory.set(phoneComp.phone.address.deviceId, entity);
     }
   }
@@ -367,7 +367,7 @@ export class CrossRealmPhoneSystem extends BaseSystem {
         continue;
       }
 
-      const recipientPhoneComp = recipient.getComponent('cross_realm_phone') as unknown as CrossRealmPhoneComponent;
+      const recipientPhoneComp = recipient.getComponent('cross_realm_phone') as CrossRealmPhoneComponent;
 
       // Check if recipient is busy
       if (recipientPhoneComp.activeCall || recipientPhoneComp.incomingCall) {
@@ -471,7 +471,7 @@ export class CrossRealmPhoneSystem extends BaseSystem {
       return;
     }
 
-    const recipientPhoneComp = recipient.getComponent('cross_realm_phone') as unknown as CrossRealmPhoneComponent;
+    const recipientPhoneComp = recipient.getComponent('cross_realm_phone') as CrossRealmPhoneComponent;
     receiveMessage(recipientPhoneComp.phone, message, currentTime);
 
     recipientPhoneComp.inbox.push(message);
@@ -504,7 +504,7 @@ export class CrossRealmPhoneSystem extends BaseSystem {
     const timeEntities = world.query().with('time').executeEntities();
     if (timeEntities.length === 0) return 0n;
 
-    const timeComp = timeEntities[0]!.getComponent('time') as unknown as { currentTick: bigint };
+    const timeComp = timeEntities[0]!.getComponent('time') as { currentTick: bigint };
     return timeComp.currentTick;
   }
 

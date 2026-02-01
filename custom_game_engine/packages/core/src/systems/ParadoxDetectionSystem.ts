@@ -126,7 +126,7 @@ export class ParadoxDetectionSystem extends BaseSystem {
       const deathData = data as { entityId: string; killerId?: string; tick?: number };
       if (deathData.killerId && deathData.tick) {
         // Get universe ID from world (with fallback)
-        const universeId = 'universeId' in ctx.world ? (ctx.world as unknown as { universeId: string }).universeId : 'unknown';
+        const universeId = 'universeId' in ctx.world ? (ctx.world as { universeId: string }).universeId : 'unknown';
         this.recordDeath(
           deathData.entityId,
           deathData.killerId,
@@ -232,7 +232,7 @@ export class ParadoxDetectionSystem extends BaseSystem {
           tick
         );
 
-        (entity as unknown as EntityImpl).updateComponent(CT.CausalChain, () => updated);
+        (entity as EntityImpl).updateComponent(CT.CausalChain, () => updated);
 
         // Emit event
         ctx.emit('multiverse:paradox_detected', {
@@ -324,11 +324,11 @@ export class ParadoxDetectionSystem extends BaseSystem {
       tick
     );
 
-    (entity as unknown as EntityImpl).updateComponent(CT.CausalChain, () => updated);
+    (entity as EntityImpl).updateComponent(CT.CausalChain, () => updated);
 
     // Mark as in causal loop
     const loopMarked = markCausalLoop(updated, tick);
-    (entity as unknown as EntityImpl).updateComponent(CT.CausalChain, () => loopMarked);
+    (entity as EntityImpl).updateComponent(CT.CausalChain, () => loopMarked);
 
     // Emit event
     ctx.emit('multiverse:paradox_detected', {
@@ -434,7 +434,7 @@ export class ParadoxDetectionSystem extends BaseSystem {
       tick
     );
 
-    (entity as unknown as EntityImpl).updateComponent(CT.CausalChain, () => updated);
+    (entity as EntityImpl).updateComponent(CT.CausalChain, () => updated);
 
     // Emit event
     ctx.emit('multiverse:paradox_detected', {
@@ -524,7 +524,7 @@ export class ParadoxDetectionSystem extends BaseSystem {
         tick
       );
 
-      (entity as unknown as EntityImpl).updateComponent(CT.CausalChain, () => ({
+      (entity as EntityImpl).updateComponent(CT.CausalChain, () => ({
         ...updated,
         hasNoOrigin: true,
       }));
@@ -618,7 +618,7 @@ export class ParadoxDetectionSystem extends BaseSystem {
 
         if (paradoxIndex !== -1) {
           const resolved = resolveParadox(causalChain, paradoxIndex, strategy, ctx.tick);
-          (entity as unknown as EntityImpl).updateComponent(CT.CausalChain, () => resolved);
+          (entity as EntityImpl).updateComponent(CT.CausalChain, () => resolved);
         }
       }
     }

@@ -142,7 +142,7 @@ export const AngelsView: DashboardView<AngelsViewData> = {
 
         // AngelComponent doesn't exist yet, so we access it as a generic component
         // with expected fields (type, power, currentTask, loyalty)
-        const angelData = angelComp as unknown as {
+        const angelData = angelComp as {
           type?: string;
           power?: number;
           currentTask?: string;

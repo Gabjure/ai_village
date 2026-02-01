@@ -48,7 +48,7 @@ export class ButcherBehavior extends BaseBehavior {
     }
 
     // Read behavior state from agent component
-    const state = agent.behaviorState as unknown as ButcherState | undefined;
+    const state = agent.behaviorState as ButcherState | undefined;
     if (!state || !state.targetId) {
       return {
         complete: true,
@@ -130,12 +130,11 @@ export class ButcherBehavior extends BaseBehavior {
     // Add products to inventory
     const inventory = entity.getComponent(CT.Inventory) as InventoryComponent | undefined;
     if (inventory) {
-      entity.updateComponent(CT.Inventory, (inv) => {
-        const invComp = inv as unknown as InventoryComponent;
+      entity.updateComponent<InventoryComponent>(CT.Inventory, (inv) => {
         return {
           ...inv,
           slots: [
-            ...invComp.slots,
+            ...inv.slots,
             { itemId: 'meat', quantity: meatQuantity },
             { itemId: 'hide', quantity: baseHideQuantity },
             { itemId: 'bones', quantity: baseBonesQuantity },
@@ -273,15 +272,15 @@ function calculateButcheringQuality(
  */
 export function butcherBehaviorWithContext(ctx: BehaviorContext): ContextBehaviorResult | void {
   // Read behavior state
-  const state = ctx.getAllState() as unknown as ButcherState | undefined;
+  const state = ctx.getAllState() as ButcherState | undefined;
   if (!state || !state.targetId) {
     return ctx.complete('Missing butcher target in behaviorState');
   }
 
   const { targetId, reason = 'food' } = state;
 
-  // Access world through internal property (temporary until BehaviorContext exposes needed APIs)
-  const world = (ctx as unknown as { world: World }).world;
+  // Access world from BehaviorContext (world is exposed as readonly property)
+  const world = ctx.world;
 
   // Check for nearby butchering table
   const buildingTargeting = new BuildingTargeting();
@@ -341,12 +340,11 @@ export function butcherBehaviorWithContext(ctx: BehaviorContext): ContextBehavio
 
   // Add products to inventory
   if (ctx.inventory) {
-    ctx.updateComponent(CT.Inventory, (inv) => {
-      const invComp = inv as unknown as InventoryComponent;
+    ctx.updateComponent<InventoryComponent>(CT.Inventory, (inv) => {
       return {
         ...inv,
         slots: [
-          ...invComp.slots,
+          ...inv.slots,
           { itemId: 'meat', quantity: meatQuantity },
           { itemId: 'hide', quantity: baseHideQuantity },
           { itemId: 'bones', quantity: baseBonesQuantity },
@@ -356,7 +354,7 @@ export function butcherBehaviorWithContext(ctx: BehaviorContext): ContextBehavio
   }
 
   // Remove the animal entity from the world
-  (world as unknown as WorldMutator).destroyEntity(targetId, 'butchered');
+  (world as WorldMutator).destroyEntity(targetId, 'butchered');
 
   // Emit crafting:completed event for CookingSystem integration
   // This allows CookingSystem to track butchering XP and specialization

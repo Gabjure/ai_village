@@ -18,7 +18,7 @@ export class PlantSerializer extends BaseComponentSerializer<PlantComponent> {
 
     // Fallback for plain objects (corrupted or legacy data)
     // Extract fields manually - use type assertion since we know the shape
-    const plainObj = component as unknown as Record<string, unknown>;
+    const plainObj = component as Record<string, unknown>;
     return {
       speciesId: plainObj.speciesId,
       position: plainObj.position || plainObj._position,
@@ -36,7 +36,7 @@ export class PlantSerializer extends BaseComponentSerializer<PlantComponent> {
       seedsProduced: plainObj.seedsProduced ?? 0,
       planted: plainObj.planted,
       tileEntityId: plainObj.tileEntityId,
-    } as unknown as PlantComponentData;
+    } as PlantComponentData;
   }
 
   protected deserializeData(data: unknown): PlantComponent {

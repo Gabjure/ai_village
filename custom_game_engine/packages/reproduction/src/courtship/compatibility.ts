@@ -174,8 +174,8 @@ export function calculateSharedInterests(agent1: Entity, agent2: Entity): number
   const agent1Component = (agent1 as EntityImpl).getComponent('agent');
   const agent2Component = (agent2 as EntityImpl).getComponent('agent');
 
-  const agentComp1 = agent1Component as unknown as { priorities?: StrategicPriorities };
-  const agentComp2 = agent2Component as unknown as { priorities?: StrategicPriorities };
+  const agentComp1 = agent1Component as { priorities?: StrategicPriorities };
+  const agentComp2 = agent2Component as { priorities?: StrategicPriorities };
 
   if (!agentComp1?.priorities || !agentComp2?.priorities) {
     return 0.5; // Neutral when no priority data

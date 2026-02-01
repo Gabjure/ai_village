@@ -35,7 +35,7 @@ let panelDataMap: Map<string, PanelData> = new Map();
  */
 async function loadPanelConfigs(): Promise<void> {
   try {
-    const data = panelConfigsDataRaw as unknown as PanelConfigsData;
+    const data = panelConfigsDataRaw as PanelConfigsData;
     data.panels.forEach((panel) => {
       panelDataMap.set(panel.id, panel);
     });

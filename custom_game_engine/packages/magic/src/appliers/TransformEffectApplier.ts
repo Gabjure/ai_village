@@ -47,7 +47,7 @@ export class TransformEffectApplier implements EffectApplier<TransformEffect> {
     let appearance = target.components.get('appearance') as AppearanceComponent | undefined;
     if (!appearance) {
       const newAppearance = { type: 'appearance' as const, version: 1, form: 'default', size: 1.0, material: 'flesh' };
-      (world as WorldMutator).addComponent(target.id, newAppearance as unknown as Component);
+      (world as WorldMutator).addComponent(target.id, newAppearance as Component);
       appearance = newAppearance as AppearanceComponent;
     }
 

@@ -58,7 +58,7 @@ let skinToneMap: Record<string, string> = {};
  */
 async function loadSpriteRegistry(): Promise<void> {
   try {
-    const data = spriteRegistryData as unknown as SpriteRegistryData;
+    const data = spriteRegistryData as SpriteRegistryData;
     SPRITE_MAPPINGS = data.spriteMappings;
     hairColorMap = data.hairColorNormalization;
     skinToneMap = data.skinToneNormalization;

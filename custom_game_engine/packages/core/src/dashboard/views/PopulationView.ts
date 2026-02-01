@@ -89,7 +89,7 @@ export const PopulationView: DashboardView<PopulationViewData> = {
 
         if (agent) {
           // Age tracking - use type assertion for component data
-          const agentData = agent as unknown as { age?: number; currentBehavior?: string };
+          const agentData = agent as { age?: number; currentBehavior?: string };
           totalAge += agentData.age || 0;
 
           // Behavior tracking
@@ -99,7 +99,7 @@ export const PopulationView: DashboardView<PopulationViewData> = {
 
         // Health categorization
         if (needs) {
-          const needsData = needs as unknown as { hunger?: number; energy?: number; health?: number };
+          const needsData = needs as { hunger?: number; energy?: number; health?: number };
           const minNeed = Math.min(
             needsData.hunger ?? 100,
             needsData.energy ?? 100,

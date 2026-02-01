@@ -134,10 +134,10 @@ export class TillBehavior extends BaseBehavior {
     world: World,
     position: PositionComponent
   ): { x: number; y: number; distance: number } | null {
-    interface WorldWithTiles {
+    interface WorldWithTiles extends World {
       getTileAt?: (x: number, y: number) => { terrain: string; tilled?: boolean } | undefined;
     }
-    const worldWithTiles = world as unknown as WorldWithTiles;
+    const worldWithTiles = world as WorldWithTiles;
     if (typeof worldWithTiles.getTileAt !== 'function') {
       console.warn('[TillBehavior] World does not have getTileAt - cannot find tiles to till');
       return null;
@@ -776,12 +776,15 @@ export function tillBehaviorWithContext(ctx: import('../BehaviorContext.js').Beh
       emit: (event: unknown) => void;
     };
   }
+  interface CtxWorldWithTiles extends World {
+    getTileAt?: (x: number, y: number) => { terrain: string; tilled?: boolean } | undefined;
+  }
   const world: WorldWithTiles = {
     tick: ctx.tick,
-    getTileAt: (ctx as unknown as { world?: WorldWithTiles }).world?.getTileAt,
-    eventBus: { emit: (e: any) => ctx.emit(e) }
+    getTileAt: (ctx.world as CtxWorldWithTiles).getTileAt,
+    eventBus: { emit: (e: unknown) => ctx.emit(e) }
   };
-  return behavior.execute(ctx.entity, world as unknown as World);
+  return behavior.execute(ctx.entity, world as World);
 }
 
 export function plantBehaviorWithContext(ctx: import('../BehaviorContext.js').BehaviorContext): import('../BehaviorContext.js').BehaviorResult | void {
@@ -799,14 +802,17 @@ export function plantBehaviorWithContext(ctx: import('../BehaviorContext.js').Be
       emit: (event: unknown) => void;
     };
   }
+  interface CtxWorldWithTiles extends World {
+    getTileAt?: (x: number, y: number) => { tilled?: boolean; plantability?: number } | undefined;
+  }
   const world: WorldWithTiles = {
     tick: ctx.tick,
-    getTileAt: (ctx as unknown as { world?: WorldWithTiles }).world?.getTileAt,
+    getTileAt: (ctx.world as CtxWorldWithTiles).getTileAt,
     getEntity: (id: string) => ctx.getEntity(id),
-    eventBus: { emit: (e: any) => ctx.emit(e) },
+    eventBus: { emit: (e: unknown) => ctx.emit(e) },
   };
 
-  return behavior.execute(ctx.entity, world as unknown as World);
+  return behavior.execute(ctx.entity, world as World);
 }
 
 export function waterBehaviorWithContext(ctx: import('../BehaviorContext.js').BehaviorContext): import('../BehaviorContext.js').BehaviorResult | void {
@@ -878,11 +884,15 @@ export function waterBehaviorWithContext(ctx: import('../BehaviorContext.js').Be
   if (plantEntity) {
     const plantImpl = plantEntity as EntityImpl;
     plantImpl.updateComponent(ComponentType.Plant, (plant) => {
-      // Access hydration via getter and update via object spread
-      const currentHydration = (plant as unknown as { hydration: number }).hydration;
-      const updated = { ...plant };
+      // Access hydration property (runtime extension of PlantComponent)
+      interface PlantWithHydration {
+        hydration: number;
+      }
+      const plantWithHydration = plant as PlantComponent & PlantWithHydration;
+      const currentHydration = plantWithHydration.hydration;
+      const updated = { ...plant } as PlantComponent & PlantWithHydration;
       // Set hydration on the spread object
-      (updated as unknown as { hydration: number }).hydration = Math.min(100, currentHydration + 20);
+      updated.hydration = Math.min(100, currentHydration + 20);
       return updated;
     });
   }

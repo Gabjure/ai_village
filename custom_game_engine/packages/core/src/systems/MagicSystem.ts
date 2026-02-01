@@ -155,7 +155,7 @@ export class MagicSystem extends BaseSystem {
 
     // Skill tree XP grant events
     eventBus.subscribe('magic:grant_skill_xp' as keyof import('../events/EventMap.js').GameEventMap, (event) => {
-      const data = event.data as unknown as { entityId: string; paradigmId: string; xpAmount: number };
+      const data = event.data as { entityId: string; paradigmId: string; xpAmount: number };
       const { entityId, paradigmId, xpAmount } = data;
       const entity = world.getEntity(entityId);
       if (entity && this.skillTreeManager) {
@@ -242,13 +242,13 @@ export class MagicSystem extends BaseSystem {
     if (!manaPools) return;
 
     // Apply regeneration via manager
-    this.regenManager.applyMagicRegeneration(entity, manaPools as unknown as ManaPoolsComponent, deltaTime);
+    this.regenManager.applyMagicRegeneration(entity, manaPools as ManaPoolsComponent, deltaTime);
 
     const paradigmState = entity.getComponent(CT.ParadigmStateComponent);
     if (!paradigmState) return;
 
     // Sync faith/favor for divine users
-    this.regenManager.syncFaithAndFavor(entity, manaPools as unknown as ManaPoolsComponent, paradigmState as unknown as ParadigmStateComponent);
+    this.regenManager.syncFaithAndFavor(entity, manaPools as ManaPoolsComponent, paradigmState as ParadigmStateComponent);
   }
 
   // =========================================================================

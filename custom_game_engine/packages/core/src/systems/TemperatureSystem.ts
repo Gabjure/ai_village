@@ -322,7 +322,7 @@ export class TemperatureSystem extends BaseSystem {
     }
 
     // Performance: Skip if chunk not generated to avoid expensive terrain generation
-    const worldWithChunks = world as unknown as {
+    const worldWithChunks = world as {
       getChunkManager?: () => {
         getChunk: (x: number, y: number) => { generated?: boolean } | undefined;
       } | undefined;

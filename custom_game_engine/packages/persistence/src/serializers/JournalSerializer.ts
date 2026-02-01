@@ -16,7 +16,7 @@ export class JournalSerializer extends BaseComponentSerializer<JournalComponent>
 
   protected serializeData(component: JournalComponent): SerializedJournal {
     // Access private _entries field
-    const componentAny = component as unknown as { _entries: JournalEntry[] };
+    const componentAny = component as { _entries: JournalEntry[] };
     return {
       entries: componentAny._entries ?? [],
     };
@@ -29,7 +29,7 @@ export class JournalSerializer extends BaseComponentSerializer<JournalComponent>
     const component = new JournalComponent();
 
     // Restore entries by accessing private field
-    const componentAny = component as unknown as { _entries: JournalEntry[] };
+    const componentAny = component as { _entries: JournalEntry[] };
     componentAny._entries = serialized.entries ?? [];
 
     return component;

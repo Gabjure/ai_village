@@ -306,7 +306,7 @@ export class SteeringSystem extends BaseSystem {
           if (!e || !e.components.has('collision')) continue;
 
           const obstaclePos = getPosition(e);
-          const collision = e.components.get('collision') as unknown as { radius: number } | undefined;
+          const collision = e.components.get('collision') as { radius: number } | undefined;
           if (!obstaclePos || !collision) continue;
 
           // Quick distance check to filter out far obstacles BEFORE detailed checks

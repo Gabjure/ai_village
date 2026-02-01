@@ -172,8 +172,8 @@ export function initiateCombatBehaviorWithContext(ctx: BehaviorContext): Context
     return ctx.complete('Missing combat target in behaviorState');
   }
 
-  // Safe double-cast pattern: unknown intermediary validates type compatibility
-  const typedState = state as unknown as InitiateCombatState;
+  // Cast to typed state - structure validated by runtime checks above
+  const typedState = state as InitiateCombatState;
   const { targetId, cause = 'challenge', lethal = false, surprise = false } = typedState;
 
   // Validate target exists and is an agent

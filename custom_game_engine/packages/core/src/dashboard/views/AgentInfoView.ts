@@ -152,7 +152,7 @@ export const AgentInfoView: DashboardView<AgentInfoViewData> = {
       }
 
       // Check if this is actually an agent
-      const agent = entity.components.get('agent') as unknown as {
+      const agent = entity.components.get('agent') as {
         currentBehavior?: string;
         currentAction?: string;
         age?: number;
@@ -164,12 +164,12 @@ export const AgentInfoView: DashboardView<AgentInfoViewData> = {
       }
 
       // Get identity
-      const identity = entity.components.get('identity') as unknown as {
+      const identity = entity.components.get('identity') as {
         name?: string;
       } | undefined;
 
       // Get needs
-      const needsComp = entity.components.get('needs') as unknown as {
+      const needsComp = entity.components.get('needs') as {
         hunger?: number;
         energy?: number;
         health?: number;
@@ -192,7 +192,7 @@ export const AgentInfoView: DashboardView<AgentInfoViewData> = {
       }
 
       // Get skills
-      const skillsComp = entity.components.get('skills') as unknown as {
+      const skillsComp = entity.components.get('skills') as {
         skills?: Map<string, { level: number; experience: number }>;
       } | undefined;
 
@@ -205,7 +205,7 @@ export const AgentInfoView: DashboardView<AgentInfoViewData> = {
       }
 
       // Get inventory
-      const inventoryComp = entity.components.get('inventory') as unknown as {
+      const inventoryComp = entity.components.get('inventory') as {
         slots?: Array<{ itemId?: string; quantity: number }>;
         maxSlots?: number;
       } | undefined;
@@ -220,7 +220,7 @@ export const AgentInfoView: DashboardView<AgentInfoViewData> = {
       }
 
       // Get position
-      const posComp = entity.components.get('position') as unknown as {
+      const posComp = entity.components.get('position') as {
         x?: number;
         y?: number;
       } | undefined;

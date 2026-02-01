@@ -86,39 +86,39 @@ import { ParasiticHiveMindView } from './ParasiticHiveMindView.js';
  */
 export const builtInViews: readonly DashboardView<ViewData>[] = [
   // Core
-  ResourcesView as unknown as DashboardView<ViewData>,
-  PopulationView as unknown as DashboardView<ViewData>,
-  WeatherView as unknown as DashboardView<ViewData>,
+  ResourcesView as DashboardView<ViewData>,
+  PopulationView as DashboardView<ViewData>,
+  WeatherView as DashboardView<ViewData>,
   // Info
-  AgentInfoView as unknown as DashboardView<ViewData>,
-  AnimalInfoView as unknown as DashboardView<ViewData>,
-  PlantInfoView as unknown as DashboardView<ViewData>,
-  TileInspectorView as unknown as DashboardView<ViewData>,
+  AgentInfoView as DashboardView<ViewData>,
+  AnimalInfoView as DashboardView<ViewData>,
+  PlantInfoView as DashboardView<ViewData>,
+  TileInspectorView as DashboardView<ViewData>,
   // Economy
-  EconomyView as unknown as DashboardView<ViewData>,
-  ShopView as unknown as DashboardView<ViewData>,
-  CraftingView as unknown as DashboardView<ViewData>,
+  EconomyView as DashboardView<ViewData>,
+  ShopView as DashboardView<ViewData>,
+  CraftingView as DashboardView<ViewData>,
   // Social
-  RelationshipsView as unknown as DashboardView<ViewData>,
-  MemoryView as unknown as DashboardView<ViewData>,
-  GovernanceView as unknown as DashboardView<ViewData>,
+  RelationshipsView as DashboardView<ViewData>,
+  MemoryView as DashboardView<ViewData>,
+  GovernanceView as DashboardView<ViewData>,
   // Magic
-  MagicSystemsView as unknown as DashboardView<ViewData>,
-  SpellbookView as unknown as DashboardView<ViewData>,
+  MagicSystemsView as DashboardView<ViewData>,
+  SpellbookView as DashboardView<ViewData>,
   // Divinity
-  DivinePowersView as unknown as DashboardView<ViewData>,
-  PrayersView as unknown as DashboardView<ViewData>,
-  VisionComposerView as unknown as DashboardView<ViewData>,
-  AngelsView as unknown as DashboardView<ViewData>,
-  MythologyView as unknown as DashboardView<ViewData>,
-  PantheonView as unknown as DashboardView<ViewData>,
-  DeityIdentityView as unknown as DashboardView<ViewData>,
+  DivinePowersView as DashboardView<ViewData>,
+  PrayersView as DashboardView<ViewData>,
+  VisionComposerView as DashboardView<ViewData>,
+  AngelsView as DashboardView<ViewData>,
+  MythologyView as DashboardView<ViewData>,
+  PantheonView as DashboardView<ViewData>,
+  DeityIdentityView as DashboardView<ViewData>,
   // Parasitic/Hive
-  ParasiticHiveMindView as unknown as DashboardView<ViewData>,
+  ParasiticHiveMindView as DashboardView<ViewData>,
   // Settings/Dev
-  ControlsView as unknown as DashboardView<ViewData>,
-  SettingsView as unknown as DashboardView<ViewData>,
-  DevView as unknown as DashboardView<ViewData>,
+  ControlsView as DashboardView<ViewData>,
+  SettingsView as DashboardView<ViewData>,
+  DevView as DashboardView<ViewData>,
 ];
 
 /**

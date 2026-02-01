@@ -138,7 +138,7 @@ export class WorkerMonitorSystem extends BaseSystem {
         };
       };
     }
-    const worldWithGenerator = ctx.world as unknown as WorldWithChunkGenerator;
+    const worldWithGenerator = ctx.world as WorldWithChunkGenerator;
     const chunkGenerator = worldWithGenerator.backgroundChunkGenerator;
 
     if (chunkGenerator?.workerPool) {
