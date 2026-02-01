@@ -64,7 +64,6 @@ import {
   WildPlantPopulationSystem,
 } from '@ai-village/botany';
 
-import { TerrainGenerator, ChunkManager } from '@ai-village/world';
 import { createWanderingAgent } from '@ai-village/agents';
 import type { Entity } from '@ai-village/core';
 

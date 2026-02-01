@@ -107,9 +107,9 @@ async function main() {
   // Check what systems are running
   console.log('\n=== SYSTEM ACTIVITY CHECK ===\n');
 
-  // Note: systemRegistry is internal, this check is for debugging only
-  // TODO: fix type - systemRegistry is not exposed in public API
-  console.log('Grand Strategy systems check: skipped (requires internal API access)');
+  // Note: systemRegistry is internal and not exposed in the public API
+  // System activity can be verified through component changes above
+  console.log('Grand Strategy systems check: skipped (systemRegistry is internal API)');
 
   console.log('\n🎮 Gameplay test complete!');
   process.exit(0);
