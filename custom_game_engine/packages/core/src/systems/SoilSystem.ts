@@ -6,6 +6,7 @@ import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { World } from '../ecs/World.js';
 import { getWorkingTools } from '../components/InventoryComponent.js';
 import type { InventoryComponent } from '../components/InventoryComponent.js';
+import type { GameEvent } from '../events/EventBus.js';
 
 export interface Tile {
   terrain: string;
@@ -24,6 +25,22 @@ export interface Tile {
   lastWatered: number;
   lastTilled: number;
   composted: boolean;
+}
+
+/**
+ * Type guard to validate that an unknown value is a Tile with required moisture property.
+ * Used to safely process tiles from chunk data without unsafe casts.
+ */
+function isTileWithMoisture(value: unknown): value is Tile {
+  if (!value || typeof value !== 'object') {
+    return false;
+  }
+  const obj = value as Record<string, unknown>;
+  // Check for required moisture-related properties
+  return (
+    typeof obj.moisture === 'number' &&
+    typeof obj.terrain === 'string'
+  );
 }
 
 /**
@@ -106,8 +123,11 @@ export class SoilSystem extends BaseSystem {
   /**
    * Handle weather change events and emit specific rain/snow events
    */
-  private handleWeatherChange(world: World, event: any): void {
+  private handleWeatherChange(world: World, event: GameEvent<'weather:changed'>): void {
     const { weatherType, intensity } = event.data;
+
+    // Normalize intensity to a number (0.0 - 1.0)
+    const normalizedIntensity = this.normalizeIntensity(intensity);
 
     if (weatherType === 'rain') {
       // Emit rain event for soil moisture integration
@@ -115,22 +135,50 @@ export class SoilSystem extends BaseSystem {
         type: 'weather:rain',
         source: 'soil-system',
         data: {
-          intensity: intensity || 0.5,
+          intensity: normalizedIntensity,
         },
       });
       // Apply rain to all outdoor tiles
-      this.handleRainEvent(world, intensity || 0.5);
+      this.handleRainEvent(world, normalizedIntensity);
     } else if (weatherType === 'snow') {
       // Emit snow event for soil moisture integration
       world.eventBus.emit({
         type: 'weather:snow',
         source: 'soil-system',
         data: {
-          intensity: intensity || 0.5,
+          intensity: normalizedIntensity,
         },
       });
       // Apply snow to all outdoor tiles
-      this.handleSnowEvent(world, intensity || 0.5);
+      this.handleSnowEvent(world, normalizedIntensity);
+    }
+  }
+
+  /**
+   * Normalize intensity to a number between 0.0 and 1.0
+   */
+  private normalizeIntensity(intensity: string | number | undefined): number {
+    if (intensity === undefined) {
+      return 0.5; // Default moderate intensity
+    }
+    if (typeof intensity === 'number') {
+      return Math.max(0, Math.min(1, intensity));
+    }
+    // Handle string intensity values
+    switch (intensity) {
+      case 'light':
+        return 0.3;
+      case 'moderate':
+        return 0.5;
+      case 'heavy':
+        return 0.8;
+      default:
+        // Try to parse as number
+        const parsed = parseFloat(intensity);
+        if (!Number.isNaN(parsed)) {
+          return Math.max(0, Math.min(1, parsed));
+        }
+        return 0.5; // Default for unknown strings
     }
   }
 
@@ -151,9 +199,9 @@ export class SoilSystem extends BaseSystem {
             const worldX = chunk.x * 32 + x; // CHUNK_SIZE = 32
             const worldY = chunk.y * 32 + y;
 
-            // Only apply rain to outdoor tiles
-            if (!this.isTileIndoors(tile, world, worldX, worldY)) {
-              this.applyRain(world, tile as Tile, worldX, worldY, intensity);
+            // Only apply rain to outdoor tiles with valid moisture property
+            if (isTileWithMoisture(tile) && !this.isTileIndoors(tile, world, worldX, worldY)) {
+              this.applyRain(world, tile, worldX, worldY, intensity);
             }
           }
         }
@@ -178,9 +226,9 @@ export class SoilSystem extends BaseSystem {
             const worldX = chunk.x * 32 + x; // CHUNK_SIZE = 32
             const worldY = chunk.y * 32 + y;
 
-            // Only apply snow to outdoor tiles
-            if (!this.isTileIndoors(tile, world, worldX, worldY)) {
-              this.applySnow(world, tile as Tile, worldX, worldY, intensity);
+            // Only apply snow to outdoor tiles with valid moisture property
+            if (isTileWithMoisture(tile) && !this.isTileIndoors(tile, world, worldX, worldY)) {
+              this.applySnow(world, tile, worldX, worldY, intensity);
             }
           }
         }
@@ -208,9 +256,9 @@ export class SoilSystem extends BaseSystem {
             const worldX = chunk.x * 32 + x; // CHUNK_SIZE = 32
             const worldY = chunk.y * 32 + y;
 
-            // Apply decay to outdoor tiles (indoor tiles decay slower)
-            if (!this.isTileIndoors(tile, world, worldX, worldY)) {
-              this.decayMoisture(world, tile as Tile, worldX, worldY, temperature);
+            // Apply decay to outdoor tiles with valid moisture property
+            if (isTileWithMoisture(tile) && !this.isTileIndoors(tile, world, worldX, worldY)) {
+              this.decayMoisture(world, tile, worldX, worldY, temperature);
             }
           }
         }

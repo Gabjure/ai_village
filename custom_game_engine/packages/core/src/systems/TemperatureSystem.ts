@@ -9,6 +9,7 @@ import type { PositionComponent } from '../components/PositionComponent.js';
 import type { NeedsComponent } from '../components/NeedsComponent.js';
 import type { BuildingComponent } from '../components/BuildingComponent.js';
 import type { WeatherComponent } from '../components/WeatherComponent.js';
+import type { TimeComponent } from './TimeSystem.js';
 import { setMutationRate, clearMutationRate } from '../components/MutationVectorComponent.js';
 import {
   HEALTH_DAMAGE_RATE,
@@ -185,7 +186,7 @@ export class TemperatureSystem extends BaseSystem {
     if (this.timeEntityId) {
       const timeEntity = world.getEntity(this.timeEntityId);
       if (timeEntity) {
-        const timeComp = (timeEntity as EntityImpl).getComponent<any>('time');
+        const timeComp = (timeEntity as EntityImpl).getComponent<TimeComponent>(CT.Time);
         if (timeComp) {
           timeOfDay = timeComp.timeOfDay;
         }
