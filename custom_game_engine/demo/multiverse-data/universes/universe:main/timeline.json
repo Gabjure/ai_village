@@ -1282,7 +1282,463 @@
       "decayPolicy": {
         "decayAfterTicks": 1728000
       }
+    },
+    {
+      "tick": 344005,
+      "timestamp": 1769980053801,
+      "day": 1,
+      "type": "manual",
+      "fileSize": 5854255,
+      "checksum": "6c10e255",
+      "filename": "344005.json.gz",
+      "decayPolicy": {
+        "decayAfterTicks": 1728000
+      }
+    },
+    {
+      "tick": 344005,
+      "timestamp": 1769980056782,
+      "day": 1,
+      "type": "manual",
+      "fileSize": 5854269,
+      "checksum": "6dcf2afa",
+      "filename": "344005.json.gz",
+      "decayPolicy": {
+        "decayAfterTicks": 1728000
+      }
+    },
+    {
+      "tick": 344005,
+      "timestamp": 1769980059848,
+      "day": 1,
+      "type": "manual",
+      "fileSize": 5854264,
+      "checksum": "-105be4b1",
+      "filename": "344005.json.gz",
+      "decayPolicy": {
+        "decayAfterTicks": 1728000
+      }
+    },
+    {
+      "tick": 344005,
+      "timestamp": 1769980063130,
+      "day": 1,
+      "type": "manual",
+      "fileSize": 5854258,
+      "checksum": "-6a8ddbbb",
+      "filename": "344005.json.gz",
+      "decayPolicy": {
+        "decayAfterTicks": 1728000
+      }
+    },
+    {
+      "tick": 344005,
+      "timestamp": 1769980066360,
+      "day": 1,
+      "type": "manual",
+      "fileSize": 5854255,
+      "checksum": "-490a4cae",
+      "filename": "344005.json.gz",
+      "decayPolicy": {
+        "decayAfterTicks": 1728000
+      }
+    },
+    {
+      "tick": 344005,
+      "timestamp": 1769980069351,
+      "day": 1,
+      "type": "manual",
+      "fileSize": 5854254,
+      "checksum": "-51d3ac59",
+      "filename": "344005.json.gz",
+      "decayPolicy": {
+        "decayAfterTicks": 1728000
+      }
+    },
+    {
+      "tick": 344005,
+      "timestamp": 1769980072342,
+      "day": 1,
+      "type": "manual",
+      "fileSize": 5854267,
+      "checksum": "-776d4aaf",
+      "filename": "344005.json.gz",
+      "decayPolicy": {
+        "decayAfterTicks": 1728000
+      }
+    },
+    {
+      "tick": 344005,
+      "timestamp": 1769980075321,
+      "day": 1,
+      "type": "manual",
+      "fileSize": 5854264,
+      "checksum": "3b49bb49",
+      "filename": "344005.json.gz",
+      "decayPolicy": {
+        "decayAfterTicks": 1728000
+      }
+    },
+    {
+      "tick": 344005,
+      "timestamp": 1769980078271,
+      "day": 1,
+      "type": "manual",
+      "fileSize": 5854268,
+      "checksum": "530192b6",
+      "filename": "344005.json.gz",
+      "decayPolicy": {
+        "decayAfterTicks": 1728000
+      }
+    },
+    {
+      "tick": 344005,
+      "timestamp": 1769980081246,
+      "day": 1,
+      "type": "manual",
+      "fileSize": 5854257,
+      "checksum": "7c109f06",
+      "filename": "344005.json.gz",
+      "decayPolicy": {
+        "decayAfterTicks": 1728000
+      }
+    },
+    {
+      "tick": 344005,
+      "timestamp": 1769980084381,
+      "day": 1,
+      "type": "manual",
+      "fileSize": 5854263,
+      "checksum": "-5a23a6a9",
+      "filename": "344005.json.gz",
+      "decayPolicy": {
+        "decayAfterTicks": 1728000
+      }
+    },
+    {
+      "tick": 344005,
+      "timestamp": 1769980087360,
+      "day": 1,
+      "type": "manual",
+      "fileSize": 5854263,
+      "checksum": "5267b080",
+      "filename": "344005.json.gz",
+      "decayPolicy": {
+        "decayAfterTicks": 1728000
+      }
+    },
+    {
+      "tick": 344005,
+      "timestamp": 1769980090535,
+      "day": 1,
+      "type": "manual",
+      "fileSize": 5854267,
+      "checksum": "7c8ab5b7",
+      "filename": "344005.json.gz",
+      "decayPolicy": {
+        "decayAfterTicks": 1728000
+      }
+    },
+    {
+      "tick": 344005,
+      "timestamp": 1769980093830,
+      "day": 1,
+      "type": "manual",
+      "fileSize": 5854261,
+      "checksum": "1e0b4bea",
+      "filename": "344005.json.gz",
+      "decayPolicy": {
+        "decayAfterTicks": 1728000
+      }
+    },
+    {
+      "tick": 344005,
+      "timestamp": 1769980096992,
+      "day": 1,
+      "type": "manual",
+      "fileSize": 5854261,
+      "checksum": "-65a1016c",
+      "filename": "344005.json.gz",
+      "decayPolicy": {
+        "decayAfterTicks": 1728000
+      }
+    },
+    {
+      "tick": 344005,
+      "timestamp": 1769980100282,
+      "day": 1,
+      "type": "manual",
+      "fileSize": 5854255,
+      "checksum": "6be4d122",
+      "filename": "344005.json.gz",
+      "decayPolicy": {
+        "decayAfterTicks": 1728000
+      }
+    },
+    {
+      "tick": 344005,
+      "timestamp": 1769980103409,
+      "day": 1,
+      "type": "manual",
+      "fileSize": 5854263,
+      "checksum": "-1166585f",
+      "filename": "344005.json.gz",
+      "decayPolicy": {
+        "decayAfterTicks": 1728000
+      }
+    },
+    {
+      "tick": 344005,
+      "timestamp": 1769980106469,
+      "day": 1,
+      "type": "manual",
+      "fileSize": 5854264,
+      "checksum": "7590a9e9",
+      "filename": "344005.json.gz",
+      "decayPolicy": {
+        "decayAfterTicks": 1728000
+      }
+    },
+    {
+      "tick": 344005,
+      "timestamp": 1769980109367,
+      "day": 1,
+      "type": "manual",
+      "fileSize": 5854257,
+      "checksum": "-60d1a359",
+      "filename": "344005.json.gz",
+      "decayPolicy": {
+        "decayAfterTicks": 1728000
+      }
+    },
+    {
+      "tick": 344005,
+      "timestamp": 1769980112516,
+      "day": 1,
+      "type": "manual",
+      "fileSize": 5854263,
+      "checksum": "-22ad43c6",
+      "filename": "344005.json.gz",
+      "decayPolicy": {
+        "decayAfterTicks": 1728000
+      }
+    },
+    {
+      "tick": 344005,
+      "timestamp": 1769980115441,
+      "day": 1,
+      "type": "manual",
+      "fileSize": 5854263,
+      "checksum": "-31ca93d2",
+      "filename": "344005.json.gz",
+      "decayPolicy": {
+        "decayAfterTicks": 1728000
+      }
+    },
+    {
+      "tick": 344005,
+      "timestamp": 1769980118602,
+      "day": 1,
+      "type": "manual",
+      "fileSize": 5854262,
+      "checksum": "-39a0358a",
+      "filename": "344005.json.gz",
+      "decayPolicy": {
+        "decayAfterTicks": 1728000
+      }
+    },
+    {
+      "tick": 344005,
+      "timestamp": 1769980121581,
+      "day": 1,
+      "type": "manual",
+      "fileSize": 5854262,
+      "checksum": "16e9c323",
+      "filename": "344005.json.gz",
+      "decayPolicy": {
+        "decayAfterTicks": 1728000
+      }
+    },
+    {
+      "tick": 344005,
+      "timestamp": 1769980124663,
+      "day": 1,
+      "type": "manual",
+      "fileSize": 5854256,
+      "checksum": "-768116bd",
+      "filename": "344005.json.gz",
+      "decayPolicy": {
+        "decayAfterTicks": 1728000
+      }
+    },
+    {
+      "tick": 344005,
+      "timestamp": 1769980127658,
+      "day": 1,
+      "type": "manual",
+      "fileSize": 5854260,
+      "checksum": "714a52be",
+      "filename": "344005.json.gz",
+      "decayPolicy": {
+        "decayAfterTicks": 1728000
+      }
+    },
+    {
+      "tick": 344005,
+      "timestamp": 1769980130777,
+      "day": 1,
+      "type": "manual",
+      "fileSize": 5854257,
+      "checksum": "-7a87fe51",
+      "filename": "344005.json.gz",
+      "decayPolicy": {
+        "decayAfterTicks": 1728000
+      }
+    },
+    {
+      "tick": 344005,
+      "timestamp": 1769980133717,
+      "day": 1,
+      "type": "manual",
+      "fileSize": 5854256,
+      "checksum": "-77773164",
+      "filename": "344005.json.gz",
+      "decayPolicy": {
+        "decayAfterTicks": 1728000
+      }
+    },
+    {
+      "tick": 344005,
+      "timestamp": 1769980136899,
+      "day": 1,
+      "type": "manual",
+      "fileSize": 5854260,
+      "checksum": "-4937caf6",
+      "filename": "344005.json.gz",
+      "decayPolicy": {
+        "decayAfterTicks": 1728000
+      }
+    },
+    {
+      "tick": 344005,
+      "timestamp": 1769980139836,
+      "day": 1,
+      "type": "manual",
+      "fileSize": 5854264,
+      "checksum": "64b62221",
+      "filename": "344005.json.gz",
+      "decayPolicy": {
+        "decayAfterTicks": 1728000
+      }
+    },
+    {
+      "tick": 344005,
+      "timestamp": 1769980142819,
+      "day": 1,
+      "type": "manual",
+      "fileSize": 5854247,
+      "checksum": "-2c238e78",
+      "filename": "344005.json.gz",
+      "decayPolicy": {
+        "decayAfterTicks": 1728000
+      }
+    },
+    {
+      "tick": 344005,
+      "timestamp": 1769980145824,
+      "day": 1,
+      "type": "manual",
+      "fileSize": 5854253,
+      "checksum": "-ed3bcde",
+      "filename": "344005.json.gz",
+      "decayPolicy": {
+        "decayAfterTicks": 1728000
+      }
+    },
+    {
+      "tick": 344005,
+      "timestamp": 1769980148970,
+      "day": 1,
+      "type": "manual",
+      "fileSize": 5854262,
+      "checksum": "-7be16c1a",
+      "filename": "344005.json.gz",
+      "decayPolicy": {
+        "decayAfterTicks": 1728000
+      }
+    },
+    {
+      "tick": 344005,
+      "timestamp": 1769980152236,
+      "day": 1,
+      "type": "manual",
+      "fileSize": 5854259,
+      "checksum": "-67211053",
+      "filename": "344005.json.gz",
+      "decayPolicy": {
+        "decayAfterTicks": 1728000
+      }
+    },
+    {
+      "tick": 344005,
+      "timestamp": 1769980155527,
+      "day": 1,
+      "type": "manual",
+      "fileSize": 5854266,
+      "checksum": "46f0d763",
+      "filename": "344005.json.gz",
+      "decayPolicy": {
+        "decayAfterTicks": 1728000
+      }
+    },
+    {
+      "tick": 344005,
+      "timestamp": 1769980158768,
+      "day": 1,
+      "type": "manual",
+      "fileSize": 5854260,
+      "checksum": "-279b9a34",
+      "filename": "344005.json.gz",
+      "decayPolicy": {
+        "decayAfterTicks": 1728000
+      }
+    },
+    {
+      "tick": 344005,
+      "timestamp": 1769980162124,
+      "day": 1,
+      "type": "manual",
+      "fileSize": 5854263,
+      "checksum": "-7c80d35c",
+      "filename": "344005.json.gz",
+      "decayPolicy": {
+        "decayAfterTicks": 1728000
+      }
+    },
+    {
+      "tick": 344005,
+      "timestamp": 1769980165160,
+      "day": 1,
+      "type": "manual",
+      "fileSize": 5854257,
+      "checksum": "-6aa46b6c",
+      "filename": "344005.json.gz",
+      "decayPolicy": {
+        "decayAfterTicks": 1728000
+      }
+    },
+    {
+      "tick": 344005,
+      "timestamp": 1769980168155,
+      "day": 1,
+      "type": "manual",
+      "fileSize": 5854261,
+      "checksum": "-5937900b",
+      "filename": "344005.json.gz",
+      "decayPolicy": {
+        "decayAfterTicks": 1728000
+      }
     }
   ],
-  "lastUpdated": 1769944546974
+  "lastUpdated": 1769980168155
 }
