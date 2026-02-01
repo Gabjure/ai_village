@@ -400,3 +400,6 @@ export function registerStandardAppliers(): void {
     }
   }
 }
+
+// Re-export appliers from their source files for external consumers
+export { BuffEffectApplier, DebuffEffectApplier, ControlEffectApplier };
