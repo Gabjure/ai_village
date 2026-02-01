@@ -213,6 +213,8 @@ export * from './SkillConstants.js';
 export {
   ALL_SKILL_IDS,
   generateRandomStartingSkills,
+  generateSkillsWithGuaranteed,
+  calculateGuaranteedResearchers,
   isEntityVisibleWithSkill,
   getFoodStorageInfo,
   getVillageInfo,

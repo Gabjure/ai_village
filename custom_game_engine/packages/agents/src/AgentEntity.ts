@@ -13,6 +13,8 @@ import {
   PersonalityComponent,
   createVisionForProfile,
   type SkillsComponent,
+  type SkillId,
+  type SkillLevel,
   createConversationComponent,
   createRelationshipComponent,
   createInventoryComponent,
@@ -23,6 +25,7 @@ import {
   createIdentityComponent,
   createGatheringStatsComponent,
   generateRandomStartingSkills,
+  generateSkillsWithGuaranteed,
   derivePrioritiesFromSkills,
   createGoalsComponent,
   EpisodicMemoryComponent,
@@ -109,12 +112,22 @@ function generateThinkOffset(entityId: string, maxOffset: number = 40): number {
   return Math.abs(hash) % maxOffset;
 }
 
+/**
+ * Options for creating a wandering agent.
+ */
+export interface WanderingAgentOptions {
+  /** Deity the agent believes in (for spiritual component) */
+  believedDeity?: string;
+  /** Skills the agent is guaranteed to have at minimum levels */
+  guaranteedSkills?: Partial<Record<SkillId, SkillLevel>>;
+}
+
 export function createWanderingAgent(
   world: WorldMutator,
   x: number,
   y: number,
   speed: number = 2.0,
-  options?: { believedDeity?: string }
+  options?: WanderingAgentOptions
 ): string {
   const entity = new EntityImpl(createEntityId(), world.tick);
 
@@ -149,7 +162,10 @@ export function createWanderingAgent(
 
   // Skills - personality-based starting skills for role diversity
   // Created early so we can derive priorities from them
-  const skillsComponent = generateRandomStartingSkills(personality);
+  // If guaranteedSkills is provided, ensure those skills are at minimum levels
+  const skillsComponent = options?.guaranteedSkills
+    ? generateSkillsWithGuaranteed(personality, options.guaranteedSkills)
+    : generateRandomStartingSkills(personality);
   entity.addComponent(skillsComponent);
 
   // Agent behavior - start idle, will wander when bored

@@ -898,6 +898,64 @@ export function generateRandomStartingSkills(
 }
 
 /**
+ * Generate starting skills with guaranteed minimum skills in specific areas.
+ * Used to ensure population diversity (e.g., at least one researcher per village).
+ *
+ * @param personality - Agent's personality traits
+ * @param guaranteedSkills - Map of skill IDs to minimum levels (e.g., { research: 1 })
+ * @returns SkillsComponent with guaranteed skills plus random extras based on personality
+ */
+export function generateSkillsWithGuaranteed(
+  personality: PersonalityComponent,
+  guaranteedSkills: Partial<Record<SkillId, SkillLevel>>
+): SkillsComponent {
+  if (!personality) {
+    throw new Error('generateSkillsWithGuaranteed requires a valid personality component');
+  }
+
+  // Start with random skills from personality
+  const baseSkills = generateRandomStartingSkills(personality);
+
+  // Override with guaranteed skills
+  for (const [skillId, minLevel] of Object.entries(guaranteedSkills)) {
+    const skill = skillId as SkillId;
+    const level = minLevel as SkillLevel;
+
+    // Only upgrade if guaranteed level is higher than random roll
+    if (level > (baseSkills.levels[skill] ?? 0)) {
+      baseSkills.levels[skill] = level;
+
+      // Set experience to match the new level
+      const xp = XP_PER_LEVEL[level];
+      baseSkills.experience[skill] = 0;
+      baseSkills.totalExperience[skill] = xp;
+    }
+  }
+
+  return baseSkills;
+}
+
+/**
+ * Determine how many guaranteed researchers should spawn for a given population.
+ * Scales with population: ~5% researchers, minimum 1 for any population > 0.
+ *
+ * Scale rationale (from grand-strategy tech progression):
+ * - HARD STEPS model requires critical mass of researchers for breakthroughs
+ * - Universities accelerate research but need researchers to staff them
+ * - 5% baseline ensures viable tech progression path
+ *
+ * @param populationSize - Total number of agents being spawned
+ * @returns Number of agents that should have guaranteed research skill
+ */
+export function calculateGuaranteedResearchers(populationSize: number): number {
+  if (populationSize <= 0) return 0;
+  if (populationSize <= 10) return 1;
+  if (populationSize <= 30) return 2;
+  if (populationSize <= 100) return Math.ceil(populationSize * 0.05); // 5%
+  return Math.ceil(populationSize * 0.03); // 3% for large populations (diminishing returns)
+}
+
+/**
  * Get perception radius based on skill level.
  * Per progressive-skill-reveal-spec.md:
  * - Level 0: ~5 tiles (adjacent only)

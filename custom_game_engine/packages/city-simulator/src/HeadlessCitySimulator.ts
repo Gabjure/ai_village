@@ -34,6 +34,7 @@ import {
   initializeDefaultRecipes,
   globalRecipeRegistry,
   registerDefaultResearch,
+  calculateGuaranteedResearchers,
 } from '@ai-village/core';
 
 // StrategicPriorities type for CityManager (all fields required)
@@ -299,13 +300,25 @@ export class HeadlessCitySimulator {
     });
 
     // Spawn initial population
+    // Calculate how many guaranteed researchers we need for viable tech progression
+    // Per grand-strategy spec: HARD STEPS model requires critical mass of researchers
+    const guaranteedResearchers = calculateGuaranteedResearchers(initialPopulation!);
+
     for (let i = 0; i < initialPopulation!; i++) {
       // For large-city preset, spread agents across entire city
       const spawnRadius = this.preset === 'large-city' ? 80 : 20;
       const x = cityCenter.x + (Math.random() - 0.5) * spawnRadius;
       const y = cityCenter.y + (Math.random() - 0.5) * spawnRadius;
 
-      const agentId = createWanderingAgent(world as unknown as WorldMutator, x, y); // Use default speed (2.0)
+      // First N agents get guaranteed research skill for viable tech progression
+      const isGuaranteedResearcher = i < guaranteedResearchers;
+      const agentId = createWanderingAgent(
+        world as unknown as WorldMutator,
+        x,
+        y,
+        2.0, // default speed
+        isGuaranteedResearcher ? { guaranteedSkills: { research: 1 } } : undefined
+      );
 
       // Apply containment bounds if economy enabled
       if (cityBounds) {

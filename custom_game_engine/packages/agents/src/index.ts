@@ -6,3 +6,4 @@
  */
 
 export { createWanderingAgent, createLLMAgent } from './AgentEntity.js';
+export type { WanderingAgentOptions } from './AgentEntity.js';
