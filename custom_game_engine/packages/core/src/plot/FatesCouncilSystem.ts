@@ -284,13 +284,25 @@ export class FatesCouncilSystem extends BaseSystem {
     // Calculate world tension
     const worldTension = this.calculateWorldTension(world, allThreads);
 
-    // Count active exotic/epic plots
+    // Count active exotic/epic plots by checking actual plot scales
     let activeExotic = 0;
     let activeEpic = 0;
     for (const thread of allThreads) {
-      // Count plot types from instance IDs
-      // TODO: Actually check plot scale
-      activeExotic += thread.activePlots.length;  // Simplified for now
+      for (const plotInstanceId of thread.activePlots) {
+        // Extract template ID from instance ID (format: templateId_timestamp_uuid)
+        const parts = plotInstanceId.split('_');
+        // Template ID is everything before the timestamp (last two parts are timestamp and uuid segment)
+        const templateId = parts.slice(0, -2).join('_');
+
+        const template = plotLineRegistry.getTemplate(templateId);
+        if (template) {
+          if (template.scale === 'exotic') {
+            activeExotic++;
+          } else if (template.scale === 'epic') {
+            activeEpic++;
+          }
+        }
+      }
     }
 
     return {
@@ -389,27 +401,266 @@ export class FatesCouncilSystem extends BaseSystem {
 
   /**
    * Assess how interesting an entity's current situation is (0-1)
+   * Higher values indicate richer narrative potential
    */
   private assessStoryPotential(entity: Entity, world: World): number {
     let potential = 0.3;  // Base potential
 
-    // TODO: Implement sophisticated assessment:
-    // - Recent major events (death, marriage, power gain/loss)
-    // - Relationship tensions
-    // - Unfulfilled goals
-    // - Contradiction between actions and stated values
-    // - Rising/falling trajectory
+    // Check episodic memory for recent major events
+    const memory = entity.getComponent<EpisodicMemoryComponent>(CT.EpisodicMemory);
+    if (memory?.episodicMemories) {
+      const recentMemories = memory.episodicMemories.filter((m) => {
+        // Consider memories from last 10,000 ticks as "recent"
+        return (world.tick - m.timestamp) < 10000;
+      });
+
+      // High-importance recent memories boost story potential
+      const majorEvents = recentMemories.filter((m) => m.importance >= 0.7);
+      potential += majorEvents.length * 0.1;
+
+      // High emotional intensity suggests drama
+      const intenseMemories = recentMemories.filter((m) => m.emotionalIntensity >= 0.7);
+      potential += intenseMemories.length * 0.05;
+    }
+
+    // Relationship tensions
+    interface RelationshipData {
+      trust?: number;
+      affection?: number;
+    }
+    interface RelationshipComponent {
+      type: 'relationship';
+      relationships?: Map<string, RelationshipData>;
+    }
+    const relationships = entity.getComponent(CT.Relationship) as RelationshipComponent | undefined;
+    if (relationships?.relationships) {
+      let tensions = 0;
+      let strongBonds = 0;
+
+      for (const [_, rel] of relationships.relationships.entries()) {
+        const trust = rel.trust ?? 0;
+        const affection = rel.affection ?? 0;
+
+        // Tension: love-hate relationships or enemies
+        if ((affection > 50 && trust < 0) || (trust < -30)) {
+          tensions++;
+        }
+        // Strong bonds that could be tested
+        if (trust > 70 && affection > 50) {
+          strongBonds++;
+        }
+      }
+
+      // Tensions are interesting
+      potential += tensions * 0.15;
+      // Strong bonds that could be tested
+      potential += strongBonds * 0.05;
+    }
+
+    // Unfulfilled goals boost potential
+    interface GoalsComponent {
+      type: 'goals';
+      goals?: Array<{ achieved?: boolean; priority?: number }>;
+    }
+    const goals = entity.getComponent(CT.Goals) as GoalsComponent | undefined;
+    if (goals?.goals) {
+      const unfulfilledHighPriority = goals.goals.filter(
+        g => !g.achieved && (g.priority ?? 0) >= 0.7
+      );
+      potential += unfulfilledHighPriority.length * 0.1;
+    }
+
+    // Health crisis increases drama
+    interface HealthComponent {
+      type: 'health';
+      current?: number;
+      max?: number;
+    }
+    const health = entity.getComponent(CT.Health) as HealthComponent | undefined;
+    if (health && health.current !== undefined && health.max !== undefined) {
+      const healthPercent = health.current / health.max;
+      if (healthPercent < 0.3) {
+        potential += 0.2; // Near death is dramatic
+      }
+    }
+
+    // Mood extremes suggest pivotal moments
+    interface MoodComponent {
+      type: 'mood';
+      value?: number;
+    }
+    const mood = entity.getComponent(CT.Mood) as MoodComponent | undefined;
+    if (mood?.value !== undefined) {
+      if (mood.value < -60 || mood.value > 80) {
+        potential += 0.1;
+      }
+    }
+
+    // Power/wisdom trajectory - high wisdom means more at stake
+    const soulIdentity = entity.getComponent<SoulIdentityComponent>(CT.SoulIdentity);
+    if (soulIdentity) {
+      const wisdom = soulIdentity.wisdom_level ?? 0;
+      if (wisdom > 50) {
+        potential += 0.1; // Powerful souls have more interesting falls/rises
+      }
+      if (wisdom > 80) {
+        potential += 0.1; // Very wise souls approaching ascension
+      }
+    }
+
+    // Active courtship or pregnancy adds drama
+    const courtship = entity.hasComponent(CT.Courtship);
+    const pregnancy = entity.hasComponent(CT.Pregnancy);
+    if (courtship) potential += 0.1;
+    if (pregnancy) potential += 0.15;
 
     return Math.min(1, potential);
   }
 
   /**
    * Build brief context string for an entity
+   * Extracts role, relationships, family, and recent significant state
    */
   private buildEntityContext(entity: Entity, world: World): string {
-    // TODO: Build rich context from entity state
-    // For now, simple placeholder
-    return 'Entity in the world';
+    const contextParts: string[] = [];
+
+    // Identity/profession
+    interface IdentityComponent {
+      type: 'identity';
+      name?: string;
+      title?: string;
+      role?: string;
+    }
+    interface ProfessionComponent {
+      type: 'profession';
+      profession?: string;
+      rank?: string;
+    }
+
+    const identity = entity.getComponent(CT.Identity) as IdentityComponent | undefined;
+    const profession = entity.getComponent(CT.Profession) as ProfessionComponent | undefined;
+
+    if (profession?.profession) {
+      const rank = profession.rank ? `${profession.rank} ` : '';
+      contextParts.push(`${rank}${profession.profession}`);
+    } else if (identity?.role) {
+      contextParts.push(identity.role);
+    }
+
+    // Family/parenting status
+    interface ParentingComponent {
+      type: 'parenting';
+      children?: Array<unknown>;
+    }
+    const parenting = entity.getComponent(CT.Parenting) as ParentingComponent | undefined;
+    if (parenting?.children && parenting.children.length > 0) {
+      contextParts.push(`parent of ${parenting.children.length} children`);
+    }
+
+    // Dynasty membership
+    interface DynastyComponent {
+      type: 'dynasty';
+      dynastyName?: string;
+      role?: string;
+    }
+    const dynasty = entity.getComponent(CT.Dynasty) as DynastyComponent | undefined;
+    if (dynasty?.dynastyName) {
+      const dynastyRole = dynasty.role ? `${dynasty.role} of ` : 'member of ';
+      contextParts.push(`${dynastyRole}${dynasty.dynastyName} dynasty`);
+    }
+
+    // Relationship highlights (strongest positive/negative)
+    interface RelationshipData {
+      trust?: number;
+      affection?: number;
+      targetId?: string;
+    }
+    interface RelationshipComponent {
+      type: 'relationship';
+      relationships?: Map<string, RelationshipData>;
+    }
+    const relationships = entity.getComponent(CT.Relationship) as RelationshipComponent | undefined;
+    if (relationships?.relationships && relationships.relationships.size > 0) {
+      let strongestAlly: { name: string; trust: number } | null = null;
+      let strongestEnemy: { name: string; trust: number } | null = null;
+
+      for (const [targetId, rel] of relationships.relationships.entries()) {
+        const targetEntity = world.getEntity(targetId);
+        if (!targetEntity) continue;
+
+        const targetIdentity = targetEntity.getComponent(CT.Identity) as IdentityComponent | undefined;
+        const targetSoul = targetEntity.getComponent<SoulIdentityComponent>(CT.SoulIdentity);
+        const targetName = targetIdentity?.name || targetSoul?.true_name || 'someone';
+
+        const trust = rel.trust ?? 0;
+        if (trust > 70 && (!strongestAlly || trust > strongestAlly.trust)) {
+          strongestAlly = { name: targetName, trust };
+        }
+        if (trust < -50 && (!strongestEnemy || trust < strongestEnemy.trust)) {
+          strongestEnemy = { name: targetName, trust };
+        }
+      }
+
+      if (strongestAlly) {
+        contextParts.push(`close ally of ${strongestAlly.name}`);
+      }
+      if (strongestEnemy) {
+        contextParts.push(`bitter enemy of ${strongestEnemy.name}`);
+      }
+    }
+
+    // Health/mood state if concerning
+    interface HealthComponent {
+      type: 'health';
+      current?: number;
+      max?: number;
+    }
+    interface MoodComponent {
+      type: 'mood';
+      value?: number;
+      state?: string;
+    }
+    const health = entity.getComponent(CT.Health) as HealthComponent | undefined;
+    const mood = entity.getComponent(CT.Mood) as MoodComponent | undefined;
+
+    if (health && health.current !== undefined && health.max !== undefined) {
+      const healthPercent = health.current / health.max;
+      if (healthPercent < 0.3) {
+        contextParts.push('gravely injured');
+      } else if (healthPercent < 0.6) {
+        contextParts.push('wounded');
+      }
+    }
+
+    if (mood) {
+      if (mood.state === 'depressed' || (mood.value !== undefined && mood.value < -50)) {
+        contextParts.push('in deep despair');
+      } else if (mood.state === 'ecstatic' || (mood.value !== undefined && mood.value > 80)) {
+        contextParts.push('overjoyed');
+      }
+    }
+
+    // Skills (notable expertise)
+    interface SkillsComponent {
+      type: 'skills';
+      levels?: Record<string, number>;
+    }
+    const skills = entity.getComponent(CT.Skills) as SkillsComponent | undefined;
+    if (skills?.levels) {
+      const highSkills = Object.entries(skills.levels)
+        .filter(([_, level]) => level >= 5)
+        .map(([skill, _]) => skill.replace(/_/g, ' '));
+      if (highSkills.length > 0) {
+        contextParts.push(`skilled in ${highSkills.slice(0, 2).join(' and ')}`);
+      }
+    }
+
+    // Fallback if no context found
+    if (contextParts.length === 0) {
+      return 'A soul finding their path in the world';
+    }
+
+    return contextParts.join(', ');
   }
 
   /**
@@ -578,7 +829,56 @@ export class FatesCouncilSystem extends BaseSystem {
     const activeExoticCount = threads.reduce((sum, t) => sum + t.activePlots.length, 0);
     tension += activeExoticCount * 0.05;
 
-    // TODO: Add world state factors (wars, plagues, divine interventions)
+    // World state factors
+
+    // Active conflicts (wars, battles)
+    const conflicts = world.query().with(CT.Conflict).executeEntities();
+    tension += conflicts.length * 0.15;
+
+    // Dimensional rifts (cosmic instability)
+    const rifts = world.query().with(CT.DimensionalRift).executeEntities();
+    tension += rifts.length * 0.1;
+
+    // Power vacuums (political instability)
+    const vacuums = world.query().with(CT.PowerVacuum).executeEntities();
+    tension += vacuums.length * 0.1;
+
+    // Active invasions (multiverse warfare)
+    const invasions = world.query().with(CT.Invasion).executeEntities();
+    tension += invasions.length * 0.2;
+
+    // Divine interventions (active divine abilities being used)
+    const divineActions = world.query().with(CT.DivineAbility).executeEntities();
+    const activeDivine = divineActions.filter(e => {
+      interface DivineAbilityComponent {
+        type: 'divine_ability';
+        active?: boolean;
+        recentUse?: number;
+      }
+      const ability = e.getComponent(CT.DivineAbility) as DivineAbilityComponent | undefined;
+      // Count as active if used recently (within last 1000 ticks)
+      return ability?.active || (ability?.recentUse && (world.tick - ability.recentUse) < 1000);
+    });
+    tension += activeDivine.length * 0.05;
+
+    // Rebellion outcomes (recent divine rebellions)
+    const rebellions = world.query().with(CT.RebellionOutcome).executeEntities();
+    tension += rebellions.length * 0.15;
+
+    // Health crises (many entities at low health)
+    const lowHealthCount = threads.filter(t => {
+      const entity = world.getEntity(t.entityId);
+      if (!entity) return false;
+      interface HealthComponent {
+        type: 'health';
+        current?: number;
+        max?: number;
+      }
+      const health = entity.getComponent(CT.Health) as HealthComponent | undefined;
+      if (!health || health.current === undefined || health.max === undefined) return false;
+      return health.current / health.max < 0.3;
+    }).length;
+    tension += lowHealthCount * 0.02;
 
     return Math.min(1, tension);
   }
@@ -980,13 +1280,126 @@ export class FatesCouncilSystem extends BaseSystem {
       });
     });
 
-    // TODO: Subscribe to other exotic events:
-    // - magic:paradigm_conflict_detected
-    // - companion:dimensional_encounter
-    // - governance:political_elevation
-    // - time:paradox_detected
-    // - divinity:prophecy_given
-    // - divinity:champion_chosen
+    // Subscribe to magic paradigm conflicts
+    this.events.onGeneric('magic:paradigm_conflict_detected', (data: unknown) => {
+      interface ParadigmConflictData {
+        entityId?: string;
+        agentId?: string;
+        paradigm1?: string;
+        paradigm2?: string;
+      }
+      if (!data || typeof data !== 'object') return;
+      const eventData = data as ParadigmConflictData;
+      const entityId = eventData.entityId || eventData.agentId || 'unknown';
+      this.trackExoticEvent({
+        type: 'paradigm_conflict',
+        entityId,
+        description: `Magic paradigm conflict: ${eventData.paradigm1 || 'unknown'} vs ${eventData.paradigm2 || 'unknown'}`,
+        tick: this.world?.tick || 0,
+        severity: 0.7,
+      });
+    });
+
+    // Subscribe to dimensional encounters
+    this.events.onGeneric('companion:dimensional_encounter', (data: unknown) => {
+      interface DimensionalEncounterData {
+        entityId?: string;
+        agentId?: string;
+        dimension?: string;
+      }
+      if (!data || typeof data !== 'object') return;
+      const eventData = data as DimensionalEncounterData;
+      const entityId = eventData.entityId || eventData.agentId || 'unknown';
+      this.trackExoticEvent({
+        type: 'dimensional_encounter',
+        entityId,
+        description: `Encountered beings from ${eventData.dimension || 'another dimension'}`,
+        tick: this.world?.tick || 0,
+        severity: 0.75,
+      });
+    });
+
+    // Subscribe to political elevation
+    this.events.onGeneric('governance:political_elevation', (data: unknown) => {
+      interface PoliticalElevationData {
+        entityId?: string;
+        agentId?: string;
+        newPosition?: string;
+        previousPosition?: string;
+      }
+      if (!data || typeof data !== 'object') return;
+      const eventData = data as PoliticalElevationData;
+      const entityId = eventData.entityId || eventData.agentId || 'unknown';
+      this.trackExoticEvent({
+        type: 'political_elevation',
+        entityId,
+        description: `Rose to power: ${eventData.newPosition || 'a position of authority'}`,
+        tick: this.world?.tick || 0,
+        severity: 0.6,
+      });
+    });
+
+    // Subscribe to time paradoxes
+    this.events.onGeneric('time:paradox_detected', (data: unknown) => {
+      interface ParadoxData {
+        entityId?: string;
+        agentId?: string;
+        paradoxType?: string;
+        severity?: number;
+      }
+      if (!data || typeof data !== 'object') return;
+      const eventData = data as ParadoxData;
+      const entityId = eventData.entityId || eventData.agentId || 'universe';
+      this.trackExoticEvent({
+        type: 'time_paradox',
+        entityId,
+        description: `Time paradox detected: ${eventData.paradoxType || 'causality violation'}`,
+        tick: this.world?.tick || 0,
+        severity: eventData.severity || 0.85,
+      });
+    });
+
+    // Subscribe to prophecy events
+    this.events.onGeneric('divinity:prophecy_given', (data: unknown) => {
+      interface ProphecyData {
+        entityId?: string;
+        agentId?: string;
+        recipientId?: string;
+        prophecyType?: string;
+      }
+      if (!data || typeof data !== 'object') return;
+      const eventData = data as ProphecyData;
+      const entityId = eventData.recipientId || eventData.entityId || eventData.agentId || 'unknown';
+      this.trackExoticEvent({
+        type: 'prophecy_given',
+        entityId,
+        description: `Received a prophecy${eventData.prophecyType ? `: ${eventData.prophecyType}` : ''}`,
+        tick: this.world?.tick || 0,
+        severity: 0.7,
+      });
+    });
+
+    // Subscribe to champion chosen events
+    this.events.onGeneric('divinity:champion_chosen', (data: unknown) => {
+      interface ChampionData {
+        entityId?: string;
+        agentId?: string;
+        championId?: string;
+        deityId?: string;
+        deityName?: string;
+      }
+      if (!data || typeof data !== 'object') return;
+      const eventData = data as ChampionData;
+      const entityId = eventData.championId || eventData.entityId || eventData.agentId || 'unknown';
+      const deityName = eventData.deityName || 'a deity';
+      this.trackExoticEvent({
+        type: 'champion_chosen',
+        entityId,
+        description: `Chosen as champion of ${deityName}`,
+        tick: this.world?.tick || 0,
+        severity: 0.8,
+      });
+    });
   }
 
   /**
