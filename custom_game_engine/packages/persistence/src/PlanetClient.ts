@@ -214,6 +214,22 @@ export class PlanetClient {
     return request;
   }
 
+  /**
+   * Helper to parse error responses with fallback to statusText
+   * Logs JSON parsing errors for debugging malformed server responses
+   */
+  private async parseErrorResponse(response: Response): Promise<{ error: string }> {
+    try {
+      return await response.json();
+    } catch (jsonError) {
+      console.warn(
+        `[PlanetClient] Failed to parse error response from ${response.url}:`,
+        jsonError instanceof Error ? jsonError.message : 'unknown'
+      );
+      return { error: response.statusText };
+    }
+  }
+
   // ============================================================
   // PLANET OPERATIONS
   // ============================================================
@@ -253,7 +269,7 @@ export class PlanetClient {
     });
 
     if (!response.ok) {
-      const error = await response.json().catch(() => ({ error: response.statusText }));
+      const error = await this.parseErrorResponse(response);
       throw new Error(`Failed to create planet: ${error.error}`);
     }
 
@@ -273,7 +289,7 @@ export class PlanetClient {
       }
 
       if (!response.ok) {
-        const error = await response.json().catch(() => ({ error: response.statusText }));
+        const error = await this.parseErrorResponse(response);
         throw new Error(`Failed to get planet: ${error.error}`);
       }
 
@@ -289,7 +305,7 @@ export class PlanetClient {
     const response = await fetch(`${this.baseUrl}/api/planets`);
 
     if (!response.ok) {
-      const error = await response.json().catch(() => ({ error: response.statusText }));
+      const error = await this.parseErrorResponse(response);
       throw new Error(`Failed to list planets: ${error.error}`);
     }
 
@@ -314,7 +330,7 @@ export class PlanetClient {
     });
 
     if (!response.ok) {
-      const error = await response.json().catch(() => ({ error: response.statusText }));
+      const error = await this.parseErrorResponse(response);
       throw new Error(`Failed to delete planet: ${error.error}`);
     }
   }
@@ -328,7 +344,7 @@ export class PlanetClient {
     });
 
     if (!response.ok) {
-      const error = await response.json().catch(() => ({ error: response.statusText }));
+      const error = await this.parseErrorResponse(response);
       throw new Error(`Failed to record access: ${error.error}`);
     }
   }
@@ -340,7 +356,7 @@ export class PlanetClient {
     const response = await fetch(`${this.baseUrl}/api/planets/stats`);
 
     if (!response.ok) {
-      const error = await response.json().catch(() => ({ error: response.statusText }));
+      const error = await this.parseErrorResponse(response);
       throw new Error(`Failed to get stats: ${error.error}`);
     }
 
@@ -364,7 +380,7 @@ export class PlanetClient {
       }
 
       if (!response.ok) {
-        const error = await response.json().catch(() => ({ error: response.statusText }));
+        const error = await this.parseErrorResponse(response);
         throw new Error(`Failed to get biosphere: ${error.error}`);
       }
 
@@ -384,7 +400,7 @@ export class PlanetClient {
     });
 
     if (!response.ok) {
-      const error = await response.json().catch(() => ({ error: response.statusText }));
+      const error = await this.parseErrorResponse(response);
       throw new Error(`Failed to save biosphere: ${error.error}`);
     }
   }
@@ -407,7 +423,7 @@ export class PlanetClient {
       }
 
       if (!response.ok) {
-        const error = await response.json().catch(() => ({ error: response.statusText }));
+        const error = await this.parseErrorResponse(response);
         throw new Error(`Failed to get chunk: ${error.error}`);
       }
 
@@ -435,7 +451,7 @@ export class PlanetClient {
     );
 
     if (!response.ok) {
-      const error = await response.json().catch(() => ({ error: response.statusText }));
+      const error = await this.parseErrorResponse(response);
       throw new Error(`Failed to save chunk: ${error.error}`);
     }
 
@@ -460,7 +476,7 @@ export class PlanetClient {
     );
 
     if (!response.ok) {
-      const error = await response.json().catch(() => ({ error: response.statusText }));
+      const error = await this.parseErrorResponse(response);
       throw new Error(`Failed to batch get chunks: ${error.error}`);
     }
 
@@ -484,7 +500,7 @@ export class PlanetClient {
     );
 
     if (!response.ok) {
-      const error = await response.json().catch(() => ({ error: response.statusText }));
+      const error = await this.parseErrorResponse(response);
       throw new Error(`Failed to list chunks: ${error.error}`);
     }
 
@@ -521,7 +537,7 @@ export class PlanetClient {
     );
 
     if (!response.ok) {
-      const error = await response.json().catch(() => ({ error: response.statusText }));
+      const error = await this.parseErrorResponse(response);
       throw new Error(`Failed to save entities: ${error.error}`);
     }
   }
@@ -544,7 +560,7 @@ export class PlanetClient {
       }
 
       if (!response.ok) {
-        const error = await response.json().catch(() => ({ error: response.statusText }));
+        const error = await this.parseErrorResponse(response);
         throw new Error(`Failed to get entities: ${error.error}`);
       }
 
@@ -563,7 +579,7 @@ export class PlanetClient {
     );
 
     if (!response.ok && response.status !== 404) {
-      const error = await response.json().catch(() => ({ error: response.statusText }));
+      const error = await this.parseErrorResponse(response);
       throw new Error(`Failed to clear entities: ${error.error}`);
     }
   }
@@ -695,7 +711,7 @@ export class PlanetClient {
     );
 
     if (!response.ok) {
-      const error = await response.json().catch(() => ({ error: response.statusText }));
+      const error = await this.parseErrorResponse(response);
       throw new Error(`Failed to get named locations: ${error.error}`);
     }
 
@@ -727,7 +743,7 @@ export class PlanetClient {
     );
 
     if (!response.ok) {
-      const error = await response.json().catch(() => ({ error: response.statusText }));
+      const error = await this.parseErrorResponse(response);
       throw new Error(`Failed to add named location: ${error.error}`);
     }
   }
