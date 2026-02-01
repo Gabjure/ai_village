@@ -13,6 +13,7 @@ import { EntityImpl } from '../ecs/Entity.js';
 import { createBuildingComponent, BuildingType } from '../components/BuildingComponent.js';
 import { createPositionComponent } from '../components/PositionComponent.js';
 import { createRenderableComponent } from '../components/RenderableComponent.js';
+import { createProfessionComponent, type ProfessionRole } from '../components/ProfessionComponent.js';
 
 // Agent creation functions - lazy loaded to avoid circular dependency with @ai-village/agents
 type AgentModule = { createLLMAgent: (world: WorldMutator, x: number, y: number, speed: number) => string; createWanderingAgent: (world: WorldMutator, x: number, y: number, speed: number) => string };
@@ -25,6 +26,142 @@ async function getAgentModule(): Promise<AgentModule> {
     _agentModule = module as AgentModule;
   }
   return _agentModule!;
+}
+
+/**
+ * Map city profession strings to ProfessionRole types.
+ * Falls back to 'generic_worker' for unmapped professions.
+ */
+function mapProfessionToRole(profession: string): ProfessionRole {
+  const mapping: Record<string, ProfessionRole> = {
+    // Service professions
+    'shopkeeper': 'shopkeeper',
+    'merchant': 'shopkeeper',
+    'trader': 'shopkeeper',
+    'librarian': 'librarian',
+    'teacher': 'teacher',
+    'professor': 'teacher',
+    'healer': 'doctor',
+    'doctor': 'doctor',
+    'nurse': 'nurse',
+
+    // Administrative professions
+    'bureaucrat': 'bureaucrat',
+    'accountant': 'accountant',
+  };
+
+  return mapping[profession] || 'generic_worker';
+}
+
+/**
+ * Profession to building type mapping (static, defined once for performance).
+ * Maps professions to their preferred workplace building types.
+ */
+const PROFESSION_TO_BUILDING_TYPE: Record<string, string[]> = {
+  'farmer': ['farm', 'barn', 'granary'],
+  'blacksmith': ['forge', 'smithy', 'blacksmith'],
+  'miner': ['mine'],
+  'merchant': ['shop', 'market', 'warehouse'],
+  'trader': ['shop', 'market', 'warehouse'],
+  'guard': ['watchtower', 'barracks', 'armory'],
+  'soldier': ['barracks', 'armory', 'training_ground'],
+  'fisher': ['dock'],
+  'sailor': ['dock'],
+  'dockworker': ['dock', 'warehouse'],
+  'scholar': ['library', 'university'],
+  'professor': ['university', 'library'],
+  'student': ['university', 'dormitory'],
+  'librarian': ['library'],
+  'factory_worker': ['factory', 'workshop'],
+  'engineer': ['factory', 'workshop', 'laboratory'],
+  'foreman': ['factory', 'workshop'],
+  'inventor': ['laboratory', 'workshop'],
+  'miller': ['mill'],
+  'rancher': ['barn', 'farm'],
+  'butcher': ['shop'],
+  'captain': ['barracks', 'armory'],
+  'weaponsmith': ['forge', 'smithy', 'armory'],
+  'wizard': ['tower', 'library'],
+  'alchemist': ['alchemy_lab', 'laboratory'],
+  'enchanter': ['tower', 'ritual_circle'],
+  'apprentice': ['workshop', 'tower'],
+  'hunter': ['house'], // No specific building
+  'gatherer': ['house'],
+  'scout': ['watchtower', 'house'],
+  'smith': ['forge', 'smithy'],
+  'brewer': ['brewery', 'tavern'],
+  'warrior': ['barracks', 'training_ground'],
+  'archer': ['archery_range', 'watchtower'],
+  'druid': ['garden', 'shrine'],
+  'artisan': ['workshop'],
+  'scientist': ['laboratory', 'observatory'],
+  'researcher': ['laboratory', 'observatory'],
+  'technician': ['laboratory', 'workshop'],
+  'priest': ['temple', 'shrine'],
+  'monk': ['temple', 'dormitory'],
+  'scribe': ['library', 'temple'],
+  'craftsman': ['workshop'],
+};
+
+/**
+ * Build a lookup table of buildings by type for O(1) lookup.
+ * Performance optimization: called once before agent spawning loop.
+ */
+function buildBuildingLookupTable(
+  spawnedBuildingIds: string[],
+  world: World
+): Map<string, string[]> {
+  const lookup = new Map<string, string[]>();
+
+  for (const buildingId of spawnedBuildingIds) {
+    const building = world.getEntity(buildingId);
+    if (!building) continue;
+
+    const renderable = building.getComponent('renderable') as { sprite: string } | undefined;
+    if (!renderable) continue;
+
+    const buildingType = renderable.sprite;
+    if (!lookup.has(buildingType)) {
+      lookup.set(buildingType, []);
+    }
+    lookup.get(buildingType)!.push(buildingId);
+  }
+
+  return lookup;
+}
+
+/**
+ * Find a suitable workplace building for a profession using pre-built lookup table.
+ * Returns building ID or cityId as fallback (city center).
+ * Performance: O(preferred_types) instead of O(buildings × preferred_types)
+ */
+function findWorkplaceForProfession(
+  profession: string,
+  buildingLookup: Map<string, string[]>,
+  cityId: string
+): string {
+  const preferredBuildings = PROFESSION_TO_BUILDING_TYPE[profession] || [];
+
+  // Try to find a matching building using lookup table
+  for (const preferredType of preferredBuildings) {
+    const buildings = buildingLookup.get(preferredType);
+    if (buildings && buildings.length > 0) {
+      // Round-robin assignment: use modulo to distribute agents across buildings of same type
+      const buildingIndex = Math.floor(Math.random() * buildings.length);
+      return buildings[buildingIndex];
+    }
+  }
+
+  // Fallback: find any non-house building
+  for (const [buildingType, buildings] of buildingLookup.entries()) {
+    if (buildingType !== 'house' && buildingType !== 'tent' && buildings.length > 0) {
+      const buildingIndex = Math.floor(Math.random() * buildings.length);
+      return buildings[buildingIndex];
+    }
+  }
+
+  // Final fallback: city center (city director entity)
+  return cityId;
 }
 
 /**
@@ -725,6 +862,9 @@ export async function spawnCity(
     }
   }
 
+  // Build lookup table for O(1) building type lookups (performance optimization)
+  const buildingLookup = buildBuildingLookupTable(spawnedBuildingIds, world);
+
   // Spawn agents distributed around the city
   const professions = template.professions;
   for (let i = 0; i < agentCount; i++) {
@@ -780,8 +920,16 @@ export async function spawnCity(
       identity.cityId = cityId;
     }
 
-    // Note: Profession system is not yet implemented in the codebase
-    // When it is, we can set: agent.profession.currentProfession = profession;
+    // Add profession component with workplace assignment
+    const professionRole = mapProfessionToRole(profession);
+    const workplaceBuildingId = findWorkplaceForProfession(profession, buildingLookup, cityId);
+    const professionComponent = createProfessionComponent(
+      professionRole,
+      workplaceBuildingId,
+      cityId, // cityDirectorId
+      world.tick
+    );
+    (agentEntity as EntityImpl).addComponent(professionComponent);
   }
 
   // Count buildings by district type
