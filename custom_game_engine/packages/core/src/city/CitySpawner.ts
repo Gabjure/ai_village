@@ -14,8 +14,18 @@ import { createBuildingComponent, BuildingType } from '../components/BuildingCom
 import { createPositionComponent } from '../components/PositionComponent.js';
 import { createRenderableComponent } from '../components/RenderableComponent.js';
 
+import { calculateGuaranteedResearchers, type SkillId, type SkillLevel } from '../components/SkillsComponent.js';
+
 // Agent creation functions - lazy loaded to avoid circular dependency with @ai-village/agents
-type AgentModule = { createLLMAgent: (world: WorldMutator, x: number, y: number, speed: number) => string; createWanderingAgent: (world: WorldMutator, x: number, y: number, speed: number) => string };
+// WanderingAgentOptions matches the type exported from @ai-village/agents
+type WanderingAgentOptions = {
+  believedDeity?: string;
+  guaranteedSkills?: Partial<Record<SkillId, SkillLevel>>;
+};
+type AgentModule = {
+  createLLMAgent: (world: WorldMutator, x: number, y: number, speed: number) => string;
+  createWanderingAgent: (world: WorldMutator, x: number, y: number, speed?: number, options?: WanderingAgentOptions) => string;
+};
 let _agentModule: AgentModule | null = null;
 async function getAgentModule(): Promise<AgentModule> {
   if (!_agentModule) {
@@ -726,6 +736,10 @@ export async function spawnCity(
   }
 
   // Spawn agents distributed around the city
+  // Calculate guaranteed researchers for viable tech progression (per grand-strategy HARD STEPS model)
+  const guaranteedResearchers = calculateGuaranteedResearchers(agentCount);
+  const agentModule = await getAgentModule();
+
   const professions = template.professions;
   for (let i = 0; i < agentCount; i++) {
     // Assign profession based on template
@@ -739,12 +753,19 @@ export async function spawnCity(
 
     // Create agent using existing agent creation functions (lazy-loaded)
     // Use LLM agents if configured, otherwise use wandering agents (scripted)
-    const agentModule = await getAgentModule();
+    // First N agents get guaranteed research skill for viable tech progression
+    const isGuaranteedResearcher = i < guaranteedResearchers;
     let agentId: string;
     if (useLLM) {
       agentId = agentModule.createLLMAgent(world, agentX, agentY, 2.0);
     } else {
-      agentId = agentModule.createWanderingAgent(world, agentX, agentY, 2.0);
+      agentId = agentModule.createWanderingAgent(
+        world,
+        agentX,
+        agentY,
+        2.0,
+        isGuaranteedResearcher ? { guaranteedSkills: { research: 1 } } : undefined
+      );
     }
 
     spawnedAgentIds.push(agentId);
