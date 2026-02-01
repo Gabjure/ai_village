@@ -47,11 +47,8 @@ import {
 } from '../components/NationComponent.js';
 import type { NavyComponent } from '../components/NavyComponent.js';
 import type { ProvinceGovernanceComponent } from '../components/ProvinceGovernanceComponent.js';
-import {
-  NATIONAL_TECH_TREE,
-  arePrerequisitesMet,
-  calculateTechLevel,
-} from '../data/NationalTechTree.js';
+import { ResearchRegistry } from '../research/ResearchRegistry.js';
+import type { ResearchField } from '../research/types.js';
 import {
   NATIONAL_POLICIES,
   calculatePolicyEffect,
@@ -136,6 +133,12 @@ export class NationSystem extends BaseSystem {
       this._onEmpireAllianceFormed(data);
     });
 
+    // === Research Events ===
+    // React to agent-level research completions
+    this.events.on('research:completed', (data) => {
+      this._onResearchCompleted(data);
+    });
+
     // === Governor Decision Events ===
     // React to governor decisions being executed
     this.events.on('nation:policy_enacted', (data) => {
@@ -194,7 +197,10 @@ export class NationSystem extends BaseSystem {
         this.processWars(ctx.world, impl, nation);
       }
 
-      // Process research projects
+      // Process agent-level research completions (from ResearchSystem)
+      this.processPendingResearchCompletions(ctx.world, impl, nation);
+
+      // Process research funding and capacity
       this.processResearch(ctx.world, impl, nation);
 
       // Process policies
@@ -1197,129 +1203,110 @@ export class NationSystem extends BaseSystem {
   }
 
   /**
-   * Process research projects with tech tree
+   * Process research funding and capacity
+   *
+   * Nation-level research works through the agent-based ResearchSystem:
+   * 1. Nation allocates research budget
+   * 2. Budget determines researcher capacity (funded positions)
+   * 3. Agents conduct research at research buildings
+   * 4. When agents complete research, nation gets credit via events
+   *
+   * This method handles the funding/capacity side, not the research progress.
    */
   private processResearch(
     world: World,
     entity: EntityImpl,
     nation: NationComponent
   ): void {
-    if (nation.researchProjects.length === 0) return;
-
-    const updatedProjects: ResearchProject[] = [];
-    const newlyCompletedTechs: string[] = [];
-    const completedTechnologies = nation.research?.completedTechnologies || [];
-
-    // Get research speed modifier from policies
+    // Get research modifiers from policies
     const researchSpeedMod = this.getPolicyModifier(nation, 'research_speed');
-    const researchCostMod = this.getPolicyModifier(nation, 'research_cost');
 
-    for (const project of nation.researchProjects) {
-      if (project.progress >= 1) {
-        updatedProjects.push(project);
-        continue;
-      }
+    // Calculate research capacity from budget
+    // Base: 1 researcher per 1000 budget, modified by policies
+    const baseCapacity = Math.floor(nation.economy.researchBudget / 1000);
+    const researchCapacity = Math.max(1, Math.floor(baseCapacity * researchSpeedMod));
 
-      // Check prerequisites from tech tree
-      const techDef = NATIONAL_TECH_TREE[project.id];
-      if (techDef) {
-        const prereqsMet = arePrerequisitesMet(project.id, completedTechnologies);
-        if (!prereqsMet) {
-          // Project blocked - can't progress
-          updatedProjects.push(project);
-          continue;
+    // Count research buildings (universities) in provinces
+    let universitiesCount = 0;
+    const provinces = world
+      .query()
+      .with(CT.ProvinceGovernance)
+      .executeEntities();
+
+    for (const provinceEntity of provinces) {
+      const province = provinceEntity.getComponent<ProvinceGovernanceComponent>(CT.ProvinceGovernance);
+      if (!province || province.parentNationId !== entity.id) continue;
+
+      // Count cities with research buildings (estimate based on city size)
+      for (const city of province.cities) {
+        if (city.population > 10000) {
+          universitiesCount += 1; // Larger cities have universities
         }
       }
-
-      // Calculate progress rate
-      const totalCost = project.totalCost || techDef?.cost || project.costRemaining || 1000;
-      const adjustedCost = totalCost * researchCostMod;
-
-      // Research capacity multiplier
-      const capacityMultiplier = Math.min(2,
-        (nation.research?.researchCapacity || 10) / (adjustedCost / 100)
-      );
-
-      // Progress based on research budget
-      const baseProgressRate = (nation.economy.researchBudget / adjustedCost) * 0.001;
-      const progressRate = baseProgressRate * capacityMultiplier * researchSpeedMod;
-
-      project.progress = Math.min(1, project.progress + progressRate);
-      project.monthsInvested = (project.monthsInvested || 0) + 1;
-
-      // Check for completion
-      if (project.progress >= 1) {
-        newlyCompletedTechs.push(project.id);
-
-        // Apply tech unlocks
-        const unlocks = project.unlocks || techDef?.unlocks || [];
-        for (const unlock of unlocks) {
-          world.eventBus.emit({
-            type: `nation:${unlock.type}_unlocked`,
-            source: entity.id,
-            data: {
-              nationId: entity.id,
-              nationName: nation.nationName,
-              unlockType: unlock.type,
-              unlockId: unlock.id,
-              unlockName: unlock.name,
-              unlockDescription: unlock.description,
-              tick: world.tick,
-            },
-          });
-        }
-
-        // Emit research completed event
-        world.eventBus.emit({
-          type: 'nation:research_completed',
-          source: entity.id,
-          data: {
-            nationId: entity.id,
-            nationName: nation.nationName,
-            projectId: project.id,
-            projectName: project.name,
-            field: project.field,
-            unlocks: unlocks.map(u => u.name),
-            tick: world.tick,
-          },
-        });
-      }
-
-      updatedProjects.push(project);
     }
 
-    // Update nation with completed technologies
-    if (newlyCompletedTechs.length > 0 || nation.researchProjects !== updatedProjects) {
-      const allCompletedTechs = [...completedTechnologies, ...newlyCompletedTechs];
-      const newTechLevel = calculateTechLevel(allCompletedTechs);
+    // Researcher population scales with capacity and universities
+    const researcherPopulation = Math.min(
+      nation.population * 0.01, // Max 1% of population
+      researchCapacity * universitiesCount * 10 // 10 researchers per capacity per university
+    );
 
-      // Determine current era based on completed techs
-      let currentEra: 'ancient' | 'classical' | 'medieval' | 'renaissance' | 'industrial' | 'modern' | 'space' = 'ancient';
-      for (const techId of allCompletedTechs) {
-        const tech = NATIONAL_TECH_TREE[techId];
-        if (tech) {
-          const eraOrder = ['ancient', 'classical', 'medieval', 'renaissance', 'industrial', 'modern', 'space'] as const;
-          const currentIndex = eraOrder.indexOf(currentEra);
-          const techIndex = eraOrder.indexOf(tech.era);
-          if (techIndex > currentIndex) {
-            currentEra = tech.era;
-          }
-        }
+    // Calculate tech level from completed research count
+    const completedTechnologies = nation.research?.completedTechnologies || [];
+    const techLevel = Math.min(10, Math.floor(completedTechnologies.length / 5) + 1);
+
+    // Determine era from research field progression
+    const registry = ResearchRegistry.getInstance();
+    let highestTier = 1;
+    for (const techId of completedTechnologies) {
+      const research = registry.tryGet(techId);
+      if (research) {
+        highestTier = Math.max(highestTier, research.tier);
       }
+    }
 
-      entity.updateComponent<NationComponent>(CT.Nation, (current) => ({
-        ...current,
-        researchProjects: updatedProjects,
-        techLevel: newTechLevel,
-        research: {
-          ...current.research,
-          researchCapacity: current.research?.researchCapacity || 10,
-          universitiesCount: current.research?.universitiesCount || 1,
-          researcherPopulation: current.research?.researcherPopulation || 100,
-          completedTechnologies: allCompletedTechs,
-          currentEra,
+    const eraByTier: Record<number, 'ancient' | 'classical' | 'medieval' | 'renaissance' | 'industrial' | 'modern' | 'space'> = {
+      1: 'ancient',
+      2: 'classical',
+      3: 'medieval',
+      4: 'renaissance',
+      5: 'industrial',
+      6: 'modern',
+      7: 'space',
+      8: 'space',
+    };
+    const currentEra = eraByTier[Math.min(8, highestTier)] || 'ancient';
+
+    // Update nation research state
+    entity.updateComponent<NationComponent>(CT.Nation, (current) => ({
+      ...current,
+      techLevel,
+      research: {
+        ...current.research,
+        researchCapacity,
+        universitiesCount,
+        researcherPopulation,
+        completedTechnologies,
+        currentEra,
+      },
+    }));
+
+    // Emit capacity update if significant change
+    const previousCapacity = nation.research?.researchCapacity || 0;
+    if (Math.abs(researchCapacity - previousCapacity) > 5) {
+      world.eventBus.emit({
+        type: 'nation:research_capacity_changed',
+        source: entity.id,
+        data: {
+          nationId: entity.id,
+          nationName: nation.nationName,
+          previousCapacity,
+          newCapacity: researchCapacity,
+          universitiesCount,
+          researcherPopulation,
+          tick: world.tick,
         },
-      }));
+      });
     }
   }
 
@@ -2136,6 +2123,145 @@ export class NationSystem extends BaseSystem {
     // Tax rate already changed by GovernorDecisionExecutor
     // This is notification-only - tax policy is already updated
     // Future: Calculate provincial reactions, update unrest based on tax changes
+  }
+
+  /**
+   * Handle research completion from agent-level ResearchSystem
+   *
+   * When agents complete research (by publishing papers), the nation
+   * gets credit for the technological advancement and can apply unlocks.
+   */
+  private _onResearchCompleted(data: {
+    researchId: string;
+    researchName: string;
+    researchers: string[];
+    unlocks: Array<{ type: string; id: string }>;
+    tick: number;
+    bibliography?: {
+      paperCount: number;
+      papers: Array<{ title: string; authors: string[]; citations: number }>;
+    };
+  }): void {
+    // Find which nation(s) the researchers belong to
+    // For now, credit research to all nations that have researchers in provinces
+    // In a full implementation, we'd track which nation funded/employed each researcher
+
+    const registry = ResearchRegistry.getInstance();
+    const research = registry.tryGet(data.researchId);
+    if (!research) return;
+
+    // Get the world from the context (stored during update)
+    // Note: This is called from event handler, so we need to access world differently
+    // For now, we'll process this in the next update cycle by storing pending completions
+
+    // Store the completion for processing in the next update
+    if (!this._pendingResearchCompletions) {
+      this._pendingResearchCompletions = [];
+    }
+    this._pendingResearchCompletions.push({
+      researchId: data.researchId,
+      researchName: data.researchName,
+      field: research.field,
+      tier: research.tier,
+      unlocks: data.unlocks,
+      researchers: data.researchers,
+      tick: data.tick,
+    });
+  }
+
+  /** Pending research completions to process in next update */
+  private _pendingResearchCompletions: Array<{
+    researchId: string;
+    researchName: string;
+    field: ResearchField;
+    tier: number;
+    unlocks: Array<{ type: string; id: string }>;
+    researchers: string[];
+    tick: number;
+  }> | null = null;
+
+  /**
+   * Process pending research completions for nations
+   * Called at the start of each update to apply agent research to nations
+   */
+  private processPendingResearchCompletions(
+    world: World,
+    entity: EntityImpl,
+    nation: NationComponent
+  ): void {
+    if (!this._pendingResearchCompletions || this._pendingResearchCompletions.length === 0) {
+      return;
+    }
+
+    const completedTechnologies = nation.research?.completedTechnologies || [];
+    const newCompletions: string[] = [];
+
+    for (const completion of this._pendingResearchCompletions) {
+      // Check if this research is already completed by this nation
+      if (completedTechnologies.includes(completion.researchId)) {
+        continue;
+      }
+
+      // Check if any researchers are from this nation's provinces
+      // For now, credit all nations with the research (simplified)
+      // A full implementation would track researcher → nation mapping
+
+      newCompletions.push(completion.researchId);
+
+      // Emit nation-level unlock events for each unlock
+      for (const unlock of completion.unlocks) {
+        world.eventBus.emit({
+          type: `nation:${unlock.type}_unlocked`,
+          source: entity.id,
+          data: {
+            nationId: entity.id,
+            nationName: nation.nationName,
+            unlockType: unlock.type,
+            unlockId: unlock.id,
+            researchId: completion.researchId,
+            researchName: completion.researchName,
+            tick: world.tick,
+          },
+        });
+      }
+
+      // Emit nation research completed event
+      world.eventBus.emit({
+        type: 'nation:tech_advancement',
+        source: entity.id,
+        data: {
+          nationId: entity.id,
+          nationName: nation.nationName,
+          researchId: completion.researchId,
+          researchName: completion.researchName,
+          field: completion.field,
+          tier: completion.tier,
+          unlockCount: completion.unlocks.length,
+          tick: world.tick,
+        },
+      });
+    }
+
+    // Update nation with new completed technologies
+    if (newCompletions.length > 0) {
+      entity.updateComponent<NationComponent>(CT.Nation, (current) => ({
+        ...current,
+        research: {
+          ...current.research,
+          researchCapacity: current.research?.researchCapacity || 10,
+          universitiesCount: current.research?.universitiesCount || 1,
+          researcherPopulation: current.research?.researcherPopulation || 100,
+          completedTechnologies: [
+            ...(current.research?.completedTechnologies || []),
+            ...newCompletions,
+          ],
+          currentEra: current.research?.currentEra || 'ancient',
+        },
+      }));
+    }
+
+    // Clear processed completions
+    this._pendingResearchCompletions = null;
   }
 
   /**
