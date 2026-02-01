@@ -161,6 +161,9 @@ export class WildPlantPopulationSystem extends BaseSystem {
     this.events.subscribe('plant:died', (event: unknown) => {
       const e = event as { data: { speciesId: string } };
       const { speciesId } = e.data;
+      // TODO: Implement seed bank addition when plants die
+      // Need to extract position from event data and add seeds based on species.seedsPerPlant
+      // Consider plant maturity stage when determining how many seeds to add to bank
       // When plants die, their seeds may enter the seed bank
       const species = this.speciesLookup?.(speciesId);
       if (species) {
@@ -412,6 +415,9 @@ export class WildPlantPopulationSystem extends BaseSystem {
     _position: { x: number; y: number },
     _world: World
   ): string | null {
+    // TODO: Implement proper biome detection from world terrain/biome system
+    // Should query the tile at position and return its biome type
+    // This will enable biome-specific plant spawning (forest plants in forests, wetland plants in wetlands, etc.)
     // In a full implementation, this would query the terrain/biome data
     // For now, return a default biome
     return 'plains';

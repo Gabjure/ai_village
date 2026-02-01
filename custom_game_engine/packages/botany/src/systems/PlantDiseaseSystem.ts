@@ -187,6 +187,8 @@ export class PlantDiseaseSystem extends BaseSystem {
     _treatmentId: string,
     _treatmentType: string
   ): void {
+    // TODO: Implement proper event-driven treatment application
+    // Should look up the entity by entityId and call applyTreatment()
     // This would look up the entity and apply treatment
     // For now this is a placeholder - actual treatment is done via applyTreatment()
   }
@@ -235,6 +237,8 @@ export class PlantDiseaseSystem extends BaseSystem {
    * Get current game day (simplified)
    */
   private getCurrentGameDay(_world: World): number{
+    // TODO: Query actual game day from TimeSystem instead of using real-world Date.now()
+    // This causes issues with time travel, save/load, and time speed multipliers
     // In a real implementation, this would query the time system
     return Math.floor(Date.now() / (1000 * 60 * 60 * 24));
   }

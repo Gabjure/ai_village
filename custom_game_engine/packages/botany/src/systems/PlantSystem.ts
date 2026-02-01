@@ -423,8 +423,11 @@ export class PlantSystem extends BaseSystem {
   private getEnvironment(position: { x: number; y: number }, world: World): Environment {
     const temperature = this.getTemperature(position, world);
     const moisture = this.getMoisture(position, world);
+    // TODO: Get actual soil nutrient data from SoilSystem instead of hardcoded default
     const nutrients = 80; // Default from soil
+    // TODO: Get actual season from TimeSystem instead of hardcoded default
     const season = 'spring'; // Default
+    // TODO: Implement light level calculation based on time of day, weather, and surrounding terrain
     const lightLevel = 100; // Default
 
     return {
@@ -440,6 +443,8 @@ export class PlantSystem extends BaseSystem {
    * Get temperature at position from TemperatureSystem
    */
   private getTemperature(_position: { x: number; y: number }, _world: World): number {
+    // TODO: Implement position-specific temperature based on biome, altitude, time of day
+    // Currently only uses global weather temperature, ignoring local variations
     // Use weather temperature
     return this.weatherTemperature;
   }
