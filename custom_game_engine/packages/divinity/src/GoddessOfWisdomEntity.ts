@@ -8,9 +8,8 @@
  * it enters the world, ensuring it fits the setting and is balanced.
  */
 
-import type { World, Entity, PositionComponent, TagsComponent } from '@ai-village/core';
+import type { World, WorldMutator, Entity, PositionComponent, TagsComponent } from '@ai-village/core';
 import {
-  EntityImpl,
   ComponentType,
   createIdentityComponent,
   createPositionComponent,
@@ -54,14 +53,15 @@ export function createGoddessOfWisdom(
 
   // Create the entity
   const entity = world.createEntity();
+  const mutator = world as WorldMutator;
 
   // Identity - Goddess of Wisdom
   const identity = createIdentityComponent(config.name);
-  (entity as unknown as EntityImpl).addComponent(identity);
+  mutator.addComponent(entity.id, identity);
 
   // Position - manifests at research/discovery location
   const position = createPositionComponent(location.x, location.y);
-  (entity as unknown as EntityImpl).addComponent(position);
+  mutator.addComponent(entity.id, position);
 
   // Tags - mark as deity and wisdom goddess
   const tags = createTagsComponent(
@@ -74,24 +74,24 @@ export function createGoddessOfWisdom(
     `origin:${config.origin}`, // Track cultural origin
     `scrutiny_style:${config.scrutinyStyle}`
   );
-  (entity as unknown as EntityImpl).addComponent(tags);
+  mutator.addComponent(entity.id, tags);
 
   // Renderable - PixelLab sprite (8-directional AI-generated character)
   const spritePath = getWisdomGoddessSpritePath(config);
   const renderable = createRenderableComponent(spritePath, 'entity');
-  (entity as unknown as EntityImpl).addComponent(renderable);
+  mutator.addComponent(entity.id, renderable);
 
   // Episodic Memory - remembers all discoveries and judgments
   const memory = createEpisodicMemoryComponent({ maxMemories: 10000 }); // Gods remember everything
-  (entity as unknown as EntityImpl).addComponent(memory);
+  mutator.addComponent(entity.id, memory);
 
   // Relationship - tracks relationships with researchers and inventors
   const relationships = createRelationshipComponent();
-  (entity as unknown as EntityImpl).addComponent(relationships);
+  mutator.addComponent(entity.id, relationships);
 
   // Conversation - can engage in dialogue about discoveries
   const conversation = createConversationComponent(100);
-  (entity as unknown as EntityImpl).addComponent(conversation);
+  mutator.addComponent(entity.id, conversation);
 
   return entity;
 }

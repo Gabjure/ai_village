@@ -215,7 +215,7 @@ export class TemporalEffectApplier implements EffectApplier<TemporalEffect> {
 
     if (!age) {
       const newAge: AgeComponent = { type: 'age', version: 1, years: Math.max(0, ageChange) };
-      (world as WorldMutator).addComponent(target.id, newAge as unknown as Component);
+      (world as WorldMutator).addComponent(target.id, newAge as Component);
       age = newAge;
     } else {
       age.years += ageChange;
@@ -279,7 +279,7 @@ export class TemporalEffectApplier implements EffectApplier<TemporalEffect> {
 
     if (!temporal) {
       const newTemporal: TemporalStateComponent = { type: 'temporal_state', version: 1, rewindRequests: [rewindRequest] };
-      (world as WorldMutator).addComponent(target.id, newTemporal as unknown as Component);
+      (world as WorldMutator).addComponent(target.id, newTemporal as Component);
       temporal = newTemporal;
     } else {
       if (!temporal.rewindRequests) {

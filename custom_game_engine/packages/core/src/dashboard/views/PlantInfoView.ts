@@ -156,7 +156,7 @@ export const PlantInfoView: DashboardView<PlantInfoViewData> = {
         return emptyData;
       }
 
-      const plant = entity.components.get('plant') as unknown as {
+      const plant = entity.components.get('plant') as {
         speciesId?: string;
         stage?: string;
         stageProgress?: number;
@@ -176,12 +176,12 @@ export const PlantInfoView: DashboardView<PlantInfoViewData> = {
         return emptyData;
       }
 
-      const position = entity.components.get('position') as unknown as {
+      const position = entity.components.get('position') as {
         x?: number;
         y?: number;
       } | undefined;
 
-      const resource = entity.components.get('resource') as unknown as {
+      const resource = entity.components.get('resource') as {
         resourceType?: string;
         type?: string;
         amount?: number;

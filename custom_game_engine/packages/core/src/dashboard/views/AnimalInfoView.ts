@@ -143,7 +143,7 @@ export const AnimalInfoView: DashboardView<AnimalInfoViewData> = {
         return emptyData;
       }
 
-      const animal = entity.components.get('animal') as unknown as {
+      const animal = entity.components.get('animal') as {
         name?: string;
         speciesId?: string;
         lifeStage?: string;
@@ -165,12 +165,12 @@ export const AnimalInfoView: DashboardView<AnimalInfoViewData> = {
         return emptyData;
       }
 
-      const position = entity.components.get('position') as unknown as {
+      const position = entity.components.get('position') as {
         x?: number;
         y?: number;
       } | undefined;
 
-      const temperature = entity.components.get('temperature') as unknown as {
+      const temperature = entity.components.get('temperature') as {
         currentTemp?: number;
         state?: string;
       } | undefined;

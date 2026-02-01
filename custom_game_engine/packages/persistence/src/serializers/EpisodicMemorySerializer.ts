@@ -17,7 +17,7 @@ export class EpisodicMemorySerializer extends BaseComponentSerializer<EpisodicMe
 
   protected serializeData(component: EpisodicMemoryComponent): SerializedEpisodicMemory {
     return {
-      maxMemories: (component as unknown as { _maxMemories: number })._maxMemories ?? 1000,
+      maxMemories: (component as { _maxMemories: number })._maxMemories ?? 1000,
       memories: [...component.episodicMemories],
     };
   }
@@ -31,7 +31,7 @@ export class EpisodicMemorySerializer extends BaseComponentSerializer<EpisodicMe
     });
 
     // Restore memories by accessing private field
-    const componentAny = component as unknown as { _episodicMemories: EpisodicMemory[] };
+    const componentAny = component as { _episodicMemories: EpisodicMemory[] };
     componentAny._episodicMemories = serialized.memories ?? [];
 
     return component;

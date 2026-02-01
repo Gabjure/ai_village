@@ -332,7 +332,7 @@ export class CompanionSystem extends BaseSystem {
     evolveToNextTier(companionComp, this.worldRef.tick);
 
     // Update sprite path for new tier
-    const renderableComp = companionEntity.getComponent(CT.Renderable) as unknown as
+    const renderableComp = companionEntity.getComponent(CT.Renderable) as
       | { spritePath: string }
       | undefined;
     if (renderableComp) {

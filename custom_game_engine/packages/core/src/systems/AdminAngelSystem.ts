@@ -571,8 +571,8 @@ function executeQuery(world: World, intent: QueryIntent): string {
       const locations: string[] = [];
 
       for (const s of storages) {
-        const inv = s.getComponent(CT.Inventory) as unknown as { slots: Array<{ itemId: string; quantity: number } | null> } | undefined;
-        const building = s.getComponent(CT.Building) as unknown as { buildingType: string } | undefined;
+        const inv = s.getComponent(CT.Inventory) as { slots: Array<{ itemId: string; quantity: number } | null> } | undefined;
+        const building = s.getComponent(CT.Building) as { buildingType: string } | undefined;
         if (!inv) continue;
 
         for (const slot of inv.slots) {

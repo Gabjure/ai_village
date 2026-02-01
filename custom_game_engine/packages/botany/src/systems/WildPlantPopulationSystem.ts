@@ -246,7 +246,7 @@ export class WildPlantPopulationSystem extends BaseSystem {
 
     // Filter to only visible plants (near agents) using SimulationScheduler
     const visiblePlants = world.simulationScheduler.filterActiveEntities(
-      plants as unknown as Entity[],
+      plants as Entity[],
       world.tick
     );
 

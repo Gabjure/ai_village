@@ -76,7 +76,7 @@ export const ResourcesView: DashboardView<ResourcesViewData> = {
         const inventory = storage.components.get('inventory');
 
         // Only count complete storage buildings - use type assertion for component data
-        const buildingData = building as unknown as { isComplete?: boolean; buildingType?: string };
+        const buildingData = building as { isComplete?: boolean; buildingType?: string };
         if (!buildingData?.isComplete) continue;
         if (buildingData.buildingType !== 'storage-chest' && buildingData.buildingType !== 'storage-box') {
           continue;
@@ -84,7 +84,7 @@ export const ResourcesView: DashboardView<ResourcesViewData> = {
 
         buildingCount++;
 
-        const inventoryData = inventory as unknown as { slots?: Array<{ itemId?: string; quantity: number }>; maxSlots?: number };
+        const inventoryData = inventory as { slots?: Array<{ itemId?: string; quantity: number }>; maxSlots?: number };
         if (inventoryData?.slots) {
           totalSlots += inventoryData.maxSlots || inventoryData.slots.length;
           for (const slot of inventoryData.slots) {

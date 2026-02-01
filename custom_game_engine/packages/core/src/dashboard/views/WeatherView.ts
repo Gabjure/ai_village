@@ -141,7 +141,7 @@ export const WeatherView: DashboardView<WeatherViewData> = {
       if (weatherEntities.length > 0) {
         const weather = weatherEntities[0]?.components.get('weather');
         if (weather) {
-          const weatherData = weather as unknown as { weatherType?: string; intensity?: number; duration?: number };
+          const weatherData = weather as { weatherType?: string; intensity?: number; duration?: number };
           weatherType = weatherData.weatherType || 'clear';
           intensity = weatherData.intensity || 0;
           durationRemaining = weatherData.duration || 0;
@@ -157,7 +157,7 @@ export const WeatherView: DashboardView<WeatherViewData> = {
       if (timeEntities.length > 0) {
         const time = timeEntities[0]?.components.get('time');
         if (time) {
-          const timeData = time as unknown as { timeOfDay?: number; phase?: string; day?: number; lightLevel?: number };
+          const timeData = time as { timeOfDay?: number; phase?: string; day?: number; lightLevel?: number };
           timeOfDay = timeData.timeOfDay ?? 12;
           phase = timeData.phase || 'day';
           day = timeData.day || 1;
@@ -173,7 +173,7 @@ export const WeatherView: DashboardView<WeatherViewData> = {
       if (tempEntities.length > 0) {
         const temp = tempEntities[0]?.components.get('temperature');
         if (temp) {
-          const tempData = temp as unknown as { ambient?: number };
+          const tempData = temp as { ambient?: number };
           if (tempData.ambient !== undefined) {
             temperature = tempData.ambient;
           }

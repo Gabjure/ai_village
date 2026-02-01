@@ -278,7 +278,7 @@ export class SoulCreationSystem extends BaseSystem {
    */
   init(world: World): void {
     // Use getSystem instead of accessing systemRegistry directly
-    const worldImpl = world as unknown as { getSystem(id: string): any };
+    const worldImpl = world as { getSystem(id: string): any };
     this.soulRepositorySystem = worldImpl.getSystem('soul_repository');
 
     if (!this.soulRepositorySystem) {

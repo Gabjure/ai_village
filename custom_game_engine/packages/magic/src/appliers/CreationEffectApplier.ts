@@ -82,7 +82,7 @@ export class CreationEffectApplier implements EffectApplier<CreationEffect> {
     }
 
     // Extract position values from component
-    const casterPosData = casterPosComp as unknown as PositionComponentData;
+    const casterPosData = casterPosComp as PositionComponentData;
     const casterPos = {
       x: casterPosData.x ?? 0,
       y: casterPosData.y ?? 0,
@@ -190,7 +190,7 @@ export class CreationEffectApplier implements EffectApplier<CreationEffect> {
     if (createdEntityIds.length > 0) {
       appliedValues['createdEntityCount'] = createdEntityIds.length;
       // Store the actual IDs in a special key
-      (appliedValues as unknown as { _createdEntityIds: string })._createdEntityIds =
+      (appliedValues as { _createdEntityIds: string })._createdEntityIds =
         createdEntityIds.join('|');
     }
 
@@ -275,7 +275,7 @@ export class CreationEffectApplier implements EffectApplier<CreationEffect> {
 
   private extractCreatedEntityIds(activeEffect: ActiveEffect): string[] {
     // Extract the packed entity IDs from appliedValues
-    const packed = (activeEffect.appliedValues as unknown as { _createdEntityIds?: string })
+    const packed = (activeEffect.appliedValues as { _createdEntityIds?: string })
       ._createdEntityIds;
     if (!packed) return [];
     return packed.split('|').filter(id => id.length > 0);

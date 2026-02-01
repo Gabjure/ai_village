@@ -1372,10 +1372,11 @@ export class GatherBehavior extends BaseBehavior {
 
       // Update plant - reduce fruitCount
       // CRITICAL FIX: Reset stage if all fruit harvested to enable regrowth
-      interface WorldWithPlantSpecies {
+      // Access plantSpeciesLookup if it exists on world (runtime extension)
+      interface WorldWithPlantSpecies extends World {
         plantSpeciesLookup?: (id: string) => { harvestResetStage?: string; harvestDestroysPlant?: boolean } | undefined;
       }
-      const species = (world as unknown as WorldWithPlantSpecies).plantSpeciesLookup?.(plantComp.speciesId);
+      const species = (world as WorldWithPlantSpecies).plantSpeciesLookup?.(plantComp.speciesId);
       const newFruitCount = Math.max(0, (plantComp.fruitCount ?? 0) - result.amountAdded);
 
       plantImpl.updateComponent<PlantComponent>(ComponentType.Plant, (current) => {
@@ -1445,12 +1446,13 @@ export class GatherBehavior extends BaseBehavior {
     agent: AgentComponent
   ): void {
     const buildingType = agent.behaviorState.returnToBuild as BuildingType;
-    interface WorldWithBuildingRegistry {
+    // Access buildingRegistry if it exists on world (runtime extension)
+    interface WorldWithBuildingRegistry extends World {
       buildingRegistry?: {
         tryGet(type: BuildingType): { resourceCost: ResourceCost[] } | undefined;
       };
     }
-    const blueprint = (world as unknown as WorldWithBuildingRegistry).buildingRegistry?.tryGet(buildingType);
+    const blueprint = (world as WorldWithBuildingRegistry).buildingRegistry?.tryGet(buildingType);
 
     if (!blueprint) {
       return;
@@ -1639,28 +1641,19 @@ export function gatherBehaviorWithContext(ctx: import('../BehaviorContext.js').B
 
     // Delegate to class methods for actual gathering
     const behavior = new GatherBehavior();
-    interface MinimalWorld {
-      tick: number;
-      eventBus: {
-        emit: (event: unknown) => void;
-      };
-    }
-    const minimalWorld: MinimalWorld = {
-      tick: ctx.tick,
-      eventBus: { emit: (e: any) => ctx.emit(e) }
-    };
+    // Use ctx.world directly - BehaviorContext provides full World interface
     if (target.type === 'resource') {
       const targetImpl = target.entity as EntityImpl;
       const voxelComp = targetImpl.getComponent<VoxelResourceComponent>(ComponentType.VoxelResource);
       if (voxelComp) {
-        behavior.handleVoxelResourceGathering(ctx.entity, target.entity, minimalWorld as unknown as World, inventory, ctx.agent);
+        behavior.handleVoxelResourceGathering(ctx.entity, target.entity, ctx.world, inventory, ctx.agent);
       } else {
-        behavior.handleResourceGathering(ctx.entity, target.entity, minimalWorld as unknown as World, inventory, ctx.agent);
+        behavior.handleResourceGathering(ctx.entity, target.entity, ctx.world, inventory, ctx.agent);
       }
     } else if (target.subtype === 'fruit') {
-      behavior.gatherFruit(ctx.entity, target.entity, minimalWorld as unknown as World, inventory, target.position, workSpeedMultiplier);
+      behavior.gatherFruit(ctx.entity, target.entity, ctx.world, inventory, target.position, workSpeedMultiplier);
     } else {
-      behavior.gatherSeeds(ctx.entity, target.entity, minimalWorld as unknown as World, inventory, target.position, workSpeedMultiplier);
+      behavior.gatherSeeds(ctx.entity, target.entity, ctx.world, inventory, target.position, workSpeedMultiplier);
     }
   }
 }

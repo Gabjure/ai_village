@@ -163,12 +163,12 @@ export class SeekCoolingBehavior extends BaseBehavior {
 
   private findWaterSources(world: World, position: PositionComponent): CoolingSource[] {
     const sources: CoolingSource[] = [];
-    interface WorldWithChunks {
+    interface WorldWithChunks extends World {
       chunkManager?: {
         getChunk(x: number, y: number): { getTile(x: number, y: number): { terrain: string; fluid?: { type: string; depth: number } } } | undefined;
       };
     }
-    const chunks = (world as unknown as WorldWithChunks).chunkManager;
+    const chunks = (world as WorldWithChunks).chunkManager;
 
     if (!chunks) return sources;
 
@@ -701,12 +701,12 @@ function findBestCoolingSourceWithContext(ctx: BehaviorContext): CoolingSource |
 
 function findWaterSourcesWithContext(ctx: BehaviorContext): CoolingSource[] {
   const sources: CoolingSource[] = [];
-  interface WorldWithChunks {
+  interface WorldWithChunks extends World {
     chunkManager?: {
       getChunk(x: number, y: number): { getTile(x: number, y: number): { terrain: string; fluid?: { type: string; depth: number } } } | undefined;
     };
   }
-  const chunks = (ctx as unknown as { world?: WorldWithChunks }).world?.chunkManager;
+  const chunks = (ctx.world as WorldWithChunks).chunkManager;
 
   if (!chunks) return sources;
 

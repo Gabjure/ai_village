@@ -144,7 +144,7 @@ export class MeditateBehavior extends BaseBehavior {
       }));
 
       // Emit internal monologue event (using untyped emit for custom event)
-      const eventBus = world.eventBus as unknown as { emit: (event: unknown) => void };
+      const eventBus = world.eventBus;
       eventBus.emit({
         type: 'agent:internal_monologue',
         source: 'meditate_behavior',
@@ -194,7 +194,7 @@ export class MeditateBehavior extends BaseBehavior {
     }));
 
     // Emit event (using untyped emit for custom event)
-    const eventBus = world.eventBus as unknown as { emit: (event: unknown) => void };
+    const eventBus = world.eventBus;
     eventBus.emit({
       type: 'agent:meditation_started',
       source: 'meditate_behavior',
@@ -262,7 +262,7 @@ export class MeditateBehavior extends BaseBehavior {
       }));
 
       // Emit vision event (using untyped emit for custom event)
-      const eventBus = world.eventBus as unknown as { emit: (event: unknown) => void };
+      const eventBus = world.eventBus;
       eventBus.emit({
         type: 'vision:received',
         source: 'meditate_behavior',
@@ -285,7 +285,7 @@ export class MeditateBehavior extends BaseBehavior {
     }
 
     // Emit meditation complete event (using untyped emit for custom event)
-    const completeEventBus = world.eventBus as unknown as { emit: (event: unknown) => void };
+    const completeEventBus = world.eventBus;
     completeEventBus.emit({
       type: 'agent:meditation_complete',
       source: 'meditate_behavior',
@@ -356,9 +356,11 @@ export class MeditateBehavior extends BaseBehavior {
    */
   private getSacredSiteSystem(world: World): SacredSiteSystem | null {
     // Systems are registered on the world, try to get the sacred site system
-    // Note: This is a simplified approach - in practice, systems should be
-    // accessible via a proper registry pattern
-    const systems = (world as unknown as { systems?: Map<string, unknown> }).systems;
+    // Access systems map if it exists on world (runtime extension)
+    interface WorldWithSystems extends World {
+      systems?: Map<string, unknown>;
+    }
+    const systems = (world as WorldWithSystems).systems;
     if (systems instanceof Map) {
       return systems.get('sacred_site') as SacredSiteSystem | null;
     }
@@ -590,12 +592,15 @@ function generateVisionWithContext(
 }
 
 function getSacredSiteSystemFromMeditationContext(ctx: BehaviorContext): SacredSiteSystem | null {
-  // Access world through entity's internal reference
-  const entityImpl = ctx.entity as EntityImpl;
-  const world = (entityImpl as unknown as { world?: World }).world;
+  // Access world from BehaviorContext (world is exposed as readonly property)
+  const world = ctx.world;
   if (!world) return null;
 
-  const systems = (world as unknown as { systems?: Map<string, unknown> }).systems;
+  // Access systems map if it exists on world (runtime extension)
+  interface WorldWithSystems extends World {
+    systems?: Map<string, unknown>;
+  }
+  const systems = (world as WorldWithSystems).systems;
   if (systems instanceof Map) {
     const system = systems.get('sacred_site');
     return system instanceof SacredSiteSystem ? system : null;

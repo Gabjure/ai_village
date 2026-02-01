@@ -341,7 +341,7 @@ class EnvironmentalEffectApplierClass implements EffectApplier<EnvironmentalEffe
       temperatureModifier: 0,
       globalZones: [],
     };
-    (world as WorldMutator).addComponent(envEntity.id, environmentComp as unknown as Component);
+    (world as WorldMutator).addComponent(envEntity.id, environmentComp as Component);
 
     return envEntity;
   }
@@ -364,7 +364,7 @@ class EnvironmentalEffectApplierClass implements EffectApplier<EnvironmentalEffe
       x: center.x,
       y: center.y,
     };
-    (world as WorldMutator).addComponent(zoneEntity.id, posComp as unknown as Component);
+    (world as WorldMutator).addComponent(zoneEntity.id, posComp as Component);
 
     const zoneComp = {
       type: 'environmental_zone' as const,
@@ -378,7 +378,7 @@ class EnvironmentalEffectApplierClass implements EffectApplier<EnvironmentalEffe
       createdAt: Date.now(),
       duration: effect.duration,
     };
-    (world as WorldMutator).addComponent(zoneEntity.id, zoneComp as unknown as Component);
+    (world as WorldMutator).addComponent(zoneEntity.id, zoneComp as Component);
 
     // Add tags for identification
     const tagsComp = {
@@ -386,7 +386,7 @@ class EnvironmentalEffectApplierClass implements EffectApplier<EnvironmentalEffe
       version: 1,
       tags: ['environmental_zone', effect.environmentType, ...(effect.tags ?? [])],
     };
-    (world as WorldMutator).addComponent(zoneEntity.id, tagsComp as unknown as Component);
+    (world as WorldMutator).addComponent(zoneEntity.id, tagsComp as Component);
   }
 
   /**

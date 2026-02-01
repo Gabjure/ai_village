@@ -290,9 +290,11 @@ export class CraftBehavior extends BaseBehavior {
    * Get the crafting system from the world.
    */
   private getCraftingSystem(world: World): CraftingSystem | null {
-    // The crafting system should be accessible via world property
-    // This is set up when the game initializes systems
-    return (world as unknown as { craftingSystem?: CraftingSystem }).craftingSystem ?? null;
+    // Access craftingSystem if it exists on world (runtime extension)
+    interface WorldWithCrafting extends World {
+      craftingSystem?: CraftingSystem;
+    }
+    return (world as WorldWithCrafting).craftingSystem ?? null;
   }
 
   /**
@@ -387,12 +389,16 @@ export function craftBehaviorWithContext(ctx: import('../BehaviorContext.js').Be
     };
     craftingSystem?: CraftingSystem;
   }
+  // Access craftingSystem from ctx.world (runtime extension)
+  interface WorldWithCrafting extends World {
+    craftingSystem?: CraftingSystem;
+  }
   const world: MinimalWorldWithCrafting = {
     tick: ctx.tick,
     getEntity: (id: string) => ctx.getEntity(id),
-    eventBus: { emit: (e: any) => ctx.emit(e) },
-    craftingSystem: (ctx as unknown as { world?: { craftingSystem?: CraftingSystem } }).world?.craftingSystem,
+    eventBus: { emit: (e: unknown) => ctx.emit(e) },
+    craftingSystem: (ctx.world as WorldWithCrafting).craftingSystem,
   };
 
-  return behavior.execute(ctx.entity, world as unknown as World);
+  return behavior.execute(ctx.entity, world as World);
 }

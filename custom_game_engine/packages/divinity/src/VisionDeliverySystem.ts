@@ -183,7 +183,7 @@ export class VisionDeliverySystem {
    * Emit an event using generic type to avoid strict type checking
    */
   private emitEvent(type: string, source: string, data: Record<string, unknown>): void {
-    (this.world.eventBus as unknown as { emit: (e: Record<string, unknown>) => void }).emit({
+    this.world.eventBus.emit({
       type,
       source,
       data,

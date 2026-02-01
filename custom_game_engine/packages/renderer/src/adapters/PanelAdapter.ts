@@ -178,7 +178,7 @@ export class PanelAdapter<T> implements IWindowPanel {
       // Default: assume panel has a render method with standard signature
       // Type assertion needed because not all panels have identical signatures
       type PanelWithRender = { render(ctx: CanvasRenderingContext2D, x: number, y: number, width: number, height: number, world?: World): void };
-      (this.panel as unknown as PanelWithRender).render(ctx, x, y, width, height, world);
+      (this.panel as PanelWithRender).render(ctx, x, y, width, height, world);
     }
   }
 

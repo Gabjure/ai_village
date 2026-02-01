@@ -5,9 +5,8 @@
  * The God of Death is a visible, conversational deity that offers death bargains.
  */
 
-import type { World, Entity, PositionComponent, TagsComponent } from '@ai-village/core';
+import type { World, WorldMutator, Entity, PositionComponent, TagsComponent } from '@ai-village/core';
 import {
-  EntityImpl,
   ComponentType,
   createIdentityComponent,
   createPositionComponent,
@@ -51,14 +50,15 @@ export function createGodOfDeath(
 
   // Create the entity
   const entity = world.createEntity();
+  const mutator = world as WorldMutator;
 
   // Identity - God of Death
   const identity = createIdentityComponent(config.name);
-  (entity as unknown as EntityImpl).addComponent(identity);
+  mutator.addComponent(entity.id, identity);
 
   // Position - manifests at death location
   const position = createPositionComponent(location.x, location.y);
-  (entity as unknown as EntityImpl).addComponent(position);
+  mutator.addComponent(entity.id, position);
 
   // Tags - mark as deity and death god
   const tags = createTagsComponent(
@@ -69,24 +69,24 @@ export function createGodOfDeath(
     'conversational', // Can be talked to
     `origin:${config.origin}` // Track cultural origin
   );
-  (entity as unknown as EntityImpl).addComponent(tags);
+  mutator.addComponent(entity.id, tags);
 
   // Renderable - PixelLab sprite (8-directional AI-generated character)
   const spritePath = getDeathGodSpritePath(config);
   const renderable = createRenderableComponent(spritePath, 'entity');
-  (entity as unknown as EntityImpl).addComponent(renderable);
+  mutator.addComponent(entity.id, renderable);
 
   // Episodic Memory - remembers all death bargains and interactions
   const memory = createEpisodicMemoryComponent({ maxMemories: 10000 }); // Gods remember everything
-  (entity as unknown as EntityImpl).addComponent(memory);
+  mutator.addComponent(entity.id, memory);
 
   // Relationship - tracks relationships with mortals and player
   const relationships = createRelationshipComponent();
-  (entity as unknown as EntityImpl).addComponent(relationships);
+  mutator.addComponent(entity.id, relationships);
 
   // Conversation - can engage in dialogue
   const conversation = createConversationComponent(100); // Gods have long conversation histories
-  (entity as unknown as EntityImpl).addComponent(conversation);
+  mutator.addComponent(entity.id, conversation);
 
   return entity;
 }

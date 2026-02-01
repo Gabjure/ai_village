@@ -470,12 +470,8 @@ export function tameAnimalBehaviorWithContext(ctx: BehaviorContext): ContextBeha
 
     // Create taming system instance for this attempt
     const tamingSystem = new TamingSystem();
-    // Access world from BehaviorContext
-    interface ContextWithWorld {
-      world: WorldMutator;
-    }
-    const world = (ctx as unknown as ContextWithWorld).world;
-    tamingSystem.setWorld(world);
+    // Access world from BehaviorContext (world is exposed as readonly property)
+    tamingSystem.setWorld(ctx.world as WorldMutator);
 
     // Attempt taming
     const result = tamingSystem.attemptTaming(
@@ -636,11 +632,7 @@ export function houseAnimalBehaviorWithContext(ctx: BehaviorContext): ContextBeh
     ctx.stopMovement();
 
     // Assign animal to housing
-    interface ContextWithWorld {
-      world: World;
-    }
-    const world = (ctx as unknown as ContextWithWorld).world;
-    const result = assignAnimalToHousing(world, targetAnimalId, housing.entity.id);
+    const result = assignAnimalToHousing(ctx.world, targetAnimalId, housing.entity.id);
 
     if (result.success) {
       // Emit success event

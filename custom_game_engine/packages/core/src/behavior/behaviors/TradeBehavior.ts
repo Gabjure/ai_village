@@ -293,11 +293,11 @@ export class TradeBehavior extends BaseBehavior {
    */
   private getTradingSystem(world: World): TradingSystem | null {
     // The trading system should be accessible via world property
-    interface WorldWithSystems {
+    interface WorldWithSystems extends World {
       getSystem?: (name: string) => unknown;
       tradingSystem?: TradingSystem;
     }
-    const worldWithSystems = world as unknown as WorldWithSystems;
+    const worldWithSystems = world as WorldWithSystems;
     const system = worldWithSystems.getSystem?.('trading');
     if (system) {
       return system as TradingSystem;
@@ -454,8 +454,8 @@ function handleExecuteTrade(ctx: BehaviorContext, state: Record<string, unknown>
   }
 
   // Get trading system - access via the entity's world reference
-  const world = (ctx as unknown as { world: World }).world;
-  interface WorldWithSystems {
+  const world = ctx.world;
+  interface WorldWithSystems extends World {
     getSystem?: (name: string) => unknown;
     tradingSystem?: TradingSystem;
   }
@@ -463,7 +463,7 @@ function handleExecuteTrade(ctx: BehaviorContext, state: Record<string, unknown>
     buyFromShop(world: World, agentId: string, shopId: string, itemId: string, quantity: number): { success: boolean; reason?: string };
     sellToShop(world: World, agentId: string, shopId: string, itemId: string, quantity: number): { success: boolean; reason?: string };
   }
-  const worldWithSystems = world as unknown as WorldWithSystems;
+  const worldWithSystems = world as WorldWithSystems;
   const tradingSystem = (worldWithSystems.getSystem?.('trading') ?? worldWithSystems.tradingSystem) as TradingSystemLike | undefined;
 
   if (!tradingSystem) {

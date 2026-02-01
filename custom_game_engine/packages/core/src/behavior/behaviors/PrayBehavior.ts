@@ -196,7 +196,7 @@ export class PrayBehavior extends BaseBehavior {
     }));
 
     // Emit prayer event (using untyped emit for custom event)
-    const eventBus = world.eventBus as unknown as { emit: (event: unknown) => void };
+    const eventBus = world.eventBus;
     eventBus.emit({
       type: 'prayer:offered',
       source: 'pray_behavior',
@@ -237,7 +237,7 @@ export class PrayBehavior extends BaseBehavior {
     }
 
     // Emit completion event (using untyped emit for custom event)
-    const eventBus = world.eventBus as unknown as { emit: (event: unknown) => void };
+    const eventBus = world.eventBus;
     eventBus.emit({
       type: 'prayer:complete',
       source: 'pray_behavior',
@@ -332,7 +332,11 @@ export class PrayBehavior extends BaseBehavior {
    * Get the SacredSiteSystem from the world
    */
   private getSacredSiteSystem(world: World): SacredSiteSystem | null {
-    const systems = (world as unknown as { systems?: Map<string, unknown> }).systems;
+    // Access systems map if it exists on world (runtime extension)
+    interface WorldWithSystems extends World {
+      systems?: Map<string, unknown>;
+    }
+    const systems = (world as WorldWithSystems).systems;
     if (systems instanceof Map) {
       return systems.get('sacred_site') as SacredSiteSystem | null;
     }
@@ -533,12 +537,15 @@ function generatePrayerFromTemplate(
 }
 
 function getSacredSiteSystemFromContext(ctx: BehaviorContext): SacredSiteSystem | null {
-  // Access world through entity's internal reference
-  const entityImpl = ctx.entity as EntityImpl;
-  const world = (entityImpl as unknown as { world?: World }).world;
+  // Access world from BehaviorContext (world is exposed as readonly property)
+  const world = ctx.world;
   if (!world) return null;
 
-  const systems = (world as unknown as { systems?: Map<string, unknown> }).systems;
+  // Access systems map if it exists on world (runtime extension)
+  interface WorldWithSystems extends World {
+    systems?: Map<string, unknown>;
+  }
+  const systems = (world as WorldWithSystems).systems;
   if (systems instanceof Map) {
     const system = systems.get('sacred_site');
     return system instanceof SacredSiteSystem ? system : null;
