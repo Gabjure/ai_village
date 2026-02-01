@@ -525,6 +525,7 @@ export class PlanetCreationScreen {
     `;
     nameInput.oninput = (e) => {
       this.planetName = (e.target as HTMLInputElement).value;
+      this.renderNavButtons('naming');
     };
     inputContainer.appendChild(nameInput);
 
@@ -544,6 +545,7 @@ export class PlanetCreationScreen {
     randomBtn.onclick = () => {
       this.planetName = PlanetCreationScreen.generatePlanetName();
       nameInput.value = this.planetName;
+      this.renderNavButtons('naming');
     };
     inputContainer.appendChild(randomBtn);
 

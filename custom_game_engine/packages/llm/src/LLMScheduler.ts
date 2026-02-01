@@ -410,16 +410,22 @@ export class LLMScheduler {
       return null;
     }
 
-    // Build prompt using selected layer's builder
-    const prompt = this.buildPrompt(selection.layer, agent, world);
-
-    // Record invocation time
+    // Record invocation time BEFORE queueing
+    // (cooldown starts when we decide to invoke, not when LLM responds)
     const state = this.getAgentState(agent.id);
     state.lastInvocation[selection.layer] = Date.now();
 
-    // Queue decision
+    // LAZY PROMPT BUILDING: Pass a builder function instead of a built prompt.
+    // The prompt will be built at send-time (when request reaches front of queue),
+    // ensuring it reflects the agent's current state, not stale queue-time state.
+    // This is both more efficient (no wasted builds for stale requests) and more
+    // accurate (prompt reflects reality when LLM actually processes it).
+    const layer = selection.layer; // Capture for closure
+    const promptBuilder = () => this.buildPrompt(layer, agent, world);
+
+    // Queue decision with lazy prompt builder
     try {
-      const response = await this.queue.requestDecision(agent.id, prompt);
+      const response = await this.queue.requestDecision(agent.id, promptBuilder);
 
       // Track metrics: successful call
       this.metrics.successfulCalls++;

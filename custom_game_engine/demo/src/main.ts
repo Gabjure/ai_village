@@ -66,10 +66,13 @@ import {
   createIdentityComponent,
   // Component type enum for content checkers
   ComponentType as CT,
+  // Settlement component (multi-player groups on shared planets)
+  createSettlementComponent,
+  generateSettlementId,
   // Chunk spatial query injection functions
   // Injection functions removed - use world.spatialQuery instead
 } from '@ai-village/core';
-import { saveLoadService, IndexedDBStorage, migrateLocalSaves, checkMigrationStatus, planetClient, multiverseClient, creationStateManager, EntityPersistenceStream, type PlanetMetadata, type CreationState } from '@ai-village/persistence';
+import { saveLoadService, IndexedDBStorage, migrateLocalSaves, checkMigrationStatus, planetClient, multiverseClient, creationStateManager, EntityPersistenceStream, type PlanetMetadata, type CreationState, type SettlementData } from '@ai-village/persistence';
 import { LiveEntityAPI } from '@ai-village/metrics';
 import { SpellRegistry } from '@ai-village/magic';
 import { GameIntrospectionAPI, ComponentRegistry, MutationService } from '@ai-village/introspection';
@@ -137,6 +140,7 @@ import {
   UniverseBrowserScreen,
   type UniverseBrowserResult,
   type GameStartConfig,
+  SettlementSelectionScreen,
   SCENARIO_PRESETS,
   type UniverseConfig,
   createGovernanceDashboardPanelAdapter,
@@ -410,13 +414,21 @@ function createInitialBuildings(world: WorldMutator) {
   (world as any)._addEntity(constructionEntity);
 }
 
-function createInitialAgents(world: WorldMutator, dungeonMasterPrompt?: string): string[] {
+function createInitialAgents(
+  world: WorldMutator,
+  dungeonMasterPrompt?: string,
+  settlementId?: string
+): string[] {
   const agentCount = 5;
   const centerX = 0;
   const centerY = 0;
   const spread = 2;
 
   const agentIds: string[] = [];
+
+  // Generate settlement ID if not provided
+  const effectiveSettlementId = settlementId || generateSettlementId();
+  const currentTick = (world as any).tick ?? 0;
 
   for (let i = 0; i < agentCount; i++) {
     const offsetX = (i % 3) - 1;
@@ -426,7 +438,20 @@ function createInitialAgents(world: WorldMutator, dungeonMasterPrompt?: string):
 
     const agentId = createLLMAgent(world, x, y, 2.0, dungeonMasterPrompt);
     agentIds.push(agentId);
+
+    // Add settlement component to each agent
+    const agentEntity = world.getEntity(agentId);
+    if (agentEntity) {
+      const isFounder = i === 0; // First agent is the founder
+      agentEntity.addComponent(createSettlementComponent(
+        effectiveSettlementId,
+        isFounder ? 'founder' : 'member',
+        currentTick
+      ));
+    }
   }
+
+  console.log(`[Agents] Created ${agentCount} agents in settlement ${effectiveSettlementId}`);
 
   // Choose one random agent to be the leader
   const leaderIndex = Math.floor(Math.random() * agentIds.length);
@@ -3864,8 +3889,8 @@ async function main() {
     loadedCheckpoint = true;  // Treat as if we loaded a checkpoint
     universeSelection = { type: 'load', checkpointKey: 'worker-resume' };
   }
-  // Auto-load most recent save if available (unless explicitly overridden)
-  else if (!creationResumeState && !forceShowBrowser && existingSaves.length > 0) {
+  // Auto-load most recent save if available (unless explicitly overridden or hub action specified)
+  else if (!creationResumeState && !forceShowBrowser && !hubAction && existingSaves.length > 0) {
     // Sort saves by timestamp (most recent first)
     const sortedSaves = [...existingSaves].sort((a, b) => {
       const timeA = a.metadata?.savedAt || 0;
@@ -3885,9 +3910,9 @@ async function main() {
   }
   // Show Universe Browser Screen only if:
   // - Not resuming creation
-  // - No existing saves OR user explicitly wants to see browser
+  // - No existing saves OR user explicitly wants to see browser OR hub action specified
   else if (!creationResumeState) {
-    console.log('[Demo] Showing Universe Browser (no saves found or ?newGame=true in URL)');
+    console.log(`[Demo] Showing Universe Browser (no saves, ?newGame=true, or hub action: ${hubAction || 'none'})`);
     browserResult = await new Promise<UniverseBrowserResult>((resolve) => {
       const browserScreen = new UniverseBrowserScreen();
       browserScreen.show(
@@ -5033,9 +5058,42 @@ async function main() {
       }
     }
 
+    // === SETTLEMENT CREATION ===
+    // Generate or retrieve settlement ID for this game session
+    // Multiple settlements can coexist on the same planet, sharing biosphere
+    let currentSettlementId = (universeConfig as any)?.settlementId;
+    if (!currentSettlementId) {
+      currentSettlementId = generateSettlementId();
+      console.log(`[Settlement] Generated new settlement ID: ${currentSettlementId}`);
+
+      // Create settlement on server if available
+      if (planetServerAvailable && serverPlanetId) {
+        try {
+          const playerId = localStorage.getItem('ai-village-player-id') || 'local-player';
+          const settlementName = settings.settlementName || 'New Settlement';
+          await planetClient.createSettlement(serverPlanetId, {
+            id: currentSettlementId,
+            name: settlementName,
+            ownerId: playerId,
+            foundedTick: gameLoop.world.tick,
+            agentCount: 5, // Initial agent count
+            centerX: 0,
+            centerY: 0,
+            color: `hsl(${Math.floor(Math.random() * 360)}, 70%, 50%)`,
+          });
+          console.log(`[Settlement] Created settlement on server: ${settlementName}`);
+        } catch (error) {
+          console.warn('[Settlement] Failed to create settlement on server:', error);
+          // Continue anyway - settlement will work locally
+        }
+      }
+    } else {
+      console.log(`[Settlement] Using existing settlement: ${currentSettlementId}`);
+    }
+
     // Create initial entities
     createInitialBuildings(gameLoop.world);
-    const agentIds = createInitialAgents(gameLoop.world, settings.dungeonMasterPrompt);
+    const agentIds = createInitialAgents(gameLoop.world, settings.dungeonMasterPrompt, currentSettlementId);
 
     // === INCREMENTAL PERSISTENCE: Phase 3 - World Populated ===
     if (!loadedCheckpoint) {

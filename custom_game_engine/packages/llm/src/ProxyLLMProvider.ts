@@ -147,7 +147,7 @@ export class ProxyLLMProvider implements LLMProvider {
           // Extract cooldown time from server response
           const waitMs = errorData.cooldown?.waitMs ||
                         errorData.waitMs ||
-                        8000; // Default 8 second wait if not specified
+                        2000; // Default 2 second wait if not specified (reduced from 8s)
 
           // Update client-side cooldown state
           this.cooldownState.set(provider, Date.now() + waitMs);

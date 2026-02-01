@@ -76,6 +76,9 @@ export class PlantSystem extends BaseSystem {
   // Track corrupted plants that have already been reported (report once, not every tick)
   private reportedCorruptedPlants = new Set<string>();
 
+  // Cache time entity ID to avoid repeated queries
+  private timeEntityId: string | null = null;
+
   // Event listeners storage
   private weatherRainIntensity: string | null = null;
   private weatherFrostTemperature: number | null = null;
@@ -190,12 +193,13 @@ export class PlantSystem extends BaseSystem {
     world.simulationScheduler.updateAgentPositions(world);
 
     // Get time component to calculate game hours elapsed
-    const timeEntities = world.query().with(CT.Time).executeEntities();
+    // PERFORMANCE: Cache time entity ID to avoid repeated queries
     let gameHoursElapsed = 0;
 
-    if (timeEntities.length > 0) {
-      const timeEntity = timeEntities[0];
-      const timeComp = timeEntity!.components.get('time') as { dayLength: number; speedMultiplier: number } | undefined;
+    if (this.timeEntityId && world.getEntity(this.timeEntityId)) {
+      // Use cached time entity
+      const timeEntity = world.getEntity(this.timeEntityId)!;
+      const timeComp = timeEntity.components.get('time') as { dayLength: number; speedMultiplier: number } | undefined;
       if (timeComp) {
         // Calculate effective day length based on speed multiplier
         const effectiveDayLength = timeComp.dayLength / timeComp.speedMultiplier;
@@ -203,8 +207,22 @@ export class PlantSystem extends BaseSystem {
         gameHoursElapsed = (effectiveDeltaTime / effectiveDayLength) * 24;
       }
     } else {
-      // Fallback: assume 10 minutes per day (600 seconds)
-      gameHoursElapsed = (effectiveDeltaTime / 600) * 24;
+      // Query for time entity and cache its ID
+      const timeEntities = world.query().with(CT.Time).executeEntities();
+      if (timeEntities.length > 0) {
+        const timeEntity = timeEntities[0];
+        this.timeEntityId = timeEntity!.id; // Cache the ID
+        const timeComp = timeEntity!.components.get('time') as { dayLength: number; speedMultiplier: number } | undefined;
+        if (timeComp) {
+          // Calculate effective day length based on speed multiplier
+          const effectiveDayLength = timeComp.dayLength / timeComp.speedMultiplier;
+          // Convert real-time effectiveDeltaTime to game hours
+          gameHoursElapsed = (effectiveDeltaTime / effectiveDayLength) * 24;
+        }
+      } else {
+        // Fallback: assume 10 minutes per day (600 seconds)
+        gameHoursElapsed = (effectiveDeltaTime / 600) * 24;
+      }
     }
 
     // Accumulate time
@@ -229,7 +247,19 @@ export class PlantSystem extends BaseSystem {
       hoursToProcess = this.accumulatedTime;
     }
 
-    // Validate all plant entities first (regardless of time accumulation)
+    // Filter entities using SimulationScheduler - only process visible plants (if we have hours to process)
+    // Note: Planted crops are handled specially below (always simulate)
+    const visibleEntities = shouldUpdate && hoursToProcess > 0
+      ? world.simulationScheduler.filterActiveEntities(entities as unknown as Entity[], world.tick)
+      : [];
+
+    // Build set of visible entity IDs for quick lookup
+    const visibleEntityIds = new Set<string>();
+    for (const entity of visibleEntities) {
+      visibleEntityIds.add(entity.id);
+    }
+
+    // PERFORMANCE: Single loop for validation and processing (merged)
     for (const entity of entities) {
       const impl = entity as EntityImpl;
       const plant = impl.getComponent<PlantComponent>(CT.Plant);
@@ -279,36 +309,11 @@ export class PlantSystem extends BaseSystem {
         continue;
       }
 
-      // Validate species exists (per CLAUDE.md: throw instead of silent fallback)
-      const species = this.getSpecies(plant.speciesId);
-      void species; // Use species to prevent unused variable warning
-    }
-
-    // Skip processing if no hours to process
-    if (!shouldUpdate || hoursToProcess === 0) {
-      return;
-    }
-
-    // Filter entities using SimulationScheduler - only process visible plants
-    // Note: Planted crops are handled specially below (always simulate)
-    const visibleEntities = world.simulationScheduler.filterActiveEntities(
-      entities as unknown as Entity[],
-      world.tick
-    );
-
-    // Build set of visible entity IDs for quick lookup
-    const visibleEntityIds = new Set<string>();
-    for (const entity of visibleEntities) {
-      visibleEntityIds.add(entity.id);
-    }
-
-    for (const entity of entities) {
-      const impl = entity as EntityImpl;
-      const plant = impl.getComponent<PlantComponent>(CT.Plant);
-      if (!plant) continue;
-
-      // Skip plants missing critical data (validated above, but double-check)
-      if (!plant.position) {
+      // Skip processing if no hours to process (validation is complete)
+      if (!shouldUpdate || hoursToProcess === 0) {
+        // Still validate species exists (per CLAUDE.md: throw instead of silent fallback)
+        const species = this.getSpecies(plant.speciesId);
+        void species; // Use species to prevent unused variable warning
         continue;
       }
 
@@ -387,9 +392,8 @@ export class PlantSystem extends BaseSystem {
       this.daySkipCount = 0; // Reset day skip counter
     }
 
-    // Mark delta rates as updated
-    const shouldUpdateDeltas = currentTick - this.lastDeltaUpdateTick >= this.DELTA_UPDATE_INTERVAL;
-    if (shouldUpdateDeltas) {
+    // Mark delta rates as updated (only check once, not redundantly)
+    if (currentTick - this.lastDeltaUpdateTick >= this.DELTA_UPDATE_INTERVAL) {
       this.lastDeltaUpdateTick = currentTick;
     }
 
@@ -1065,9 +1069,13 @@ export class PlantSystem extends BaseSystem {
   /** Cache of nearby plants per position (cleared each update) */
   private nearbyPlantsCache: Map<string, Array<{ speciesId: string; distance: number }>> = new Map();
 
+  /** Chunk size for spatial queries (must match world package) */
+  private static readonly CHUNK_SIZE = 32;
+
   /**
    * Get nearby plants within companion radius
-   * Uses caching to avoid repeated queries for the same position
+   * Uses chunk-based spatial query (O(nearby) instead of O(all plants))
+   * and caching to avoid repeated queries for the same position
    */
   private getNearbyPlants(
     position: { x: number; y: number },
@@ -1081,29 +1089,46 @@ export class PlantSystem extends BaseSystem {
     }
 
     const nearbyPlants: Array<{ speciesId: string; distance: number }> = [];
-    const allPlants = world.query().with(CT.Plant).executeEntities();
 
-    for (const plantEntity of allPlants) {
-      if (plantEntity.id === excludeEntityId) continue;
+    // PERFORMANCE: Use chunk-based spatial query instead of global query
+    // For COMPANION_RADIUS=3 and CHUNK_SIZE=32, we query a 3x3 chunk grid
+    // This is O(entities in ~9 chunks) instead of O(all plants in world)
+    const centerChunkX = Math.floor(position.x / PlantSystem.CHUNK_SIZE);
+    const centerChunkY = Math.floor(position.y / PlantSystem.CHUNK_SIZE);
 
-      const plantImpl = plantEntity as EntityImpl;
-      const plantComp = plantImpl.getComponent<PlantComponent>(CT.Plant);
-      if (!plantComp || !plantComp.position) continue;
+    // Query 3x3 chunk grid around center position
+    for (let dx = -1; dx <= 1; dx++) {
+      for (let dy = -1; dy <= 1; dy++) {
+        const chunkX = centerChunkX + dx;
+        const chunkY = centerChunkY + dy;
+        const entityIds = world.getEntitiesInChunk(chunkX, chunkY);
 
-      // Skip dead plants
-      if (plantComp.stage === 'dead') continue;
+        for (const entityId of entityIds) {
+          if (entityId === excludeEntityId) continue;
 
-      const dx = plantComp.position.x - position.x;
-      const dy = plantComp.position.y - position.y;
-      const distanceSquared = dx * dx + dy * dy;
+          const entity = world.getEntity(entityId);
+          if (!entity) continue;
 
-      if (distanceSquared <= PlantSystem.COMPANION_RADIUS_SQUARED && distanceSquared > 0) {
-        // Only compute actual distance when needed (for distance falloff calculation)
-        const distance = Math.sqrt(distanceSquared);
-        nearbyPlants.push({
-          speciesId: plantComp.speciesId,
-          distance
-        });
+          // Check if this entity is a plant
+          const plantComp = entity.getComponent<PlantComponent>(CT.Plant);
+          if (!plantComp || !plantComp.position) continue;
+
+          // Skip dead plants
+          if (plantComp.stage === 'dead') continue;
+
+          const pdx = plantComp.position.x - position.x;
+          const pdy = plantComp.position.y - position.y;
+          const distanceSquared = pdx * pdx + pdy * pdy;
+
+          if (distanceSquared <= PlantSystem.COMPANION_RADIUS_SQUARED && distanceSquared > 0) {
+            // Only compute actual distance when needed (for distance falloff calculation)
+            const distance = Math.sqrt(distanceSquared);
+            nearbyPlants.push({
+              speciesId: plantComp.speciesId,
+              distance
+            });
+          }
+        }
       }
     }
 

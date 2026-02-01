@@ -1315,26 +1315,119 @@ export class PixiJSRenderer implements IRenderer {
   /**
    * Debug function to log current agent positions and sprite states.
    * Call from browser console: window.game.renderer.debugAgentPositions()
+   *
+   * This function comprehensively checks all components required for movement:
+   * - Position (required by MovementSystem + SteeringSystem)
+   * - Velocity (required by SteeringSystem)
+   * - Movement (required by MovementSystem)
+   * - Steering (behavior + target)
    */
   debugAgentPositions(): void {
-    console.group('[PixiJSRenderer] Agent Debug Info');
+    console.group('[PixiJSRenderer] Agent Movement Diagnostic');
     console.log(`Cached agents: ${this._cachedAgentEntities.length}`);
     console.log(`Entity sprites: ${this.entitySprites.size}`);
-    console.log(`Visible entities: ${this._visibleEntities.length}`);
-    console.log(`Cache refresh ticks - agents: ${this._agentCacheLastRefresh}, renderables: ${this._renderableCacheLastRefresh}`);
+    console.log(`Cache refresh ticks - agents: ${this._agentCacheLastRefresh}`);
 
-    for (const entity of this._cachedAgentEntities.slice(0, 5)) {
+    // Diagnostic counters
+    let hasPosition = 0;
+    let hasVelocity = 0;
+    let hasMovement = 0;
+    let hasSteering = 0;
+    let hasSteeringTarget = 0;
+    let hasNonZeroVelocity = 0;
+    let steeringBehaviors: Record<string, number> = {};
+
+    for (const entity of this._cachedAgentEntities) {
       const pos = entity.getComponent('position') as { x: number; y: number } | undefined;
       const vel = entity.getComponent('velocity') as { vx: number; vy: number } | undefined;
-      const sprite = this.entitySprites.get(entity.id);
-      console.log(`  Agent ${entity.id.slice(0, 8)}:`, {
-        componentPos: pos ? `(${pos.x.toFixed(2)}, ${pos.y.toFixed(2)})` : 'none',
-        velocity: vel ? `(${vel.vx.toFixed(2)}, ${vel.vy.toFixed(2)})` : 'none',
-        spritePos: sprite ? `(${sprite.x.toFixed(2)}, ${sprite.y.toFixed(2)})` : 'no sprite',
-        spriteVisible: sprite ? sprite.visible : false,
-      });
+      const movement = entity.getComponent('movement') as { velocityX: number; velocityY: number } | undefined;
+      const steering = entity.getComponent('steering') as {
+        behavior: string;
+        target?: { x: number; y: number };
+        maxSpeed?: number;
+      } | undefined;
+
+      if (pos) hasPosition++;
+      if (vel) hasVelocity++;
+      if (movement) hasMovement++;
+      if (steering) {
+        hasSteering++;
+        steeringBehaviors[steering.behavior] = (steeringBehaviors[steering.behavior] || 0) + 1;
+        if (steering.target) hasSteeringTarget++;
+      }
+      if (vel && (vel.vx !== 0 || vel.vy !== 0)) hasNonZeroVelocity++;
     }
-    console.log('\nTo check if simulation is running, run: window.game.gameLoop.world.tick');
+
+    const total = this._cachedAgentEntities.length;
+    console.log('\n=== COMPONENT COVERAGE ===');
+    console.log(`Position:  ${hasPosition}/${total} (${((hasPosition/total)*100).toFixed(0)}%)`);
+    console.log(`Velocity:  ${hasVelocity}/${total} (${((hasVelocity/total)*100).toFixed(0)}%) - REQUIRED for SteeringSystem`);
+    console.log(`Movement:  ${hasMovement}/${total} (${((hasMovement/total)*100).toFixed(0)}%) - REQUIRED for MovementSystem`);
+    console.log(`Steering:  ${hasSteering}/${total} (${((hasSteering/total)*100).toFixed(0)}%) - REQUIRED for SteeringSystem`);
+    console.log(`  - with target: ${hasSteeringTarget}/${hasSteering}`);
+    console.log(`Non-zero velocity: ${hasNonZeroVelocity}/${total}`);
+
+    console.log('\n=== STEERING BEHAVIORS ===');
+    for (const [behavior, count] of Object.entries(steeringBehaviors)) {
+      console.log(`  ${behavior}: ${count}`);
+    }
+
+    // DIAGNOSIS
+    console.log('\n=== DIAGNOSIS ===');
+    if (hasVelocity === 0) {
+      console.error('PROBLEM: No agents have Velocity component - SteeringSystem cannot run!');
+    }
+    if (hasMovement === 0) {
+      console.error('PROBLEM: No agents have Movement component - MovementSystem cannot run!');
+    }
+    if (hasSteering === 0) {
+      console.error('PROBLEM: No agents have Steering component - SteeringSystem will skip them!');
+    }
+    if (hasSteering > 0 && hasSteeringTarget === 0) {
+      console.warn('WARNING: Agents have Steering but no targets set - they may be wandering or idle');
+    }
+    if (steeringBehaviors['none'] === hasSteering) {
+      console.error('PROBLEM: All agents have steering.behavior = "none" - no movement calculated!');
+    }
+    if (hasVelocity > 0 && hasNonZeroVelocity === 0) {
+      console.warn('WARNING: Agents have Velocity component but all values are zero');
+    }
+
+    // Sample first 3 agents in detail
+    console.log('\n=== SAMPLE AGENTS (first 3) ===');
+    for (const entity of this._cachedAgentEntities.slice(0, 3)) {
+      const pos = entity.getComponent('position') as { x: number; y: number } | undefined;
+      const vel = entity.getComponent('velocity') as { vx: number; vy: number } | undefined;
+      const movement = entity.getComponent('movement') as { velocityX: number; velocityY: number } | undefined;
+      const steering = entity.getComponent('steering') as {
+        behavior: string;
+        target?: { x: number; y: number };
+        maxSpeed?: number;
+      } | undefined;
+      const sprite = this.entitySprites.get(entity.id);
+
+      console.log(`\nAgent ${entity.id.slice(0, 8)}:`);
+      console.log(`  Position: ${pos ? `(${pos.x.toFixed(2)}, ${pos.y.toFixed(2)})` : 'MISSING'}`);
+      console.log(`  Velocity: ${vel ? `vx=${vel.vx.toFixed(3)}, vy=${vel.vy.toFixed(3)}` : 'MISSING'}`);
+      console.log(`  Movement: ${movement ? `vX=${movement.velocityX.toFixed(3)}, vY=${movement.velocityY.toFixed(3)}` : 'MISSING'}`);
+      console.log(`  Steering: ${steering ? `behavior="${steering.behavior}", target=${steering.target ? `(${steering.target.x.toFixed(1)}, ${steering.target.y.toFixed(1)})` : 'none'}, maxSpeed=${steering.maxSpeed}` : 'MISSING'}`);
+      console.log(`  Sprite: ${sprite ? `visible=${sprite.visible}, pos=(${sprite.x.toFixed(1)}, ${sprite.y.toFixed(1)})` : 'no sprite'}`);
+    }
+
+    console.log('\n=== HOW TO FIX ===');
+    if (hasVelocity === 0 || hasMovement === 0 || hasSteering === 0) {
+      console.log('Agents are missing required components. Check agent creation code.');
+      console.log('Required components for movement: Position, Velocity, Movement, Steering');
+    } else if (steeringBehaviors['none'] === hasSteering || hasSteeringTarget === 0) {
+      console.log('Agents have components but no active steering behavior/target.');
+      console.log('Check AgentBrainSystem - it should set steering.behavior and steering.target.');
+    } else if (hasNonZeroVelocity === 0) {
+      console.log('SteeringSystem may not be running or not computing velocity.');
+      console.log('Check system registry: window.game.gameLoop.systemRegistry.systems');
+    } else {
+      console.log('Components look OK - check MovementSystem execution.');
+    }
+
     console.groupEnd();
   }
 

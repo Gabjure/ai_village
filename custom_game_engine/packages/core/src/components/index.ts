@@ -1337,3 +1337,17 @@ export {
   createSleepComponent,
   type SleepComponent,
 } from './SleepComponent.js';
+
+// Settlement Component (Multi-player groups on shared planets)
+export * from './SettlementComponent.js';
+export {
+  createSettlementComponent,
+  createFounderSettlementComponent,
+  generateSettlementId,
+  createSettlementMetadata,
+  countAgentsBySettlement,
+  migrateToSettlement,
+  type SettlementComponent,
+  type SettlementMetadata,
+  type SettlementRole,
+} from './SettlementComponent.js';

@@ -485,7 +485,7 @@ export class MovementSystem extends BaseSystem {
     return this.buildingCollisionCache;
   }
 
-  protected async onUpdate(ctx: SystemContext): Promise<void> {
+  protected onUpdate(ctx: SystemContext): void {
     // Get time acceleration multiplier from TimeComponent (cached)
     let timeSpeedMultiplier = 1.0;
 
@@ -512,7 +512,9 @@ export class MovementSystem extends BaseSystem {
     // TIER 3/4 OPTIMIZATION: Structure-of-Arrays batch processing with SIMD/WebGPU
     // Process velocity integration in a tight loop for better cache locality
     // This handles all entities with Velocity components (steering-based movement)
-    await this.batchProcessVelocity(ctx, timeSpeedMultiplier);
+    // Note: batchProcessVelocity is async for GPU path, but we fire-and-forget here
+    // since the legacy loop below handles non-VelocityComponent entities synchronously
+    this.batchProcessVelocity(ctx, timeSpeedMultiplier);
 
     // Entities already filtered by requiredComponents and SimulationScheduler
     for (const entity of ctx.activeEntities) {

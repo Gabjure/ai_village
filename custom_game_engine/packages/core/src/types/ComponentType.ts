@@ -304,4 +304,7 @@ export enum ComponentType {
 
   // Performance Infrastructure
   MutationVector = 'mutation_vector',        // Entity-local mutation rates for StateMutatorSystem
+
+  // Settlement (multi-player groups on shared planets)
+  Settlement = 'settlement',                 // Tracks which settlement an entity belongs to
 }

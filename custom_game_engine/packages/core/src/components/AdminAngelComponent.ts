@@ -128,6 +128,15 @@ export interface AgentFamiliarity {
 
   /** Notable memories about this agent */
   memories: AgentMemory[];
+
+  /** Quirks the angel has noticed (for personality) */
+  quirks: string[]; // ["goes to same spot", "ignores food when hungry", "hoards wood"]
+
+  /** Angel's opinion - is this agent interesting or boring? */
+  opinion: 'fascinating' | 'interesting' | 'neutral' | 'boring' | 'concerning'; // Dynamic based on behavior
+
+  /** Behavioral counters for quirk detection */
+  behaviorCounts: Map<string, number>; // Track repetitive actions
 }
 
 /**
@@ -255,6 +264,30 @@ export interface ConversationContext {
 // ============================================================================
 // Narrative Types (Phase 1)
 // ============================================================================
+
+/**
+ * Investigation into an observed pattern
+ * Angel tracks what it's curious about and forms hypotheses
+ */
+export interface Investigation {
+  id: string;
+  subject: string;           // "why does Dove hoard wood?"
+  hypothesis: string;        // "i think they're planning something big"
+  evidence: string[];        // ["gathered wood 12 times", "built 2 chests"]
+  status: 'active' | 'resolved' | 'abandoned';
+  startTick: number;
+  resolutionTick?: number;
+  resolution?: string;       // "turns out they were building a house!"
+}
+
+/**
+ * Angel's investigation journal - what mysteries it's tracking
+ */
+export interface InvestigationMemory {
+  activeInvestigations: Investigation[];
+  completedInvestigations: Investigation[];
+  maxActive: number;  // 3
+}
 
 /**
  * Tracked behavioral pattern for narrative generation
@@ -477,6 +510,9 @@ export interface AdminAngelMemory {
   /** Narrative tracking - patterns and story threads (Phase 1) */
   narrative: NarrativeState;
 
+  /** Angel's investigation journal - what it has discovered */
+  investigations: InvestigationMemory;
+
   /** Angel's agency - goals, power, achievements (Phase 2) */
   agency: AngelAgency;
 }
@@ -588,6 +624,11 @@ export function createAdminAngelMemory(): AdminAngelMemory {
       maxActiveThreads: 3,
       lastPatternScanTick: 0,
       patternScanInterval: 200, // Every 200 ticks (~10 seconds)
+    },
+    investigations: {
+      activeInvestigations: [],
+      completedInvestigations: [],
+      maxActive: 3,
     },
     agency: {
       activeGoals: [],

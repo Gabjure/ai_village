@@ -66,6 +66,7 @@ export * from './CosmicHubManager.js';
 export * from './UniverseGalleryScreen.js';
 export * from './PlanetListScreen.js';
 export * from './LivePlanetCreationScreen.js';
+export * from './SettlementSelectionScreen.js';
 export * from './UniverseBrowserScreen.js';
 export * from './UniversePlanetsScreen.js';
 export * from './MultiverseTimelineView.js';

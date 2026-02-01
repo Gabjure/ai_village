@@ -16,10 +16,18 @@ export interface CustomLLMConfig {
 
 interface DecisionRequest {
   agentId: string;
+  /**
+   * Either a pre-built prompt string OR a builder function for lazy evaluation.
+   * If promptBuilder is provided, prompt is ignored and builder is called at send-time.
+   * This allows prompts to reflect agent state when request reaches front of queue,
+   * not when it was originally queued.
+   */
   prompt: string;
+  promptBuilder?: () => string;
   resolve: (response: string) => void;
   reject: (error: Error) => void;
   startTime: number;
+  queuedAt: number; // When request was added to queue (for staleness metrics)
   customConfig?: CustomLLMConfig; // Per-agent custom LLM configuration
 }
 
@@ -72,12 +80,43 @@ export class LLMDecisionQueue {
    * Returns raw LLM response text for parsing by AISystem.
    *
    * @param agentId - Unique identifier for the agent
-   * @param prompt - The prompt to send to the LLM
+   * @param promptOrBuilder - Either a prompt string OR a builder function for lazy evaluation.
+   *                          Using a builder function is preferred as it builds the prompt
+   *                          at send-time (when request reaches front of queue), ensuring
+   *                          the prompt reflects current agent state, not stale queue-time state.
    * @param customConfig - Optional per-agent custom LLM configuration
    */
-  requestDecision(agentId: string, prompt: string, customConfig?: CustomLLMConfig): Promise<string> {
+  requestDecision(
+    agentId: string,
+    promptOrBuilder: string | (() => string),
+    customConfig?: CustomLLMConfig
+  ): Promise<string> {
+    const now = Date.now();
     return new Promise((resolve, reject) => {
-      this.queue.push({ agentId, prompt, resolve, reject, startTime: Date.now(), customConfig });
+      if (typeof promptOrBuilder === 'function') {
+        // Lazy mode: store builder, build prompt at send-time
+        this.queue.push({
+          agentId,
+          prompt: '', // Placeholder, will be built by promptBuilder
+          promptBuilder: promptOrBuilder,
+          resolve,
+          reject,
+          startTime: now,
+          queuedAt: now,
+          customConfig,
+        });
+      } else {
+        // Eager mode (backwards compat): prompt already built
+        this.queue.push({
+          agentId,
+          prompt: promptOrBuilder,
+          resolve,
+          reject,
+          startTime: now,
+          queuedAt: now,
+          customConfig,
+        });
+      }
       this.processQueue();
     });
   }
@@ -121,14 +160,34 @@ export class LLMDecisionQueue {
    */
   private async processRequest(request: DecisionRequest): Promise<void> {
     try {
+      // LAZY PROMPT BUILDING: If a promptBuilder was provided, build the prompt NOW
+      // at send-time, not at queue-time. This ensures the prompt reflects current
+      // agent state after waiting in queue.
+      let prompt: string;
+      if (request.promptBuilder) {
+        const buildStart = Date.now();
+        prompt = request.promptBuilder();
+        const buildTime = Date.now() - buildStart;
+        const queueWaitTime = Date.now() - request.queuedAt;
+
+        // Log if prompt building took significant time or queue wait was long
+        if (buildTime > 50 || queueWaitTime > 5000) {
+          // Debug: prompt built after waiting in queue
+          // buildTime: how long prompt construction took
+          // queueWaitTime: how long request waited before reaching front of queue
+        }
+      } else {
+        prompt = request.prompt;
+      }
+
       // Calculate max tokens: at least 3x estimated prompt tokens, but respect configured max
       // Cap at 8192 to stay within model limits (Groq limits to 32768, but we don't need that much)
-      const estimatedPromptTokens = Math.ceil(request.prompt.length / 4);
+      const estimatedPromptTokens = Math.ceil(prompt.length / 4);
       const minTokens = estimatedPromptTokens * 3;
       const maxTokens = Math.min(8192, Math.max(minTokens, this.configuredMaxTokens));
 
       const llmRequest: LLMRequest & { tier?: string; agentId?: string } = {
-        prompt: request.prompt,
+        prompt, // Use lazily-built prompt (or pre-built if no builder)
         temperature: 0.7,
         maxTokens, // Thinking models need room for reasoning + tool call
         // Let OllamaProvider handle stop sequences
@@ -183,13 +242,13 @@ export class LLMDecisionQueue {
       }
 
       // Extract agent name from prompt if available
-      const nameMatch = request.prompt.match(/You are (\w+),/);
+      const nameMatch = prompt.match(/You are (\w+),/);
       const agentName = nameMatch ? nameMatch[1] : undefined;
 
       promptLogger.log({
         agentId: request.agentId,
         agentName,
-        prompt: request.prompt,
+        prompt, // Use lazily-built prompt
         response: response.text,
         parsedAction,
         thinking,

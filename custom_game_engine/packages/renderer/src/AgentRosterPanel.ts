@@ -35,6 +35,25 @@ export class AgentRosterPanel implements IWindowPanel {
   private onAgentClickCallback: ((agentId: string) => void) | null = null;
   private selectedAgentId: string | null = null;
 
+  /**
+   * DOM DIFFING: Cache of portrait elements by agent ID.
+   * Instead of destroying and recreating all portraits on every update,
+   * we track existing elements and only add/remove/update what changed.
+   * This prevents:
+   * - Wasted DOM destruction/recreation
+   * - Memory leaks from orphaned event listeners
+   * - Unnecessary sprite reloading
+   */
+  private portraitCache: Map<string, HTMLDivElement> = new Map();
+  private allAgentsButton: HTMLDivElement | null = null;
+
+  /**
+   * SPRITE BATCHING: Queue sprite loads to batch them in a single animation frame.
+   * This prevents multiple repaints when loading many sprites at once.
+   */
+  private pendingSpriteLoads: Array<{canvas: HTMLCanvasElement, spriteFolder: string}> = [];
+  private spriteLoadScheduled: boolean = false;
+
 
   getId(): string {
     return 'agent-roster';
@@ -224,7 +243,8 @@ export class AgentRosterPanel implements IWindowPanel {
   }
 
   /**
-   * Update the DOM elements for this roster panel
+   * Update the DOM elements for this roster panel using DOM diffing.
+   * Only adds/removes/updates elements that changed, instead of destroying everything.
    */
   private updateDOM(): void {
     const agentCount = this.agents.size;
@@ -245,38 +265,81 @@ export class AgentRosterPanel implements IWindowPanel {
 
     // Sort by name for stable display order
     const sortedAgents = agentsToShow.sort((a, b) => a.name.localeCompare(b.name));
+    const targetAgentIds = new Set(sortedAgents.map(a => a.id));
 
-    // Clear container
-    this.rosterContainer.innerHTML = '';
+    // PHASE 1: Remove portraits for agents no longer in the visible list
+    for (const [agentId, portrait] of this.portraitCache) {
+      if (!targetAgentIds.has(agentId)) {
+        portrait.remove();
+        this.portraitCache.delete(agentId);
+      }
+    }
 
-    // Add agent portraits
+    // PHASE 2: Update existing portraits (selection state only) and add new ones
     for (const agent of sortedAgents) {
-      const portrait = this.createAgentPortrait(agent);
+      let portrait = this.portraitCache.get(agent.id);
+
+      if (portrait) {
+        // Portrait exists - just update selection state (cheap)
+        this.updatePortraitSelection(portrait, agent.id === this.selectedAgentId);
+      } else {
+        // New agent - create portrait and add to cache
+        portrait = this.createAgentPortrait(agent);
+        this.portraitCache.set(agent.id, portrait);
+      }
+
+      // Ensure portrait is in the container (may need reordering)
+      // appendChild moves existing elements, so this handles order too
       this.rosterContainer.appendChild(portrait);
     }
 
-    // Add "All Agents" button if needed
+    // PHASE 3: Handle "All Agents" button
     if (showAllButton) {
-      const allButton = this.createAllAgentsButton();
-      this.rosterContainer.appendChild(allButton);
+      if (!this.allAgentsButton) {
+        this.allAgentsButton = this.createAllAgentsButton();
+      }
+      // Update tooltip with current count
+      this.allAgentsButton.title = `View all ${this.agents.size} agents`;
+      this.rosterContainer.appendChild(this.allAgentsButton);
+    } else if (this.allAgentsButton) {
+      this.allAgentsButton.remove();
+      this.allAgentsButton = null;
+    }
+  }
+
+  /**
+   * Update just the selection state of a portrait without recreating it.
+   */
+  private updatePortraitSelection(portrait: HTMLDivElement, isSelected: boolean): void {
+    if (isSelected) {
+      portrait.style.border = '3px solid #ffed4e';
+      portrait.style.boxShadow = '0 0 20px rgba(255, 237, 78, 0.8)';
+    } else {
+      portrait.style.border = '2px solid #ffd700';
+      portrait.style.boxShadow = 'none';
     }
   }
 
   private createAgentPortrait(agent: AgentInfo): HTMLDivElement {
-    const isSelected = this.selectedAgentId === agent.id;
     const portrait = document.createElement('div');
+    // Store agent ID as data attribute for event handlers
+    portrait.dataset.agentId = agent.id;
+
+    // Base styles - selection state is set separately via updatePortraitSelection()
     portrait.style.cssText = `
       width: 70px;
       height: 70px;
       background: linear-gradient(135deg, rgba(30, 30, 50, 0.95) 0%, rgba(20, 20, 40, 0.95) 100%);
-      border: ${isSelected ? '3px solid #ffed4e' : '2px solid #ffd700'};
+      border: 2px solid #ffd700;
       border-radius: 8px;
       cursor: pointer;
       transition: all 0.2s;
       position: relative;
       overflow: hidden;
-      ${isSelected ? 'box-shadow: 0 0 20px rgba(255, 237, 78, 0.8);' : ''}
     `;
+
+    // Apply initial selection state
+    this.updatePortraitSelection(portrait, this.selectedAgentId === agent.id);
 
     // Sprite canvas
     const canvas = document.createElement('canvas');
@@ -288,13 +351,13 @@ export class AgentRosterPanel implements IWindowPanel {
       image-rendering: pixelated;
     `;
 
-    // Load sprite
-    this.loadAgentSprite(canvas, agent.spriteFolder);
+    // Queue sprite load for batching
+    this.queueSpriteLoad(canvas, agent.spriteFolder);
 
     // Name tooltip
     portrait.title = agent.name;
 
-    // Hover effects
+    // Hover effects - restore correct state on mouseleave based on selection
     portrait.addEventListener('mouseenter', () => {
       portrait.style.transform = 'scale(1.1)';
       portrait.style.boxShadow = '0 0 15px rgba(255, 215, 0, 0.6)';
@@ -303,8 +366,9 @@ export class AgentRosterPanel implements IWindowPanel {
 
     portrait.addEventListener('mouseleave', () => {
       portrait.style.transform = 'scale(1)';
-      portrait.style.boxShadow = 'none';
-      portrait.style.borderColor = '#ffd700';
+      // Restore correct selection state
+      const isSelected = this.selectedAgentId === portrait.dataset.agentId;
+      this.updatePortraitSelection(portrait, isSelected);
     });
 
     // Click to focus
@@ -368,6 +432,32 @@ export class AgentRosterPanel implements IWindowPanel {
     });
 
     return button;
+  }
+
+  /**
+   * Queue a sprite load to be processed in a batch.
+   * This prevents multiple repaints when loading many sprites at once.
+   */
+  private queueSpriteLoad(canvas: HTMLCanvasElement, spriteFolder: string): void {
+    this.pendingSpriteLoads.push({canvas, spriteFolder});
+
+    if (!this.spriteLoadScheduled) {
+      this.spriteLoadScheduled = true;
+      requestAnimationFrame(() => this.processSpriteQueue());
+    }
+  }
+
+  /**
+   * Process all pending sprite loads in parallel, batched in a single frame.
+   */
+  private async processSpriteQueue(): Promise<void> {
+    this.spriteLoadScheduled = false;
+    const batch = this.pendingSpriteLoads.splice(0, this.pendingSpriteLoads.length);
+
+    // Process all in parallel
+    await Promise.all(batch.map(({canvas, spriteFolder}) =>
+      this.loadAgentSprite(canvas, spriteFolder)
+    ));
   }
 
   private async loadAgentSprite(canvas: HTMLCanvasElement, spriteFolder: string): Promise<void> {
@@ -533,7 +623,7 @@ export class AgentRosterPanel implements IWindowPanel {
       image-rendering: pixelated;
       margin-bottom: 8px;
     `;
-    this.loadAgentSprite(canvas, agent.spriteFolder);
+    this.queueSpriteLoad(canvas, agent.spriteFolder);
 
     // Name
     const name = document.createElement('div');

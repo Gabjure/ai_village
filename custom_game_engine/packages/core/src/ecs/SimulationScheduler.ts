@@ -85,6 +85,8 @@ export const SIMULATION_CONFIGS: Record<string, ComponentSimulationConfig> = {
   deity: { mode: SimulationMode.ALWAYS },
   avatar: { mode: SimulationMode.ALWAYS },
   angel: { mode: SimulationMode.ALWAYS },
+  /** Any entity with movement must be simulated for position updates */
+  movement: { mode: SimulationMode.ALWAYS },
 
   // Tame animals always simulate (player investment)
   // Wild animals handled separately with 'animal' component

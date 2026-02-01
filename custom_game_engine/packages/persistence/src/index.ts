@@ -108,6 +108,7 @@ export type {
   SerializedChunk,
   ChunkListEntry,
   PlanetStats,
+  SettlementData,
 } from './PlanetClient.js';
 
 // Type re-exports

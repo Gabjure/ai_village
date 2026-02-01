@@ -96,6 +96,33 @@ export interface NamedLocation {
   category?: 'landmark' | 'settlement' | 'resource' | 'danger' | 'mystery';
 }
 
+/**
+ * Settlement metadata - player groups on shared planets
+ */
+export interface SettlementData {
+  /** Unique settlement ID */
+  id: string;
+  /** Human-readable settlement name */
+  name: string;
+  /** Player ID who created/owns this settlement */
+  ownerId: string;
+  /** When the settlement was founded (game tick) */
+  foundedTick: number;
+  /** When the settlement was created (real timestamp) */
+  createdAt: number;
+  /** Optional description or backstory */
+  description?: string;
+  /** Number of agents currently in this settlement */
+  agentCount: number;
+  /** Location center on the map */
+  centerX?: number;
+  centerY?: number;
+  /** Settlement color for UI differentiation */
+  color?: string;
+  /** Last accessed timestamp */
+  lastAccessedAt: number;
+}
+
 export interface SerializedChunk {
   x: number;
   y: number;
@@ -139,6 +166,7 @@ export class PlanetClient {
   private playerId: string | null = null;
   private wsConnection: WebSocket | null = null;
   private chunkUpdateCallbacks: Map<string, Set<(chunk: SerializedChunk) => void>> = new Map();
+  private pendingRequests: Map<string, Promise<any>> = new Map();
 
   constructor(baseUrl: string = 'http://localhost:8766') {
     this.baseUrl = baseUrl;
@@ -156,6 +184,26 @@ export class PlanetClient {
    */
   getPlayerId(): string | null {
     return this.playerId;
+  }
+
+  /**
+   * Helper method for request deduplication.
+   * Ensures that multiple rapid calls to the same endpoint share a single in-flight request.
+   */
+  private async deduplicatedFetch<T>(key: string, fetchFn: () => Promise<T>): Promise<T> {
+    // If request already in flight, return existing promise
+    const pending = this.pendingRequests.get(key);
+    if (pending) {
+      return pending as Promise<T>;
+    }
+
+    // Create new request
+    const request = fetchFn().finally(() => {
+      this.pendingRequests.delete(key);
+    });
+
+    this.pendingRequests.set(key, request);
+    return request;
   }
 
   // ============================================================
@@ -197,19 +245,21 @@ export class PlanetClient {
    * Get planet metadata
    */
   async getPlanet(planetId: string): Promise<PlanetMetadata | null> {
-    const response = await fetch(`${this.baseUrl}/api/planets/${encodeURIComponent(planetId)}`);
+    return this.deduplicatedFetch(`get-planet-${planetId}`, async () => {
+      const response = await fetch(`${this.baseUrl}/api/planets/${encodeURIComponent(planetId)}`);
 
-    if (response.status === 404) {
-      return null;
-    }
+      if (response.status === 404) {
+        return null;
+      }
 
-    if (!response.ok) {
-      const error = await response.json().catch(() => ({ error: response.statusText }));
-      throw new Error(`Failed to get planet: ${error.error}`);
-    }
+      if (!response.ok) {
+        const error = await response.json().catch(() => ({ error: response.statusText }));
+        throw new Error(`Failed to get planet: ${error.error}`);
+      }
 
-    const data = await response.json();
-    return data.planet;
+      const data = await response.json();
+      return data.planet;
+    });
   }
 
   /**
@@ -278,19 +328,21 @@ export class PlanetClient {
    * Get biosphere data (if exists)
    */
   async getBiosphere(planetId: string): Promise<BiosphereData | null> {
-    const response = await fetch(`${this.baseUrl}/api/planets/${encodeURIComponent(planetId)}/biosphere`);
+    return this.deduplicatedFetch(`get-biosphere-${planetId}`, async () => {
+      const response = await fetch(`${this.baseUrl}/api/planets/${encodeURIComponent(planetId)}/biosphere`);
 
-    if (response.status === 404) {
-      return null;
-    }
+      if (response.status === 404) {
+        return null;
+      }
 
-    if (!response.ok) {
-      const error = await response.json().catch(() => ({ error: response.statusText }));
-      throw new Error(`Failed to get biosphere: ${error.error}`);
-    }
+      if (!response.ok) {
+        const error = await response.json().catch(() => ({ error: response.statusText }));
+        throw new Error(`Failed to get biosphere: ${error.error}`);
+      }
 
-    const data = await response.json();
-    return data.biosphere;
+      const data = await response.json();
+      return data.biosphere;
+    });
   }
 
   /**
@@ -317,21 +369,23 @@ export class PlanetClient {
    * Get a specific chunk
    */
   async getChunk(planetId: string, x: number, y: number): Promise<SerializedChunk | null> {
-    const response = await fetch(
-      `${this.baseUrl}/api/planets/${encodeURIComponent(planetId)}/chunk/${x},${y}`
-    );
+    return this.deduplicatedFetch(`get-chunk-${planetId}-${x}-${y}`, async () => {
+      const response = await fetch(
+        `${this.baseUrl}/api/planets/${encodeURIComponent(planetId)}/chunk/${x},${y}`
+      );
 
-    if (response.status === 404) {
-      return null;
-    }
+      if (response.status === 404) {
+        return null;
+      }
 
-    if (!response.ok) {
-      const error = await response.json().catch(() => ({ error: response.statusText }));
-      throw new Error(`Failed to get chunk: ${error.error}`);
-    }
+      if (!response.ok) {
+        const error = await response.json().catch(() => ({ error: response.statusText }));
+        throw new Error(`Failed to get chunk: ${error.error}`);
+      }
 
-    const data = await response.json();
-    return data.chunk;
+      const data = await response.json();
+      return data.chunk;
+    });
   }
 
   /**
@@ -452,21 +506,23 @@ export class PlanetClient {
     components: Record<string, unknown>;
     createdAt: number;
   }>> {
-    const response = await fetch(
-      `${this.baseUrl}/api/planets/${encodeURIComponent(planetId)}/entities`
-    );
+    return this.deduplicatedFetch(`get-entities-${planetId}`, async () => {
+      const response = await fetch(
+        `${this.baseUrl}/api/planets/${encodeURIComponent(planetId)}/entities`
+      );
 
-    if (response.status === 404) {
-      return [];
-    }
+      if (response.status === 404) {
+        return [];
+      }
 
-    if (!response.ok) {
-      const error = await response.json().catch(() => ({ error: response.statusText }));
-      throw new Error(`Failed to get entities: ${error.error}`);
-    }
+      if (!response.ok) {
+        const error = await response.json().catch(() => ({ error: response.statusText }));
+        throw new Error(`Failed to get entities: ${error.error}`);
+      }
 
-    const data = await response.json();
-    return data.entities ?? [];
+      const data = await response.json();
+      return data.entities ?? [];
+    });
   }
 
   /**
@@ -481,6 +537,120 @@ export class PlanetClient {
     if (!response.ok && response.status !== 404) {
       const error = await response.json().catch(() => ({ error: response.statusText }));
       throw new Error(`Failed to clear entities: ${error.error}`);
+    }
+  }
+
+  // ============================================================
+  // SETTLEMENT OPERATIONS
+  // ============================================================
+
+  /**
+   * Get all settlements on a planet
+   */
+  async getSettlements(planetId: string): Promise<SettlementData[]> {
+    const response = await fetch(
+      `${this.baseUrl}/api/planets/${encodeURIComponent(planetId)}/settlements`
+    );
+
+    if (response.status === 404) {
+      return [];
+    }
+
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({ error: response.statusText }));
+      throw new Error(`Failed to get settlements: ${error.error}`);
+    }
+
+    const data = await response.json();
+    return data.settlements ?? [];
+  }
+
+  /**
+   * Get a specific settlement by ID
+   */
+  async getSettlement(planetId: string, settlementId: string): Promise<SettlementData | null> {
+    const response = await fetch(
+      `${this.baseUrl}/api/planets/${encodeURIComponent(planetId)}/settlements/${encodeURIComponent(settlementId)}`
+    );
+
+    if (response.status === 404) {
+      return null;
+    }
+
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({ error: response.statusText }));
+      throw new Error(`Failed to get settlement: ${error.error}`);
+    }
+
+    const data = await response.json();
+    return data.settlement;
+  }
+
+  /**
+   * Create a new settlement on a planet
+   */
+  async createSettlement(planetId: string, settlement: Omit<SettlementData, 'createdAt' | 'lastAccessedAt'>): Promise<SettlementData> {
+    const fullSettlement: SettlementData = {
+      ...settlement,
+      createdAt: Date.now(),
+      lastAccessedAt: Date.now(),
+    };
+
+    const response = await fetch(
+      `${this.baseUrl}/api/planets/${encodeURIComponent(planetId)}/settlements`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(fullSettlement),
+      }
+    );
+
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({ error: response.statusText }));
+      throw new Error(`Failed to create settlement: ${error.error}`);
+    }
+
+    const data = await response.json();
+    return data.settlement;
+  }
+
+  /**
+   * Update an existing settlement
+   */
+  async updateSettlement(planetId: string, settlementId: string, updates: Partial<SettlementData>): Promise<SettlementData> {
+    const response = await fetch(
+      `${this.baseUrl}/api/planets/${encodeURIComponent(planetId)}/settlements/${encodeURIComponent(settlementId)}`,
+      {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...updates,
+          lastAccessedAt: Date.now(),
+        }),
+      }
+    );
+
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({ error: response.statusText }));
+      throw new Error(`Failed to update settlement: ${error.error}`);
+    }
+
+    const data = await response.json();
+    return data.settlement;
+  }
+
+  /**
+   * Record that this save is accessing the settlement
+   */
+  async recordSettlementAccess(planetId: string, settlementId: string): Promise<void> {
+    const response = await fetch(
+      `${this.baseUrl}/api/planets/${encodeURIComponent(planetId)}/settlements/${encodeURIComponent(settlementId)}/access`,
+      { method: 'POST' }
+    );
+
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({ error: response.statusText }));
+      throw new Error(`Failed to record settlement access: ${error.error}`);
     }
   }
 

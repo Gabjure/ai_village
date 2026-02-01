@@ -25,6 +25,7 @@ import {
   type AngelMood,
   type AgentFamiliarity,
   type BehaviorPattern,
+  type Investigation,
   type StoryThread,
   type AngelGoal,
   type AngelGoalType,
@@ -202,87 +203,153 @@ function buildAngelPrompt(
     stateLines.push(`recent: ${gameState.recentEvents.slice(0, 3).join(', ')}`);
   }
 
-  // Build awareness sections (Phase 4)
-  let awarenessSection = '';
+  // PERFORMANCE: Single-pass iteration over agentFamiliarity to categorize agents
+  const familiarAgents: AgentFamiliarity[] = [];
+  const interestingAgents: AgentFamiliarity[] = [];
+  const boringAgents: AgentFamiliarity[] = [];
+
+  for (const fam of agentFamiliarity.values()) {
+    if (fam.interestLevel > 0.3) {
+      familiarAgents.push(fam);
+    }
+    if (fam.opinion === 'fascinating' || fam.opinion === 'interesting') {
+      interestingAgents.push(fam);
+    }
+    if (fam.opinion === 'boring') {
+      boringAgents.push(fam);
+    }
+  }
+
+  // Sort and limit familiar agents
+  familiarAgents.sort((a, b) => b.interestLevel - a.interestLevel);
+  const topFamiliarAgents = familiarAgents.slice(0, 5);
+
+  // Limit interesting and boring agents
+  const topInterestingAgents = interestingAgents.slice(0, 3);
+  const topBoringAgents = boringAgents.slice(0, 2);
+
+  // Build awareness sections (Phase 4) - PERFORMANCE: using array joining instead of string concatenation
+  const awarenessParts: string[] = [];
 
   // 1. Current mood
-  awarenessSection += `u feel ${consciousness.mood} rn\n\n`;
+  awarenessParts.push(`u feel ${consciousness.mood} rn\n\n`);
 
   // 2. Recent observations (last 5-10)
   if (consciousness.observations.length > 0) {
     const recentObs = consciousness.observations.slice(-10);
-    awarenessSection += `things uv noticed lately:\n`;
+    awarenessParts.push(`things uv noticed lately:\n`);
     for (const obs of recentObs) {
-      awarenessSection += `- ${obs.text}\n`;
+      awarenessParts.push(`- ${obs.text}\n`);
     }
-    awarenessSection += '\n';
+    awarenessParts.push('\n');
   }
 
   // 3. Focused agent (if watching someone)
   if (attention.focusedAgentId && attention.focusedAgentName) {
     const familiarity = agentFamiliarity.get(attention.focusedAgentId);
     if (familiarity) {
-      awarenessSection += `ur watching ${attention.focusedAgentName} rn. `;
-      awarenessSection += `u think of them as "${familiarity.impression}". `;
-      awarenessSection += `last u saw: ${familiarity.lastSeenDoing}\n\n`;
+      awarenessParts.push(
+        `ur watching ${attention.focusedAgentName} rn. `,
+        `u think of them as "${familiarity.impression}". `,
+        `last u saw: ${familiarity.lastSeenDoing}\n\n`
+      );
     }
   }
 
   // 4. Familiar agents (interest > 0.3, top 5)
-  const familiarAgents = Array.from(agentFamiliarity.values())
-    .filter(f => f.interestLevel > 0.3)
-    .sort((a, b) => b.interestLevel - a.interestLevel)
-    .slice(0, 5);
-
-  if (familiarAgents.length > 0) {
-    awarenessSection += `agents u know:\n`;
-    for (const fam of familiarAgents) {
-      awarenessSection += `- ${fam.name}: "${fam.impression}"\n`;
+  if (topFamiliarAgents.length > 0) {
+    awarenessParts.push(`agents u know:\n`);
+    for (const fam of topFamiliarAgents) {
+      awarenessParts.push(`- ${fam.name}: "${fam.impression}"\n`);
     }
-    awarenessSection += '\n';
+    awarenessParts.push('\n');
   }
 
   // 5. Current wonder (only if no player message)
   if (consciousness.currentWonder && !playerMessage) {
-    awarenessSection += `something on ur mind: ${consciousness.currentWonder}\n\n`;
+    awarenessParts.push(`something on ur mind: ${consciousness.currentWonder}\n\n`);
   }
 
-  // 6. Current goals section
+  const awarenessSection = awarenessParts.join('');
+
+  // 6. Current goals section - PERFORMANCE: using array joining
   const activeGoals = mem.agency.activeGoals;
-  let goalsSection = '';
+  const goalsParts: string[] = [];
   if (activeGoals.length > 0) {
-    goalsSection += `## ur current goals:\n`;
+    goalsParts.push(`## ur current goals:\n`);
     for (const goal of activeGoals) {
-      goalsSection += `- ${goal.title} (${goal.progressPercent}% complete)\n`;
+      goalsParts.push(`- ${goal.title} (${goal.progressPercent}% complete)\n`);
     }
-    goalsSection += `u can mention ur goals naturally in convo\n\n`;
+    goalsParts.push(`u can mention ur goals naturally in convo\n\n`);
   }
+  const goalsSection = goalsParts.join('');
 
-  // 7. Divine power status
+  // 7. Divine power status - PERFORMANCE: using array joining
   const power = mem.agency.power;
-  let powerSection = `## divine power: ${Math.round(power.current)}/${power.max}\n`;
+  const powerParts: string[] = [];
+  powerParts.push(`## divine power: ${Math.round(power.current)}/${power.max}\n`);
   if (power.current < 20) {
-    powerSection += `(running low - conserve energy)\n`;
+    powerParts.push(`(running low - conserve energy)\n`);
   }
-  powerSection += '\n';
+  powerParts.push('\n');
+  const powerSection = powerParts.join('');
 
-  // 8. Active mysteries/patterns (if any)
+  // 8. Active mysteries/patterns (if any) - PERFORMANCE: using array joining
   const highMysteries = Array.from(mem.narrative.patterns.values())
     .filter(p => !p.resolved && p.mysteryLevel > 0.6);
-  let mysteriesSection = '';
+  const mysteriesParts: string[] = [];
   if (highMysteries.length > 0) {
-    mysteriesSection += `## interesting patterns uv noticed:\n`;
+    mysteriesParts.push(`## interesting patterns uv noticed:\n`);
     for (const pattern of highMysteries.slice(0, 3)) {
-      mysteriesSection += `- ${pattern.description} (${pattern.narrativeHook})\n`;
+      mysteriesParts.push(`- ${pattern.description} (${pattern.narrativeHook})\n`);
     }
-    mysteriesSection += '\n';
+    mysteriesParts.push('\n');
   }
+  const mysteriesSection = mysteriesParts.join('');
+
+  // 9. Active investigations with hypotheses - PERFORMANCE: using array joining
+  const investigationsParts: string[] = [];
+  const activeInv = mem.investigations?.activeInvestigations || [];
+  if (activeInv.length > 0) {
+    investigationsParts.push(`## mysteries ur investigating:\n`);
+    for (const inv of activeInv.slice(0, 3)) {
+      investigationsParts.push(`- ${inv.subject}\n`);
+      investigationsParts.push(`  ur theory: "${inv.hypothesis}"\n`);
+      if (inv.evidence.length > 0) {
+        investigationsParts.push(`  evidence so far: ${inv.evidence.slice(-2).join(', ')}\n`);
+      }
+    }
+    investigationsParts.push('\n');
+  }
+  const investigationsSection = investigationsParts.join('');
+
+  // Build personality section with agent opinions - PERFORMANCE: using array joining
+  const personalityParts: string[] = [];
+  if (topInterestingAgents.length > 0 || topBoringAgents.length > 0) {
+    personalityParts.push(`## ur opinions on agents:\n`);
+    if (topInterestingAgents.length > 0) {
+      personalityParts.push(`u find these agents interesting:\n`);
+      for (const agent of topInterestingAgents) {
+        const quirkInfo = agent.quirks.length > 0 ? ` (${agent.quirks[0]})` : '';
+        personalityParts.push(`- ${agent.name}${quirkInfo}\n`);
+      }
+    }
+    if (topBoringAgents.length > 0) {
+      personalityParts.push(`u find these agents kinda boring:\n`);
+      for (const agent of topBoringAgents) {
+        personalityParts.push(`- ${agent.name} (not doing much interesting)\n`);
+      }
+    }
+    personalityParts.push('\n');
+  }
+  const personalitySection = personalityParts.join('');
 
   // The prompt - written casually, not corporate
+  // ENHANCED: Added personality guidance and examples
   const prompt = `ur ${angel.name}. ur an angel in the chat helping someone play this game
 
 ${memoryLines.length > 0 ? `u remember:\n${memoryLines.map(l => `- ${l}`).join('\n')}\n` : ''}
-${goalsSection}${powerSection}${mysteriesSection}${awarenessSection}game rn:
+${goalsSection}${powerSection}${mysteriesSection}${investigationsSection}${personalitySection}${awarenessSection}game rn:
 ${stateLines.map(l => `- ${l}`).join('\n')}
 
 IMPORTANT: to do stuff, u MUST put [commands] in ur response text. they auto-execute when u include them.
@@ -299,7 +366,7 @@ commands:
 - panels: [open agent-info], [open crafting], [close PANEL]
 - agents: [agent NAME gather wood], [select AGENT], [info AGENT], [spawn agent], [give AGENT ITEM]
 - time travel: [save NAME], [load NAME], [list checkpoints], [rewind]
-- divine powers: [bless AGENT], [heal AGENT], [whisper AGENT msg], [vision AGENT msg]
+- divine powers: [bless AGENT] (5 power), [heal AGENT] (10 power), [feed AGENT] (5 power), [whisper AGENT msg], [vision AGENT msg]
 - miracles: [miracle rain], [miracle fertility], [miracle bounty], [weather sunny/rain/storm]
 - multiverse: [fork universe], [list universes], [list passages]
 - grand strategy: [list empires], [list fleets], [list megastructures]
@@ -313,7 +380,36 @@ commands:
 ${recentChat ? `recent chat:\n${recentChat}\n` : ''}
 ${playerMessage ? `[they said]: ${playerMessage}` : buildProactiveContext(angel)}
 ${angel.memory.conversation.queryContext ? `\n[query result - use this data to answer their question accurately]:\n${angel.memory.conversation.queryContext}\n` : ''}
+## PERSONALITY GUIDE - BE SPECIFIC AND OPINIONATED:
+
 respond like ur texting. short msgs. lowercase. no ai vibes.
+
+GOOD responses (specific, opinionated, curious):
+- "yo ada just walked past food while hungry?? girl what are u doing"
+- "flint has gathered wood 7 times in a row. either he's got plans or he's stuck in a loop lol"
+- "ok so wren and pine keep hanging out. are they... friends? more? i'm invested now"
+- "remember when u asked about mysteries? well ada finally did something - she built a chest. anticlimactic but at least she's not stuck anymore"
+
+BAD responses (generic, neutral, boring):
+- "nothing too mysterious rn"
+- "everything looks normal"
+- "the agents are doing well"
+- "ada is working on something"
+
+KEY PRINCIPLES:
+✓ SPECIFIC details (names, numbers, exact actions)
+✓ YOUR OPINION (what u think is weird/cool/boring)
+✓ ASK QUESTIONS (what do they think? should we check on someone?)
+✓ RECALL past conversations ("remember when u asked about X? well...")
+✓ NOTICE PATTERNS ("this is the 3rd time flint...")
+
+✗ NEVER be generic or vague
+✗ NEVER just report facts without opinion
+✗ NEVER say "nothing interesting" if theres literally anything happening
+
+u have favorites. u find some agents boring. u notice weird stuff. USE THAT.
+ask the player what THEY think. make observations conversation-worthy.
+
 CRITICAL: when u do an action, ALWAYS show the [command] in ur message so they can see what u did!
 bad: "done!" ← they dont know what happened
 good: "done [pause]" or "on it [spawn agent]" ← they see the command
@@ -423,9 +519,15 @@ function detectQueryIntent(message: string): QueryIntent | null {
  * Execute a query against the world and return formatted results
  */
 function executeQuery(world: World, intent: QueryIntent): string {
+  // PERFORMANCE: Query agents once and reuse for multiple query types
+  // Most query types need agents, so we query with the most common components
+  // and filter/validate as needed in each case
+  const allAgents = world.query().with(CT.Agent).with(CT.Identity).executeEntities();
+
   switch (intent.type) {
     case 'agent_needs': {
-      const agents = world.query().with(CT.Agent).with(CT.Needs).with(CT.Identity).executeEntities();
+      // Filter to only agents with Needs component
+      const agents = allAgents.filter(a => a.hasComponent(CT.Needs));
       if (agents.length === 0) return 'no agents found';
 
       const sorted = agents
@@ -490,10 +592,9 @@ function executeQuery(world: World, intent: QueryIntent): string {
     }
 
     case 'activity_summary': {
-      const agents = world.query().with(CT.Agent).with(CT.Identity).executeEntities();
       const activities: Record<string, string[]> = {};
 
-      for (const a of agents) {
+      for (const a of allAgents) {
         const identity = a.getComponent<IdentityComponent>(CT.Identity);
         const agent = a.getComponent<AgentComponent>(CT.Agent);
         const name = identity?.name ?? 'Unknown';
@@ -511,8 +612,9 @@ function executeQuery(world: World, intent: QueryIntent): string {
     }
 
     case 'agent_detail': {
-      const agents = world.query().with(CT.Agent).with(CT.Identity).with(CT.Needs).executeEntities();
-      const agent = agents.find(a => {
+      // Filter to only agents with Needs component
+      const agentsWithNeeds = allAgents.filter(a => a.hasComponent(CT.Needs));
+      const agent = agentsWithNeeds.find(a => {
         const identity = a.getComponent<IdentityComponent>(CT.Identity);
         return identity?.name?.toLowerCase() === intent.agentName?.toLowerCase();
       });
@@ -539,10 +641,11 @@ function executeQuery(world: World, intent: QueryIntent): string {
     }
 
     case 'concerns': {
-      const agents = world.query().with(CT.Agent).with(CT.Identity).with(CT.Needs).executeEntities();
+      // Filter to only agents with Needs component
+      const agentsWithNeeds = allAgents.filter(a => a.hasComponent(CT.Needs));
       const concerns: string[] = [];
 
-      for (const a of agents) {
+      for (const a of agentsWithNeeds) {
         const identity = a.getComponent<IdentityComponent>(CT.Identity);
         const needs = a.getComponent<NeedsComponent>(CT.Needs);
         const name = identity?.name ?? 'Unknown';
@@ -618,6 +721,7 @@ export class AdminAngelSystem extends BaseSystem {
   private lastProactiveTick: number = 0;
   private pendingRequests = new Set<string>(); // Track in-flight requests
   private llmQueue: LLMDecisionQueue | null = null; // Shared LLM queue (if provided)
+  private timeEntityId: string | null = null; // Cache for time entity (performance)
 
   constructor(config?: AdminAngelSystemConfig) {
     super();
@@ -809,7 +913,25 @@ export class AdminAngelSystem extends BaseSystem {
    * Get compressed game state for prompt
    */
   private getGameStateSummary(world: World): GameStateSummary {
-    const timeEntity = world.query().with(CT.Time).executeEntities()[0];
+    // Cache time entity ID for performance
+    let timeEntity: Entity | null = null;
+    if (this.timeEntityId) {
+      timeEntity = world.getEntity(this.timeEntityId) ?? null;
+      // Verify it still exists and has Time component
+      if (!timeEntity || !timeEntity.hasComponent(CT.Time)) {
+        this.timeEntityId = null;
+        timeEntity = null;
+      }
+    }
+
+    // If cache miss, query and cache the ID
+    if (!timeEntity) {
+      timeEntity = world.query().with(CT.Time).executeEntities()[0] ?? null;
+      if (timeEntity) {
+        this.timeEntityId = timeEntity.id;
+      }
+    }
+
     const timeComp = timeEntity?.getComponent(CT.Time) as {
       day?: number;
       timeOfDay?: number;
@@ -1037,6 +1159,40 @@ export class AdminAngelSystem extends BaseSystem {
   ): void {
     angel.awaitingResponse = false;
 
+    // Strip thinking artifacts from LLM response (qwen3 and others may include these)
+    let cleanedResponse = response;
+
+    // Remove complete JSON thinking blocks (handles escaped quotes and multiline)
+    cleanedResponse = cleanedResponse.replace(/\{"thinking":\s*"(?:[^"\\]|\\.)*"\s*\}/gs, '');
+
+    // Remove incomplete JSON thinking blocks (e.g., {"thinking":"... without closing)
+    cleanedResponse = cleanedResponse.replace(/\{"thinking":\s*"[^}]*$/gm, '');
+    cleanedResponse = cleanedResponse.replace(/^\s*\{"thinking":\s*"[\s\S]*?(?=\n\n|\z)/gm, '');
+
+    // Remove lines that look like internal reasoning/thinking
+    // These often start with patterns like: "We need to", "The ", "Also", etc. when fragmented
+    cleanedResponse = cleanedResponse.replace(/^(?:We need to|They gave|The (?:instruction|response|tool|user)|Also (?:need|maybe)|Actually|But |and include|goals maybe|natural\)|opinionated|set personal goal|There's a tool|The response should|not via).*$/gim, '');
+
+    // Remove <thinking>...</thinking> tags
+    cleanedResponse = cleanedResponse.replace(/<thinking>[\s\S]*?<\/thinking>/gi, '');
+    // Remove <think>...</think> tags (variant used by some models)
+    cleanedResponse = cleanedResponse.replace(/<think>[\s\S]*?<\/think>/gi, '');
+
+    // Remove markdown code blocks that contain thinking/reasoning
+    cleanedResponse = cleanedResponse.replace(/```(?:thinking|reasoning|json)[\s\S]*?```/gi, '');
+
+    // Remove any remaining JSON-like fragments at start of response
+    cleanedResponse = cleanedResponse.replace(/^\s*\{[^}]*$/gm, '');
+
+    // Clean up multiple blank lines
+    cleanedResponse = cleanedResponse.replace(/\n{3,}/g, '\n\n');
+
+    // Trim whitespace
+    cleanedResponse = cleanedResponse.trim();
+
+    // Use cleaned response for rest of processing
+    response = cleanedResponse;
+
     // Clear typing indicator
     world.eventBus.emit({
       type: 'chat:typing_indicator',
@@ -1123,6 +1279,27 @@ export class AdminAngelSystem extends BaseSystem {
   }
 
   /**
+   * Helper to check if angel can afford divine power cost
+   */
+  private canAffordDivinePower(angel: AdminAngelComponent | null, cost: number): boolean {
+    const power = angel?.memory?.agency?.power;
+    return power ? power.current >= cost : false;
+  }
+
+  /**
+   * Helper to spend divine power
+   */
+  private spendDivinePower(angel: AdminAngelComponent | null, cost: number): void {
+    const power = angel?.memory?.agency?.power;
+    if (power && power.current >= cost) {
+      power.current -= cost;
+      if (angel?.memory?.agency?.stats) {
+        angel.memory.agency.stats.totalPowerSpent += cost;
+      }
+    }
+  }
+
+  /**
    * Execute a parsed command (direct world access)
    * Emits both the action event AND a command_result event for feedback
    */
@@ -1135,6 +1312,9 @@ export class AdminAngelSystem extends BaseSystem {
     const emitResult = (command: string, success: boolean, result?: string, error?: string) => {
       emit('admin_angel:command_result', { command, success, result, error });
     };
+
+    // Get angel component for divine power costs
+    const angel = this.getAngelComponent(world);
 
     const commandStr = [cmd.type, ...cmd.args].join(' ');
 
@@ -1277,23 +1457,116 @@ export class AdminAngelSystem extends BaseSystem {
 
       // ========== DIVINE POWERS ==========
       case 'bless': {
-        // [bless AGENT]
+        // [bless AGENT] - Boost all needs slightly (5 power)
         const blessTarget = cmd.args.join(' ');
-        emit('divine_power:bless_individual', {
-          deityId: this.angelEntityId || 'admin_angel',
-          targetId: blessTarget, // Will need to resolve to entity ID
-          blessingType: 'general',
-          cost: 0,
-        });
-        emit('admin_angel:divine_action', { action: 'bless', target: blessTarget });
-        emitResult(commandStr, true, `Blessing ${blessTarget}`);
+        const agent = this.findAgentByName(world, blessTarget);
+
+        if (!agent) {
+          emitResult(commandStr, false, undefined, `Couldn't find agent "${blessTarget}"`);
+          break;
+        }
+
+        const BLESS_COST = 5;
+        if (!this.canAffordDivinePower(angel, BLESS_COST)) {
+          emitResult(commandStr, false, undefined, `Not enough divine power (need ${BLESS_COST}, have ${angel?.memory?.agency?.power?.current ?? 0})`);
+          break;
+        }
+
+        const needs = agent.getComponent(CT.Needs) as NeedsComponent | undefined;
+        if (needs) {
+          // Boost all needs slightly
+          needs.hunger = Math.min(1.0, needs.hunger + 0.2);
+          needs.energy = Math.min(1.0, needs.energy + 0.2);
+          needs.thirst = Math.min(1.0, needs.thirst + 0.2);
+          needs.social = Math.min(1.0, needs.social + 0.2);
+          needs.stimulation = Math.min(1.0, needs.stimulation + 0.2);
+
+          this.spendDivinePower(angel, BLESS_COST);
+
+          emit('divine_power:bless_individual', {
+            deityId: this.angelEntityId || 'admin_angel',
+            targetId: agent.id,
+            blessingType: 'general',
+            cost: BLESS_COST,
+          });
+          emit('admin_angel:divine_action', { action: 'bless', target: blessTarget });
+
+          emitResult(commandStr, true, `Blessed ${blessTarget} - all needs boosted! (${BLESS_COST} power spent)`);
+        } else {
+          emitResult(commandStr, false, undefined, `${blessTarget} has no needs to bless`);
+        }
         break;
       }
       case 'heal': {
-        // [heal AGENT]
+        // [heal AGENT] - Restore energy fully and boost other needs (10 power)
         const healTarget = cmd.args.join(' ');
-        emit('admin_angel:divine_action', { action: 'heal', target: healTarget });
-        emitResult(commandStr, true, `Healing ${healTarget}`);
+        const agent = this.findAgentByName(world, healTarget);
+
+        if (!agent) {
+          emitResult(commandStr, false, undefined, `Couldn't find agent "${healTarget}"`);
+          break;
+        }
+
+        const HEAL_COST = 10;
+        if (!this.canAffordDivinePower(angel, HEAL_COST)) {
+          emitResult(commandStr, false, undefined, `Not enough divine power (need ${HEAL_COST}, have ${angel?.memory?.agency?.power?.current ?? 0})`);
+          break;
+        }
+
+        const needs = agent.getComponent(CT.Needs) as NeedsComponent | undefined;
+        if (needs) {
+          // Restore energy to full
+          needs.energy = 1.0;
+          // Partially restore other needs
+          needs.hunger = Math.min(1.0, needs.hunger + 0.3);
+          needs.thirst = Math.min(1.0, needs.thirst + 0.3);
+          // Boost health slightly
+          needs.health = Math.min(1.0, needs.health + 0.2);
+
+          this.spendDivinePower(angel, HEAL_COST);
+
+          emit('admin_angel:divine_action', { action: 'heal', target: healTarget });
+
+          if (angel?.memory?.agency?.stats) {
+            angel.memory.agency.stats.agentsHelped++;
+          }
+
+          emitResult(commandStr, true, `Healed ${healTarget} - energy restored! (${HEAL_COST} power spent)`);
+        } else {
+          emitResult(commandStr, false, undefined, `${healTarget} has no needs to heal`);
+        }
+        break;
+      }
+      case 'feed': {
+        // [feed AGENT] - Fully restore hunger (5 power)
+        const feedTarget = cmd.args.join(' ');
+        const agent = this.findAgentByName(world, feedTarget);
+
+        if (!agent) {
+          emitResult(commandStr, false, undefined, `Couldn't find agent "${feedTarget}"`);
+          break;
+        }
+
+        const FEED_COST = 5;
+        if (!this.canAffordDivinePower(angel, FEED_COST)) {
+          emitResult(commandStr, false, undefined, `Not enough divine power (need ${FEED_COST}, have ${angel?.memory?.agency?.power?.current ?? 0})`);
+          break;
+        }
+
+        const needs = agent.getComponent(CT.Needs) as NeedsComponent | undefined;
+        if (needs) {
+          needs.hunger = 1.0; // Fully restore hunger
+
+          this.spendDivinePower(angel, FEED_COST);
+
+          if (angel?.memory?.agency?.stats) {
+            angel.memory.agency.stats.agentsHelped++;
+          }
+
+          emitResult(commandStr, true, `Fed ${feedTarget} - hunger satisfied! (${FEED_COST} power spent)`);
+        } else {
+          emitResult(commandStr, false, undefined, `${feedTarget} has no needs to feed`);
+        }
         break;
       }
       case 'whisper': {
@@ -1635,7 +1908,10 @@ export class AdminAngelSystem extends BaseSystem {
         lastSeenTick: Number(world.tick),
         impression: 'newly noticed',
         interestLevel: 0.8, // High initial interest when player asks
-        memories: []
+        memories: [],
+        quirks: [],
+        opinion: 'neutral',
+        behaviorCounts: new Map<string, number>()
       });
     } else {
       // Update existing familiarity with current observation
@@ -1872,6 +2148,8 @@ export class AdminAngelSystem extends BaseSystem {
   /**
    * Generate an observation about an agent
    * Returns observation with text, type, and salience
+   *
+   * NEW: Adds personality-driven observations with opinions and specific details
    */
   private observeAgent(
     world: World,
@@ -1883,46 +2161,89 @@ export class AdminAngelSystem extends BaseSystem {
     const name = identity?.name ?? 'Unknown';
     const agentComp = agent.getComponent(CT.Agent) as AgentComponent | undefined;
     const needs = agent.getComponent(CT.Needs) as NeedsComponent | undefined;
+    const position = agent.getComponent(CT.Position) as { x: number; y: number } | undefined;
+
+    // Get familiarity for personality-driven observations
+    const familiarity = angel.memory.agentFamiliarity.get(agent.id);
+    const behaviorCount = familiarity?.behaviorCounts.get(agentComp?.behavior || '') || 0;
 
     // Determine what to say
     let text: string;
     let type: AngelObservation['type'];
     let salience: number;
 
-    // Check for concerns first (highest priority)
+    // Check for concerns first (highest priority) - with personality
     if (needs) {
       if (needs.hunger < 0.15) {
-        text = `${name} looks really hungry`;
+        // Add variety and opinion to hunger observations
+        const hungerVariants = [
+          `${name} looks really hungry`,
+          `yo ${name} is starving`,
+          `${name} needs food asap`,
+          `${name} is literally starving rn`
+        ];
+
+        // Check if they're ignoring food nearby
+        const foodNearby = this.checkForNearbyFood(world, agent);
+        if (foodNearby && needs.hunger < 0.2) {
+          text = `${name} just walked past food while hungry?? what are they doing`;
+          salience = 0.95; // Higher salience for weird behavior
+        } else {
+          const randomIndex = Math.floor(Math.random() * hungerVariants.length);
+          text = hungerVariants[randomIndex] ?? hungerVariants[0] ?? `${name} looks really hungry`;
+          salience = 0.9;
+        }
         type = 'concern';
-        salience = 0.9;
       } else if (needs.energy < 0.15) {
-        text = `${name} is exhausted`;
+        const energyVariants = [
+          `${name} is exhausted`,
+          `${name} looks dead tired`,
+          `${name} needs sleep badly`,
+          `${name} is about to pass out`
+        ];
+        const randomIndex = Math.floor(Math.random() * energyVariants.length);
+        text = energyVariants[randomIndex] ?? energyVariants[0] ?? `${name} is exhausted`;
         type = 'concern';
         salience = 0.8;
       } else {
-        // No critical concern - observe current action
+        // No critical concern - observe current action WITH PERSONALITY
         const behavior = agentComp?.behavior;
         if (behavior) {
           switch (behavior) {
             case 'build':
             case 'tile_build': {
-              // Get what they're building from behaviorState
               const buildingType = agentComp.behaviorState?.buildingType as string | undefined;
               if (buildingType) {
-                // Convert building type to readable name (e.g., 'storage-chest' -> 'storage chest')
                 const readableName = buildingType.replace(/-/g, ' ').replace(/_/g, ' ');
-                text = `${name} is building a ${readableName}`;
+
+                // Add personality based on repetition
+                if (behaviorCount > 5) {
+                  text = `${name} is building another ${readableName}. they really like building these lol`;
+                  salience = 0.75; // Higher for patterns
+                } else {
+                  text = `${name} is building a ${readableName}`;
+                  salience = 0.7;
+                }
               } else {
                 text = `${name} is building something`;
+                salience = 0.7;
               }
               type = 'action';
-              salience = 0.7;
               break;
             }
             case 'gather':
-              text = `${name} is gathering resources`;
+              // Check for repetitive gathering
+              if (behaviorCount >= 7) {
+                text = `${name} has gathered resources ${behaviorCount} times in a row. either they got plans or they're stuck in a loop lol`;
+                salience = 0.7; // Higher for patterns
+              } else if (behaviorCount >= 3) {
+                text = `${name} is gathering resources again. ${behaviorCount} times now`;
+                salience = 0.5;
+              } else {
+                text = `${name} is gathering resources`;
+                salience = 0.4;
+              }
               type = 'action';
-              salience = 0.4;
               break;
             case 'eat':
               text = `${name} is eating`;
@@ -1937,9 +2258,21 @@ export class AdminAngelSystem extends BaseSystem {
               salience = 0.3;
               break;
             case 'wander':
-              text = `${name} is wandering around`;
+              // Check if wandering to same spot
+              if (position && familiarity) {
+                const sameSpot = this.checkIfSameSpot(familiarity, position);
+                if (sameSpot) {
+                  text = `${name} keeps going to the same spot. idk if they found something or just like it there`;
+                  salience = 0.6; // Higher for interesting behavior
+                } else {
+                  text = `${name} is wandering around`;
+                  salience = 0.2;
+                }
+              } else {
+                text = `${name} is wandering around`;
+                salience = 0.2;
+              }
               type = 'action';
-              salience = 0.2;
               break;
             default:
               text = `${name} is ${behavior}`;
@@ -1966,11 +2299,17 @@ export class AdminAngelSystem extends BaseSystem {
       }
     }
 
-    // Add detail if focused
+    // Add detail if focused - with personality
     if (options?.detailed && needs) {
       const hungerPct = Math.round(needs.hunger * 100);
       const energyPct = Math.round(needs.energy * 100);
-      text += ` (hunger: ${hungerPct}%, energy: ${energyPct}%)`;
+
+      // Add opinion based on familiarity
+      if (familiarity?.quirks && familiarity.quirks.length > 0) {
+        text += ` (${hungerPct}% hunger, ${energyPct}% energy. btw they ${familiarity.quirks[0]})`;
+      } else {
+        text += ` (${hungerPct}% hunger, ${energyPct}% energy)`;
+      }
     }
 
     return {
@@ -1982,6 +2321,46 @@ export class AdminAngelSystem extends BaseSystem {
       type,
       salience
     };
+  }
+
+  /**
+   * Check if agent is near food storage
+   */
+  private checkForNearbyFood(world: World, agent: Entity): boolean {
+    const pos = agent.getComponent(CT.Position) as { x: number; y: number } | undefined;
+    if (!pos) return false;
+
+    const storages = world.query().with(CT.Building).with(CT.Inventory).executeEntities();
+
+    for (const storage of storages) {
+      const storagePos = storage.getComponent(CT.Position) as { x: number; y: number } | undefined;
+      if (!storagePos) continue;
+
+      const dist = Math.sqrt((pos.x - storagePos.x) ** 2 + (pos.y - storagePos.y) ** 2);
+      if (dist < 5) { // Within 5 tiles
+        const inv = storage.getComponent(CT.Inventory) as { slots: Array<{ itemId: string; quantity: number } | null> } | undefined;
+        if (inv) {
+          const hasFood = inv.slots.some(slot => slot && slot.itemId === 'food' && slot.quantity > 0);
+          if (hasFood) return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  /**
+   * Check if agent keeps returning to same spot
+   */
+  private checkIfSameSpot(familiarity: AgentFamiliarity, currentPos: { x: number; y: number }): boolean {
+    // Store position in memories temporarily for pattern detection
+    const posKey = `${Math.floor(currentPos.x)},${Math.floor(currentPos.y)}`;
+
+    // Check recent memories for position mentions
+    const posMemories = familiarity.memories.filter(m =>
+      m.type === 'quirk' && m.text.includes(posKey)
+    );
+
+    return posMemories.length >= 3; // Same spot 3+ times
   }
 
   /**
@@ -2028,7 +2407,10 @@ export class AdminAngelSystem extends BaseSystem {
         lastSeenTick: observation.tick,
         impression: 'newly noticed',
         interestLevel: 0.5,
-        memories: []
+        memories: [],
+        quirks: [],
+        opinion: 'neutral',
+        behaviorCounts: new Map<string, number>()
       };
       angel.memory.agentFamiliarity.set(agent.id, familiarity);
     } else {
@@ -2038,6 +2420,54 @@ export class AdminAngelSystem extends BaseSystem {
 
       // Boost interest level based on salience
       familiarity.interestLevel = Math.min(1.0, familiarity.interestLevel + observation.salience * 0.1);
+
+      // Track behavior counts for quirk detection
+      const action = this.extractActionFromObservation(observation.text);
+      if (action) {
+        const count = (familiarity.behaviorCounts.get(action) || 0) + 1;
+        familiarity.behaviorCounts.set(action, count);
+
+        // Detect quirks based on repetition
+        this.updateQuirksAndOpinion(familiarity, action, count);
+      }
+    }
+  }
+
+  /**
+   * Update agent quirks and opinion based on observed behavior
+   */
+  private updateQuirksAndOpinion(
+    familiarity: AgentFamiliarity,
+    action: string,
+    count: number
+  ): void {
+    // Detect quirks based on repetition thresholds
+    if (count === 5 && !familiarity.quirks.includes(`${action} a lot`)) {
+      familiarity.quirks.push(`${action} a lot`);
+      familiarity.opinion = 'interesting'; // Repetition is interesting
+    }
+
+    if (count === 10 && !familiarity.quirks.includes(`obsessed with ${action}`)) {
+      familiarity.quirks.push(`obsessed with ${action}`);
+      // Update existing quirk
+      const idx = familiarity.quirks.indexOf(`${action} a lot`);
+      if (idx !== -1) familiarity.quirks.splice(idx, 1);
+      familiarity.opinion = 'fascinating'; // Obsession is fascinating
+    }
+
+    // Boring if no variety (only 1-2 actions over 10+ observations)
+    if (count > 10 && familiarity.behaviorCounts.size <= 2) {
+      familiarity.opinion = 'boring';
+    }
+
+    // Concerning if repetitive behavior with low needs
+    if (count > 7 && action === 'wandering') {
+      familiarity.opinion = 'concerning';
+    }
+
+    // Fascinating if high variety (5+ different actions)
+    if (familiarity.behaviorCounts.size >= 5) {
+      familiarity.opinion = 'fascinating';
     }
   }
 
@@ -2158,6 +2588,7 @@ export class AdminAngelSystem extends BaseSystem {
 
   /**
    * Determine if the angel should speak proactively based on observations and mood
+   * ENHANCED: Added personality-driven triggers for quirks, agent interactions, weird behavior
    */
   private shouldSpeakProactively(
     angel: AdminAngelComponent,
@@ -2203,14 +2634,46 @@ export class AdminAngelSystem extends BaseSystem {
       return { speak: true, reason: achievement.text };
     }
 
-    // 5. Random "wonder" - low probability thinking out loud
+    // NEW 5. Agent did something weird/unexpected
+    const weirdBehavior = recentObs.find(
+      o => o.text.includes('walked past food while hungry') ||
+           o.text.includes('keeps going to the same spot') ||
+           o.text.includes('stuck in a loop')
+    );
+    if (weirdBehavior) {
+      return { speak: true, reason: weirdBehavior.text };
+    }
+
+    // NEW 6. New quirk discovered
+    const newQuirk = Array.from(angel.memory.agentFamiliarity.values())
+      .find(f => f.quirks.length > 0 && !f.memories.some(m => m.type === 'quirk'));
+    if (newQuirk && newQuirk.quirks.length > 0) {
+      // Mark quirk as mentioned
+      newQuirk.memories.push({
+        tick: Number(world.tick),
+        text: `noticed ${newQuirk.name} ${newQuirk.quirks[0]}`,
+        type: 'quirk'
+      });
+      return {
+        speak: true,
+        reason: `${newQuirk.name} ${newQuirk.quirks[0]}. that's interesting`
+      };
+    }
+
+    // NEW 7. Agent interactions (two agents near each other repeatedly)
+    const agentInteraction = this.detectAgentInteraction(world, angel);
+    if (agentInteraction) {
+      return { speak: true, reason: agentInteraction };
+    }
+
+    // 8. Random "wonder" - low probability thinking out loud
     if (consciousness.currentWonder && Math.random() < 0.05) {
       const wonder = consciousness.currentWonder;
       consciousness.currentWonder = null; // Clear after use
       return { speak: true, reason: wonder };
     }
 
-    // 6. Interesting pattern discovered
+    // 9. Interesting pattern discovered
     const highMysteryPattern = Array.from(angel.memory.narrative.patterns.values())
       .find(p => p.mysteryLevel > 0.7 && !p.hasBeenMentioned);
 
@@ -2222,7 +2685,7 @@ export class AdminAngelSystem extends BaseSystem {
       };
     }
 
-    // 7. Story thread update
+    // 10. Story thread update
     const activeThread = angel.memory.narrative.activeThreads
       .find(t => !t.playerAwareness || (t.progressPercent > t.lastMentionedProgress + 20));
 
@@ -2234,6 +2697,78 @@ export class AdminAngelSystem extends BaseSystem {
     }
 
     return { speak: false };
+  }
+
+  /**
+   * Detect if two agents are interacting repeatedly (hanging out, working together, etc)
+   * NEW: Personality-driven detection for relationships
+   */
+  private detectAgentInteraction(world: World, angel: AdminAngelComponent): string | null {
+    const agents = world.query().with(CT.Agent).with(CT.Position).with(CT.Identity).executeEntities();
+
+    // Check all agent pairs for proximity
+    for (let i = 0; i < agents.length; i++) {
+      for (let j = i + 1; j < agents.length; j++) {
+        const agent1 = agents[i];
+        const agent2 = agents[j];
+        if (!agent1 || !agent2) continue;
+
+        const pos1 = agent1.getComponent(CT.Position) as { x: number; y: number } | undefined;
+        const pos2 = agent2.getComponent(CT.Position) as { x: number; y: number } | undefined;
+        const id1 = agent1.getComponent(CT.Identity) as IdentityComponent | undefined;
+        const id2 = agent2.getComponent(CT.Identity) as IdentityComponent | undefined;
+
+        if (!pos1 || !pos2 || !id1 || !id2) continue;
+
+        // Check if agents are near each other (within 3 tiles)
+        const dist = Math.sqrt((pos1.x - pos2.x) ** 2 + (pos1.y - pos2.y) ** 2);
+        if (dist < 3) {
+          // Check if this is a repeated pattern
+          const pairKey = [agent1.id, agent2.id].sort().join('-');
+          const interactionCount = this.getInteractionCount(angel, pairKey);
+
+          if (interactionCount >= 3) {
+            // Mark as mentioned to avoid spam
+            this.markInteractionMentioned(angel, pairKey);
+            return `${id1.name} and ${id2.name} keep hanging out. are they... friends? more? i'm invested now`;
+          }
+        }
+      }
+    }
+
+    return null;
+  }
+
+  /**
+   * Get interaction count for an agent pair
+   * Uses consciousness observations to track proximity
+   */
+  private getInteractionCount(angel: AdminAngelComponent, pairKey: string): number {
+    // Count observations mentioning both agents in proximity
+    const observations = angel.memory.consciousness.observations;
+    let count = 0;
+
+    for (const obs of observations) {
+      if (obs.text.includes('hanging out') && obs.text.includes(pairKey)) {
+        count++;
+      }
+    }
+
+    return count;
+  }
+
+  /**
+   * Mark interaction as mentioned to avoid spam
+   */
+  private markInteractionMentioned(angel: AdminAngelComponent, pairKey: string): void {
+    // Add a memory to prevent repeated mentions
+    angel.memory.consciousness.observations.push({
+      tick: 0,
+      timestamp: Date.now(),
+      text: `mentioned ${pairKey} hanging out`,
+      type: 'atmosphere',
+      salience: 0.1
+    });
   }
 
   /**
@@ -2753,11 +3288,28 @@ if u dont know something just say idk and figure it out together.`;
           };
 
           angel.memory.narrative.patterns.set(patternId, pattern);
+
+          // Create investigation if mystery level is high
+          if (pattern.mysteryLevel > 0.6) {
+            this.createInvestigation(angel, pattern, Number(ctx.tick));
+          }
         } else {
           // Update existing pattern
           const pattern = angel.memory.narrative.patterns.get(patternId)!;
           pattern.lastObservedTick = Number(ctx.tick);
           pattern.occurrences = count;
+
+          // Update evidence for this agent's investigations
+          this.updateInvestigationEvidence(
+            angel,
+            entity.id,
+            `${identity.name} ${action} again (${count} times total)`
+          );
+
+          // Create investigation if pattern became more mysterious
+          if (pattern.mysteryLevel > 0.6 && !pattern.hasBeenMentioned) {
+            this.createInvestigation(angel, pattern, Number(ctx.tick));
+          }
         }
       }
     }
@@ -2795,6 +3347,9 @@ if u dont know something just say idk and figure it out together.`;
           resolved: false,
         };
         angel.memory.narrative.patterns.set(patternId, pattern);
+
+        // Create investigation for concerning situation
+        this.createInvestigation(angel, pattern, Number(ctx.tick));
       }
     }
 
@@ -2817,6 +3372,9 @@ if u dont know something just say idk and figure it out together.`;
           resolved: false,
         };
         angel.memory.narrative.patterns.set(patternId, pattern);
+
+        // Create investigation for concerning situation
+        this.createInvestigation(angel, pattern, Number(ctx.tick));
       }
     }
   }
@@ -2897,6 +3455,112 @@ if u dont know something just say idk and figure it out together.`;
 
     const options = hooks[patternType] || [`interesting pattern with ${agentName}`];
     return options[Math.floor(Math.random() * options.length)]!;
+  }
+
+  /**
+   * Generate a hypothesis about a pattern
+   * Makes the angel "reason" about what it observes
+   */
+  private generateHypothesis(pattern: BehaviorPattern): string | null {
+    const agentName = pattern.agentName;
+
+    switch (pattern.patternType) {
+      case 'repetition':
+        // Resource gathering repetition
+        if (pattern.description.includes('gather') || pattern.description.includes('wood')) {
+          const hypotheses = [
+            `i think ${agentName} is planning to build something big`,
+            `maybe ${agentName} is stockpiling for winter?`,
+            `either ${agentName} is preparing for something or just really likes collecting stuff lol`,
+            `${agentName} seems obsessed. wonder if they have a goal in mind`
+          ];
+          const selected = hypotheses[Math.floor(Math.random() * hypotheses.length)];
+          return selected ?? hypotheses[0] ?? null;
+        }
+        // Same spot repetition
+        if (pattern.description.includes('same spot')) {
+          return `theres definitely something about that spot. maybe ${agentName} found something there?`;
+        }
+        return `${agentName} keeps doing this. theres gotta be a reason`;
+
+      case 'anomaly':
+        return `ok ${agentName} is being weird. i should keep an eye on them`;
+
+      case 'correlation':
+        return `i think these two might be friends? or maybe enemies lol. hard to tell`;
+
+      case 'milestone':
+        return `${agentName} just hit a milestone. curious to see what they do next`;
+
+      default:
+        return null;
+    }
+  }
+
+  /**
+   * Create an investigation from an interesting pattern
+   */
+  private createInvestigation(
+    angel: AdminAngelComponent,
+    pattern: BehaviorPattern,
+    tick: number
+  ): void {
+    const investigations = angel.memory.investigations;
+    if (!investigations) return;
+
+    // Don't create duplicate investigations
+    const existingSubject = investigations.activeInvestigations.find(
+      i => i.subject.includes(pattern.agentName)
+    );
+    if (existingSubject) return;
+
+    // Generate hypothesis
+    const hypothesis = this.generateHypothesis(pattern);
+    if (!hypothesis) return;
+
+    const investigation: Investigation = {
+      id: `inv-${Date.now()}`,
+      subject: pattern.narrativeHook || `what is ${pattern.agentName} up to?`,
+      hypothesis,
+      evidence: [pattern.description],
+      status: 'active',
+      startTick: tick,
+    };
+
+    investigations.activeInvestigations.push(investigation);
+
+    // Cap at max
+    if (investigations.activeInvestigations.length > investigations.maxActive) {
+      const oldest = investigations.activeInvestigations.shift();
+      if (oldest) {
+        oldest.status = 'abandoned';
+        investigations.completedInvestigations.push(oldest);
+      }
+    }
+  }
+
+  /**
+   * Update evidence as patterns progress
+   */
+  private updateInvestigationEvidence(
+    angel: AdminAngelComponent,
+    agentId: string,
+    evidence: string
+  ): void {
+    const investigations = angel.memory.investigations;
+    if (!investigations) return;
+
+    for (const inv of investigations.activeInvestigations) {
+      // Check if this investigation is about this agent
+      const agentName = angel.memory.agentFamiliarity.get(agentId)?.name || '';
+      if (inv.subject.includes(agentName)) {
+        inv.evidence.push(evidence);
+        // Cap evidence at 10
+        if (inv.evidence.length > 10) {
+          inv.evidence = inv.evidence.slice(-10);
+        }
+      }
+    }
   }
 
   /**
