@@ -24,6 +24,7 @@ import type { ChunkManager, TerrainGenerator } from '@ai-village/world';
 import type { IRenderer, RendererOptions, RendererFactory } from './IRenderer.js';
 import { PixiJSRenderer } from './PixiJSRenderer.js';
 import { Renderer as Canvas2DRenderer } from './Renderer.js';
+import { getPixelLabSpriteLoader } from './sprites/PixelLabSpriteLoader.js';
 
 /**
  * Feature flag for WebGPU renderer.
@@ -129,6 +130,9 @@ function wrapCanvas2DRenderer(renderer: Canvas2DRenderer): IRenderer {
     },
     get tileSize() {
       return 16; // Default tile size
+    },
+    get pixelLabLoader() {
+      return renderer.pixelLabLoader;
     },
 
     // View toggles

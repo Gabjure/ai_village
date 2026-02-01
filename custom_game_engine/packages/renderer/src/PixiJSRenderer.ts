@@ -35,6 +35,7 @@ import type {
 } from './IRenderer.js';
 import { lookupSprite } from './sprites/SpriteService.js';
 import type { SpriteTraits, ClothingType } from './sprites/SpriteRegistry.js';
+import { getPixelLabSpriteLoader, type PixelLabSpriteLoader } from './sprites/PixelLabSpriteLoader.js';
 
 // Global renderer instance for cleanup on HMR/reload
 // This prevents WebGL context leaks that cause "CanvasRenderer is not yet implemented" errors
@@ -254,6 +255,9 @@ export class PixiJSRenderer implements IRenderer {
   private _overlayCanvas: HTMLCanvasElement | null = null;
   private _overlayContext: CanvasRenderingContext2D | null = null;
 
+  // PixelLab sprite loader for loading character sprites
+  private _pixelLabLoader: PixelLabSpriteLoader;
+
   // Sprite path mappings (same as SpriteRenderer)
   private static readonly MAP_OBJECT_SPRITES: Record<string, string> = {
     // Trees
@@ -345,6 +349,7 @@ export class PixiJSRenderer implements IRenderer {
     this.terrainGenerator = terrainGenerator;
     this._camera = new Camera(canvas.width, canvas.height);
     this._tileSize = options.tileSize ?? 16;
+    this._pixelLabLoader = getPixelLabSpriteLoader('/assets/sprites/pixellab');
   }
 
   /**
@@ -630,6 +635,10 @@ export class PixiJSRenderer implements IRenderer {
 
   get tileSize(): number {
     return this._tileSize;
+  }
+
+  get pixelLabLoader(): PixelLabSpriteLoader {
+    return this._pixelLabLoader;
   }
 
   get overlayCanvas(): HTMLCanvasElement | undefined {

@@ -6,6 +6,7 @@
 import type { World, Entity, EventBus } from '@ai-village/core';
 import type { ChunkManager, TerrainGenerator } from '@ai-village/world';
 import type { Camera, VisibleBounds, ScreenPosition, WorldPosition } from './Camera.js';
+import type { PixelLabSpriteLoader } from './sprites/PixelLabSpriteLoader.js';
 
 /**
  * Renderer statistics for debugging and performance monitoring.
@@ -76,6 +77,9 @@ export interface IRenderer {
 
   /** Tile size in pixels */
   readonly tileSize: number;
+
+  /** PixelLab sprite loader for loading character sprites */
+  readonly pixelLabLoader: PixelLabSpriteLoader;
 
   // ============================================================================
   // View Toggle Properties
