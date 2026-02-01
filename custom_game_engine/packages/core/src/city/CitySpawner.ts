@@ -40,16 +40,6 @@ async function getAgentModule(): Promise<AgentModule> {
     _agentModule = module as AgentModule;
   }
   return _agentModule!;
-=======
-import { container, type AgentFactory } from '../di/index.js';
-
-/**
- * Get agent factory from DI container.
- * Returns null if agents package hasn't been registered yet.
- */
-function getAgentFactory(): AgentFactory | null {
-  return container.getAgentFactory();
->>>>>>> origin/claude/fix-circular-dependencies-g2hpq
 }
 
 /**
