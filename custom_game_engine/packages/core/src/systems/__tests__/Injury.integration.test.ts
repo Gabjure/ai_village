@@ -59,7 +59,7 @@ describe('InjurySystem Integration', () => {
 
     // Verify skill penalties were applied
     // Implementation modifies combat_stats directly, not injury.skillPenalties
-    const combatStats = agent.getComponent('combat_stats') as any;
+    const combatStats = agent.getComponent('combat_stats') as Record<string, unknown>;
 
     // Arm injuries should reduce combat skill (initial was 7, major injury applies -2 penalty)
     expect(combatStats.combatSkill).toBeLessThan(7);
@@ -104,7 +104,7 @@ describe('InjurySystem Integration', () => {
     system.update(world, [agent], 1);
 
     // Leg injuries should reduce movement speed
-    const movement = agent.getComponent('movement') as any;
+    const movement = agent.getComponent('movement') as Record<string, unknown>;
     expect(movement.currentSpeed).toBeLessThan(movement.baseSpeed);
 
     // Major leg injury should apply significant penalty
@@ -149,14 +149,14 @@ describe('InjurySystem Integration', () => {
     );
     world.addEntity(agent);
 
-    const initialNeeds = agent.getComponent('needs') as any;
+    const initialNeeds = agent.getComponent('needs') as Record<string, unknown>;
     const initialHungerRate = initialNeeds.hungerDecayRate;
     const initialEnergyRate = initialNeeds.energyDecayRate;
 
     const system = new InjurySystem();
     system.update(world, [agent], 1);
 
-    const needs = agent.getComponent('needs') as any;
+    const needs = agent.getComponent('needs') as Record<string, unknown>;
 
     // Injuries should increase hunger/energy decay (healing requires more resources)
     // Or decrease health
@@ -204,7 +204,7 @@ describe('InjurySystem Integration', () => {
     const system = new InjurySystem();
     system.update(world, [agent], 1);
 
-    const memory = agent.getComponent('episodic_memory') as any;
+    const memory = agent.getComponent('episodic_memory') as Record<string, unknown>;
 
     // Head injuries should prevent memory formation
     expect(memory.canFormMemories).toBe(false);
@@ -241,7 +241,7 @@ describe('InjurySystem Integration', () => {
     const system = new InjurySystem();
 
     // Initial state
-    let injury = agent.getComponent('injury') as any;
+    let injury = agent.getComponent('injury') as Record<string, unknown>;
     expect(injury).toBeDefined();
     const healingTime = injury.healingTime; // Fixed at 10 seconds
     const initialElapsed = injury.elapsed || 0;
@@ -249,7 +249,7 @@ describe('InjurySystem Integration', () => {
     // Simulate 5 seconds passing
     system.update(world, [agent], 5);
 
-    injury = agent.getComponent('injury') as any;
+    injury = agent.getComponent('injury') as Record<string, unknown>;
 
     if (injury) {
       // Implementation increments 'elapsed' field, not decreases healingTime
@@ -299,7 +299,7 @@ describe('InjurySystem Integration', () => {
     const system = new InjurySystem();
     system.update(world, [agent], 1);
 
-    const injury = agent.getComponent('injury') as any;
+    const injury = agent.getComponent('injury') as Record<string, unknown>;
 
     // Critical injuries should require treatment
     expect(injury.requiresTreatment).toBe(true);
@@ -308,7 +308,7 @@ describe('InjurySystem Integration', () => {
     const initialHealingTime = injury.healingTime;
     system.update(world, [agent], 10);
 
-    const stillInjured = agent.getComponent('injury') as any;
+    const stillInjured = agent.getComponent('injury') as Record<string, unknown>;
     expect(stillInjured).toBeDefined();
 
     // If untreated, healing should be much slower or not happen
@@ -380,9 +380,9 @@ describe('InjurySystem Integration', () => {
     system.update(world, [agent], 1);
 
     // Multiple injuries should compound effects
-    const movement = agent.getComponent('movement') as any;
-    const injury = agent.getComponent('injury') as any;
-    const combatStats = agent.getComponent('combat_stats') as any;
+    const movement = agent.getComponent('movement') as Record<string, unknown>;
+    const injury = agent.getComponent('injury') as Record<string, unknown>;
+    const combatStats = agent.getComponent('combat_stats') as Record<string, unknown>;
 
     // Leg injury should reduce speed
     expect(movement.currentSpeed).toBeLessThan(movement.baseSpeed);
@@ -417,7 +417,8 @@ describe('InjurySystem Integration', () => {
     agent.addComponent({
       type: 'injury' as const,
       version: 0,
-      injuryType: 'invalid_type' as any,
+      injuryType: // @ts-expect-error Testing invalid value validation
+      'invalid_type',
       severity: 'major',
       location: 'arms',
     });

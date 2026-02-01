@@ -422,7 +422,7 @@ describe('GovernanceDataSystem Integration', () => {
       // Trigger death event with missing reason
       eventBus.emitImmediate({
         type: 'agent:collapsed',
-        data: { agentId: agent.id } as any, // Missing 'reason'
+        data: { agentId: agent.id } as unknown, // Missing 'reason'
       });
 
       // Verify error was logged

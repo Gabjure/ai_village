@@ -26,7 +26,7 @@ describe('TradingSystem Quality Integration', () => {
     eventBus = new EventBusImpl();
     world = new World(eventBus);
     // Set world tick to daytime (10 AM = tick 12000)
-    (world as any)._tick = 12000;
+    (world as { _tick: number })._tick = 12000;
 
     // Create actual trading system
     tradingSystem = new TradingSystem();

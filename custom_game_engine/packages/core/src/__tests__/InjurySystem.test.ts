@@ -404,7 +404,8 @@ describe('InjurySystem', () => {
   describe('error handling', () => {
     it('should throw when injury type is invalid', () => {
       expect(() => createInjuryComponent({
-        injuryType: 'invalid_type' as any,
+        injuryType: // @ts-expect-error Testing invalid value validation
+      'invalid_type',
         severity: 'minor',
         location: 'torso',
       })).toThrow('Invalid injury type');
@@ -413,7 +414,8 @@ describe('InjurySystem', () => {
     it('should throw when severity is invalid', () => {
       expect(() => createInjuryComponent({
         injuryType: 'laceration',
-        severity: 'invalid' as any,
+        severity: // @ts-expect-error Testing invalid value validation
+      'invalid',
         location: 'torso',
       })).toThrow('Invalid injury severity');
     });
@@ -422,7 +424,8 @@ describe('InjurySystem', () => {
       expect(() => createInjuryComponent({
         injuryType: 'laceration',
         severity: 'minor',
-        location: 'invalid' as any,
+        location: // @ts-expect-error Testing invalid value validation
+      'invalid',
       })).toThrow('Invalid injury location');
     });
   });

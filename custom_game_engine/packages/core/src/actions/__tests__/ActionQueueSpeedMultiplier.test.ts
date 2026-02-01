@@ -30,7 +30,7 @@ describe('ActionQueue Speed Multiplier', () => {
       }),
       hasComponent: vi.fn((type: string) => type === 'time'),
       components: new Map([['time', { type: ComponentType.Time, speedMultiplier }]]),
-    } as unknown as EntityImpl;
+    } as Partial<EntityImpl> as EntityImpl;
     return entity;
   }
 
@@ -63,7 +63,7 @@ describe('ActionQueue Speed Multiplier', () => {
         }),
         getEntity: vi.fn((id: string) => id === 'time-entity' ? timeEntity : undefined),
         eventBus: { emit: vi.fn() },
-      } as unknown as WorldMutator;
+      } as WorldMutator;
 
       // Submit an action
       const actionId = actionQueue.submit({
@@ -103,7 +103,7 @@ describe('ActionQueue Speed Multiplier', () => {
         }),
         getEntity: vi.fn((id: string) => id === 'time-entity' ? timeEntity : undefined),
         eventBus: { emit: vi.fn() },
-      } as unknown as WorldMutator;
+      } as WorldMutator;
 
       // Submit an action
       actionQueue.submit({
@@ -142,7 +142,7 @@ describe('ActionQueue Speed Multiplier', () => {
         }),
         getEntity: vi.fn((id: string) => id === 'time-entity' ? timeEntity : undefined),
         eventBus: { emit: vi.fn() },
-      } as unknown as WorldMutator;
+      } as WorldMutator;
 
       actionQueue.submit({
         type: 'test_gather',
@@ -176,7 +176,7 @@ describe('ActionQueue Speed Multiplier', () => {
         }),
         getEntity: vi.fn((id: string) => id === 'time-entity' ? timeEntity : undefined),
         eventBus: { emit: vi.fn() },
-      } as unknown as WorldMutator;
+      } as WorldMutator;
 
       actionQueue.submit({
         type: 'test_gather',
@@ -211,7 +211,7 @@ describe('ActionQueue Speed Multiplier', () => {
         }),
         getEntity: vi.fn(() => undefined), // No time entity
         eventBus: { emit: vi.fn() },
-      } as unknown as WorldMutator;
+      } as WorldMutator;
 
       actionQueue.submit({
         type: 'test_gather',
@@ -256,7 +256,7 @@ describe('ActionQueue Speed Multiplier', () => {
           componentsMap.set('time', { type: ComponentType.Time, speedMultiplier: currentSpeed });
           return componentsMap;
         },
-      } as unknown as EntityImpl;
+      } as Partial<EntityImpl> as EntityImpl;
 
       mockWorld = {
         query: vi.fn().mockReturnValue({
@@ -266,7 +266,7 @@ describe('ActionQueue Speed Multiplier', () => {
         }),
         getEntity: vi.fn((id: string) => id === 'time-entity' ? timeEntity : undefined),
         eventBus: { emit: vi.fn() },
-      } as unknown as WorldMutator;
+      } as WorldMutator;
 
       actionQueue.submit({
         type: 'test_gather',
@@ -309,7 +309,7 @@ describe('ActionQueue Speed Multiplier', () => {
         }),
         getEntity: vi.fn((id: string) => id === 'time-entity' ? timeEntity : undefined),
         eventBus: { emit: vi.fn() },
-      } as unknown as WorldMutator;
+      } as WorldMutator;
 
       // Submit actions for two different agents
       actionQueue.submit({

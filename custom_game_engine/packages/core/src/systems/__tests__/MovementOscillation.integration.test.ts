@@ -206,7 +206,7 @@ describe('Movement Oscillation Detection', () => {
 
       for (let tick = 0; tick < 100; tick++) {
         const position = agent.getComponent(ComponentType.Position);
-        const movement = agent.getComponent(ComponentType.Movement) as any;
+        const movement = agent.getComponent(ComponentType.Movement);
 
         samples.push({
           tick,
@@ -237,7 +237,7 @@ describe('Movement Oscillation Detection', () => {
 
       for (let tick = 0; tick < 100; tick++) {
         const position = agent.getComponent(ComponentType.Position);
-        const movement = agent.getComponent(ComponentType.Movement) as any;
+        const movement = agent.getComponent(ComponentType.Movement);
 
         samples.push({
           tick,
@@ -269,7 +269,7 @@ describe('Movement Oscillation Detection', () => {
       // Simulate oscillating behavior by alternating velocity every 3 ticks
       for (let tick = 0; tick < 100; tick++) {
         const position = agent.getComponent(ComponentType.Position);
-        const movement = agent.getComponent(ComponentType.Movement) as any;
+        const movement = agent.getComponent(ComponentType.Movement);
 
         samples.push({
           tick,
@@ -319,7 +319,7 @@ describe('Movement Oscillation Detection', () => {
 
       for (let tick = 0; tick < 100; tick++) {
         const position = agent.getComponent(ComponentType.Position);
-        const movement = agent.getComponent(ComponentType.Movement) as any;
+        const movement = agent.getComponent(ComponentType.Movement);
 
         samples.push({
           tick,
@@ -356,7 +356,7 @@ describe('Movement Oscillation Detection', () => {
 
       for (let tick = 0; tick < 100; tick++) {
         const position = agent.getComponent(ComponentType.Position);
-        const movement = agent.getComponent(ComponentType.Movement) as any;
+        const movement = agent.getComponent(ComponentType.Movement);
 
         samples.push({
           tick,
@@ -415,11 +415,11 @@ describe('Movement Oscillation Detection', () => {
       aiSystem.update(harness.world, entities, 1 / 60);
 
       // Check that steering was disabled by idleBehavior
-      const steering = agent.getComponent(ComponentType.Steering) as any;
+      const steering = agent.getComponent(ComponentType.Steering);
       expect(steering.behavior).toBe('none');
 
       // Check velocity is 0
-      const movement = agent.getComponent(ComponentType.Movement) as any;
+      const movement = agent.getComponent(ComponentType.Movement);
       expect(movement.velocityX).toBe(0);
       expect(movement.velocityY).toBe(0);
     });
@@ -453,7 +453,7 @@ describe('Movement Oscillation Detection', () => {
       aiSystem.update(harness.world, entities, 1 / 60);
 
       // Check that steering was disabled by gatherBehavior
-      const steering = agent.getComponent(ComponentType.Steering) as any;
+      const steering = agent.getComponent(ComponentType.Steering);
       expect(steering.behavior).toBe('none');
     });
 
@@ -488,7 +488,7 @@ describe('Movement Oscillation Detection', () => {
       aiSystem.update(harness.world, entities, 1 / 60);
 
       // Check that steering was disabled
-      const steering = agent.getComponent(ComponentType.Steering) as any;
+      const steering = agent.getComponent(ComponentType.Steering);
       expect(steering.behavior).toBe('none');
     });
 
@@ -522,7 +522,7 @@ describe('Movement Oscillation Detection', () => {
       aiSystem.update(harness.world, entities, 1 / 60);
 
       // Check that steering was disabled
-      const steering = agent.getComponent(ComponentType.Steering) as any;
+      const steering = agent.getComponent(ComponentType.Steering);
       expect(steering.behavior).toBe('none');
     });
 
@@ -549,7 +549,7 @@ describe('Movement Oscillation Detection', () => {
       aiSystem.update(harness.world, entities, 1 / 60);
 
       // Check that steering was disabled
-      const steering = agent.getComponent(ComponentType.Steering) as any;
+      const steering = agent.getComponent(ComponentType.Steering);
       expect(steering.behavior).toBe('none');
     });
   });

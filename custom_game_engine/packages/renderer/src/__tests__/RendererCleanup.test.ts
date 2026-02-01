@@ -169,7 +169,8 @@ describe('Renderer Cleanup (Memory Leak Fix)', () => {
 
       expect(() => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        new Renderer(null as any, chunkManager, terrainGenerator);
+      // @ts-expect-error Testing null parameter validation
+        new Renderer(null, chunkManager, terrainGenerator);
       }).toThrow();
     });
 
@@ -178,7 +179,7 @@ describe('Renderer Cleanup (Memory Leak Fix)', () => {
 
       expect(() => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        new Renderer(undefined as any, chunkManager, terrainGenerator);
+        new Renderer(undefined as unknown, chunkManager, terrainGenerator);
       }).toThrow();
     });
   });

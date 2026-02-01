@@ -129,7 +129,7 @@ describe('ResearchLibraryPanel', () => {
         moveTo: vi.fn(),
         lineTo: vi.fn(),
         stroke: vi.fn(),
-      } as any;
+      } as unknown;
 
       panel.setVisible(true);
       panel.render(mockCtx, 0, 0, 380, 600, world);
@@ -167,7 +167,7 @@ describe('ResearchLibraryPanel', () => {
         moveTo: vi.fn(),
         lineTo: vi.fn(),
         stroke: vi.fn(),
-      } as any;
+      } as unknown;
 
       panel.setVisible(true);
       panel.render(mockCtx, 0, 0, 380, 600, emptyWorld);
@@ -196,7 +196,7 @@ describe('ResearchLibraryPanel', () => {
         moveTo: vi.fn(),
         lineTo: vi.fn(),
         stroke: vi.fn(),
-      } as any;
+      } as unknown;
 
       panel.setVisible(true);
       panel.render(mockCtx, 0, 0, 380, 600, world);
@@ -221,7 +221,7 @@ describe('ResearchLibraryPanel', () => {
         moveTo: vi.fn(),
         lineTo: vi.fn(),
         stroke: vi.fn(),
-      } as any;
+      } as unknown;
 
       panel.setVisible(true);
       panel.render(mockCtx, 0, 0, 380, 600, world);
@@ -241,7 +241,7 @@ describe('ResearchLibraryPanel', () => {
       const mockCtx = {
         fillText: vi.fn(),
         fillRect: vi.fn(),
-      } as any;
+      } as Record<string, unknown>;
 
       panel.setVisible(false);
       panel.render(mockCtx, 0, 0, 380, 600, world);
@@ -254,7 +254,7 @@ describe('ResearchLibraryPanel', () => {
       const mockCtx = {
         fillText: vi.fn(),
         fillRect: vi.fn(),
-      } as any;
+      } as Record<string, unknown>;
 
       panel.setVisible(true);
       panel.render(mockCtx, 0, 0, 380, 600, undefined);
@@ -277,7 +277,7 @@ describe('ResearchLibraryPanel', () => {
         moveTo: vi.fn(),
         lineTo: vi.fn(),
         stroke: vi.fn(),
-      } as any;
+      } as unknown;
 
       panel.setVisible(true);
       panel.render(mockCtx, 0, 0, 380, 600, world);
@@ -316,7 +316,7 @@ describe('ResearchLibraryPanel', () => {
         moveTo: vi.fn(),
         lineTo: vi.fn(),
         stroke: vi.fn(),
-      } as any;
+      } as unknown;
 
       panel.setVisible(true);
       expect(() => {
@@ -338,7 +338,7 @@ describe('ResearchLibraryPanel', () => {
         moveTo: vi.fn(),
         lineTo: vi.fn(),
         stroke: vi.fn(),
-      } as any;
+      } as unknown;
 
       panel.setVisible(true);
 
@@ -369,7 +369,7 @@ describe('ResearchLibraryPanel', () => {
         moveTo: vi.fn(),
         lineTo: vi.fn(),
         stroke: vi.fn(),
-      } as any;
+      } as unknown;
 
       panel.setVisible(true);
       panel.render(mockCtx, 0, 0, 380, 600, world);

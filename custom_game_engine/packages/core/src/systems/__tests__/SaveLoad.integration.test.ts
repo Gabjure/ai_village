@@ -68,7 +68,7 @@ describe('Save/Load Persistence Integration', () => {
     agent.addComponent(needs);
 
     // Get component
-    const retrievedNeeds = agent.getComponent(ComponentType.Needs) as any;
+    const retrievedNeeds = agent.getComponent(ComponentType.Needs);
 
     // Verify data preserved
     expect(retrievedNeeds.hunger).toBe(0.7);
@@ -102,7 +102,7 @@ describe('Save/Load Persistence Integration', () => {
 
     const agent = harness.createTestAgent({ x, y });
 
-    const position = agent.getComponent(ComponentType.Position) as any;
+    const position = agent.getComponent(ComponentType.Position);
     expect(position.x).toBe(x);
     expect(position.y).toBe(y);
   });
@@ -131,7 +131,7 @@ describe('Save/Load Persistence Integration', () => {
 
     agent.addComponent(memory);
 
-    const retrieved = agent.getComponent(ComponentType.Memory) as any;
+    const retrieved = agent.getComponent(ComponentType.Memory);
 
     expect(retrieved).toBeDefined();
     expect(retrieved.memories).toBeDefined();
@@ -164,7 +164,7 @@ describe('Save/Load Persistence Integration', () => {
 
     agent.addComponent(circadian);
 
-    const retrieved = agent.getComponent(ComponentType.Circadian) as any;
+    const retrieved = agent.getComponent(ComponentType.Circadian);
 
     expect(retrieved).toBeDefined();
     expect(retrieved.sleepDrive).toBeDefined();
@@ -215,7 +215,7 @@ describe('Save/Load Persistence Integration', () => {
 
     agent.addComponent(needs);
 
-    const retrieved = agent.getComponent(ComponentType.Needs) as any;
+    const retrieved = agent.getComponent(ComponentType.Needs);
 
     expect(retrieved.version).toBeDefined();
     expect(typeof retrieved.version).toBe('number');
@@ -285,7 +285,7 @@ describe('Save/Load Persistence Integration', () => {
     temperature: 37,
   }));
 
-    const needs = agent.getComponent(ComponentType.Needs) as any;
+    const needs = agent.getComponent(ComponentType.Needs);
 
     expect(needs.type).toBe('needs');
   });

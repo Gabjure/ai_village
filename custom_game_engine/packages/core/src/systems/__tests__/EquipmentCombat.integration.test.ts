@@ -413,7 +413,7 @@ describe('Equipment + Combat Integration', () => {
     combatSystem.update(world, [attacker], 0.1);
 
     // Get combat outcome
-    const conflict = world.getComponent(attacker.id, 'conflict') as any;
+    const conflict = world.getComponent(attacker.id, 'conflict') as unknown;
     return conflict.outcome;
   }
 

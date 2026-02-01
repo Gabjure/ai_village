@@ -103,7 +103,7 @@ describe('AgentCombatSystem Integration', () => {
     system.update(world, [attacker, defender], 1);
 
     // Verify combat was resolved
-    const conflict = attacker.getComponent('conflict') as any;
+    const conflict = attacker.getComponent('conflict') as Record<string, unknown>;
     expect(conflict).toBeDefined();
     expect(conflict.state).toBe('resolved');
     expect(['attacker_victory', 'defender_victory', 'mutual_injury', 'stalemate']).toContain(
@@ -197,21 +197,21 @@ describe('AgentCombatSystem Integration', () => {
     system.update(world, [attacker, defender], 1);
 
     // Check if injuries were applied
-    const conflict = attacker.getComponent('conflict') as any;
+    const conflict = attacker.getComponent('conflict') as Record<string, unknown>;
 
     if (conflict.outcome === 'attacker_victory') {
       // Defender should have injury
       const defenderInjury = defender.getComponent('injury');
       expect(defenderInjury).toBeDefined();
       if (defenderInjury) {
-        expect(['minor', 'major', 'critical']).toContain((defenderInjury as any).severity);
+        expect(['minor', 'major', 'critical']).toContain((defenderInjury as Record<string, unknown>).severity);
       }
     } else if (conflict.outcome === 'defender_victory') {
       // Attacker should have injury
       const attackerInjury = attacker.getComponent('injury');
       expect(attackerInjury).toBeDefined();
       if (attackerInjury) {
-        expect(['minor', 'major', 'critical']).toContain((attackerInjury as any).severity);
+        expect(['minor', 'major', 'critical']).toContain((attackerInjury as Record<string, unknown>).severity);
       }
     } else if (conflict.outcome === 'mutual_injury') {
       // Both should have injuries
@@ -381,7 +381,7 @@ describe('AgentCombatSystem Integration', () => {
     world.addEntity(defender);
 
     // Set initial friendly relationship
-    const attackerRel = attacker.getComponent('relationship') as any;
+    const attackerRel = attacker.getComponent('relationship') as Record<string, unknown>;
     attackerRel.relationships[defender.id] = { opinion: 60, trust: 70 };
 
     attacker.addComponent(
@@ -398,7 +398,7 @@ describe('AgentCombatSystem Integration', () => {
     system.update(world, [attacker, defender], 1);
 
     // Relationship should have degraded after combat
-    const updatedRel = attacker.getComponent('relationship') as any;
+    const updatedRel = attacker.getComponent('relationship') as Record<string, unknown>;
     if (updatedRel.relationships[defender.id]) {
       // Opinion should be worse than before
       expect(updatedRel.relationships[defender.id].opinion).toBeLessThan(60);

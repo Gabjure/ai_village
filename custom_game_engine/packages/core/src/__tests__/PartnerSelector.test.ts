@@ -74,7 +74,7 @@ function createMockEntity(
       return (components.get(type) as T) ?? null;
     },
     hasComponent: (type: string): boolean => components.has(type),
-  } as unknown as Entity;
+  } as Entity;
 }
 
 // Helper to create an interest
@@ -126,7 +126,7 @@ const mockWorld: World = {
   }),
   getEntity: () => null,
   tick: 0,
-} as unknown as World;
+} as World;
 
 describe('PartnerSelector', () => {
   describe('calculateSharedInterestScore', () => {

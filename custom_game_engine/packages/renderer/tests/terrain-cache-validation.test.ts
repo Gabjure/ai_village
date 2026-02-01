@@ -15,6 +15,20 @@ import { Camera } from '../src/Camera';
 import type { Chunk, Tile } from '@ai-village/world';
 import { CHUNK_SIZE } from '@ai-village/world';
 
+// Type helpers for testing
+type EntityWithMethods = {
+  addComponent?: (comp: unknown) => void;
+  updateComponent?: (type: string, updater: (current: unknown) => unknown) => void;
+  getComponent?: (type: string) => unknown;
+  hasComponent?: (type: string) => boolean;
+};
+type WorldWithMethods = Record<string, unknown> & {
+  getEntity?: (id: string) => unknown;
+  addEntity?: (entity: unknown) => void;
+  query?: unknown;
+  getSystem?: (name: string) => unknown;
+};
+
 // Mock OffscreenCanvas for Node.js environment
 class MockOffscreenCanvas {
   width: number;
@@ -64,7 +78,7 @@ const mockCanvasContext = {
 
 // Make OffscreenCanvas available in test environment
 if (typeof globalThis.OffscreenCanvas === 'undefined') {
-  (globalThis as any).OffscreenCanvas = MockOffscreenCanvas;
+  (globalThis as Record<string, unknown>).OffscreenCanvas = MockOffscreenCanvas;
 }
 
 function createMockTile(overrides: Partial<Tile> = {}): Tile {
@@ -121,9 +135,9 @@ describe('TerrainRenderer Canvas Caching', () => {
       }
       // For other types, just no-op in test environment
       return;
-    }) as any;
-    (ctx as any)._drawImageCallCount = () => drawImageCallCount;
-    (ctx as any)._resetDrawImageCount = () => { drawImageCallCount = 0; };
+    }) as unknown;
+    (ctx as Record<string, unknown>)._drawImageCallCount = () => drawImageCallCount;
+    (ctx as Record<string, unknown>)._resetDrawImageCount = () => { drawImageCallCount = 0; };
 
     renderer = new TerrainRenderer(ctx, 16);
     camera = new Camera(800, 600);
@@ -141,7 +155,7 @@ describe('TerrainRenderer Canvas Caching', () => {
 
   it('should reuse cache on subsequent renders', () => {
     const chunk = createMockChunk(0, 0);
-    const ctx = mockCanvas.getContext('2d') as any;
+    const ctx = mockCanvas.getContext('2d') as unknown;
 
     // First render
     ctx._resetDrawImageCount();
@@ -233,7 +247,7 @@ describe('TerrainRenderer Canvas Caching', () => {
     renderer.renderChunk(chunk, camera);
 
     // Add wall to tile
-    (chunk.tiles[0] as any).wall = {
+    (chunk.tiles[0] as unknown).wall = {
       material: 'stone',
       condition: 100,
       constructionProgress: 100,
@@ -368,7 +382,7 @@ describe('TerrainRenderer Canvas Caching', () => {
 
     for (let i = 0; i < CHUNK_SIZE * CHUNK_SIZE; i++) {
       tiles.push(createMockTile({
-        terrain: terrainTypes[i % terrainTypes.length] as any,
+        terrain: terrainTypes[i % terrainTypes.length] as unknown,
       }));
     }
 
@@ -384,7 +398,7 @@ describe('TerrainRenderer Canvas Caching', () => {
     const tiles: Tile[] = [];
 
     for (let i = 0; i < CHUNK_SIZE * CHUNK_SIZE; i++) {
-      const tile = createMockTile() as any;
+      const tile = createMockTile() as unknown;
 
       // Add various building components
       if (i % 4 === 0) {

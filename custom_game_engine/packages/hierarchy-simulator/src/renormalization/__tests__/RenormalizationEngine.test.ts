@@ -70,7 +70,8 @@ describe('RenormalizationEngine', () => {
     });
 
     it('should return 1 for unknown tier', () => {
-      expect(engine.getTimeScale('unknown' as any)).toBe(1);
+      // @ts-expect-error Testing unknown tier type fallback
+      expect(engine.getTimeScale('unknown')).toBe(1);
     });
   });
 

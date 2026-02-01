@@ -483,7 +483,7 @@ describe('JournalingSystem', () => {
         emotionalIntensity: 0.7
       });
 
-      const llmSpy = vi.spyOn(system as any, 'generateJournalEntry');
+      const llmSpy = vi.spyOn(system as unknown, 'generateJournalEntry');
 
       eventBus.emit('agent:idle', { agentId: agent.id });
 
@@ -493,7 +493,7 @@ describe('JournalingSystem', () => {
     });
 
     it('should handle LLM failure gracefully', () => {
-      vi.spyOn(system as any, 'generateJournalEntry').mockRejectedValue(
+      vi.spyOn(system as unknown, 'generateJournalEntry').mockRejectedValue(
         new Error('LLM unavailable')
       );
 
@@ -539,7 +539,7 @@ describe('JournalingSystem', () => {
         journalComp.addEntry({
           timestamp: Date.now(),
           discoverable: true
-        } as any);
+        } as Record<string, unknown>);
       }).toThrow();
     });
 
@@ -550,7 +550,7 @@ describe('JournalingSystem', () => {
         journalComp.addEntry({
           text: 'Test',
           discoverable: true
-        } as any);
+        } as Record<string, unknown>);
       }).toThrow();
     });
 
@@ -562,7 +562,7 @@ describe('JournalingSystem', () => {
           text: 'Test',
           timestamp: Date.now()
           // Missing discoverable - should throw, not default
-        } as any);
+        } as Record<string, unknown>);
       }).toThrow();
     });
   });

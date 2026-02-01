@@ -224,7 +224,7 @@ describe('AutonomicSystem', () => {
     health: 1.0,
   });
       needs.energy = 0;
-      (entity as any).addComponent(needs);
+      entity.addComponent(needs);
 
       const result = autonomicSystem.check(entity);
 
@@ -265,7 +265,8 @@ describe('BehaviorPriority', () => {
     });
 
     it('returns 10 for unknown behaviors', () => {
-      expect(getBehaviorPriority('unknown_behavior' as any)).toBe(10);
+      expect(getBehaviorPriority(// @ts-expect-error Testing invalid value validation
+      'unknown_behavior')).toBe(10);
     });
 
     it('returns 90 for seek_warmth when dangerously cold', () => {

@@ -460,7 +460,7 @@ function createMockDeity(id: string): Deity {
       forms: [],
     },
     knownParadigms: [],
-  } as any;
+  } as Record<string, unknown>;
 }
 
 function createMockAgent(id: string): any {
@@ -476,7 +476,7 @@ function createMockAgent(id: string): any {
 }
 
 function createMockWorld(): World {
-  return {} as any;
+  return {} as Partial<World> as World;
 }
 
 function castTheurgicSpell(caster: any, spell: ComposedSpell, deity: Deity, world: World): any {
@@ -504,7 +504,7 @@ function calculateTheurgicCost(caster: any, spell: ComposedSpell, deity: Deity):
 
   // Domain alignment
   const domain = spell.form;
-  const alignment = (deity.identity.domains as any)[domain] || 0;
+  const alignment = (deity.identity.domains as Record<string, number>)[domain] || 0;
   if (alignment > 0.7) {
     cost *= 0.7; // 30% discount
   } else if (alignment < 0.3) {

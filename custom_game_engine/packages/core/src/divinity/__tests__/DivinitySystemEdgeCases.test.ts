@@ -357,9 +357,9 @@ describe('Pantheon Relationship Deadlocks', () => {
     const deity3: Deity = createMockDeity('god3');
 
     // A -> B -> C -> A (circular!)
-    (deity1 as any).superior = deity2.id;
-    (deity2 as any).superior = deity3.id;
-    (deity3 as any).superior = deity1.id;
+    (deity1 as Record<string, unknown>).superior = deity2.id;
+    (deity2 as Record<string, unknown>).superior = deity3.id;
+    (deity3 as Record<string, unknown>).superior = deity1.id;
 
     const circular = detectCircularHierarchy([deity1, deity2, deity3]);
 
@@ -372,11 +372,11 @@ describe('Pantheon Relationship Deadlocks', () => {
     const deity2: Deity = createMockDeity('god2');
 
     // Both claim to be enemies AND allies
-    (deity1 as any).relationships = {
+    (deity1 as Record<string, unknown>).relationships = {
       [deity2.id]: { type: 'ally', strength: 0.8 },
     };
 
-    (deity2 as any).relationships = {
+    (deity2 as Record<string, unknown>).relationships = {
       [deity1.id]: { type: 'enemy', strength: 0.9 },
     };
 
@@ -557,11 +557,11 @@ describe('Memory Leaks in Divinity System', () => {
 
   it('should prevent answered prayer history from growing unbounded', () => {
     const deity: Deity = createMockDeity('god');
-    (deity as any).answeredPrayers = [];
+    (deity as Record<string, unknown>).answeredPrayers = [];
 
     // Answer thousands of prayers
     for (let i = 0; i < 10000; i++) {
-      (deity as any).answeredPrayers.push({
+      (deity as Record<string, unknown>).answeredPrayers.push({
         prayerId: `p${i}`,
         tick: i,
       });
@@ -570,12 +570,12 @@ describe('Memory Leaks in Divinity System', () => {
     // Trim old history
     trimPrayerHistory(deity, 1000);
 
-    expect((deity as any).answeredPrayers.length).toBe(1000);
+    expect((deity as Record<string, unknown>).answeredPrayers.length).toBe(1000);
   });
 
   it('should clean up expired divine effects from world', () => {
     const world = {
-      activeEffects: [] as any[],
+      activeEffects: [] as unknown[],
     };
 
     // Add many effects
@@ -609,7 +609,7 @@ function createMockDeity(id: string): Deity {
     },
     pendingPrayers: [],
     emergencePhase: 'nascent',
-  } as any;
+  } as Record<string, unknown>;
 }
 
 function spendBelief(deity: Deity, amount: number): any {
@@ -650,7 +650,7 @@ function processBeliefGenerations(deity: Deity, generations: any[]): void {
   }
 }
 
-function performMiracle(deity: Deity, options: any): Promise<void> {
+function performMiracle(deity: Deity, options:Record<string, unknown>): Promise<void> {
   deity.belief -= options.cost;
   return Promise.resolve();
 }
@@ -659,12 +659,12 @@ function startPrayerProcessing(deity: Deity, prayer: Prayer): any {
   return { deity, prayer, started: true };
 }
 
-function completePrayerProcessing(processing: any): any {
+function completePrayerProcessing(processing:Record<string, unknown>): any {
   // Check if believer still exists
   return { success: false, reason: 'believer_dead' };
 }
 
-function createPrayer(believerId: string, deityId: string, content: string, options?: any): Prayer {
+function createPrayer(believerId: string, deityId: string, content: string, options?:Record<string, unknown>): Prayer {
   return {
     id: `${believerId}_${Date.now()}`,
     believerId,
@@ -674,7 +674,7 @@ function createPrayer(believerId: string, deityId: string, content: string, opti
     emotion: 'hopeful',
     intensity: options?.intensity || 0.5,
     tick: 0,
-  } as any;
+  } as Record<string, unknown>;
 }
 
 function answerPrayer(deity: Deity, prayer: Prayer): any {
@@ -686,7 +686,7 @@ function cleanupBelieverList(deity: Deity): Deity {
   return deity;
 }
 
-function validateBelieverState(believer: any): any {
+function validateBelieverState(believer:Record<string, unknown>): any {
   return {
     ...believer,
     faith: Math.max(0, Math.min(1, believer.faith)),
@@ -702,7 +702,7 @@ function detectDomainContradictions(deity: Deity): any[] {
   ];
 
   for (const [d1, d2] of contradictoryPairs) {
-    if ((deity.identity.domains as any)[d1] > 0.7 && (deity.identity.domains as any)[d2] > 0.7) {
+    if ((deity.identity.domains as unknown)[d1] > 0.7 && (deity.identity.domains as unknown)[d2] > 0.7) {
       contradictions.push({ domains: [d1, d2], severity: 'high' });
     }
   }
@@ -718,7 +718,7 @@ function detectPersonalityContradictions(deity: Deity): any[] {
   ];
 
   for (const [t1, t2] of contradictoryPairs) {
-    if ((deity.identity.personality as any)[t1] > 0.7 && (deity.identity.personality as any)[t2] > 0.7) {
+    if ((deity.identity.personality as unknown)[t1] > 0.7 && (deity.identity.personality as unknown)[t2] > 0.7) {
       contradictions.push({ traits: [t1, t2] });
     }
   }
@@ -726,7 +726,7 @@ function detectPersonalityContradictions(deity: Deity): any[] {
   return contradictions;
 }
 
-function validateAlignment(alignment: any): any {
+function validateAlignment(alignment:Record<string, unknown>): any {
   return {
     law_chaos: Math.max(-1, Math.min(1, alignment.law_chaos)),
     good_evil: Math.max(-1, Math.min(1, alignment.good_evil)),
@@ -752,7 +752,7 @@ function limitPrayerQueue(deity: Deity, maxSize: number): any {
   return { ...deity, droppedPrayers: dropped };
 }
 
-function addPrayerToQueue(deity: Deity, prayer: Prayer, options: any): void {
+function addPrayerToQueue(deity: Deity, prayer: Prayer, options:Record<string, unknown>): void {
   deity.pendingPrayers.push(prayer);
   if (deity.pendingPrayers.length > options.maxSize) {
     // Remove least intense prayer
@@ -794,12 +794,12 @@ function detectCircularHierarchy(deities: Deity[]): any {
     let current: any = deity;
     const path = [deity.id];
 
-    while (current && (current as any).superior) {
-      if (visited.has((current as any).superior)) {
-        return { detected: true, cycle: [...path, (current as any).superior] };
+    while (current && (current as Record<string, unknown>).superior) {
+      if (visited.has((current as Record<string, unknown>).superior)) {
+        return { detected: true, cycle: [...path, (current as Record<string, unknown>).superior] };
       }
-      path.push((current as any).superior);
-      current = deities.find((d) => d.id === (current as any).superior);
+      path.push((current as Record<string, unknown>).superior);
+      current = deities.find((d) => d.id === (current as Record<string, unknown>).superior);
     }
   }
 
@@ -807,8 +807,8 @@ function detectCircularHierarchy(deities: Deity[]): any {
 }
 
 function detectRelationshipConflicts(deity1: Deity, deity2: Deity): any {
-  const rel1 = (deity1 as any).relationships?.[deity2.id];
-  const rel2 = (deity2 as any).relationships?.[deity1.id];
+  const rel1 = (deity1 as Record<string, unknown>).relationships?.[deity2.id];
+  const rel2 = (deity2 as Record<string, unknown>).relationships?.[deity1.id];
 
   if (rel1 && rel2 && rel1.type !== rel2.type) {
     return { hasConflict: true, type: 'mutual_disagreement' };
@@ -825,9 +825,9 @@ function validateTreaty(treaty: any, existingDeities: string[]): any {
   };
 }
 
-function scheduleVision(deity: Deity, vision: any): void {
-  (deity as any).scheduledVisions = (deity as any).scheduledVisions || [];
-  (deity as any).scheduledVisions.push(vision);
+function scheduleVision(deity: Deity, vision:Record<string, unknown>): void {
+  (deity as Record<string, unknown>).scheduledVisions = (deity as Record<string, unknown>).scheduledVisions || [];
+  (deity as Record<string, unknown>).scheduledVisions.push(vision);
 }
 
 function deliverScheduledVision(vision: any, currentTime: number): any {
@@ -843,11 +843,11 @@ function processTick(target: any, tick: number): any {
   return target;
 }
 
-function applyCurseDamage(target: any): any {
+function applyCurseDamage(target:Record<string, unknown>): any {
   return { target, damageToApply: target.activeCurse.damagePerTick };
 }
 
-function completeDamageApplication(result: any): any {
+function completeDamageApplication(result:Record<string, unknown>): any {
   if (result.target.activeCurse.liftedAt) {
     return { damageApplied: false };
   }
@@ -878,12 +878,12 @@ function cleanupDeadBelievers(deity: Deity, livingIds: Set<string>): void {
 }
 
 function trimPrayerHistory(deity: Deity, maxSize: number): void {
-  const history = (deity as any).answeredPrayers || [];
+  const history = (deity as Record<string, unknown>).answeredPrayers || [];
   if (history.length > maxSize) {
-    (deity as any).answeredPrayers = history.slice(-maxSize);
+    (deity as Record<string, unknown>).answeredPrayers = history.slice(-maxSize);
   }
 }
 
 function cleanupExpiredDivineEffects(world: any, currentTick: number): void {
-  world.activeEffects = world.activeEffects.filter((e: any) => e.expiresAt > currentTick);
+  world.activeEffects = world.activeEffects.filter((e:Record<string, unknown>) => e.expiresAt > currentTick);
 }

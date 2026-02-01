@@ -101,11 +101,11 @@ describe('PlantSeedProduction Integration', () => {
     });
 
     const entity = new EntityImpl(createEntityId(), 0);
-    (entity as any).addComponent(plant);
+    entity.addComponent(plant);
     world.addEntity(entity);
 
-    // Store entity ID on plant for logging
-    (plant as any).entityId = entity.id;
+    // Store entity ID on plant for logging (plant component doesn't have this field in type, but it's used for debugging)
+    (plant as { entityId?: string }).entityId = entity.id;
 
     // Force plant to 100% progress so it transitions
     plant.stageProgress = 1.0;
@@ -114,7 +114,7 @@ describe('PlantSeedProduction Integration', () => {
     eventBus.emitImmediate({ type: 'time:day_changed', source: 'test', data: {} });
 
     // Run plant system update
-    const entities = (world as any).query().with(ComponentType.Plant).executeEntities();
+    const entities = world.query().with(ComponentType.Plant).executeEntities();
     plantSystem.update(world, entities, 0.1);
 
     // Plant should have transitioned to mature
@@ -139,11 +139,11 @@ describe('PlantSeedProduction Integration', () => {
     });
 
     const entity = new EntityImpl(createEntityId(), 0);
-    (entity as any).addComponent(plant);
+    entity.addComponent(plant);
     world.addEntity(entity);
 
-    // Store entity ID on plant for logging
-    (plant as any).entityId = entity.id;
+    // Store entity ID on plant for logging (plant component doesn't have this field in type, but it's used for debugging)
+    (plant as { entityId?: string }).entityId = entity.id;
 
     // Force plant to 100% progress
     plant.stageProgress = 1.0;
@@ -152,7 +152,7 @@ describe('PlantSeedProduction Integration', () => {
     eventBus.emitImmediate({ type: 'time:day_changed', source: 'test', data: {} });
 
     // Run plant system update
-    const entities = (world as any).query().with(ComponentType.Plant).executeEntities();
+    const entities = world.query().with(ComponentType.Plant).executeEntities();
     plantSystem.update(world, entities, 0.1);
 
     // Plant should have transitioned to seeding
@@ -179,16 +179,16 @@ describe('PlantSeedProduction Integration', () => {
     });
 
     const entity = new EntityImpl(createEntityId(), 0);
-    (entity as any).addComponent(plant);
+    entity.addComponent(plant);
     world.addEntity(entity);
 
-    // Store entity ID on plant for logging
-    (plant as any).entityId = entity.id;
+    // Store entity ID on plant for logging (plant component doesn't have this field in type, but it's used for debugging)
+    (plant as { entityId?: string }).entityId = entity.id;
 
     // TRANSITION 1: vegetative → mature
     plant.stageProgress = 1.0;
     eventBus.emitImmediate({ type: 'time:day_changed', source: 'test', data: {} });
-    let entities = (world as any).query().with(ComponentType.Plant).executeEntities();
+    let entities = world.query().with(ComponentType.Plant).executeEntities();
     plantSystem.update(world, entities, 0.1);
 
     expect(plant.stage).toBe('mature');
@@ -197,7 +197,7 @@ describe('PlantSeedProduction Integration', () => {
     // TRANSITION 2: mature → seeding
     plant.stageProgress = 1.0;
     eventBus.emitImmediate({ type: 'time:day_changed', source: 'test', data: {} });
-    entities = (world as any).query().with(ComponentType.Plant).executeEntities();
+    entities = world.query().with(ComponentType.Plant).executeEntities();
     plantSystem.update(world, entities, 0.1);
 
     expect(plant.stage).toBe('seeding');

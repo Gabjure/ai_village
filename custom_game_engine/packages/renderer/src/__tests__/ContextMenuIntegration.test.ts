@@ -4,6 +4,20 @@ import { World, EventBusImpl } from '@ai-village/core';
 import { Camera } from '../Camera';
 import { InputHandler } from '../InputHandler';
 
+// Type helpers for testing
+type EntityWithMethods = {
+  addComponent?: (comp: unknown) => void;
+  updateComponent?: (type: string, updater: (current: unknown) => unknown) => void;
+  getComponent?: (type: string) => unknown;
+  hasComponent?: (type: string) => boolean;
+};
+type WorldWithMethods = Record<string, unknown> & {
+  getEntity?: (id: string) => unknown;
+  addEntity?: (entity: unknown) => void;
+  query?: unknown;
+  getSystem?: (name: string) => unknown;
+};
+
 describe('ContextMenu Integration', () => {
   let world: World;
   let eventBus: EventBusImpl;
@@ -190,13 +204,14 @@ describe('ContextMenu Integration', () => {
 
       const context = contextMenu.getContext();
       eventBus.emit({
-        type: 'ui:confirmation:confirmed' as any,
+        type: // @ts-expect-error Testing invalid value validation
+      'ui:confirmation:confirmed',
         source: 'world',
         data: {
           actionId: 'demolish',
           context
         }
-      } as any);
+      } as Record<string, unknown>);
       eventBus.flush(); // Flush confirmation event (triggers confirmHandler)
       eventBus.flush(); // Flush action:demolish event (emitted by confirmHandler)
 
@@ -552,10 +567,11 @@ describe('ContextMenu Integration', () => {
 
       // Simulate right-click
       eventBus.emit({
-        type: 'input:rightclick' as any,
+        type: // @ts-expect-error Testing invalid value validation
+      'input:rightclick',
         source: 'world',
         data: { x: 400, y: 300 }
-      } as any);
+      } as Record<string, unknown>);
       eventBus.flush(); // Flush input:rightclick event (triggers rightClickHandler)
       eventBus.flush(); // Flush ui:contextmenu:opened event (emitted by open())
 
@@ -627,7 +643,7 @@ describe('ContextMenu Integration', () => {
       };
 
       // Access the registry directly to register our test action
-      const registry = (contextMenu as any).registry as any;
+      const registry = (contextMenu as Record<string, unknown>).registry as unknown;
       registry.register(throwingAction);
 
       // Open menu at any position

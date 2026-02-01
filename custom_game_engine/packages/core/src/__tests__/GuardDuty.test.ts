@@ -222,7 +222,7 @@ describe('GuardDutySystem', () => {
 
       threat.addComponent('threat_level', { level: 'high' });
       // Use updateComponent for immutable components
-      (guard as any).updateComponent('combat_stats', (stats: any) => ({
+      (guard as Record<string, unknown>).updateComponent('combat_stats', (stats: Record<string, unknown>) => ({
         ...stats,
         combatSkill: 10, // Confident guard
       }));
@@ -264,7 +264,7 @@ describe('GuardDutySystem', () => {
       });
 
       // Use updateComponent for immutable components
-      (guard as any).updateComponent('combat_stats', (stats: any) => ({
+      (guard as Record<string, unknown>).updateComponent('combat_stats', (stats: Record<string, unknown>) => ({
         ...stats,
         combatSkill: 2, // Weak guard
       }));
@@ -360,7 +360,7 @@ describe('GuardDutySystem', () => {
       guard.addComponent('guard_duty', {
         alertness: 1.0,
         responseRadius: 20,
-      } as any);
+      } as Record<string, unknown>);
 
       expect(() => system.update(world, Array.from(world.entities.values()), 1)).toThrow('Guard assignment type is required');
     });
@@ -370,7 +370,7 @@ describe('GuardDutySystem', () => {
         assignmentType: 'location',
         alertness: 1.0,
         responseRadius: 20,
-      } as any);
+      } as Record<string, unknown>);
 
       expect(() => system.update(world, Array.from(world.entities.values()), 1)).toThrow('Location guard assignment requires targetLocation');
     });
@@ -380,7 +380,7 @@ describe('GuardDutySystem', () => {
         assignmentType: 'person',
         alertness: 1.0,
         responseRadius: 20,
-      } as any);
+      } as Record<string, unknown>);
 
       expect(() => system.update(world, Array.from(world.entities.values()), 1)).toThrow('Person guard assignment requires targetPerson');
     });
@@ -390,7 +390,7 @@ describe('GuardDutySystem', () => {
         assignmentType: 'patrol',
         alertness: 1.0,
         responseRadius: 20,
-      } as any);
+      } as Record<string, unknown>);
 
       expect(() => system.update(world, Array.from(world.entities.values()), 1)).toThrow('Patrol assignment requires patrolRoute');
     });

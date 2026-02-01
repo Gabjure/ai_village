@@ -225,21 +225,21 @@ describe('ProgressiveSkillReveal Integration Tests', () => {
       const skillsLow: Partial<Record<SkillId, SkillLevel>> = {
         gathering: 0,
       };
-      const visibleLow = filterVisibleEntities(entities as any, skillsLow, agentPos);
+      const visibleLow = filterVisibleEntities(entities as unknown, skillsLow, agentPos);
       expect(visibleLow).toHaveLength(0); // Berry bush at 10 tiles is beyond 5 tile radius
 
       // Level 2 gathering - can see hidden patches and has 30 tile radius
       const skillsMed: Partial<Record<SkillId, SkillLevel>> = {
         gathering: 2,
       };
-      const visibleMed = filterVisibleEntities(entities as any, skillsMed, agentPos);
+      const visibleMed = filterVisibleEntities(entities as unknown, skillsMed, agentPos);
       expect(visibleMed.length).toBeGreaterThan(0); // Should see berry bush and hidden patch
 
       // Level 3 gathering - can see clay and has 50 tile radius
       const skillsHigh: Partial<Record<SkillId, SkillLevel>> = {
         gathering: 3,
       };
-      const visibleHigh = filterVisibleEntities(entities as any, skillsHigh, agentPos);
+      const visibleHigh = filterVisibleEntities(entities as unknown, skillsHigh, agentPos);
       expect(visibleHigh).toHaveLength(3); // All entities visible
     });
 

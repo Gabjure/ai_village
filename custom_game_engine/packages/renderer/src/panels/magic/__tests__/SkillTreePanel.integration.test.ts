@@ -59,7 +59,7 @@ describe('SkillTreePanel Backend Integration', () => {
     mockWindowManager = {
       registerWindow: () => {},
       getWindowConfig: () => ({ keyboardShortcut: 'KeyT' }),
-    } as any;
+    } as unknown;
 
     panel = new SkillTreePanel(mockWindowManager);
   });
@@ -111,7 +111,8 @@ describe('SkillTreePanel Backend Integration', () => {
 
       // Track events
       const events: any[] = [];
-      eventBus.on('magic:skill_node_unlocked' as any, (event) => events.push(event));
+      eventBus.on(// @ts-expect-error Testing invalid value validation
+      'magic:skill_node_unlocked', (event) => events.push(event));
 
       // Unlock via backend
       const result = skillTreeManager.unlockSkillNode(entity, 'integration-paradigm', 'test-node', 50);
@@ -183,7 +184,8 @@ describe('SkillTreePanel Backend Integration', () => {
       panel.setSelectedEntity(entity);
 
       const events: any[] = [];
-      eventBus.on('magic:spell_unlocked_from_skill_tree' as any, (event) => events.push(event));
+      eventBus.on(// @ts-expect-error Testing invalid value validation
+      'magic:spell_unlocked_from_skill_tree', (event) => events.push(event));
 
       // Unlock node
       skillTreeManager.unlockSkillNode(entity, 'spell-unlock-paradigm', 'spell-unlock-node', 40);

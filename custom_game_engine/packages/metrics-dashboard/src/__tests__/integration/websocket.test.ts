@@ -2,9 +2,22 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { MetricsWebSocketClient } from '@/services/MetricsWebSocketClient';
 import { mockWebSocketMessage } from '../mockData';
 
+// Mock type for WebSocket - partial implementation with mocked methods
+type MockWebSocket = Partial<WebSocket> & {
+  addEventListener: ReturnType<typeof vi.fn>;
+  removeEventListener: ReturnType<typeof vi.fn>;
+  send: ReturnType<typeof vi.fn>;
+  close: ReturnType<typeof vi.fn>;
+  readyState: number;
+  CONNECTING: number;
+  OPEN: number;
+  CLOSING: number;
+  CLOSED: number;
+}
+
 describe('MetricsWebSocketClient Integration', () => {
   let client: MetricsWebSocketClient;
-  let mockWebSocket: any;
+  let mockWebSocket: MockWebSocket;
   let messageHandlers: Map<string, Function>;
 
   beforeEach(() => {
@@ -26,7 +39,8 @@ describe('MetricsWebSocketClient Integration', () => {
       CLOSED: WebSocket.CLOSED,
     };
 
-    global.WebSocket = vi.fn(() => mockWebSocket) as any;
+    // Mock WebSocket constructor to return our mock instance
+    global.WebSocket = vi.fn(() => mockWebSocket as WebSocket) as typeof WebSocket;
   });
 
   afterEach(() => {

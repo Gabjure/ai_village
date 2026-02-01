@@ -2,6 +2,20 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { World } from '@ai-village/core/ecs/World';
 import { EventBus } from '@ai-village/core/events/EventBus';
 
+// Type helpers for testing
+type EntityWithMethods = {
+  addComponent?: (comp: unknown) => void;
+  updateComponent?: (type: string, updater: (current: unknown) => unknown) => void;
+  getComponent?: (type: string) => unknown;
+  hasComponent?: (type: string) => boolean;
+};
+type WorldWithMethods = Record<string, unknown> & {
+  getEntity?: (id: string) => unknown;
+  addEntity?: (entity: unknown) => void;
+  query?: unknown;
+  getSystem?: (name: string) => unknown;
+};
+
 // Mock FloatingNumberRenderer - will be implemented
 class FloatingNumberRenderer {
   private world: World;
@@ -400,7 +414,7 @@ describe.skip('FloatingNumberRenderer', () => {
     it('should throw when canvas context cannot be acquired', () => {
       const badCanvas = {
         getContext: () => null,
-      } as unknown as HTMLCanvasElement;
+      } as Partial<HTMLCanvasElement> as HTMLCanvasElement;
 
       expect(() => {
         new FloatingNumberRenderer(world, eventBus, badCanvas);

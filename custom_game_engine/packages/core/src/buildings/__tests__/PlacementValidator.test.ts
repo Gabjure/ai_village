@@ -30,7 +30,7 @@ function createMockWorld(options: {
       emit: vi.fn(),
       subscribe: vi.fn(),
       flush: vi.fn(),
-    } as any,
+    } as unknown,
     features: {},
     query: vi.fn().mockReturnValue({
       with: vi.fn().mockReturnThis(),
@@ -67,7 +67,7 @@ function createMockWorld(options: {
     isFeatureEnabled: vi.fn().mockReturnValue(false),
     // Custom method for testing - get tile at position
     getTile: (x: number, y: number) => tiles.get(`${x},${y}`),
-  } as unknown as World;
+  } as World;
 }
 
 function createTestBlueprint(overrides: Partial<BuildingBlueprint> = {}): BuildingBlueprint {
@@ -324,7 +324,8 @@ describe('PlacementValidator', () => {
       const world = createMockWorld({});
 
       expect(() =>
-        validator.validate({ x: 0, y: 0 }, null as any, world)
+      // @ts-expect-error Testing null parameter validation
+        validator.validate({ x: 0, y: 0 }, null, world)
       ).toThrow('Blueprint is required');
     });
 
@@ -332,7 +333,8 @@ describe('PlacementValidator', () => {
       const blueprint = createTestBlueprint();
 
       expect(() =>
-        validator.validate({ x: 0, y: 0 }, blueprint, null as any)
+      // @ts-expect-error Testing null parameter validation
+        validator.validate({ x: 0, y: 0 }, blueprint, null)
       ).toThrow('World is required');
     });
 

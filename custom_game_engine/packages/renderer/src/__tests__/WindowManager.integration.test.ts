@@ -610,7 +610,8 @@ describe('WindowManager Integration Tests', () => {
 
     it('should throw when canvas is null', () => {
       expect(() => {
-        new WindowManager(null as any);
+      // @ts-expect-error Testing null parameter validation
+        new WindowManager(null);
       }).toThrow('Canvas cannot be null or undefined');
     });
 
@@ -618,7 +619,8 @@ describe('WindowManager Integration Tests', () => {
       const config = createWindowConfig(10, 10, 200, 150);
 
       expect(() => {
-        windowManager.registerWindow('null-panel', null as any, config);
+      // @ts-expect-error Testing null parameter validation
+        windowManager.registerWindow('null-panel', null, config);
       }).toThrow('Panel cannot be null or undefined');
     });
 

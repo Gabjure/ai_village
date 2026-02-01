@@ -21,6 +21,20 @@ import {
 
 import type { DivinePowerType } from '../DivinePowerTypes.js';
 
+// Type helpers for testing
+type EntityWithMethods = {
+  addComponent?: (comp: unknown) => void;
+  updateComponent?: (type: string, updater: (current: unknown) => unknown) => void;
+  getComponent?: (type: string) => unknown;
+  hasComponent?: (type: string) => boolean;
+};
+type WorldWithMethods = Record<string, unknown> & {
+  getEntity?: (id: string) => unknown;
+  addEntity?: (entity: unknown) => void;
+  query?: unknown;
+  getSystem?: (name: string) => unknown;
+};
+
 // ============================================================================
 // getPresetConfig Tests
 // ============================================================================
@@ -286,11 +300,11 @@ describe('calculateEffectiveRange', () => {
     basePowerSuccessRate: 0.9,
     offDomainFailureChance: 0.1,
     offDomainCostMultiplier: 1.5,
-    powerVisibility: {} as any,
-    prayers: {} as any,
-    visions: {} as any,
-    blessings: {} as any,
-    curses: {} as any,
+    powerVisibility: {} as Record<string, unknown>,
+    prayers: {} as Record<string, unknown>,
+    visions: {} as Record<string, unknown>,
+    blessings: {} as Record<string, unknown>,
+    curses: {} as Record<string, unknown>,
   };
 
   it('should return base range when multiplier is 1', () => {
@@ -344,11 +358,11 @@ describe('calculateEffectiveDuration', () => {
     basePowerSuccessRate: 0.9,
     offDomainFailureChance: 0.1,
     offDomainCostMultiplier: 1.5,
-    powerVisibility: {} as any,
-    prayers: {} as any,
-    visions: {} as any,
-    blessings: {} as any,
-    curses: {} as any,
+    powerVisibility: {} as Record<string, unknown>,
+    prayers: {} as Record<string, unknown>,
+    visions: {} as Record<string, unknown>,
+    blessings: {} as Record<string, unknown>,
+    curses: {} as Record<string, unknown>,
   };
 
   it('should return base duration when multiplier is 1', () => {
@@ -608,7 +622,7 @@ describe('createUniverseConfig', () => {
     const config = createUniverseConfig('u1', 'Test', 'high_fantasy', {
       coreParams: {
         divinePresence: 0.99,
-      } as any,
+      } as unknown,
     });
 
     // Custom override applied
@@ -715,7 +729,7 @@ describe('gameplay scenarios', () => {
         beliefEconomy: {
           generationMultiplier: 3,          // Fast belief gain
           decayMultiplier: 5,               // But also fast decay
-        } as any,
+        } as unknown,
       });
 
       expect(config.powers?.globalCostMultiplier).toBe(0.5);

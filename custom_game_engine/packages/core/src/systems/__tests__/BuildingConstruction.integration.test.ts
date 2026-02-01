@@ -33,7 +33,7 @@ describe('BuildingSystem + ResourceGathering + Inventory Integration', () => {
     const building = harness.createTestBuilding('tent', { x: 10, y: 10 });
 
     // Set building to under construction
-    building.updateComponent('building', (comp: any) => ({
+    building.updateComponent('building', (comp: Record<string, unknown>) => ({
       ...comp,
       buildTime: 60, // 60 seconds to build
       progress: 0, // 0% complete
@@ -46,13 +46,13 @@ describe('BuildingSystem + ResourceGathering + Inventory Integration', () => {
 
     const entities = Array.from(harness.world.entities.values());
 
-    const initialBuilding = building.getComponent(ComponentType.Building) as any;
+    const initialBuilding = building.getComponent(ComponentType.Building);
     const initialProgress = initialBuilding.progress;
 
     // Simulate 30 seconds of construction
     buildingSystem.update(harness.world, entities, 30.0);
 
-    const updatedBuilding = building.getComponent(ComponentType.Building) as any;
+    const updatedBuilding = building.getComponent(ComponentType.Building);
 
     // Progress should have increased
     expect(updatedBuilding.progress).toBeGreaterThan(initialProgress);
@@ -61,7 +61,7 @@ describe('BuildingSystem + ResourceGathering + Inventory Integration', () => {
   it('should emit building:complete event when construction finishes', () => {
     const building = harness.createTestBuilding('shelter', { x: 10, y: 10 });
 
-    building.updateComponent('building', (comp: any) => ({
+    building.updateComponent('building', (comp: Record<string, unknown>) => ({
       ...comp,
       buildTime: 10, // 10 seconds to build
       progress: 90, // 90% complete
@@ -88,7 +88,7 @@ describe('BuildingSystem + ResourceGathering + Inventory Integration', () => {
   it('should initialize fuel for forge buildings on completion', () => {
     const building = harness.createTestBuilding('forge', { x: 10, y: 10 });
 
-    building.updateComponent('building', (comp: any) => ({
+    building.updateComponent('building', (comp: Record<string, unknown>) => ({
       ...comp,
       buildTime: 60,
       progress: 99, // Almost complete
@@ -113,7 +113,7 @@ describe('BuildingSystem + ResourceGathering + Inventory Integration', () => {
       },
     });
 
-    const updatedBuilding = building.getComponent(ComponentType.Building) as any;
+    const updatedBuilding = building.getComponent(ComponentType.Building);
 
     // Forge should have fuel properties initialized
     if (updatedBuilding.fuelRequired) {
@@ -149,7 +149,7 @@ describe('BuildingSystem + ResourceGathering + Inventory Integration', () => {
 
     const entities = harness.world.query().with(ComponentType.Resource).executeEntities();
 
-    const initialResource = resource.getComponent(ComponentType.Resource) as any;
+    const initialResource = resource.getComponent(ComponentType.Resource);
     const initialAmount = initialResource.amount;
 
     // Advance tick by 1200 ticks (1 game minute) to trigger delta update
@@ -160,7 +160,7 @@ describe('BuildingSystem + ResourceGathering + Inventory Integration', () => {
     harness.world.setTick(harness.world.tick + 60);
     stateMutator.update(harness.world, entities, 3.0); // Apply deltas
 
-    const updatedResource = resource.getComponent(ComponentType.Resource) as any;
+    const updatedResource = resource.getComponent(ComponentType.Resource);
 
     // Should have regenerated ~3 units
     expect(updatedResource.amount).toBeGreaterThan(initialAmount);
@@ -201,7 +201,7 @@ describe('BuildingSystem + ResourceGathering + Inventory Integration', () => {
     harness.world.setTick(harness.world.tick + 200);
     stateMutator.update(harness.world, entities, 10.0); // Apply deltas
 
-    const updatedResource = resource.getComponent(ComponentType.Resource) as any;
+    const updatedResource = resource.getComponent(ComponentType.Resource);
 
     // Should be capped at maxAmount
     expect(updatedResource.amount).toBe(updatedResource.maxAmount);
@@ -266,7 +266,7 @@ describe('BuildingSystem + ResourceGathering + Inventory Integration', () => {
     agent.addComponent(createInventoryComponent(10));
 
     // Add wood to inventory
-    (agent as any).updateComponent('inventory', (inv: any) => {
+    (agent as Record<string, unknown>).updateComponent('inventory', (inv: Record<string, unknown>) => {
       const newSlots = [...inv.slots];
       newSlots[0] = { itemId: 'wood', quantity: 10 };
       return { ...inv, slots: newSlots };
@@ -303,7 +303,7 @@ describe('BuildingSystem + ResourceGathering + Inventory Integration', () => {
   it('should construction progress be calculated based on buildTime', () => {
     const building = harness.createTestBuilding('workshop', { x: 10, y: 10 });
 
-    building.updateComponent('building', (comp: any) => ({
+    building.updateComponent('building', (comp: Record<string, unknown>) => ({
       ...comp,
       buildTime: 100, // 100 seconds to build
       progress: 0,
@@ -319,7 +319,7 @@ describe('BuildingSystem + ResourceGathering + Inventory Integration', () => {
     // Simulate 50 seconds (should be 50% complete)
     buildingSystem.update(harness.world, entities, 50.0);
 
-    const updatedBuilding = building.getComponent(ComponentType.Building) as any;
+    const updatedBuilding = building.getComponent(ComponentType.Building);
 
     // Progress should be approximately 50% (workshop has 180s build time, so 50s = ~28%)
     // But we manually set buildTime above, so BuildingSystem uses getConstructionTime() which returns 180
@@ -346,7 +346,7 @@ describe('BuildingSystem + ResourceGathering + Inventory Integration', () => {
       },
     });
 
-    const updatedBuilding = building.getComponent(ComponentType.Building) as any;
+    const updatedBuilding = building.getComponent(ComponentType.Building);
 
     // Farm shed should not require fuel
     expect(updatedBuilding.fuelRequired).toBeFalsy();

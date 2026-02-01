@@ -354,7 +354,7 @@ describe('Wild Animal Spawning System', () => {
       };
 
       expect(() => {
-        spawningSystem.spawnAnimalsInChunk(world, invalidChunk as any);
+        spawningSystem.spawnAnimalsInChunk(world, invalidChunk as unknown);
       }).toThrow();
     });
 
@@ -377,7 +377,7 @@ describe('Wild Animal Spawning System', () => {
 
     it('should throw when creating animal with missing required position', () => {
       expect(() => {
-        spawningSystem.spawnSpecificAnimal(world, 'rabbit', undefined as any);
+        spawningSystem.spawnSpecificAnimal(world, 'rabbit', undefined as unknown);
       }).toThrow();
     });
   });

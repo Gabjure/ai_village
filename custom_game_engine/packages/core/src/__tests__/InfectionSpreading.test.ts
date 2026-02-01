@@ -9,6 +9,20 @@ import { ComponentType as CT } from '../types/ComponentType.js';
 import { createBodyComponentFromPlan } from '../components/BodyPlanRegistry.js';
 import type { BodyComponent } from '../components/BodyComponent.js';
 
+// Type helpers for testing
+type EntityWithMethods = {
+  addComponent?: (comp: unknown) => void;
+  updateComponent?: (type: string, updater: (current: unknown) => unknown) => void;
+  getComponent?: (type: string) => unknown;
+  hasComponent?: (type: string) => boolean;
+};
+type WorldWithMethods = Record<string, unknown> & {
+  getEntity?: (id: string) => unknown;
+  addEntity?: (entity: unknown) => void;
+  query?: unknown;
+  getSystem?: (name: string) => unknown;
+};
+
 describe('BodySystem - Infection Spreading', () => {
   let world: World;
   let bodySystem: BodySystem;
@@ -101,7 +115,7 @@ describe('BodySystem - Infection Spreading', () => {
     world.registerSystem(bodySystem);
 
     // Use reflection to access private method for testing
-    const getAdjacentBodyParts = (bodySystem as any).getAdjacentBodyParts.bind(bodySystem);
+    const getAdjacentBodyParts = (bodySystem as Record<string, unknown>).getAdjacentBodyParts.bind(bodySystem);
 
     // Test torso adjacency - should connect to head, arms, legs
     const torsoAdjacent = getAdjacentBodyParts('torso', body);
@@ -185,7 +199,7 @@ describe('BodySystem - Infection Spreading', () => {
     world.registerSystem(bodySystem);
 
     // Use reflection to access private method
-    const getAdjacentBodyParts = (bodySystem as any).getAdjacentBodyParts.bind(bodySystem);
+    const getAdjacentBodyParts = (bodySystem as Record<string, unknown>).getAdjacentBodyParts.bind(bodySystem);
 
     // Thorax should connect to head, arms, legs, abdomen
     const thoraxAdjacent = getAdjacentBodyParts('thorax', body);

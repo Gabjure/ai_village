@@ -16,6 +16,21 @@ import type { ComponentRegistry } from '../registry/ComponentRegistry.js';
 import type { MutationService } from '../mutation/MutationService.js';
 import type { World } from '@ai-village/core';
 
+// Type helpers for testing
+type MockComponentRegistry = Pick<ComponentRegistry, 'get' | 'getAll' | 'register' | 'clear'>;
+type MockMutationService = Pick<MutationService, 'mutate' | 'canUndo' | 'canRedo' | 'undo' | 'redo' | 'getInstance'>;
+type EntityWithMethods = {
+  addComponent: (comp: unknown) => void;
+  updateComponent: (type: string, updater: (current: unknown) => unknown) => void;
+};
+type QueryMock = ReturnType<typeof vi.fn> & {
+  with: ReturnType<typeof vi.fn>;
+  executeEntities: ReturnType<typeof vi.fn>;
+};
+type WorldWithGetSystem = World & {
+  getSystem: (name: string) => unknown;
+};
+
 /**
  * Test helper: Create mock entity
  */
@@ -70,7 +85,7 @@ function createMockWorld(): World {
       if (name === 'chunk') return mockChunkSystem;
       return null;
     }),
-  } as unknown as World;
+  } as World;
 }
 
 /**
@@ -82,7 +97,7 @@ function createMockDependencies() {
     getAll: vi.fn().mockReturnValue([]),
     register: vi.fn(),
     clear: vi.fn(),
-  } as unknown as ComponentRegistry;
+  } as MockComponentRegistry;
 
   const mockMutations = {
     mutate: vi.fn(),
@@ -91,7 +106,7 @@ function createMockDependencies() {
     undo: vi.fn(),
     redo: vi.fn(),
     getInstance: vi.fn(),
-  } as unknown as MutationService;
+  } as MockMutationService;
 
   const mockMetrics = {
     trackEvent: vi.fn(),
@@ -165,7 +180,7 @@ describe('GameIntrospectionAPI - Economic & Environmental Queries (Phase 6b)', (
       priceHistory: [14, 15, 16, 15, 15],
       lastUpdated: 5000,
     });
-    (marketEntity as any).addComponent({
+    (marketEntity as EntityWithMethods).addComponent({
       type: 'market_state',
       version: 1,
       itemStats: marketStats,
@@ -178,7 +193,7 @@ describe('GameIntrospectionAPI - Economic & Environmental Queries (Phase 6b)', (
     world.addEntity?.(marketEntity);
 
     // Setup query mock to return entities based on component type
-    const queryMock = world.query as any;
+    const queryMock = world.query as QueryMock;
     queryMock.mockImplementation(() => {
       let componentType: string | null = null;
 
@@ -204,7 +219,7 @@ describe('GameIntrospectionAPI - Economic & Environmental Queries (Phase 6b)', (
 
     // Create weather entity
     weatherEntity = createMockEntity('weather-entity');
-    (weatherEntity as any).addComponent({
+    (weatherEntity as EntityWithMethods).addComponent({
       type: 'weather',
       version: 1,
       weatherType: 'rain',
@@ -217,7 +232,7 @@ describe('GameIntrospectionAPI - Economic & Environmental Queries (Phase 6b)', (
 
     // Create time entity
     timeEntity = createMockEntity('time-entity');
-    (timeEntity as any).addComponent({
+    (timeEntity as EntityWithMethods).addComponent({
       type: 'time',
       version: 1,
       timeOfDay: 14.5, // 2:30 PM
@@ -231,7 +246,7 @@ describe('GameIntrospectionAPI - Economic & Environmental Queries (Phase 6b)', (
 
     // Create temperature entity (global)
     tempEntity = createMockEntity('temp-entity');
-    (tempEntity as any).addComponent({
+    (tempEntity as EntityWithMethods).addComponent({
       type: 'temperature',
       version: 1,
       ambient: 20,
@@ -353,7 +368,7 @@ describe('GameIntrospectionAPI - Economic & Environmental Queries (Phase 6b)', (
         // Remove market entity
         world.removeEntity?.('market-entity');
 
-        const queryMock = world.query as any;
+        const queryMock = world.query as QueryMock;
         queryMock.mockImplementation(() => {
           const builder = {
             with: vi.fn().mockReturnThis(),
@@ -451,7 +466,7 @@ describe('GameIntrospectionAPI - Economic & Environmental Queries (Phase 6b)', (
 
       it('should calculate correct season for different days', async () => {
         // Test spring (day 150: 150 % 365 = 150, < 182)
-        (timeEntity as any).updateComponent('time', () => ({
+        timeEntity.updateComponent('time', () => ({
           type: 'time',
           version: 1,
           day: 150,
@@ -466,7 +481,7 @@ describe('GameIntrospectionAPI - Economic & Environmental Queries (Phase 6b)', (
         expect(env.time.season).toBe('spring');
 
         // Test summer (day 250: 250 % 365 = 250, < 273)
-        (timeEntity as any).updateComponent('time', () => ({
+        timeEntity.updateComponent('time', () => ({
           type: 'time',
           version: 1,
           day: 250,
@@ -481,7 +496,7 @@ describe('GameIntrospectionAPI - Economic & Environmental Queries (Phase 6b)', (
         expect(env.time.season).toBe('summer');
 
         // Test autumn (day 350: 350 % 365 = 350, >= 273)
-        (timeEntity as any).updateComponent('time', () => ({
+        timeEntity.updateComponent('time', () => ({
           type: 'time',
           version: 1,
           day: 350,
@@ -505,7 +520,7 @@ describe('GameIntrospectionAPI - Economic & Environmental Queries (Phase 6b)', (
 
       it('should calculate moon phase for different days', async () => {
         // Test new moon (day 28: 28 % 28 = 0)
-        (timeEntity as any).updateComponent('time', () => ({
+        timeEntity.updateComponent('time', () => ({
           type: 'time',
           version: 1,
           day: 28,
@@ -520,7 +535,7 @@ describe('GameIntrospectionAPI - Economic & Environmental Queries (Phase 6b)', (
         expect(env.time.moonPhase).toBeCloseTo(0.0, 1);
 
         // Test quarter moon (day 7: 7 % 28 = 7, 7/28 = 0.25)
-        (timeEntity as any).updateComponent('time', () => ({
+        timeEntity.updateComponent('time', () => ({
           type: 'time',
           version: 1,
           day: 7,
@@ -639,7 +654,7 @@ describe('GameIntrospectionAPI - Economic & Environmental Queries (Phase 6b)', (
         world.removeEntity?.('time-entity');
         world.removeEntity?.('temp-entity');
 
-        const queryMock = world.query as any;
+        const queryMock = world.query as QueryMock;
         queryMock.mockImplementation(() => {
           const builder = {
             with: vi.fn().mockReturnThis(),
@@ -662,7 +677,7 @@ describe('GameIntrospectionAPI - Economic & Environmental Queries (Phase 6b)', (
         const mockChunkSystem = {
           getTile: vi.fn().mockReturnValue(undefined),
         };
-        (world as any).getSystem = vi.fn((name: string) => {
+        (world as WorldWithGetSystem).getSystem = vi.fn((name: string) => {
           if (name === 'chunk') return mockChunkSystem;
           return null;
         });
@@ -680,7 +695,7 @@ describe('GameIntrospectionAPI - Economic & Environmental Queries (Phase 6b)', (
 
       it('should handle night time light levels', async () => {
         // Set time to night
-        (timeEntity as any).updateComponent('time', () => ({
+        timeEntity.updateComponent('time', () => ({
           type: 'time',
           version: 1,
           timeOfDay: 22, // 10 PM
@@ -703,7 +718,7 @@ describe('GameIntrospectionAPI - Economic & Environmental Queries (Phase 6b)', (
 
       it('should handle different weather types', async () => {
         // Test clear weather
-        (weatherEntity as any).updateComponent('weather', () => ({
+        (weatherEntity as EntityWithMethods).updateComponent('weather', () => ({
           type: 'weather',
           version: 1,
           weatherType: 'clear',
@@ -718,7 +733,7 @@ describe('GameIntrospectionAPI - Economic & Environmental Queries (Phase 6b)', (
         expect(env.weather.precipitation).toBeCloseTo(0.0, 1);
 
         // Test snow (note: current implementation only sets precipitation for 'rain')
-        (weatherEntity as any).updateComponent('weather', () => ({
+        (weatherEntity as EntityWithMethods).updateComponent('weather', () => ({
           type: 'weather',
           version: 1,
           weatherType: 'snow',

@@ -384,12 +384,18 @@ describe('ConflictIntegration', () => {
       const eventLog: string[] = [];
 
       // Set up listeners first
-      world.eventBus.on('hunt:started' as any, () => eventLog.push('hunt:started'));
-      world.eventBus.on('hunt:success' as any, () => eventLog.push('hunt:success'));
-      world.eventBus.on('combat:started' as any, () => eventLog.push('combat:started'));
-      world.eventBus.on('combat:ended' as any, () => eventLog.push('combat:ended'));
-      world.eventBus.on('injury:inflicted' as any, () => eventLog.push('injury:inflicted'));
-      world.eventBus.on('death:occurred' as any, () => eventLog.push('death:occurred'));
+      world.eventBus.on(// @ts-expect-error Testing invalid value validation
+      'hunt:started', () => eventLog.push('hunt:started'));
+      world.eventBus.on(// @ts-expect-error Testing invalid value validation
+      'hunt:success', () => eventLog.push('hunt:success'));
+      world.eventBus.on(// @ts-expect-error Testing invalid value validation
+      'combat:started', () => eventLog.push('combat:started'));
+      world.eventBus.on(// @ts-expect-error Testing invalid value validation
+      'combat:ended', () => eventLog.push('combat:ended'));
+      world.eventBus.on(// @ts-expect-error Testing invalid value validation
+      'injury:inflicted', () => eventLog.push('injury:inflicted'));
+      world.eventBus.on(// @ts-expect-error Testing invalid value validation
+      'death:occurred', () => eventLog.push('death:occurred'));
 
       const hunter = world.createEntity();
       hunter.addComponent('position', { x: 0, y: 0, z: 0 });
@@ -401,8 +407,9 @@ describe('ConflictIntegration', () => {
       prey.addComponent('animal', { species: 'deer' });
 
       // Trigger hunt event
-      world.eventBus.emit({ type: 'hunt:started' as any, hunterId: hunter.id, preyId: prey.id });
-      (world.eventBus as any).flush?.(); // Process queued events if flush exists
+      world.eventBus.emit({ type: // @ts-expect-error Testing invalid value validation
+      'hunt:started', hunterId: hunter.id, preyId: prey.id });
+      (world.eventBus as Record<string, unknown>).flush?.(); // Process queued events if flush exists
 
       // Verify event was logged
       expect(eventLog).toContain('hunt:started');
@@ -420,7 +427,7 @@ describe('ConflictIntegration', () => {
           conflictType: 'agent_combat',
           state: 'initiated',
           startTime: 0,
-        } as any);
+        } as Record<string, unknown>);
       }).toThrow('Conflict target is required');
     });
 
@@ -434,7 +441,7 @@ describe('ConflictIntegration', () => {
           injuryType: 'invalid',
           severity: 'minor',
           location: 'torso',
-        } as any);
+        } as Record<string, unknown>);
       }).toThrow('Invalid injury type');
     });
   });

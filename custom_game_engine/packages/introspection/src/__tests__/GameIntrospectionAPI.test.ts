@@ -18,6 +18,16 @@ import type { Component } from '../types/index.js';
 // Import GameIntrospectionAPI (will be implemented)
 // import { GameIntrospectionAPI } from '../api/GameIntrospectionAPI.js';
 
+// Type helpers for testing - EntityImpl with component methods
+type EntityWithComponents = {
+  hasComponent: (type: string) => boolean;
+  getComponent: (type: string) => unknown;
+};
+
+type EntityWithAddComponent = {
+  addComponent: (comp: unknown) => void;
+};
+
 /**
  * Test component types
  */
@@ -308,10 +318,7 @@ class MockGameIntrospectionAPI {
     const components: Record<string, unknown> = {};
     const schemas: Record<string, unknown> = {};
 
-    const entityWithComponents = entity as unknown as {
-      hasComponent: (type: string) => boolean;
-      getComponent: (type: string) => unknown;
-    };
+    const entityWithComponents = entity as EntityWithComponents;
     for (const compType of ['test_agent', 'test_needs', 'test_position']) {
       if (entityWithComponents.hasComponent(compType)) {
         const comp = entityWithComponents.getComponent(compType);
@@ -384,10 +391,8 @@ class MockGameIntrospectionAPI {
     }
 
     // Get old value before mutation
-    const entityWithComponents = entity as unknown as {
-      getComponent: (type: string) => Record<string, unknown> | undefined;
-    };
-    const component = entityWithComponents.getComponent(mutation.componentType);
+    const entityWithComponents = entity as EntityWithComponents;
+    const component = entityWithComponents.getComponent(mutation.componentType) as Record<string, unknown> | undefined;
     const oldValue = component ? component[mutation.field] : undefined;
 
     const result = MutationService.mutate(
@@ -503,9 +508,9 @@ describe('GameIntrospectionAPI Phase 1', () => {
 
     // Create test entity with components
     testEntity = createMockEntity('test-entity-1');
-    (testEntity as unknown as { addComponent: (comp: unknown) => void }).addComponent(TestAgentSchema.createDefault());
-    (testEntity as unknown as { addComponent: (comp: unknown) => void }).addComponent(TestNeedsSchema.createDefault());
-    (testEntity as unknown as { addComponent: (comp: unknown) => void }).addComponent(TestPositionSchema.createDefault());
+    (testEntity as EntityWithAddComponent).addComponent(TestAgentSchema.createDefault());
+    (testEntity as EntityWithAddComponent).addComponent(TestNeedsSchema.createDefault());
+    (testEntity as EntityWithAddComponent).addComponent(TestPositionSchema.createDefault());
 
     // Add entity to world
     world.addEntity?.(testEntity);
@@ -688,9 +693,7 @@ describe('GameIntrospectionAPI Phase 1', () => {
         expect(result.undoId).toBeDefined();
 
         // Verify mutation applied
-        const entity = world.getEntity?.('test-entity-1') as unknown as {
-          getComponent: (type: string) => Record<string, unknown> | undefined;
-        };
+        const entity = world.getEntity?.('test-entity-1') as EntityWithComponents;
         const agent = entity?.getComponent('test_agent');
         expect(agent.name).toBe('Alice');
       });
@@ -805,9 +808,7 @@ describe('GameIntrospectionAPI Phase 1', () => {
         expect(result.results.every((r: any) => r.success)).toBe(true);
 
         // Verify both mutations applied
-        const entity = world.getEntity?.('test-entity-1') as unknown as {
-          getComponent: (type: string) => Record<string, unknown> | undefined;
-        };
+        const entity = world.getEntity?.('test-entity-1') as EntityWithComponents;
         expect(entity?.getComponent('test_agent').name).toBe('Bob');
         expect(entity?.getComponent('test_needs').hunger).toBe(0.8);
       });
@@ -847,9 +848,7 @@ describe('GameIntrospectionAPI Phase 1', () => {
           value: 'David',
         });
 
-        const entity = world.getEntity?.('test-entity-1') as unknown as {
-          getComponent: (type: string) => Record<string, unknown> | undefined;
-        };
+        const entity = world.getEntity?.('test-entity-1') as EntityWithComponents;
         expect(entity?.getComponent('test_agent').name).toBe('David');
 
         // Undo
@@ -870,9 +869,7 @@ describe('GameIntrospectionAPI Phase 1', () => {
         // Undo
         await api.undo();
 
-        const entity = world.getEntity?.('test-entity-1') as unknown as {
-          getComponent: (type: string) => Record<string, unknown> | undefined;
-        };
+        const entity = world.getEntity?.('test-entity-1') as EntityWithComponents;
         expect(entity?.getComponent('test_agent').name).toBe('Unknown');
 
         // Redo
@@ -899,9 +896,7 @@ describe('GameIntrospectionAPI Phase 1', () => {
         // Undo both
         await api.undo(2);
 
-        const entity = world.getEntity?.('test-entity-1') as unknown as {
-          getComponent: (type: string) => Record<string, unknown> | undefined;
-        };
+        const entity = world.getEntity?.('test-entity-1') as EntityWithComponents;
         expect(entity?.getComponent('test_agent').name).toBe('Unknown');
         expect(entity?.getComponent('test_agent').level).toBe(1);
       });

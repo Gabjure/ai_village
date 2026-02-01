@@ -712,7 +712,8 @@ describe('CourtshipSystem', () => {
       expect(() => {
         agent1.addComponent(CourtshipComponent, {
           state: 'idle',
-          paradigm: null as any, // Invalid: required field
+      // @ts-expect-error Testing null parameter validation
+          paradigm: null, // Invalid: required field
           preferredTactics: [],
           dislikedTactics: [],
           style: 'bold',
@@ -732,7 +733,8 @@ describe('CourtshipSystem', () => {
     it('should throw when state is invalid', () => {
       expect(() => {
         agent1.addComponent(CourtshipComponent, {
-          state: 'invalid_state' as any,
+          state: // @ts-expect-error Testing invalid value validation
+      'invalid_state',
           paradigm: createHumanCourtshipParadigm(),
           preferredTactics: [],
           dislikedTactics: [],
@@ -767,7 +769,7 @@ describe('CourtshipSystem', () => {
           rejectionCooldown: new Map(),
           currentCourtshipTarget: null,
           currentCourtshipInitiator: null,
-        } as any);
+        } as Record<string, unknown>);
       }).toThrow();
     });
 

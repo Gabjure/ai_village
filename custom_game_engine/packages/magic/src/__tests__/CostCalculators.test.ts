@@ -8,6 +8,20 @@ import type { ComposedSpell, MagicComponent, CastingContext } from '@ai-village/
 import { costCalculatorRegistry } from '../costs/CostCalculatorRegistry.js';
 import { registerAllCostCalculators } from '../costs/index.js';
 
+// Type helpers for testing
+type EntityWithMethods = {
+  addComponent?: (comp: unknown) => void;
+  updateComponent?: (type: string, updater: (current: unknown) => unknown) => void;
+  getComponent?: (type: string) => unknown;
+  hasComponent?: (type: string) => boolean;
+};
+type WorldWithMethods = Record<string, unknown> & {
+  getEntity?: (id: string) => unknown;
+  addEntity?: (entity: unknown) => void;
+  query?: unknown;
+  getSystem?: (name: string) => unknown;
+};
+
 // Register all cost calculators before any tests run
 beforeAll(() => {
   registerAllCostCalculators();
@@ -28,7 +42,7 @@ describe('CostCalculators - Academic Paradigm', () => {
         stamina: { type: 'stamina', current: 100, maximum: 100, regenRate: 0.02, locked: 0 },
       },
       paradigmState: {},
-    } as any;
+    } as unknown;
 
     mockContext = {
       tick: 1000,
@@ -54,7 +68,7 @@ describe('CostCalculators - Academic Paradigm', () => {
   it('should calculate basic mana cost', () => {
     const costs = academicCalculator.calculateCosts(simpleSpell, mockCaster, mockContext);
 
-    const manaCost = costs.find((c: any) => c.type === 'mana');
+    const manaCost = costs.find((c: Record<string, unknown>) => c.type === 'mana');
     expect(manaCost).toBeDefined();
     expect(manaCost?.amount).toBe(50);
   });
@@ -62,7 +76,7 @@ describe('CostCalculators - Academic Paradigm', () => {
   it('should calculate stamina cost based on cast time', () => {
     const costs = academicCalculator.calculateCosts(simpleSpell, mockCaster, mockContext);
 
-    const staminaCost = costs.find((c: any) => c.type === 'stamina');
+    const staminaCost = costs.find((c: Record<string, unknown>) => c.type === 'stamina');
     expect(staminaCost).toBeDefined();
     expect(staminaCost?.amount).toBe(Math.ceil(10 * 0.5)); // castTime * 0.5
   });
@@ -71,7 +85,7 @@ describe('CostCalculators - Academic Paradigm', () => {
     mockContext.ambientPower = 2.0; // Strong ley line
     const costs = academicCalculator.calculateCosts(simpleSpell, mockCaster, mockContext);
 
-    const manaCost = costs.find((c: any) => c.type === 'mana');
+    const manaCost = costs.find((c: Record<string, unknown>) => c.type === 'mana');
     expect(manaCost?.amount).toBeLessThan(50);
     expect(manaCost?.amount).toBeGreaterThanOrEqual(35); // Max 30% reduction
   });
@@ -80,7 +94,7 @@ describe('CostCalculators - Academic Paradigm', () => {
     mockContext.ambientPower = 100.0; // Absurdly strong
     const costs = academicCalculator.calculateCosts(simpleSpell, mockCaster, mockContext);
 
-    const manaCost = costs.find((c: any) => c.type === 'mana');
+    const manaCost = costs.find((c: Record<string, unknown>) => c.type === 'mana');
     expect(manaCost?.amount).toBe(Math.ceil(50 * 0.7)); // Max 30% off
   });
 
@@ -114,7 +128,7 @@ describe('CostCalculators - Academic Paradigm', () => {
   });
 
   it('should initialize resource pools', () => {
-    const newCaster = { resourcePools: {} } as any;
+    const newCaster = { resourcePools: {} } as unknown;
     academicCalculator.initializeResourcePools(newCaster);
 
     expect(newCaster.resourcePools.mana).toBeDefined();
@@ -140,7 +154,7 @@ describe('CostCalculators - Pact Paradigm', () => {
       paradigmState: {
         pact: { patronId: 'fiend_lord', pactTerms: [], serviceOwed: 0 },
       },
-    } as any;
+    } as unknown;
 
     mockContext = {
       tick: 1000,
@@ -165,7 +179,7 @@ describe('CostCalculators - Pact Paradigm', () => {
     };
 
     const costs = pactCalculator.calculateCosts(spell, mockCaster, mockContext);
-    const favorCost = costs.find((c: any) => c.type === 'favor');
+    const favorCost = costs.find((c: Record<string, unknown>) => c.type === 'favor');
 
     expect(favorCost).toBeDefined();
     expect(favorCost?.amount).toBe(Math.ceil(50 * 0.2)); // 20% of mana cost
@@ -185,7 +199,7 @@ describe('CostCalculators - Pact Paradigm', () => {
     };
 
     const costs = pactCalculator.calculateCosts(darkSpell, mockCaster, mockContext);
-    const corruptionCost = costs.find((c: any) => c.type === 'corruption');
+    const corruptionCost = costs.find((c: Record<string, unknown>) => c.type === 'corruption');
 
     expect(corruptionCost).toBeDefined();
     expect(corruptionCost?.amount).toBeGreaterThan(0);
@@ -205,7 +219,7 @@ describe('CostCalculators - Pact Paradigm', () => {
     };
 
     const costs = pactCalculator.calculateCosts(summonSpell, mockCaster, mockContext);
-    const soulCost = costs.find((c: any) => c.type === 'soul_fragment');
+    const soulCost = costs.find((c: Record<string, unknown>) => c.type === 'soul_fragment');
 
     expect(soulCost).toBeDefined();
     expect(soulCost?.amount).toBe(1);
@@ -256,7 +270,7 @@ describe('CostCalculators - Pact Paradigm', () => {
   });
 
   it('should initialize pact resources', () => {
-    const newCaster = { resourcePools: {}, paradigmState: {} } as any;
+    const newCaster = { resourcePools: {}, paradigmState: {} } as unknown;
     pactCalculator.initializeResourcePools(newCaster);
 
     expect(newCaster.resourcePools.favor).toBeDefined();
@@ -282,7 +296,7 @@ describe('CostCalculators - Name Paradigm', () => {
       paradigmState: {
         names: { knownNames: ['fire', 'wind', 'stone'] },
       },
-    } as any;
+    } as unknown;
 
     mockContext = {
       tick: 1000,
@@ -307,7 +321,7 @@ describe('CostCalculators - Name Paradigm', () => {
     };
 
     const costs = nameCalculator.calculateCosts(spell, mockCaster, mockContext);
-    const sanityCost = costs.find((c: any) => c.type === 'sanity');
+    const sanityCost = costs.find((c: Record<string, unknown>) => c.type === 'sanity');
 
     expect(sanityCost).toBeDefined();
     expect(sanityCost?.amount).toBe(Math.ceil(30 * 0.1));
@@ -327,7 +341,7 @@ describe('CostCalculators - Name Paradigm', () => {
     };
 
     const costs = nameCalculator.calculateCosts(spell, mockCaster, mockContext);
-    const attentionCost = costs.find((c: any) => c.type === 'attention');
+    const attentionCost = costs.find((c: Record<string, unknown>) => c.type === 'attention');
 
     expect(attentionCost).toBeDefined();
     expect(attentionCost?.amount).toBe(1); // Always 1 per cast
@@ -349,7 +363,7 @@ describe('CostCalculators - Name Paradigm', () => {
     };
 
     const costs = nameCalculator.calculateCosts(spell, mockCaster, mockContext);
-    const timeCost = costs.find((c: any) => c.type === 'time');
+    const timeCost = costs.find((c: Record<string, unknown>) => c.type === 'time');
 
     expect(timeCost?.amount).toBeGreaterThan(10); // Base cast time increased
   });
@@ -403,7 +417,7 @@ describe('CostCalculators - Breath Paradigm', () => {
       paradigmState: {
         breath: { breathCount: 50, heighteningTier: 0 },
       },
-    } as any;
+    } as unknown;
 
     mockContext = {
       tick: 1000,
@@ -428,7 +442,7 @@ describe('CostCalculators - Breath Paradigm', () => {
     };
 
     const costs = breathCalculator.calculateCosts(spell, mockCaster, mockContext);
-    const breathCost = costs.find((c: any) => c.type === 'health');
+    const breathCost = costs.find((c: Record<string, unknown>) => c.type === 'health');
 
     expect(breathCost?.amount).toBe(0);
   });
@@ -447,7 +461,7 @@ describe('CostCalculators - Breath Paradigm', () => {
     };
 
     const costs = breathCalculator.calculateCosts(spell, mockCaster, mockContext);
-    const breathCost = costs.find((c: any) => c.type === 'health');
+    const breathCost = costs.find((c: Record<string, unknown>) => c.type === 'health');
 
     expect(breathCost).toBeDefined();
     expect(breathCost?.amount).toBeGreaterThan(0);
@@ -468,7 +482,7 @@ describe('CostCalculators - Breath Paradigm', () => {
     };
 
     const costs = breathCalculator.calculateCosts(spell, mockCaster, mockContext);
-    const breathCost = costs.find((c: any) => c.type === 'health');
+    const breathCost = costs.find((c: Record<string, unknown>) => c.type === 'health');
 
     expect(breathCost?.amount).toBeGreaterThanOrEqual(50); // Min for permanent
   });
@@ -536,7 +550,7 @@ describe('CostCalculators - Divine Paradigm', () => {
       paradigmState: {
         divine: { deityId: 'healing_god', deityStanding: 'neutral' },
       },
-    } as any;
+    } as unknown;
 
     mockContext = {
       tick: 1000,
@@ -561,7 +575,7 @@ describe('CostCalculators - Divine Paradigm', () => {
     };
 
     const costs = divineCalculator.calculateCosts(spell, mockCaster, mockContext);
-    const favorCost = costs.find((c: any) => c.type === 'favor');
+    const favorCost = costs.find((c: Record<string, unknown>) => c.type === 'favor');
 
     expect(favorCost).toBeDefined();
     expect(favorCost?.amount).toBe(Math.ceil(40 * 0.3));
@@ -582,7 +596,7 @@ describe('CostCalculators - Divine Paradigm', () => {
     };
 
     const costs = divineCalculator.calculateCosts(alignedSpell, mockCaster, mockContext);
-    const favorCost = costs.find((c: any) => c.type === 'favor');
+    const favorCost = costs.find((c: Record<string, unknown>) => c.type === 'favor');
 
     const baseCost = Math.ceil(50 * 0.3);
     expect(favorCost?.amount).toBeLessThanOrEqual(baseCost);
@@ -602,7 +616,7 @@ describe('CostCalculators - Divine Paradigm', () => {
     };
 
     const costs = divineCalculator.calculateCosts(misalignedSpell, mockCaster, mockContext);
-    const karmaCost = costs.find((c: any) => c.type === 'karma');
+    const karmaCost = costs.find((c: Record<string, unknown>) => c.type === 'karma');
 
     expect(karmaCost).toBeDefined();
     expect(karmaCost?.amount).toBeGreaterThan(0);
@@ -650,7 +664,7 @@ describe('CostCalculators - Blood Paradigm', () => {
       paradigmState: {
         blood: { bloodDebt: 0 },
       },
-    } as any;
+    } as unknown;
 
     mockContext = {
       tick: 1000,
@@ -676,8 +690,8 @@ describe('CostCalculators - Blood Paradigm', () => {
 
     const costs = bloodCalculator.calculateCosts(spell, mockCaster, mockContext);
 
-    const bloodCost = costs.find((c: any) => c.type === 'blood');
-    const healthCost = costs.find((c: any) => c.type === 'health');
+    const bloodCost = costs.find((c: Record<string, unknown>) => c.type === 'blood');
+    const healthCost = costs.find((c: Record<string, unknown>) => c.type === 'health');
 
     expect(bloodCost).toBeDefined();
     expect(healthCost).toBeDefined();
@@ -699,7 +713,7 @@ describe('CostCalculators - Blood Paradigm', () => {
     };
 
     const costs = bloodCalculator.calculateCosts(spell, mockCaster, mockContext);
-    const corruptionCost = costs.find((c: any) => c.type === 'corruption');
+    const corruptionCost = costs.find((c: Record<string, unknown>) => c.type === 'corruption');
 
     expect(corruptionCost).toBeDefined();
     expect(corruptionCost?.amount).toBeGreaterThan(0);
@@ -719,7 +733,7 @@ describe('CostCalculators - Blood Paradigm', () => {
     };
 
     const costs = bloodCalculator.calculateCosts(soulSpell, mockCaster, mockContext);
-    const lifespanCost = costs.find((c: any) => c.type === 'lifespan');
+    const lifespanCost = costs.find((c: Record<string, unknown>) => c.type === 'lifespan');
 
     expect(lifespanCost).toBeDefined();
     expect(lifespanCost?.amount).toBeGreaterThan(0);
@@ -767,7 +781,7 @@ describe('CostCalculators - Emotional Paradigm', () => {
       paradigmState: {
         emotional: { dominantEmotion: 'joy', emotionalStability: 100 },
       },
-    } as any;
+    } as unknown;
 
     mockContext = {
       tick: 1000,
@@ -794,12 +808,12 @@ describe('CostCalculators - Emotional Paradigm', () => {
     // Joy emotion (0.5x cost)
     mockCaster.paradigmState.emotional.dominantEmotion = 'joy';
     const joyCosts = emotionalCalculator.calculateCosts(spell, mockCaster, mockContext);
-    const joyEmotionCost = joyCosts.find((c: any) => c.type === 'emotion');
+    const joyEmotionCost = joyCosts.find((c: Record<string, unknown>) => c.type === 'emotion');
 
     // Rage emotion (1.5x cost)
     mockCaster.paradigmState.emotional.dominantEmotion = 'rage';
     const rageCosts = emotionalCalculator.calculateCosts(spell, mockCaster, mockContext);
-    const rageEmotionCost = rageCosts.find((c: any) => c.type === 'emotion');
+    const rageEmotionCost = rageCosts.find((c: Record<string, unknown>) => c.type === 'emotion');
 
     expect(joyEmotionCost?.amount).toBeLessThan(rageEmotionCost?.amount);
   });
@@ -818,7 +832,7 @@ describe('CostCalculators - Emotional Paradigm', () => {
     };
 
     const costs = emotionalCalculator.calculateCosts(spell, mockCaster, mockContext);
-    const sanityCost = costs.find((c: any) => c.type === 'sanity');
+    const sanityCost = costs.find((c: Record<string, unknown>) => c.type === 'sanity');
 
     expect(sanityCost).toBeDefined();
     expect(sanityCost?.amount).toBe(Math.ceil(40 * 0.05));

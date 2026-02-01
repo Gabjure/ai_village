@@ -6,7 +6,14 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { ChunkSerializer } from '../ChunkSerializer.js';
 import { createChunk, CHUNK_SIZE } from '../Chunk.js';
 import { ChunkManager } from '../ChunkManager.js';
-import type { SerializedChunk } from '../types.js';
+import type { SerializedChunk, SerializedTile } from '../types.js';
+import type { Chunk } from '../Chunk.js';
+
+// Helper to access private deserializeChunk method for testing
+function deserializeChunk(serializer: ChunkSerializer, serialized: SerializedChunk): Chunk {
+  // @ts-expect-error Accessing private method for testing purposes
+  return (serializer as { deserializeChunk(s: SerializedChunk): Chunk }).deserializeChunk(serialized);
+}
 
 describe('ChunkSerializer Edge Cases', () => {
   let serializer: ChunkSerializer;
@@ -25,7 +32,7 @@ describe('ChunkSerializer Edge Cases', () => {
       chunk.tiles[200]!.plantId = 'another_missing_plant_67890';
 
       const serialized = serializer.serializeChunk(chunk);
-      const deserialized = (serializer as any).deserializeChunk(serialized);
+      const deserialized = deserializeChunk(serializer,serialized);
 
       expect(deserialized.tiles[100]!.plantId).toBe('non_existent_plant_12345');
       expect(deserialized.tiles[200]!.plantId).toBe('another_missing_plant_67890');
@@ -38,7 +45,7 @@ describe('ChunkSerializer Edge Cases', () => {
       chunk.tiles[0]!.plantId = null;
 
       const serialized = serializer.serializeChunk(chunk);
-      const deserialized = (serializer as any).deserializeChunk(serialized);
+      const deserialized = deserializeChunk(serializer,serialized);
 
       expect(deserialized.tiles[0]!.plantId).toBe(null);
     });
@@ -53,7 +60,7 @@ describe('ChunkSerializer Edge Cases', () => {
       chunk.entities.add('deleted_entity_3');
 
       const serialized = serializer.serializeChunk(chunk);
-      const deserialized = (serializer as any).deserializeChunk(serialized);
+      const deserialized = deserializeChunk(serializer,serialized);
 
       expect(deserialized.entities.size).toBe(3);
       expect(deserialized.entities.has('non_existent_entity_1')).toBe(true);
@@ -67,7 +74,7 @@ describe('ChunkSerializer Edge Cases', () => {
       chunk.entities.clear();
 
       const serialized = serializer.serializeChunk(chunk);
-      const deserialized = (serializer as any).deserializeChunk(serialized);
+      const deserialized = deserializeChunk(serializer,serialized);
 
       expect(deserialized.entities.size).toBe(0);
     });
@@ -89,20 +96,25 @@ describe('ChunkSerializer Edge Cases', () => {
       if ('data' in mutableSerialized.tiles && Array.isArray(mutableSerialized.tiles.data)) {
         const firstRun = mutableSerialized.tiles.data[0];
         if (firstRun && 'tile' in firstRun) {
-          (firstRun.tile as unknown as Record<string, unknown>).futureField1 = 'unknown_value';
-          (firstRun.tile as unknown as Record<string, unknown>).futureField2 = 12345;
+          // Add future fields to test forward compatibility
+          // @ts-expect-error Adding unknown fields for forward compatibility testing
+          firstRun.tile.futureField1 = 'unknown_value';
+          // @ts-expect-error Adding unknown fields for forward compatibility testing
+          firstRun.tile.futureField2 = 12345;
         }
       }
       mutableSerialized.futureChunkField = 'some_future_data';
 
       // Should not throw when deserializing
-      const deserialized = (serializer as any).deserializeChunk(serialized);
+      const deserialized = deserializeChunk(serializer,serialized);
 
       expect(deserialized.tiles[0]).toBeDefined();
-      expect((deserialized.tiles[0] as Record<string, unknown>).futureField1).toBeUndefined();
+      // @ts-expect-error Checking that unknown field was not preserved
+      expect(deserialized.tiles[0].futureField1).toBeUndefined();
     });
 
     it('should handle extra fields in tile data gracefully', () => {
+      // Testing forward compatibility with unknown fields
       const serialized: SerializedChunk = {
         x: 0,
         y: 0,
@@ -126,13 +138,13 @@ describe('ChunkSerializer Edge Cases', () => {
             // Unknown future fields
             unknownField: 'test',
             futureSystem: { data: 123 },
-          } as any)),
+          } as SerializedTile & Record<string, unknown>)),
         },
         entityIds: [],
       };
 
       // Should not throw
-      const deserialized = (serializer as any).deserializeChunk(serialized);
+      const deserialized = deserializeChunk(serializer,serialized);
       expect(deserialized.tiles.length).toBe(CHUNK_SIZE * CHUNK_SIZE);
     });
   });
@@ -146,6 +158,7 @@ describe('ChunkSerializer Edge Cases', () => {
         generated: true,
         tiles: {
           encoding: 'full',
+          // @ts-expect-error Testing deserialization with missing fields (edge case)
           data: Array(CHUNK_SIZE * CHUNK_SIZE).fill(null).map(() => ({
             terrain: 'grass',
             // Missing: elevation, moisture, fertility
@@ -153,12 +166,12 @@ describe('ChunkSerializer Edge Cases', () => {
             // Missing: biome, floor
             nutrients: { nitrogen: 50, phosphorus: 50, potassium: 50 },
             plantId: null,
-          } as any)),
+          })),
         },
         entityIds: [],
       };
 
-      const deserialized = (serializer as any).deserializeChunk(serialized);
+      const deserialized = deserializeChunk(serializer,serialized);
 
       // Should fill in defaults
       expect(deserialized.tiles[0]!.elevation).toBe(0);
@@ -180,6 +193,7 @@ describe('ChunkSerializer Edge Cases', () => {
         generated: true,
         tiles: {
           encoding: 'full',
+          // @ts-expect-error Testing deserialization with missing nutrients field (edge case)
           data: Array(CHUNK_SIZE * CHUNK_SIZE).fill(null).map(() => ({
             terrain: 'grass',
             elevation: 0,
@@ -194,12 +208,12 @@ describe('ChunkSerializer Edge Cases', () => {
             lastTilled: 0,
             composted: false,
             plantId: null,
-          } as any)),
+          } as Partial<SerializedTile>)),
         },
         entityIds: [],
       };
 
-      const deserialized = (serializer as any).deserializeChunk(serialized);
+      const deserialized = deserializeChunk(serializer,serialized);
 
       expect(deserialized.tiles[0]!.nutrients).toEqual({
         nitrogen: 50,
@@ -218,7 +232,7 @@ describe('ChunkSerializer Edge Cases', () => {
           data: [{
             tile: {
               terrain: 'grass',
-              // Missing biome
+              // Missing biome - testing edge case where field is undefined
               elevation: 0,
               moisture: 50,
               fertility: 50,
@@ -231,14 +245,14 @@ describe('ChunkSerializer Edge Cases', () => {
               lastTilled: 0,
               composted: false,
               plantId: null,
-            } as any,
+            },
             count: CHUNK_SIZE * CHUNK_SIZE,
           }],
         },
         entityIds: [],
       };
 
-      const deserialized = (serializer as any).deserializeChunk(serialized);
+      const deserialized = deserializeChunk(serializer,serialized);
 
       // Biome should be undefined (not required)
       expect(deserialized.tiles[0]!.biome).toBeUndefined();
@@ -253,6 +267,7 @@ describe('ChunkSerializer Edge Cases', () => {
         generated: true,
         tiles: {
           encoding: 'full',
+          // @ts-expect-error Testing deserialization with invalid terrain type (edge case)
           data: Array(CHUNK_SIZE * CHUNK_SIZE).fill(null).map(() => ({
             terrain: 'invalid_terrain_type',
             elevation: 0,
@@ -267,13 +282,13 @@ describe('ChunkSerializer Edge Cases', () => {
             lastTilled: 0,
             composted: false,
             plantId: null,
-          } as any)),
+          } as Partial<SerializedTile>)),
         },
         entityIds: [],
       };
 
       // Should not throw - just accept the string
-      const deserialized = (serializer as any).deserializeChunk(serialized);
+      const deserialized = deserializeChunk(serializer,serialized);
       expect(deserialized.tiles[0]!.terrain).toBe('invalid_terrain_type');
     });
 
@@ -284,6 +299,7 @@ describe('ChunkSerializer Edge Cases', () => {
         generated: true,
         tiles: {
           encoding: 'full',
+          // @ts-expect-error Testing deserialization with wrong array size (edge case)
           data: Array(500).fill(null).map(() => ({
             terrain: 'grass',
             elevation: 0,
@@ -298,13 +314,13 @@ describe('ChunkSerializer Edge Cases', () => {
             lastTilled: 0,
             composted: false,
             plantId: null,
-          } as any)),
+          } as Partial<SerializedTile>)),
         },
         entityIds: [],
       };
 
       expect(() => {
-        (serializer as any).deserializeChunk(serialized);
+        deserializeChunk(serializer,serialized);
       }).toThrow(/Invalid tile count/);
     });
 
@@ -338,7 +354,7 @@ describe('ChunkSerializer Edge Cases', () => {
       };
 
       expect(() => {
-        (serializer as any).deserializeChunk(serialized);
+        deserializeChunk(serializer,serialized);
       }).toThrow(/Invalid tile count/);
     });
 
@@ -391,7 +407,7 @@ describe('ChunkSerializer Edge Cases', () => {
       };
 
       // Should not throw - just apply to out of bounds index (no effect)
-      const deserialized = (serializer as any).deserializeChunk(serialized);
+      const deserialized = deserializeChunk(serializer,serialized);
       expect(deserialized.tiles.length).toBe(CHUNK_SIZE * CHUNK_SIZE);
     });
   });
@@ -411,7 +427,7 @@ describe('ChunkSerializer Edge Cases', () => {
       };
 
       const serialized = serializer.serializeChunk(chunk);
-      const deserialized = (serializer as any).deserializeChunk(serialized);
+      const deserialized = deserializeChunk(serializer,serialized);
 
       const wall = deserialized.tiles[100]!.wall!;
       expect(wall).toBeDefined();
@@ -436,7 +452,7 @@ describe('ChunkSerializer Edge Cases', () => {
       };
 
       const serialized = serializer.serializeChunk(chunk);
-      const deserialized = (serializer as any).deserializeChunk(serialized);
+      const deserialized = deserializeChunk(serializer,serialized);
 
       const door = deserialized.tiles[200]!.door!;
       expect(door).toBeDefined();
@@ -460,7 +476,7 @@ describe('ChunkSerializer Edge Cases', () => {
       };
 
       const serialized = serializer.serializeChunk(chunk);
-      const deserialized = (serializer as any).deserializeChunk(serialized);
+      const deserialized = deserializeChunk(serializer,serialized);
 
       const window = deserialized.tiles[300]!.window!;
       expect(window).toBeDefined();
@@ -488,7 +504,7 @@ describe('ChunkSerializer Edge Cases', () => {
       };
 
       const serialized = serializer.serializeChunk(chunk);
-      const deserialized = (serializer as any).deserializeChunk(serialized);
+      const deserialized = deserializeChunk(serializer,serialized);
 
       expect(deserialized.tiles[0]!.wall).toBeDefined();
       expect(deserialized.tiles[0]!.window).toBeDefined();
@@ -512,7 +528,7 @@ describe('ChunkSerializer Edge Cases', () => {
       };
 
       const serialized = serializer.serializeChunk(chunk);
-      const deserialized = (serializer as any).deserializeChunk(serialized);
+      const deserialized = deserializeChunk(serializer,serialized);
 
       const fluid = deserialized.tiles[100]!.fluid!;
       expect(fluid).toBeDefined();
@@ -543,7 +559,7 @@ describe('ChunkSerializer Edge Cases', () => {
       chunk.tiles[100]!.fluid = minimalFluid as NonNullable<typeof chunk.tiles[0]['fluid']>;
 
       const serialized = serializer.serializeChunk(chunk);
-      const deserialized = (serializer as any).deserializeChunk(serialized);
+      const deserialized = deserializeChunk(serializer,serialized);
 
       expect(deserialized.tiles[100]!.fluid).toBeDefined();
       expect(deserialized.tiles[100]!.fluid!.type).toBe('water');
@@ -630,7 +646,7 @@ describe('ChunkSerializer Edge Cases', () => {
       chunk.entities.clear();
 
       const serialized = serializer.serializeChunk(chunk);
-      const deserialized = (serializer as any).deserializeChunk(serialized);
+      const deserialized = deserializeChunk(serializer,serialized);
 
       expect(deserialized.entities.size).toBe(0);
     });
@@ -650,7 +666,7 @@ describe('ChunkSerializer Edge Cases', () => {
       });
 
       const serialized = serializer.serializeChunk(chunk);
-      const deserialized = (serializer as any).deserializeChunk(serialized);
+      const deserialized = deserializeChunk(serializer,serialized);
 
       expect(deserialized.tiles[0]!.biome).toBeUndefined();
       expect(deserialized.tiles[0]!.floor).toBeUndefined();

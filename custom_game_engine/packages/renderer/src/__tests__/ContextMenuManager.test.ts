@@ -1078,19 +1078,22 @@ describe('ContextMenuManager', () => {
   describe('error handling', () => {
     it('should throw when opening menu without world', () => {
       expect(() => {
-        new ContextMenuManager(null as any, eventBus, camera, canvas);
+      // @ts-expect-error Testing null parameter validation
+        new ContextMenuManager(null, eventBus, camera, canvas);
       }).toThrow('world');
     });
 
     it('should throw when opening menu without eventBus', () => {
       expect(() => {
-        new ContextMenuManager(world, null as any, camera, canvas);
+      // @ts-expect-error Testing null parameter validation
+        new ContextMenuManager(world, null, camera, canvas);
       }).toThrow('eventBus');
     });
 
     it('should throw when opening menu without camera', () => {
       expect(() => {
-        new ContextMenuManager(world, eventBus, null as any, canvas);
+      // @ts-expect-error Testing null parameter validation
+        new ContextMenuManager(world, eventBus, null, canvas);
       }).toThrow('camera');
     });
 

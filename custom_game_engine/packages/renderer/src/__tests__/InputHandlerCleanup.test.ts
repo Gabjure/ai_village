@@ -1,6 +1,20 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { InputHandler } from '../InputHandler';
 
+// Type helpers for testing
+type EntityWithMethods = {
+  addComponent?: (comp: unknown) => void;
+  updateComponent?: (type: string, updater: (current: unknown) => unknown) => void;
+  getComponent?: (type: string) => unknown;
+  hasComponent?: (type: string) => boolean;
+};
+type WorldWithMethods = Record<string, unknown> & {
+  getEntity?: (id: string) => unknown;
+  addEntity?: (entity: unknown) => void;
+  query?: unknown;
+  getSystem?: (name: string) => unknown;
+};
+
 describe('InputHandler Cleanup (Memory Leak Fix)', () => {
   let canvas: HTMLCanvasElement;
   let inputHandler: InputHandler;
@@ -13,8 +27,8 @@ describe('InputHandler Cleanup (Memory Leak Fix)', () => {
 
   afterEach(() => {
     // Cleanup
-    if (inputHandler && typeof (inputHandler as any).destroy === 'function') {
-      (inputHandler as any).destroy();
+    if (inputHandler && typeof (inputHandler as Record<string, unknown>).destroy === 'function') {
+      (inputHandler as Record<string, unknown>).destroy();
     }
     document.body.removeChild(canvas);
     vi.clearAllMocks();
@@ -25,7 +39,7 @@ describe('InputHandler Cleanup (Memory Leak Fix)', () => {
       inputHandler = new InputHandler(canvas);
 
       expect(inputHandler).toHaveProperty('destroy');
-      expect(typeof (inputHandler as any).destroy).toBe('function');
+      expect(typeof (inputHandler as Record<string, unknown>).destroy).toBe('function');
     });
 
     it('should remove all event listeners when destroy() is called', () => {
@@ -35,7 +49,7 @@ describe('InputHandler Cleanup (Memory Leak Fix)', () => {
       const removeEventListenerSpy = vi.spyOn(canvas, 'removeEventListener');
 
       // Call destroy
-      (inputHandler as any).destroy();
+      (inputHandler as Record<string, unknown>).destroy();
 
       // Should have called removeEventListener for each registered handler
       // InputHandler typically listens to: mousedown, mouseup, mousemove, contextmenu, wheel
@@ -56,8 +70,8 @@ describe('InputHandler Cleanup (Memory Leak Fix)', () => {
         canvas.dispatchEvent(new MouseEvent('mousedown', { clientX: 10, clientY: 10 }));
 
         // Destroy it
-        if (typeof (handler as any).destroy === 'function') {
-          (handler as any).destroy();
+        if (typeof (handler as Record<string, unknown>).destroy === 'function') {
+          (handler as Record<string, unknown>).destroy();
         }
       }
 
@@ -73,7 +87,7 @@ describe('InputHandler Cleanup (Memory Leak Fix)', () => {
 
       expect(inputHandler).toHaveProperty('boundHandlers');
 
-      const boundHandlers = (inputHandler as any).boundHandlers;
+      const boundHandlers = (inputHandler as Record<string, unknown>).boundHandlers;
       expect(Array.isArray(boundHandlers) || typeof boundHandlers === 'object').toBe(true);
     });
 
@@ -82,12 +96,12 @@ describe('InputHandler Cleanup (Memory Leak Fix)', () => {
 
       // First destroy
       expect(() => {
-        (inputHandler as any).destroy();
+        (inputHandler as Record<string, unknown>).destroy();
       }).not.toThrow();
 
       // Second destroy should also not throw
       expect(() => {
-        (inputHandler as any).destroy();
+        (inputHandler as Record<string, unknown>).destroy();
       }).not.toThrow();
     });
 
@@ -103,8 +117,8 @@ describe('InputHandler Cleanup (Memory Leak Fix)', () => {
       // Create and destroy multiple times
       for (let i = 0; i < 5; i++) {
         const handler = new InputHandler(canvas);
-        if (typeof (handler as any).destroy === 'function') {
-          (handler as any).destroy();
+        if (typeof (handler as Record<string, unknown>).destroy === 'function') {
+          (handler as Record<string, unknown>).destroy();
         }
       }
 
@@ -116,13 +130,14 @@ describe('InputHandler Cleanup (Memory Leak Fix)', () => {
   describe('Error Handling: No Silent Fallbacks', () => {
     it('should throw when InputHandler is created with invalid canvas', () => {
       expect(() => {
-        new InputHandler(null as any);
+      // @ts-expect-error Testing null parameter validation
+        new InputHandler(null);
       }).toThrow();
     });
 
     it('should throw when InputHandler is created with undefined canvas', () => {
       expect(() => {
-        new InputHandler(undefined as any);
+        new InputHandler(undefined as unknown);
       }).toThrow();
     });
   });

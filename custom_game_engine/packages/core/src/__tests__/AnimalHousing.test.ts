@@ -5,6 +5,20 @@ import { createBuildingComponent, type BuildingComponent, BuildingType } from '.
 import { AnimalComponent } from '../components/AnimalComponent.js';
 import type { PositionComponent } from '../components/PositionComponent.js';
 
+// Type helpers for testing
+type EntityWithMethods = {
+  addComponent?: (comp: unknown) => void;
+  updateComponent?: (type: string, updater: (current: unknown) => unknown) => void;
+  getComponent?: (type: string) => unknown;
+  hasComponent?: (type: string) => boolean;
+};
+type WorldWithMethods = Record<string, unknown> & {
+  getEntity?: (id: string) => unknown;
+  addEntity?: (entity: unknown) => void;
+  query?: unknown;
+  getSystem?: (name: string) => unknown;
+};
+
 describe('Animal Housing - Core Functionality', () => {
   let world: World;
 
@@ -27,10 +41,10 @@ describe('Animal Housing - Core Functionality', () => {
       expect(building.tier).toBe(2);
 
       // These properties don't exist yet - will fail
-      expect((building as any).animalCapacity).toBe(8);
-      expect((building as any).allowedSpecies).toEqual(['chicken', 'duck', 'turkey']);
+      expect((building as Record<string, unknown>).animalCapacity).toBe(8);
+      expect((building as Record<string, unknown>).allowedSpecies).toEqual(['chicken', 'duck', 'turkey']);
       // Size property doesn't exist in BuildingComponent - skipping
-      // expect((building as any).size).toEqual({ width: 2, height: 2 });
+      // expect((building as Record<string, unknown>).size).toEqual({ width: 2, height: 2 });
     });
 
     it('should create kennel with correct properties', () => {
@@ -43,10 +57,10 @@ describe('Animal Housing - Core Functionality', () => {
 
       // Per spec: Size 2x3, capacity 6 dogs, cost 30 Wood + 10 Stone
       expect(building.buildingType).toBe('kennel');
-      expect((building as any).animalCapacity).toBe(6);
-      expect((building as any).allowedSpecies).toEqual(['dog', 'wolf']);
+      expect((building as Record<string, unknown>).animalCapacity).toBe(6);
+      expect((building as Record<string, unknown>).allowedSpecies).toEqual(['dog', 'wolf']);
       // Size property doesn't exist in BuildingComponent - skipping
-      // expect((building as any).size).toEqual({ width: 2, height: 3 });
+      // expect((building as Record<string, unknown>).size).toEqual({ width: 2, height: 3 });
     });
 
     it('should create stable with correct properties', () => {
@@ -59,10 +73,10 @@ describe('Animal Housing - Core Functionality', () => {
 
       // Per spec: Size 3x4, capacity 4 horses/donkeys, cost 50 Wood + 20 Stone
       expect(building.buildingType).toBe('stable');
-      expect((building as any).animalCapacity).toBe(4);
-      expect((building as any).allowedSpecies).toEqual(['horse', 'donkey', 'mule']);
+      expect((building as Record<string, unknown>).animalCapacity).toBe(4);
+      expect((building as Record<string, unknown>).allowedSpecies).toEqual(['horse', 'donkey', 'mule']);
       // Size property doesn't exist in BuildingComponent - skipping
-      // expect((building as any).size).toEqual({ width: 3, height: 4 });
+      // expect((building as Record<string, unknown>).size).toEqual({ width: 3, height: 4 });
     });
 
     it('should create apiary with correct properties', () => {
@@ -75,10 +89,10 @@ describe('Animal Housing - Core Functionality', () => {
 
       // Per spec: Size 2x2, capacity 3 bee colonies, cost 20 Wood + 5 Glass
       expect(building.buildingType).toBe('apiary');
-      expect((building as any).animalCapacity).toBe(3);
-      expect((building as any).allowedSpecies).toEqual(['bee_colony']);
+      expect((building as Record<string, unknown>).animalCapacity).toBe(3);
+      expect((building as Record<string, unknown>).allowedSpecies).toEqual(['bee_colony']);
       // Size property doesn't exist in BuildingComponent - skipping
-      // expect((building as any).size).toEqual({ width: 2, height: 2 });
+      // expect((building as Record<string, unknown>).size).toEqual({ width: 2, height: 2 });
     });
 
     it('should create aquarium with correct properties', () => {
@@ -91,10 +105,10 @@ describe('Animal Housing - Core Functionality', () => {
 
       // Per spec: Size 2x2, capacity 10 fish, cost 30 Glass + 10 Stone
       expect(building.buildingType).toBe('aquarium');
-      expect((building as any).animalCapacity).toBe(10);
-      expect((building as any).allowedSpecies).toEqual(['fish']);
+      expect((building as Record<string, unknown>).animalCapacity).toBe(10);
+      expect((building as Record<string, unknown>).allowedSpecies).toEqual(['fish']);
       // Size property doesn't exist in BuildingComponent - skipping
-      // expect((building as any).size).toEqual({ width: 2, height: 2 });
+      // expect((building as Record<string, unknown>).size).toEqual({ width: 2, height: 2 });
     });
 
     it('should include barn for large livestock (Tier 3)', () => {
@@ -108,8 +122,8 @@ describe('Animal Housing - Core Functionality', () => {
       // Barn: 12 capacity for large livestock
       expect(building.buildingType).toBe('barn');
       expect(building.tier).toBe(3);
-      expect((building as any).animalCapacity).toBe(12);
-      expect((building as any).allowedSpecies).toEqual(['cow', 'sheep', 'goat', 'pig']);
+      expect((building as Record<string, unknown>).animalCapacity).toBe(12);
+      expect((building as Record<string, unknown>).allowedSpecies).toEqual(['cow', 'sheep', 'goat', 'pig']);
     });
   });
 
@@ -122,7 +136,7 @@ describe('Animal Housing - Core Functionality', () => {
       const building = housingEntity.getComponent('building') as BuildingComponent;
 
       // Initially no occupants (currentOccupants is an array of entity IDs)
-      expect((building as any).currentOccupants).toEqual([]);
+      expect((building as Record<string, unknown>).currentOccupants).toEqual([]);
 
       // After assigning animals, currentOccupants should increase
       // This will be tested via AnimalHousingSystem
@@ -305,8 +319,8 @@ describe('Animal Housing - Core Functionality', () => {
       const building = housingEntity.getComponent('building') as BuildingComponent;
 
       // Chicken coop only allows birds
-      expect((building as any).allowedSpecies).toContain('chicken');
-      expect((building as any).allowedSpecies).not.toContain('cow');
+      expect((building as Record<string, unknown>).allowedSpecies).toContain('chicken');
+      expect((building as Record<string, unknown>).allowedSpecies).not.toContain('cow');
     });
 
     it('should reject incompatible species assignment', () => {
@@ -409,7 +423,7 @@ describe('Animal Housing - Core Functionality', () => {
       const animal = dogEntity.getComponent('animal') as AnimalComponent;
 
       // This property doesn't exist yet - will fail
-      expect((animal as any).housingBuildingId).toBeUndefined(); // Initially unhoused
+      expect((animal as Record<string, unknown>).housingBuildingId).toBeUndefined(); // Initially unhoused
 
       // After assignment:
       // expect(animal.housingBuildingId).toBe(kennelEntity.id);

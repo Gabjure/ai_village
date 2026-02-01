@@ -25,7 +25,7 @@ describe('PredictiveChunkLoadingSystem', () => {
   });
 
   it('should have throttle interval of 20 ticks', () => {
-    expect((system as unknown as PredictiveChunkLoadingSystemInternal).throttleInterval).toBe(20);
+    expect((system as PredictiveChunkLoadingSystemInternal).throttleInterval).toBe(20);
   });
 
   it('should have correct system id', () => {

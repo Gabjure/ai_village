@@ -101,7 +101,7 @@ describe('HuntingSystem Integration', () => {
     system.update(world, [hunter, prey, env], 1);
 
     // Verify hunt completed
-    const conflict = hunter.getComponent('conflict') as any;
+    const conflict = hunter.getComponent('conflict') as Record<string, unknown>;
     expect(conflict).toBeDefined();
 
     // With high hunting/stealth (9/8) vs low awareness (5), hunt should succeed
@@ -188,7 +188,7 @@ describe('HuntingSystem Integration', () => {
     const system = new HuntingSystem(eventBus, mockLLM);
     system.update(world, [hunter, prey, env], 1);
 
-    const conflict = hunter.getComponent('conflict') as any;
+    const conflict = hunter.getComponent('conflict') as Record<string, unknown>;
 
     // System processes states in loop, should end in 'resolved'
     expect(conflict.state).toBe('resolved');
@@ -264,7 +264,7 @@ describe('HuntingSystem Integration', () => {
     });
     world.addEntity(env);
 
-    const initialInventoryLength = (hunter.getComponent('inventory') as any).items.length;
+    const initialInventoryLength = (hunter.getComponent('inventory') as Record<string, unknown>).items.length;
 
     hunter.addComponent(
       createConflictComponent({
@@ -278,15 +278,15 @@ describe('HuntingSystem Integration', () => {
     const system = new HuntingSystem(eventBus, mockLLM);
     system.update(world, [hunter, prey, env], 1);
 
-    const conflict = hunter.getComponent('conflict') as any;
+    const conflict = hunter.getComponent('conflict') as Record<string, unknown>;
 
     if (conflict.outcome === 'attacker_victory') {
       // Hunter should have gained resources
-      const inventory = hunter.getComponent('inventory') as any;
+      const inventory = hunter.getComponent('inventory') as Record<string, unknown>;
       expect(inventory.items.length).toBeGreaterThan(initialInventoryLength);
 
       // Should have meat, hide, or bones
-      const hasExpectedResources = inventory.items.some((item: any) =>
+      const hasExpectedResources = inventory.items.some((item: Record<string, unknown>) =>
         ['meat', 'hide', 'bones'].includes(item.type)
       );
       expect(hasExpectedResources).toBe(true);
@@ -378,7 +378,7 @@ describe('HuntingSystem Integration', () => {
     const system = new HuntingSystem(eventBus, mockLLM);
 
     // Verify the hunter has the conflict before update
-    const preUpdateConflict = hunter.getComponent('conflict') as any;
+    const preUpdateConflict = hunter.getComponent('conflict') as Record<string, unknown>;
     expect(preUpdateConflict).toBeDefined();
     expect(preUpdateConflict.conflictType).toBe('hunting');
     expect(preUpdateConflict.state).toBe('initiated');
@@ -386,7 +386,7 @@ describe('HuntingSystem Integration', () => {
     system.update(world, [hunter, prey, env], 1);
 
     // Check if the hunt progressed
-    const postUpdateConflict = hunter.getComponent('conflict') as any;
+    const postUpdateConflict = hunter.getComponent('conflict') as Record<string, unknown>;
     expect(postUpdateConflict).toBeDefined();
 
     // The implementation may not emit events if eventBus is falsy or if LLM calls are async.
@@ -477,14 +477,14 @@ describe('HuntingSystem Integration', () => {
     const system = new HuntingSystem(eventBus, mockLLM);
     system.update(world, [hunter, prey, env], 1);
 
-    const conflict = hunter.getComponent('conflict') as any;
+    const conflict = hunter.getComponent('conflict') as Record<string, unknown>;
 
     // If hunt failed or hunter got injured (implementation uses 'defender_victory' for failed hunts)
     if (conflict.outcome === 'defender_victory' || conflict.hunterInjured) {
       const injury = hunter.getComponent('injury');
       // May have injury from counterattack
       if (injury) {
-        expect(['minor', 'major', 'critical']).toContain((injury as any).severity);
+        expect(['minor', 'major', 'critical']).toContain((injury as Record<string, unknown>).severity);
       }
     }
   });

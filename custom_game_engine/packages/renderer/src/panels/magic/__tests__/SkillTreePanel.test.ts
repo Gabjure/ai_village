@@ -61,7 +61,7 @@ describe('SkillTreePanel', () => {
       const isUnlocked = context.progress?.unlockedNodes?.[node.id] !== undefined;
 
       // Check prerequisites - all must be in unlockedNodes
-      const hasPrerequisites = node.unlockConditions?.every((cond: any) => {
+      const hasPrerequisites = node.unlockConditions?.every((cond: Record<string, unknown>) => {
         if (cond.type === 'prerequisite_node') {
           return context.progress?.unlockedNodes?.[cond.nodeId] !== undefined;
         }
@@ -143,8 +143,8 @@ describe('SkillTreePanel', () => {
         ctx.fillText('Requirements:', 300, y + 100);
 
         // Determine if prerequisites are met for this node
-        const hoveredNode = tree.nodes.find((n: any) => n.id === options.hoveredNodeId);
-        const prereqs = hoveredNode?.unlockConditions?.filter((c: any) => c.type === 'prerequisite_node') || [];
+        const hoveredNode = tree.nodes.find((n: Record<string, unknown>) => n.id === options.hoveredNodeId);
+        const prereqs = hoveredNode?.unlockConditions?.filter((c: Record<string, unknown>) => c.type === 'prerequisite_node') || [];
 
         prereqs.forEach((prereq: any, idx: number) => {
           if (progress.unlockedNodes?.[prereq.nodeId]) {
@@ -300,7 +300,7 @@ describe('SkillTreePanel', () => {
       panel.render(ctx, 0, 0, 800, 600, mockWorld);
 
       // Check for green fill style for unlocked node (#00ff00)
-      const greenFills = ctx._fillStyleCalls?.filter((call: any) =>
+      const greenFills = ctx._fillStyleCalls?.filter((call: Record<string, unknown>) =>
         call.includes('#00ff00') || call.includes('green') || call.toLowerCase().includes('0f0')
       );
       expect(greenFills.length).toBeGreaterThan(0);
@@ -320,7 +320,7 @@ describe('SkillTreePanel', () => {
       panel.render(ctx, 0, 0, 800, 600, mockWorld);
 
       // Check for yellow stroke/glow for available node (#ffff00)
-      const yellowStrokes = ctx._strokeStyleCalls?.filter((call: any) =>
+      const yellowStrokes = ctx._strokeStyleCalls?.filter((call: Record<string, unknown>) =>
         call.includes('yellow') || call.includes('#ffff00') || call.toLowerCase().includes('ff0')
       );
       expect(yellowStrokes.length).toBeGreaterThan(0);
@@ -340,7 +340,7 @@ describe('SkillTreePanel', () => {
       panel.render(ctx, 0, 0, 800, 600, mockWorld);
 
       // Check for gray fill style for locked nodes (#888888)
-      const grayFills = ctx._fillStyleCalls?.filter((call: any) =>
+      const grayFills = ctx._fillStyleCalls?.filter((call: Record<string, unknown>) =>
         call.includes('gray') || call.includes('#888888') || call.includes('#888')
       );
       expect(grayFills.length).toBeGreaterThan(0);
@@ -566,7 +566,7 @@ describe('SkillTreePanel', () => {
       panel.render(ctx, 0, 0, 800, 600, mockWorld);
 
       // Verify newly unlocked node shows as green (unlocked)
-      const greenFills = ctx._fillStyleCalls?.filter((call: any) =>
+      const greenFills = ctx._fillStyleCalls?.filter((call: Record<string, unknown>) =>
         call.includes('green')
       );
       expect(greenFills.length).toBeGreaterThan(0);
@@ -999,7 +999,7 @@ function createMockWorld(): World {
     getRegistry: vi.fn(() => ({
       getTree: vi.fn(),
     })),
-  } as any;
+  } as Record<string, unknown>;
 }
 
 function createMockMagicEntity(config: {
@@ -1046,7 +1046,7 @@ function createMockMagicEntity(config: {
       return undefined;
     }),
     hasComponent: vi.fn((type: string) => type === 'magic'),
-  } as any;
+  } as Record<string, unknown>;
 }
 
 function createMockEntity(): Entity {
@@ -1054,7 +1054,7 @@ function createMockEntity(): Entity {
     id: 'test_entity_non_magic',
     getComponent: vi.fn(() => undefined),
     hasComponent: vi.fn(() => false),
-  } as any;
+  } as Record<string, unknown>;
 }
 
 function createMockWindowManager(): WindowManager {
@@ -1063,7 +1063,7 @@ function createMockWindowManager(): WindowManager {
       keyboardShortcut: 'KeyT',
     })),
     registerWindow: vi.fn(),
-  } as any;
+  } as Record<string, unknown>;
 }
 
 function createMockCanvasContext(): CanvasRenderingContext2D {
@@ -1376,7 +1376,7 @@ function setupMockSkillTrees() {
   }
 
   // Register trees
-  (registry as any).trees = new Map([
+  (registry as Record<string, unknown>).trees = new Map([
     ['shinto', shintoTree],
     ['allomancy', allomancyTree],
     ['sympathy', sympathyTree],

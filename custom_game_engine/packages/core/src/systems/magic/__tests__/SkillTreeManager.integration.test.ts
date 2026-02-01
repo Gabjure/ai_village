@@ -230,7 +230,8 @@ describe('SkillTreeManager Integration', () => {
 
       // Listen for event using specific event type
       const events: any[] = [];
-      eventBus.on('magic:skill_node_unlocked' as any, (event) => events.push(event));
+      eventBus.on(// @ts-expect-error Testing invalid value validation
+      'magic:skill_node_unlocked', (event) => events.push(event));
 
       // Unlock node
       skillTreeManager.unlockSkillNode(entity, 'event-paradigm', 'event-node', 30);
@@ -392,7 +393,8 @@ describe('SkillTreeManager Integration', () => {
 
       // Listen for spell unlock event using specific event type
       const events: any[] = [];
-      eventBus.on('magic:spell_unlocked_from_skill_tree' as any, (event) => events.push(event));
+      eventBus.on(// @ts-expect-error Testing invalid value validation
+      'magic:spell_unlocked_from_skill_tree', (event) => events.push(event));
 
       // Unlock node
       skillTreeManager.unlockSkillNode(entity, 'spell-paradigm', 'spell-node', 40);

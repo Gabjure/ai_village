@@ -45,7 +45,7 @@ describe('EffectDiscoveryIntegration', () => {
     // Create mock generation service
     mockGenerationService = {
       generate: vi.fn(),
-    } as any;
+    } as Record<string, unknown>;
 
     // Create integration
     integration = new EffectDiscoveryIntegration(
@@ -54,7 +54,7 @@ describe('EffectDiscoveryIntegration', () => {
       evaluationService,
       blessingService,
       artifactSystem,
-      mockSpellRegistry as any
+      mockSpellRegistry as unknown
     );
   });
 
@@ -249,7 +249,7 @@ describe('EffectDiscoveryIntegration', () => {
     it('should categorize overpowered effects correctly', async () => {
       const overpoweredEffect = createValidEffect();
       overpoweredEffect.operations = [
-        { op: 'deal_damage', damageType: 'fire', amount: 9000 } as any,
+        { op: 'deal_damage', damageType: 'fire', amount: 9000 } as unknown,
       ];
 
       vi.mocked(mockGenerationService.generate).mockResolvedValue({
@@ -349,8 +349,8 @@ describe('EffectDiscoveryIntegration', () => {
     it('should infer technique from operation types', async () => {
       const effect = createValidEffect();
       effect.operations = [
-        { op: 'spawn_entity', entityType: 'fire_elemental', count: 1 } as any,
-        { op: 'apply_status', status: 'summoned', duration: 100 } as any,
+        { op: 'spawn_entity', entityType: 'fire_elemental', count: 1 } as unknown,
+        { op: 'apply_status', status: 'summoned', duration: 100 } as unknown,
       ];
 
       vi.mocked(mockGenerationService.generate).mockResolvedValue({
@@ -437,7 +437,7 @@ function createValidEffect(): EffectExpression {
     timing: {
       type: 'immediate',
     },
-  } as any;
+  } as Record<string, unknown>;
 }
 
 function createUnsafeEffect(): EffectExpression {
@@ -458,7 +458,7 @@ function createUnsafeEffect(): EffectExpression {
     timing: {
       type: 'immediate',
     },
-  } as any;
+  } as Record<string, unknown>;
 }
 
 function createInvalidEffect(): EffectExpression {
@@ -472,7 +472,7 @@ function createInvalidEffect(): EffectExpression {
     timing: {
       type: 'immediate',
     },
-  } as any;
+  } as Record<string, unknown>;
 }
 
 function createIncompleteEffect(): EffectExpression {
@@ -491,5 +491,5 @@ function createIncompleteEffect(): EffectExpression {
     timing: {
       type: 'immediate',
     },
-  } as any;
+  } as Record<string, unknown>;
 }

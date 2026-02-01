@@ -32,7 +32,7 @@ describe('MagicLawEnforcer - Cost Calculator Integration', () => {
       },
       knownSpells: [],
       paradigmState: {},
-    } as any;
+    } as unknown;
 
     mockContext = {
       tick: 1000,
@@ -172,7 +172,7 @@ describe('MagicLawEnforcer - Cross-Paradigm Validation', () => {
       paradigmState: {
         names: { knownNames: ['fire', 'wind'] },
       },
-    } as any;
+    } as unknown;
 
     const nameSpell: ComposedSpell = {
       id: 'true_name_fire',
@@ -208,7 +208,7 @@ describe('MagicLawEnforcer - Cross-Paradigm Validation', () => {
       resourcePools: {},
       knownSpells: [],
       paradigmState: {},
-    } as any;
+    } as unknown;
 
     expect(() => {
       const enforcer = new MagicLawEnforcer(ACADEMIC_PARADIGM);
@@ -233,7 +233,7 @@ describe('MagicLawEnforcer - Risk Assessment', () => {
         },
       ],
       paradigmState: {},
-    } as any;
+    } as unknown;
 
     const enforcer = new MagicLawEnforcer(ACADEMIC_PARADIGM);
     const spell: ComposedSpell = {
@@ -276,7 +276,7 @@ describe('MagicLawEnforcer - Risk Assessment', () => {
       },
       knownSpells: [],
       paradigmState: { pact: { patronId: 'demon', pactTerms: [], serviceOwed: 0 } },
-    } as any;
+    } as unknown;
 
     const pactParadigm = getCoreParadigm('pact');
     console.log('Pact paradigm:', JSON.stringify({
@@ -332,7 +332,7 @@ describe('MagicLawEnforcer - Spell Modification', () => {
       },
       knownSpells: [],
       paradigmState: {},
-    } as any;
+    } as unknown;
 
     const enforcer = new MagicLawEnforcer(ACADEMIC_PARADIGM);
     // Use a resonant combination spell (control + fire has resonance in academic paradigm)
@@ -372,7 +372,7 @@ describe('MagicLawEnforcer - Spell Modification', () => {
       },
       knownSpells: [],
       paradigmState: { divine: { deityId: 'healing_god', deityStanding: 'disfavored' } },
-    } as any;
+    } as unknown;
 
     const divineEnforcer = new MagicLawEnforcer(getCoreParadigm('divine'));
     const spell: ComposedSpell = {

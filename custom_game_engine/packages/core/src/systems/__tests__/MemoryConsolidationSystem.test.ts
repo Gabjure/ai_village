@@ -4,6 +4,20 @@ import { MemoryConsolidationSystem } from '../MemoryConsolidationSystem';
 import { EpisodicMemoryComponent } from '../../components/EpisodicMemoryComponent';
 import { EventBus } from '../../EventBus';
 
+// Type helpers for testing
+type EntityWithMethods = {
+  addComponent?: (comp: unknown) => void;
+  updateComponent?: (type: string, updater: (current: unknown) => unknown) => void;
+  getComponent?: (type: string) => unknown;
+  hasComponent?: (type: string) => boolean;
+};
+type WorldWithMethods = Record<string, unknown> & {
+  getEntity?: (id: string) => unknown;
+  addEntity?: (entity: unknown) => void;
+  query?: unknown;
+  getSystem?: (name: string) => unknown;
+};
+
 describe('MemoryConsolidationSystem', () => {
   let world: World;
   let system: MemoryConsolidationSystem;
@@ -435,7 +449,7 @@ describe('MemoryConsolidationSystem', () => {
       });
 
       // Mock consolidation failure
-      vi.spyOn(system as any, '_consolidateMemories').mockImplementation(() => {
+      vi.spyOn(system as unknown, '_consolidateMemories').mockImplementation(() => {
         throw new Error('Consolidation failed');
       });
 
@@ -450,7 +464,7 @@ describe('MemoryConsolidationSystem', () => {
       const memComp = agent.getComponent(EpisodicMemoryComponent);
 
       // Manually add invalid memory
-      (memComp as any)._episodicMemories.push({
+      (memComp as Record<string, unknown>)._episodicMemories.push({
         eventType: 'test',
         summary: 'Test',
         timestamp: Date.now()

@@ -8,6 +8,20 @@ import { wrapEntity, wrapComponent, wrapObject } from '../ProxyWrappers.js';
 import { EntityImpl, createEntityId } from '../../ecs/Entity.js';
 import { EventBusImpl } from '../../events/EventBus.js';
 
+// Type helpers for testing
+type EntityWithMethods = {
+  addComponent?: (comp: unknown) => void;
+  updateComponent?: (type: string, updater: (current: unknown) => unknown) => void;
+  getComponent?: (type: string) => unknown;
+  hasComponent?: (type: string) => boolean;
+};
+type WorldWithMethods = Record<string, unknown> & {
+  getEntity?: (id: string) => unknown;
+  addEntity?: (entity: unknown) => void;
+  query?: unknown;
+  getSystem?: (name: string) => unknown;
+};
+
 describe('DiagnosticsHarness', () => {
   beforeEach(() => {
     diagnosticsHarness.clear();
@@ -20,7 +34,7 @@ describe('DiagnosticsHarness', () => {
     const wrapped = wrapEntity(entity);
 
     // Access undefined property
-    const value = (wrapped as any).nonExistentProperty;
+    const value = (wrapped as Record<string, unknown>).nonExistentProperty;
 
     const issues = diagnosticsHarness.getIssues({ type: 'undefined_property' });
     expect(issues.length).toBeGreaterThan(0);
@@ -33,7 +47,7 @@ describe('DiagnosticsHarness', () => {
     const wrapped = wrapComponent(component, 'position', 'test-entity');
 
     // Access undefined property
-    const value = (wrapped as any).nonExistentField;
+    const value = (wrapped as Record<string, unknown>).nonExistentField;
 
     const issues = diagnosticsHarness.getIssues({ type: 'undefined_property' });
     expect(issues.length).toBeGreaterThan(0);
@@ -48,7 +62,7 @@ describe('DiagnosticsHarness', () => {
 
     // Access same undefined property multiple times
     for (let i = 0; i < 5; i++) {
-      const value = (wrapped as any).invalidProp;
+      const value = (wrapped as Record<string, unknown>).invalidProp;
     }
 
     const issues = diagnosticsHarness.getIssues();
@@ -67,7 +81,7 @@ describe('DiagnosticsHarness', () => {
     const wrapped = wrapObject(obj, 'TestObject');
 
     // Typo: "valdMethod" instead of "validMethod"
-    const value = (wrapped as any).valdMethod;
+    const value = (wrapped as Record<string, unknown>).valdMethod;
 
     const issues = diagnosticsHarness.getIssues();
     expect(issues.length).toBeGreaterThan(0);
@@ -82,7 +96,7 @@ describe('DiagnosticsHarness', () => {
     const wrappedEntity = wrapEntity(entity);
 
     // This creates an error-level issue
-    const value = (wrappedEntity as any).invalid;
+    const value = (wrappedEntity as Record<string, unknown>).invalid;
 
     const errors = diagnosticsHarness.getIssues({ severity: 'error' });
     const warnings = diagnosticsHarness.getIssues({ severity: 'warning' });
@@ -97,12 +111,12 @@ describe('DiagnosticsHarness', () => {
 
     // Access 10 times
     for (let i = 0; i < 10; i++) {
-      const value = (wrapped as any).frequent;
+      const value = (wrapped as Record<string, unknown>).frequent;
     }
 
     // Access 2 times
     for (let i = 0; i < 2; i++) {
-      const value = (wrapped as any).infrequent;
+      const value = (wrapped as Record<string, unknown>).infrequent;
     }
 
     const allIssues = diagnosticsHarness.getIssues();
@@ -119,8 +133,8 @@ describe('DiagnosticsHarness', () => {
     const obj = { valid: 'test' };
     const wrapped = wrapObject(obj, 'TestObject');
 
-    const suppressedValue = (wrapped as any).suppressedProperty;
-    const normalValue = (wrapped as any).normalProperty;
+    const suppressedValue = (wrapped as Record<string, unknown>).suppressedProperty;
+    const normalValue = (wrapped as Record<string, unknown>).normalProperty;
 
     const issues = diagnosticsHarness.getIssues();
     // Should only have the normal property issue, not the suppressed one
@@ -134,8 +148,8 @@ describe('DiagnosticsHarness', () => {
 
     // Create multiple issues
     for (let i = 0; i < 3; i++) {
-      const v1 = (wrapped as any).issue1;
-      const v2 = (wrapped as any).issue2;
+      const v1 = (wrapped as Record<string, unknown>).issue1;
+      const v2 = (wrapped as Record<string, unknown>).issue2;
     }
 
     const summary = diagnosticsHarness.getSummary();
@@ -147,7 +161,7 @@ describe('DiagnosticsHarness', () => {
   it('should clear all issues', () => {
     const obj = { valid: 'test' };
     const wrapped = wrapObject(obj, 'TestObject');
-    const value = (wrapped as any).invalid;
+    const value = (wrapped as Record<string, unknown>).invalid;
 
     expect(diagnosticsHarness.getIssues().length).toBeGreaterThan(0);
 
@@ -161,7 +175,7 @@ describe('DiagnosticsHarness', () => {
 
     const obj = { valid: 'test' };
     const wrapped = wrapObject(obj, 'TestObject');
-    const value = (wrapped as any).invalid;
+    const value = (wrapped as Record<string, unknown>).invalid;
 
     expect(diagnosticsHarness.getIssues().length).toBe(0);
   });
@@ -171,7 +185,7 @@ describe('DiagnosticsHarness', () => {
 
     const obj = { valid: 'test' };
     const wrapped = wrapObject(obj, 'TestObject');
-    const value = (wrapped as any).invalid;
+    const value = (wrapped as Record<string, unknown>).invalid;
 
     const issues = diagnosticsHarness.getIssues();
     expect(issues[0].tick).toBe(1234);
@@ -182,9 +196,9 @@ describe('DiagnosticsHarness', () => {
     const wrapped = wrapObject(obj, 'TestObject');
 
     // These should not create issues (safe properties)
-    const promiseCheck = (wrapped as any).then;
-    const toStringCheck = (wrapped as any).toString;
-    const constructorCheck = (wrapped as any).constructor;
+    const promiseCheck = (wrapped as Record<string, unknown>).then;
+    const toStringCheck = (wrapped as Record<string, unknown>).toString;
+    const constructorCheck = (wrapped as Record<string, unknown>).constructor;
 
     expect(diagnosticsHarness.getIssues().length).toBe(0);
   });

@@ -419,7 +419,7 @@ describe('Performance Optimizations Integration', () => {
       // Test with increasing entity counts
       for (const count of [10, 50, 100]) {
         // Clear world
-        (world as any).entities.clear();
+        (world as { entities: Map<string, unknown> }).entities.clear();
 
         // Create entities
         for (let i = 0; i < count; i++) {
@@ -454,7 +454,7 @@ describe('Performance Optimizations Integration', () => {
       // Test with increasing agent counts
       for (const count of [10, 50, 100]) {
         // Clear world
-        (world as any).entities.clear();
+        (world as { entities: Map<string, unknown> }).entities.clear();
 
         // Create agents
         const agents: EntityImpl[] = [];

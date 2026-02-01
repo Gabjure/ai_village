@@ -2670,13 +2670,13 @@ function createMockWorld(): World {
     addComponent: (entityId: string, component: any) => {
       const entity = entities.get(entityId);
       if (entity) {
-        (entity as any).addComponent(component.type, component);
+        entity.addComponent(component.type, component);
       }
     },
     destroyEntity: (entityId: string, reason?: string) => {
       entities.delete(entityId);
     },
-  } as any;
+  } as Record<string, unknown>;
 }
 
 function createMockEntity(id: string, components: any = {}): any {

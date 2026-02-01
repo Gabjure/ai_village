@@ -16,6 +16,20 @@ import { VisionProcessor } from '../VisionProcessor.js';
 import { HearingProcessor } from '../HearingProcessor.js';
 import { MeetingDetector, isMeetingCall } from '../MeetingDetector.js';
 
+// Type helpers for testing
+type EntityWithMethods = {
+  addComponent?: (comp: unknown) => void;
+  updateComponent?: (type: string, updater: (current: unknown) => unknown) => void;
+  getComponent?: (type: string) => unknown;
+  hasComponent?: (type: string) => boolean;
+};
+type WorldWithMethods = Record<string, unknown> & {
+  getEntity?: (id: string) => unknown;
+  addEntity?: (entity: unknown) => void;
+  query?: unknown;
+  getSystem?: (name: string) => unknown;
+};
+
 describe('VisionProcessor', () => {
   let visionProcessor: VisionProcessor;
   let world: World;
@@ -57,7 +71,7 @@ describe('VisionProcessor', () => {
       const agent = new EntityImpl(createEntityId(), 0);
       agent.addComponent(createPositionComponent(0, 0));
       const vision = createVisionComponent(20);
-      (vision as any).canSeeResources = true;
+      (vision as { canSeeResources?: boolean }).canSeeResources = true;
       agent.addComponent(vision);
       agent.addComponent(new SpatialMemoryComponent());
       world.addEntity(agent);
@@ -82,7 +96,7 @@ describe('VisionProcessor', () => {
       const agent = new EntityImpl(createEntityId(), 0);
       agent.addComponent(createPositionComponent(0, 0));
       const vision = createVisionComponent(10);
-      (vision as any).canSeeResources = true;
+      (vision as { canSeeResources?: boolean }).canSeeResources = true;
       agent.addComponent(vision);
       agent.addComponent(new SpatialMemoryComponent());
       world.addEntity(agent);
@@ -131,7 +145,7 @@ describe('VisionProcessor', () => {
       const agent = new EntityImpl(createEntityId(), 0);
       agent.addComponent(createPositionComponent(0, 0));
       const vision = createVisionComponent(20);
-      (vision as any).canSeeAgents = true;
+      (vision as Record<string, unknown>).canSeeAgents = true;
       agent.addComponent(vision);
       agent.addComponent(new SpatialMemoryComponent());
       world.addEntity(agent);
@@ -155,7 +169,7 @@ describe('VisionProcessor', () => {
       const agent = new EntityImpl(createEntityId(), 0);
       agent.addComponent(createPositionComponent(0, 0));
       const vision = createVisionComponent(20);
-      (vision as any).canSeeAgents = true;
+      (vision as Record<string, unknown>).canSeeAgents = true;
       agent.addComponent(vision);
       agent.addComponent(new SpatialMemoryComponent());
       agent.addComponent({
@@ -174,8 +188,8 @@ describe('VisionProcessor', () => {
       const agent = new EntityImpl(createEntityId(), 0);
       agent.addComponent(createPositionComponent(0, 0));
       const vision = createVisionComponent(20);
-      (vision as any).canSeeAgents = true;
-      (vision as any).canSeeResources = true;
+      (vision as Record<string, unknown>).canSeeAgents = true;
+      (vision as { canSeeResources?: boolean }).canSeeResources = true;
       agent.addComponent(vision);
       agent.addComponent(new SpatialMemoryComponent());
       world.addEntity(agent);
@@ -193,7 +207,7 @@ describe('VisionProcessor', () => {
 
       visionProcessor.process(agent, world);
 
-      const updatedVision = agent.getComponent(ComponentType.Vision) as any;
+      const updatedVision = agent.getComponent(ComponentType.Vision);
       expect(updatedVision.seenResources).toContain(resource.id);
     });
   });
@@ -310,7 +324,7 @@ describe('HearingProcessor', () => {
 
       hearingProcessor.process(agent, world);
 
-      const updatedVision = agent.getComponent(ComponentType.Vision) as any;
+      const updatedVision = agent.getComponent(ComponentType.Vision);
       expect(updatedVision.heardSpeech).toHaveLength(1);
       expect(updatedVision.heardSpeech[0].text).toBe('Test message');
     });
@@ -371,7 +385,7 @@ describe('MeetingDetector', () => {
   describe('process', () => {
     it('returns detected=false when no agent component', () => {
       const entity = new EntityImpl(createEntityId(), 0);
-      (entity as any).addComponent(createPositionComponent(0, 0));
+      entity.addComponent(createPositionComponent(0, 0));
       world.addEntity(entity);
 
       const result = meetingDetector.process(entity, world);
@@ -404,7 +418,7 @@ describe('MeetingDetector', () => {
         behavior: 'forced_sleep', // Uninterruptible
       });
       const vision = createVisionComponent(20);
-      (vision as any).heardSpeech = [{ speaker: 'Bob', text: 'Calling a meeting!' }];
+      (vision as Record<string, unknown>).heardSpeech = [{ speaker: 'Bob', text: 'Calling a meeting!' }];
       agent.addComponent(vision);
       world.addEntity(agent);
 
@@ -422,7 +436,7 @@ describe('MeetingDetector', () => {
         behavior: 'attend_meeting', // Already attending
       });
       const vision = createVisionComponent(20);
-      (vision as any).heardSpeech = [{ speaker: 'Carol', text: 'Gather around!' }];
+      (vision as Record<string, unknown>).heardSpeech = [{ speaker: 'Carol', text: 'Gather around!' }];
       agent.addComponent(vision);
       world.addEntity(agent);
 
@@ -440,7 +454,7 @@ describe('MeetingDetector', () => {
         behavior: 'wander',
       });
       const vision = createVisionComponent(20);
-      (vision as any).heardSpeech = [{ speaker: 'Bob', text: 'I am calling a meeting!' }];
+      (vision as Record<string, unknown>).heardSpeech = [{ speaker: 'Bob', text: 'I am calling a meeting!' }];
       agent.addComponent(vision);
       world.addEntity(agent);
 

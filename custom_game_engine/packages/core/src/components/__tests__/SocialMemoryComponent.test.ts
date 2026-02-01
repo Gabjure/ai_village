@@ -364,7 +364,7 @@ describe('SocialMemoryComponent', () => {
           interactionType: 'conversation',
           sentiment: 0.5,
           timestamp: Date.now()
-        } as any);
+        } as Record<string, unknown>);
       }).toThrow();
     });
 
@@ -376,7 +376,7 @@ describe('SocialMemoryComponent', () => {
           agentId: 'test-123',
           sentiment: 0.5,
           timestamp: Date.now()
-        } as any);
+        } as Record<string, unknown>);
       }).toThrow();
     });
 
@@ -388,7 +388,7 @@ describe('SocialMemoryComponent', () => {
           agentId: 'test-123',
           interactionType: 'conversation',
           sentiment: 0.5
-        } as any);
+        } as Record<string, unknown>);
       }).toThrow();
     });
 
@@ -413,7 +413,7 @@ describe('SocialMemoryComponent', () => {
           agentId: 'test-123',
           interactionType: 'conversation',
           timestamp: Date.now()
-        } as any);
+        } as Record<string, unknown>);
       }).toThrow();
     });
   });

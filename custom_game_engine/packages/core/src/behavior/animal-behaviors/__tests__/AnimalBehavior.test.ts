@@ -59,15 +59,15 @@ function createMockWorld(): World {
       executeEntities: vi.fn().mockReturnValue([]),
     }),
     getEntity: vi.fn(),
-  } as unknown as World;
+  } as World;
 }
 
 // Helper to create an animal entity
 function createAnimalEntity(animal: AnimalComponent): EntityImpl {
   const entity = new EntityImpl(createEntityId(), 0);
-  (entity as any).addComponent(createPositionComponent(50, 50));
-  (entity as any).addComponent(createMovementComponent());
-  (entity as any).addComponent(animal);
+  entity.addComponent(createPositionComponent(50, 50));
+  entity.addComponent(createMovementComponent());
+  entity.addComponent(animal);
   return entity;
 }
 

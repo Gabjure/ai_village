@@ -4,6 +4,20 @@ import type { Entity } from '@ai-village/core/ecs/Entity';
 import { NeedsComponent } from '@ai-village/core/components/NeedsComponent';
 import { HealthBarRenderer } from '../HealthBarRenderer.js';
 
+// Type helpers for testing
+type EntityWithMethods = {
+  addComponent?: (comp: unknown) => void;
+  updateComponent?: (type: string, updater: (current: unknown) => unknown) => void;
+  getComponent?: (type: string) => unknown;
+  hasComponent?: (type: string) => boolean;
+};
+type WorldWithMethods = Record<string, unknown> & {
+  getEntity?: (id: string) => unknown;
+  addEntity?: (entity: unknown) => void;
+  query?: unknown;
+  getSystem?: (name: string) => unknown;
+};
+
 // Mock canvas context for drawing operations
 const createMockContext = () => ({
   fillStyle: '',
@@ -50,7 +64,7 @@ describe('HealthBarRenderer', () => {
 
     // Mock the canvas context
     const mockContext = createMockContext();
-    vi.spyOn(canvas, 'getContext').mockReturnValue(mockContext as any);
+    vi.spyOn(canvas, 'getContext').mockReturnValue(mockContext as unknown);
 
     renderer = new HealthBarRenderer(world, canvas);
   });
@@ -376,7 +390,7 @@ describe('HealthBarRenderer', () => {
     it('should throw when canvas context cannot be acquired', () => {
       const badCanvas = {
         getContext: () => null,
-      } as unknown as HTMLCanvasElement;
+      } as Partial<HTMLCanvasElement> as HTMLCanvasElement;
 
       expect(() => {
         new HealthBarRenderer(world, badCanvas);

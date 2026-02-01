@@ -10,6 +10,20 @@ import { ViewAdapter } from '../adapters/ViewAdapter.js';
 import type { DashboardView, ViewData, ViewContext, RenderBounds, RenderTheme } from '@ai-village/core';
 import { defaultTheme } from '@ai-village/core';
 
+// Type helpers for testing
+type EntityWithMethods = {
+  addComponent?: (comp: unknown) => void;
+  updateComponent?: (type: string, updater: (current: unknown) => unknown) => void;
+  getComponent?: (type: string) => unknown;
+  hasComponent?: (type: string) => boolean;
+};
+type WorldWithMethods = Record<string, unknown> & {
+  getEntity?: (id: string) => unknown;
+  addEntity?: (entity: unknown) => void;
+  query?: unknown;
+  getSystem?: (name: string) => unknown;
+};
+
 // Mock canvas context
 function createMockCanvasContext(): CanvasRenderingContext2D {
   return {
@@ -29,17 +43,19 @@ function createMockCanvasContext(): CanvasRenderingContext2D {
     moveTo: vi.fn(),
     lineTo: vi.fn(),
     stroke: vi.fn(),
-  } as unknown as CanvasRenderingContext2D;
+  } as Partial<CanvasRenderingContext2D> as CanvasRenderingContext2D;
 }
 
 describe('ViewAdapter', () => {
   describe('constructor validation', () => {
     it('should throw if view is null', () => {
-      expect(() => new ViewAdapter(null as unknown as DashboardView)).toThrow('view is required');
+      // @ts-expect-error Testing null parameter validation
+      expect(() => new ViewAdapter(null)).toThrow('view is required');
     });
 
+      // @ts-expect-error Testing undefined parameter validation
     it('should throw if view is undefined', () => {
-      expect(() => new ViewAdapter(undefined as unknown as DashboardView)).toThrow('view is required');
+      expect(() => new ViewAdapter(undefined)).toThrow('view is required');
     });
 
     it('should throw if view.id is missing', () => {
@@ -207,7 +223,7 @@ describe('ViewAdapter', () => {
 
     it('should call getData with correct context', () => {
       const mockWorld = { getEntity: vi.fn() };
-      adapter.setWorld(mockWorld as any);
+      adapter.setWorld(mockWorld as unknown);
 
       adapter.render(ctx, 0, 0, 400, 500, mockWorld);
 
@@ -233,9 +249,10 @@ describe('ViewAdapter', () => {
     });
 
     it('should show loading message if getData returns null', () => {
+        // @ts-expect-error Mock returns null for testing
       const viewWithAsyncData: DashboardView<TestViewData> = {
         ...testView,
-        getData: vi.fn(() => null as unknown as TestViewData),
+        getData: vi.fn(() => null),
       };
 
       const asyncAdapter = new ViewAdapter(viewWithAsyncData);
@@ -494,12 +511,12 @@ describe('ViewAdapter', () => {
       const world1 = { getEntity: vi.fn() };
       const world2 = { getEntity: vi.fn() };
 
-      adapter.setWorld(world1 as any);
+      adapter.setWorld(world1 as unknown);
       adapter.render(ctx, 0, 0, 400, 500);
       expect(getDataSpy).toHaveBeenCalledTimes(1);
 
       // Change world - should invalidate cache
-      adapter.setWorld(world2 as any);
+      adapter.setWorld(world2 as unknown);
       adapter.render(ctx, 0, 0, 400, 500);
       expect(getDataSpy).toHaveBeenCalledTimes(2);
     });

@@ -27,7 +27,7 @@ describe('Dead Agent LLM Prevention', () => {
 
   it('should skip AI processing for dead agents (health = 0)', () => {
     // Create agent with 0 health
-    const agent = world.createEntity() as any;
+    const agent = world.createEntity() as unknown;
 
     agent.addComponent<AgentComponent>({
       type: CT.Agent,
@@ -83,7 +83,7 @@ describe('Dead Agent LLM Prevention', () => {
     // This test verifies that the dead agent check doesn't block alive agents.
     // We don't test full processing flow, just that the check passes.
 
-    const agentAlive = world.createEntity() as any;
+    const agentAlive = world.createEntity() as unknown;
 
     agentAlive.addComponent<AgentComponent>({
       type: CT.Agent,
@@ -124,7 +124,7 @@ describe('Dead Agent LLM Prevention', () => {
     });
 
     // Create a dead agent for comparison
-    const agentDead = world.createEntity() as any;
+    const agentDead = world.createEntity() as unknown;
 
     agentDead.addComponent<AgentComponent>({
       type: CT.Agent,
@@ -175,7 +175,7 @@ describe('Dead Agent LLM Prevention', () => {
 
   it('should skip AI processing for negative health', () => {
     // Create agent with negative health (overkill)
-    const agent = world.createEntity() as any;
+    const agent = world.createEntity() as unknown;
 
     agent.addComponent<AgentComponent>({
       type: CT.Agent,
@@ -228,7 +228,7 @@ describe('Dead Agent LLM Prevention', () => {
 
   it('should allow AI processing for afterlife souls (dead but has afterlife component)', () => {
     // Create a soul in the afterlife - dead but should still be able to think
-    const soul = world.createEntity() as any;
+    const soul = world.createEntity() as unknown;
 
     soul.addComponent<AgentComponent>({
       type: CT.Agent,
@@ -294,7 +294,7 @@ describe('Dead Agent LLM Prevention', () => {
     });
 
     // Advance world tick so agent is ready to think
-    (world as any)._tick = 100;
+    (world as { _tick: number })._tick = 100;
 
     // Run system - afterlife soul should NOT be skipped
     // The brain system should proceed past the health check
@@ -308,7 +308,7 @@ describe('Dead Agent LLM Prevention', () => {
 
   it('should skip AI processing for shades (lost identity)', () => {
     // Shades have coherence < 0.1 and have lost their identity
-    const shade = world.createEntity() as any;
+    const shade = world.createEntity() as unknown;
 
     shade.addComponent<AgentComponent>({
       type: CT.Agent,
@@ -384,7 +384,7 @@ describe('Dead Agent LLM Prevention', () => {
 
   it('should skip AI processing for passed-on souls', () => {
     // Souls that have passed on are truly gone
-    const passedSoul = world.createEntity() as any;
+    const passedSoul = world.createEntity() as unknown;
 
     passedSoul.addComponent<AgentComponent>({
       type: CT.Agent,

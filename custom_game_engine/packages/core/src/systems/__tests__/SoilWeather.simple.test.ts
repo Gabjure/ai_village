@@ -20,31 +20,31 @@ describe('SoilSystem Weather Integration (Simple)', () => {
   });
 
   it('should have onInitialize method', () => {
-    expect(typeof (soilSystem as any).onInitialize).toBe('function');
+    expect(typeof (soilSystem as Record<string, unknown>).onInitialize).toBe('function');
   });
 
   it('should have handleWeatherChange method', () => {
-    expect(typeof (soilSystem as any).handleWeatherChange).toBe('function');
+    expect(typeof (soilSystem as Record<string, unknown>).handleWeatherChange).toBe('function');
   });
 
   it('should have handleRainEvent method', () => {
-    expect(typeof (soilSystem as any).handleRainEvent).toBe('function');
+    expect(typeof (soilSystem as Record<string, unknown>).handleRainEvent).toBe('function');
   });
 
   it('should have handleSnowEvent method', () => {
-    expect(typeof (soilSystem as any).handleSnowEvent).toBe('function');
+    expect(typeof (soilSystem as Record<string, unknown>).handleSnowEvent).toBe('function');
   });
 
   it('should have processDailyMoistureDecay method', () => {
-    expect(typeof (soilSystem as any).processDailyMoistureDecay).toBe('function');
+    expect(typeof (soilSystem as Record<string, unknown>).processDailyMoistureDecay).toBe('function');
   });
 
   it('should have isTileIndoors method', () => {
-    expect(typeof (soilSystem as any).isTileIndoors).toBe('function');
+    expect(typeof (soilSystem as Record<string, unknown>).isTileIndoors).toBe('function');
   });
 
   it('should have getCurrentTemperature method', () => {
-    expect(typeof (soilSystem as any).getCurrentTemperature).toBe('function');
+    expect(typeof (soilSystem as Record<string, unknown>).getCurrentTemperature).toBe('function');
   });
 
   it('should call onInitialize when system context initializes', () => {
@@ -53,15 +53,15 @@ describe('SoilSystem Weather Integration (Simple)', () => {
       world,
       deltaTime: 0.05,
       activeEntities: [],
-      components: () => ({}) as any,
+      components: () => ({}) as unknown,
       getSingleton: () => undefined,
     } as SystemContext;
 
     // Call onInitialize
-    (soilSystem as any).onInitialize(ctx);
+    (soilSystem as Record<string, unknown>).onInitialize(ctx);
 
     // Verify event listeners were registered
-    expect((soilSystem as any).initialized).toBe(true);
+    expect((soilSystem as Record<string, unknown>).initialized).toBe(true);
   });
 
   it('should handle weather change event for rain', () => {
@@ -76,7 +76,7 @@ describe('SoilSystem Weather Integration (Simple)', () => {
 
     // Should not throw
     expect(() => {
-      (soilSystem as any).handleWeatherChange(world, event);
+      (soilSystem as Record<string, unknown>).handleWeatherChange(world, event);
     }).not.toThrow();
   });
 
@@ -92,20 +92,20 @@ describe('SoilSystem Weather Integration (Simple)', () => {
 
     // Should not throw
     expect(() => {
-      (soilSystem as any).handleWeatherChange(world, event);
+      (soilSystem as Record<string, unknown>).handleWeatherChange(world, event);
     }).not.toThrow();
   });
 
   it('should get current temperature without throwing', () => {
     // Should not throw even if no temperature component exists
     expect(() => {
-      const temp = (soilSystem as any).getCurrentTemperature(world);
+      const temp = (soilSystem as Record<string, unknown>).getCurrentTemperature(world);
       expect(typeof temp).toBe('number');
     }).not.toThrow();
   });
 
   it('should check if tile is indoors (currently returns false)', () => {
-    const result = (soilSystem as any).isTileIndoors({}, world, 0, 0);
+    const result = (soilSystem as Record<string, unknown>).isTileIndoors({}, world, 0, 0);
     expect(result).toBe(false); // Currently all tiles are outdoor
   });
 });

@@ -7,13 +7,27 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import type { MagicComponent } from '@ai-village/core';
 import type { SpiritualComponent } from '@ai-village/core';
 
+// Type helpers for testing
+type EntityWithMethods = {
+  addComponent?: (comp: unknown) => void;
+  updateComponent?: (type: string, updater: (current: unknown) => unknown) => void;
+  getComponent?: (type: string) => unknown;
+  hasComponent?: (type: string) => boolean;
+};
+type WorldWithMethods = Record<string, unknown> & {
+  getEntity?: (id: string) => unknown;
+  addEntity?: (entity: unknown) => void;
+  query?: unknown;
+  getSystem?: (name: string) => unknown;
+};
+
 describe('Validation - Negative Locked Mana Exploit', () => {
   it('should reject negative locked mana values', () => {
     const caster: MagicComponent = {
       resourcePools: {
         mana: { type: 'mana', current: 100, maximum: 100, regenRate: 0.01, locked: 0 },
       },
-    } as any;
+    } as unknown;
 
     // Attempt to set negative locked value
     expect(() => {
@@ -28,7 +42,7 @@ describe('Validation - Negative Locked Mana Exploit', () => {
       resourcePools: {
         mana: { type: 'mana', current: 100, maximum: 100, regenRate: 0.01, locked: 0 },
       },
-    } as any;
+    } as unknown;
 
     // Try to lock more than current
     const clamped = clampLocked(caster.resourcePools.mana, 150);
@@ -75,7 +89,7 @@ describe('Validation - Paradigm Conflicts', () => {
     const caster: MagicComponent = {
       activeParadigms: ['divine', 'pact'],
       resourcePools: {},
-    } as any;
+    } as unknown;
 
     expect(() => {
       validateParadigmCombination(caster.activeParadigms);
@@ -86,7 +100,7 @@ describe('Validation - Paradigm Conflicts', () => {
     const caster: MagicComponent = {
       activeParadigms: ['academic', 'divine'],
       resourcePools: {},
-    } as any;
+    } as unknown;
 
     expect(() => {
       validateParadigmCombination(caster.activeParadigms);
@@ -116,7 +130,7 @@ describe('Validation - Paradigm Conflicts', () => {
     const caster: MagicComponent = {
       activeParadigms: ['academic', 'names', 'rune'],
       resourcePools: {},
-    } as any;
+    } as unknown;
 
     expect(() => {
       validateParadigmCombination(caster.activeParadigms, universeConfig);
@@ -132,7 +146,7 @@ describe('Validation - Paradigm Conflicts', () => {
     const caster: MagicComponent = {
       activeParadigms: ['academic', 'names', 'rune'],
       resourcePools: {},
-    } as any;
+    } as unknown;
 
     expect(() => {
       validateParadigmCombination(caster.activeParadigms, universeConfig);
@@ -208,7 +222,7 @@ describe('Validation - Division by Zero', () => {
       beliefs: {},
       totalPrayers: 0,
       answeredPrayers: 0,
-    } as any;
+    } as unknown;
 
     const answerRate = calculateAnswerRate(spiritual);
     expect(answerRate).toBe(0); // Not NaN
@@ -228,7 +242,7 @@ describe('Validation - Division by Zero', () => {
         beliefs: {},
         totalPrayers: total,
         answeredPrayers: answered,
-      } as any;
+      } as unknown;
 
       const rate = calculateAnswerRate(spiritual);
       expect(rate).toBe(expected);
@@ -242,7 +256,7 @@ describe('Validation - Division by Zero', () => {
       totalPrayers: 0,
       answeredPrayers: 0,
       prayerHistory: [],
-    } as any;
+    } as unknown;
 
     const stats = calculatePrayerStatistics(spiritual);
 
@@ -271,7 +285,7 @@ describe('Validation - Faith Bounds', () => {
   it('should validate faith when setting belief', () => {
     const spiritual: SpiritualComponent = {
       beliefs: {},
-    } as any;
+    } as unknown;
 
     expect(() => {
       setFaith(spiritual, 'test_deity', 2.5);
@@ -287,7 +301,7 @@ describe('Validation - Faith Bounds', () => {
       beliefs: {
         test_deity: { faith: 0.5, devotion: 0.5 },
       },
-    } as any;
+    } as unknown;
 
     // Attempt to increase beyond 1.0
     adjustFaith(spiritual, 'test_deity', 0.8);
@@ -301,7 +315,7 @@ describe('Validation - Faith Bounds', () => {
   it('should reject NaN and Infinity faith values', () => {
     const spiritual: SpiritualComponent = {
       beliefs: {},
-    } as any;
+    } as unknown;
 
     expect(() => {
       setFaith(spiritual, 'test_deity', NaN);
@@ -369,7 +383,7 @@ describe('Validation - Resource Pool Integrity', () => {
 });
 
 // Helper functions that should be implemented
-function validateResourcePool(pool: any): void {
+function validateResourcePool(pool: Record<string, unknown>): void {
   if (pool.locked < 0) {
     throw new Error('locked cannot be negative');
   }
@@ -385,11 +399,11 @@ function clampLocked(pool: any, value: number): number {
   return Math.max(0, Math.min(pool.current, value));
 }
 
-function getAvailableResource(pool: any): number {
+function getAvailableResource(pool: Record<string, unknown>): number {
   return Math.max(0, pool.current - pool.locked);
 }
 
-function validateAndFixResourcePool(pool: any): any {
+function validateAndFixResourcePool(pool: Record<string, unknown>): any {
   const fixed = { ...pool };
   fixed.current = Math.max(0, Math.min(fixed.maximum, fixed.current));
   fixed.locked = Math.max(0, Math.min(fixed.current, fixed.locked));
@@ -462,14 +476,14 @@ function setFaith(spiritual: SpiritualComponent, deityId: string, value: number)
     throw new Error('Faith must be between 0 and 1');
   }
   if (!spiritual.beliefs[deityId]) {
-    spiritual.beliefs[deityId] = { faith: 0, devotion: 0 } as any;
+    spiritual.beliefs[deityId] = { faith: 0, devotion: 0 } as Record<string, unknown>;
   }
   spiritual.beliefs[deityId].faith = value;
 }
 
 function adjustFaith(spiritual: SpiritualComponent, deityId: string, delta: number): void {
   if (!spiritual.beliefs[deityId]) {
-    spiritual.beliefs[deityId] = { faith: 0, devotion: 0 } as any;
+    spiritual.beliefs[deityId] = { faith: 0, devotion: 0 } as Record<string, unknown>;
   }
   const newFaith = spiritual.beliefs[deityId].faith + delta;
   spiritual.beliefs[deityId].faith = clampFaith(newFaith);

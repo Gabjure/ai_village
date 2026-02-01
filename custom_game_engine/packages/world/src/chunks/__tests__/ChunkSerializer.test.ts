@@ -10,6 +10,12 @@ import type { Chunk } from '../Chunk.js';
 import type { Tile } from '../Tile.js';
 import type { SerializedChunk } from '../types.js';
 
+// Helper function to access private deserializeChunk method for testing
+function deserializeChunk(serializer: ChunkSerializer, serialized: SerializedChunk): Chunk {
+  // @ts-expect-error Accessing private method for testing purposes
+  return (serializer as { deserializeChunk(s: SerializedChunk): Chunk }).deserializeChunk(serialized);
+}
+
 describe('ChunkSerializer', () => {
   let serializer: ChunkSerializer;
 
@@ -23,7 +29,7 @@ describe('ChunkSerializer', () => {
       chunk.generated = true;
 
       const serialized = serializer.serializeChunk(chunk);
-      const deserialized = (serializer as any).deserializeChunk(serialized);
+      const deserialized = deserializeChunk(serializer, serialized);
 
       expect(deserialized.tiles.length).toBe(CHUNK_SIZE * CHUNK_SIZE);
       expect(deserialized.tiles[0]!.terrain).toBe('grass');
@@ -54,7 +60,7 @@ describe('ChunkSerializer', () => {
       tile.plantId = 'plant_123';
 
       const serialized = serializer.serializeChunk(chunk);
-      const deserialized = (serializer as any).deserializeChunk(serialized);
+      const deserialized = deserializeChunk(serializer, serialized);
 
       const deserializedTile = deserialized.tiles[0]!;
       expect(deserializedTile.terrain).toBe('water');
@@ -97,7 +103,7 @@ describe('ChunkSerializer', () => {
       chunk.generated = true;
 
       const serialized = serializer.serializeChunk(chunk);
-      const deserialized = (serializer as any).deserializeChunk(serialized);
+      const deserialized = deserializeChunk(serializer, serialized);
 
       expect(deserialized.tiles.length).toBe(CHUNK_SIZE * CHUNK_SIZE);
       expect(deserialized.tiles.every((t: Tile) => t.terrain === 'water')).toBe(true);
@@ -154,7 +160,7 @@ describe('ChunkSerializer', () => {
       chunk.tiles[300]!.elevation = 50;
 
       const serialized = serializer.serializeChunk(chunk);
-      const deserialized = (serializer as any).deserializeChunk(serialized);
+      const deserialized = deserializeChunk(serializer, serialized);
 
       expect(deserialized.tiles[100]!.terrain).toBe('water');
       expect(deserialized.tiles[200]!.terrain).toBe('stone');
@@ -193,7 +199,7 @@ describe('ChunkSerializer', () => {
       }
 
       const serialized = serializer.serializeChunk(chunk);
-      const deserialized = (serializer as any).deserializeChunk(serialized);
+      const deserialized = deserializeChunk(serializer, serialized);
 
       for (let i = 0; i < CHUNK_SIZE * CHUNK_SIZE; i++) {
         expect(deserialized.tiles[i]!.elevation).toBe(i);
@@ -382,7 +388,8 @@ describe('ChunkSerializer', () => {
         generatedChunkCount: 1,
         chunkIndex: [],
         chunks: {
-          '0,0': invalidChunk as unknown as SerializedChunk,
+          // Testing invalid chunk structure - deliberately incomplete
+          '0,0': invalidChunk,
         },
         checksums: {
           overall: 'fake',
@@ -390,6 +397,7 @@ describe('ChunkSerializer', () => {
         },
       };
 
+      // @ts-expect-error Testing deserialization with invalid chunk structure (data: null)
       await serializer.deserializeChunks(invalidSnapshot, chunkManager);
 
       // Should create corrupted marker instead of crashing
@@ -484,7 +492,8 @@ function createUniformChunk(x: number, y: number, terrain: string): Chunk {
   const chunk = createChunk(x, y);
 
   for (let i = 0; i < CHUNK_SIZE * CHUNK_SIZE; i++) {
-    chunk.tiles[i]!.terrain = terrain as any;
+    // Type assertion needed for test helper - terrain parameter is any string for testing
+    chunk.tiles[i]!.terrain = terrain as Tile['terrain'];
   }
 
   return chunk;

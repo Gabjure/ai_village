@@ -379,13 +379,15 @@ describe.skip('MenuContext', () => {
   describe('error handling', () => {
     it('should throw when world is missing', () => {
       expect(() => {
-        MenuContext.fromClick(null as any, camera, 400, 300);
+      // @ts-expect-error Testing null parameter validation
+        MenuContext.fromClick(null, camera, 400, 300);
       }).toThrow('world');
     });
 
     it('should throw when camera is missing', () => {
       expect(() => {
-        MenuContext.fromClick(world, null as any, 400, 300);
+      // @ts-expect-error Testing null parameter validation
+        MenuContext.fromClick(world, null, 400, 300);
       }).toThrow('camera');
     });
 

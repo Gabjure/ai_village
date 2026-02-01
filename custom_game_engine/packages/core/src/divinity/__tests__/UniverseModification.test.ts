@@ -696,7 +696,7 @@ describe('UniverseModification', () => {
       expect(intent.category).toBe('source');
       expect(intent.operation).toBe('add');
       expect(intent.magnitude).toBe('moderate');
-      expect((intent.changes as any).source).toEqual(newSource);
+      expect((intent.changes as Record<string, unknown>).source).toEqual(newSource);
     });
 
     it('should use major magnitude for non-minor sources', () => {
@@ -723,8 +723,8 @@ describe('UniverseModification', () => {
       expect(intent.category).toBe('law');
       expect(intent.operation).toBe('weaken');
       expect(intent.magnitude).toBe('absolute');
-      expect((intent.changes as any).lawId).toBe('conservation');
-      expect((intent.changes as any).changes.strictness).toBe('weak');
+      expect((intent.changes as Record<string, unknown>).lawId).toBe('conservation');
+      expect((intent.changes as Record<string, unknown>).changes.strictness).toBe('weak');
     });
   });
 
@@ -735,7 +735,7 @@ describe('UniverseModification', () => {
       expect(intent.category).toBe('technique');
       expect(intent.operation).toBe('add');
       expect(intent.magnitude).toBe('moderate');
-      expect((intent.changes as any).technique).toBe('travel');
+      expect((intent.changes as Record<string, unknown>).technique).toBe('travel');
     });
   });
 
@@ -752,9 +752,9 @@ describe('UniverseModification', () => {
       expect(intent.category).toBe('combination');
       expect(intent.operation).toBe('add');
       expect(intent.magnitude).toBe('major');
-      expect((intent.changes as any).resonant.technique).toBe('transform');
-      expect((intent.changes as any).resonant.form).toBe('time');
-      expect((intent.changes as any).resonant.bonusEffect).toBe('Can now manipulate time');
+      expect((intent.changes as Record<string, unknown>).resonant.technique).toBe('transform');
+      expect((intent.changes as Record<string, unknown>).resonant.form).toBe('time');
+      expect((intent.changes as Record<string, unknown>).resonant.bonusEffect).toBe('Can now manipulate time');
     });
   });
 
@@ -765,7 +765,7 @@ describe('UniverseModification', () => {
       expect(intent.category).toBe('scaling');
       expect(intent.operation).toBe('modify');
       expect(intent.magnitude).toBe('absolute');
-      expect((intent.changes as any).newScaling).toBe('exponential');
+      expect((intent.changes as Record<string, unknown>).newScaling).toBe('exponential');
     });
   });
 

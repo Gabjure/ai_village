@@ -11,6 +11,20 @@ import { VRSystem } from '../VRSystem.js';
 import { createVRSystemComponent } from '../VRSystemComponent.js';
 import { ComponentType as CT } from '../../types/ComponentType.js';
 
+// Type helpers for testing
+type EntityWithMethods = {
+  addComponent?: (comp: unknown) => void;
+  updateComponent?: (type: string, updater: (current: unknown) => unknown) => void;
+  getComponent?: (type: string) => unknown;
+  hasComponent?: (type: string) => boolean;
+};
+type WorldWithMethods = Record<string, unknown> & {
+  getEntity?: (id: string) => unknown;
+  addEntity?: (entity: unknown) => void;
+  query?: unknown;
+  getSystem?: (name: string) => unknown;
+};
+
 describe('VRSystem Integration Tests', () => {
   let harness: IntegrationTestHarness;
   let system: VRSystem;
@@ -195,7 +209,7 @@ describe('VRSystem Integration Tests', () => {
       expect(vrComp.active_sessions).toHaveLength(1);
 
       // Advance world tick past UPDATE_INTERVAL and session duration
-      (harness.world as any)._tick = 25; // Past UPDATE_INTERVAL (20) and session duration (1)
+      (harness.world as Record<string, unknown>)._tick = 25; // Past UPDATE_INTERVAL (20) and session duration (1)
       system.update(harness.world, [vrEntity], 0.05);
 
       // Session should be ended

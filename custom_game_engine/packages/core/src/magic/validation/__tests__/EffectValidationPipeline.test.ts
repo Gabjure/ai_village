@@ -48,7 +48,7 @@ describe('EffectValidationPipeline', () => {
         timing: {
           type: 'immediate',
         },
-      } as any;
+      } as Record<string, unknown>;
 
       const result = pipeline.validate(effect);
       expect(result.valid).toBe(false);
@@ -66,7 +66,7 @@ describe('EffectValidationPipeline', () => {
       const effect = {
         target: { type: 'single' },
         timing: { type: 'immediate' },
-      } as any;
+      } as Record<string, unknown>;
 
       const result = pipeline.validate(effect);
       expect(result.valid).toBe(false);
@@ -84,7 +84,7 @@ describe('EffectValidationPipeline', () => {
       const effect = {
         target: { type: 'single' },
         operations: [{ op: 'deal_damage', damageType: 'fire', amount: 50 }],
-      } as any;
+      } as Record<string, unknown>;
 
       const result = pipeline.validate(effect);
       expect(result.valid).toBe(false);
@@ -119,7 +119,8 @@ describe('EffectValidationPipeline', () => {
 
     it('should fail when target type is invalid', () => {
       const effect: EffectExpression = {
-        target: { type: 'invalid_type' as any },
+        target: { type: // @ts-expect-error Testing invalid value validation
+      'invalid_type' },
         operations: [{ op: 'deal_damage', damageType: 'fire', amount: 50 }],
         timing: { type: 'immediate' },
       };
@@ -140,7 +141,8 @@ describe('EffectValidationPipeline', () => {
       const effect: EffectExpression = {
         target: { type: 'single' },
         operations: [{ op: 'deal_damage', damageType: 'fire', amount: 50 }],
-        timing: { type: 'invalid_timing' as any },
+        timing: { type: // @ts-expect-error Testing invalid value validation
+      'invalid_timing' },
       };
 
       const result = pipeline.validate(effect);
@@ -158,7 +160,8 @@ describe('EffectValidationPipeline', () => {
     it('should fail when damage type is invalid', () => {
       const effect: EffectExpression = {
         target: { type: 'single' },
-        operations: [{ op: 'deal_damage', damageType: 'invalid_damage' as any, amount: 50 }],
+        operations: [{ op: 'deal_damage', damageType: // @ts-expect-error Testing invalid value validation
+      'invalid_damage', amount: 50 }],
         timing: { type: 'immediate' },
       };
 
@@ -177,7 +180,8 @@ describe('EffectValidationPipeline', () => {
     it('should fail when operation is missing required fields', () => {
       const effect: EffectExpression = {
         target: { type: 'single' },
-        operations: [{ op: 'modify_stat' } as any], // Missing stat and amount
+        // @ts-expect-error Testing operation with missing required fields (stat and amount)
+        operations: [{ op: 'modify_stat' }],
         timing: { type: 'immediate' },
       };
 
@@ -384,7 +388,8 @@ describe('EffectValidationPipeline', () => {
           {
             op: 'deal_damage',
             damageType: 'fire',
-            amount: '__proto__.pollute' as any,
+            amount: // @ts-expect-error Testing invalid value validation
+      '__proto__.pollute',
           },
         ],
         timing: { type: 'immediate' },
@@ -674,7 +679,7 @@ describe('EffectValidationPipeline', () => {
     it('should stop at first failing stage (schema)', () => {
       const effect = {
         // Missing target, operations, and timing
-      } as any;
+      } as Record<string, unknown>;
 
       const result = pipeline.validate(effect);
       expect(result.valid).toBe(false);

@@ -6,6 +6,20 @@ import { AnimalSystem } from '../systems/AnimalSystem.js';
 import { ANIMAL_SPECIES } from '../data/animalSpecies.js';
 
 import { ComponentType } from '../types/ComponentType.js';
+// Type helpers for testing
+type EntityWithMethods = {
+  addComponent?: (comp: unknown) => void;
+  updateComponent?: (type: string, updater: (current: unknown) => unknown) => void;
+  getComponent?: (type: string) => unknown;
+  hasComponent?: (type: string) => boolean;
+};
+type WorldWithMethods = Record<string, unknown> & {
+  getEntity?: (id: string) => unknown;
+  addEntity?: (entity: unknown) => void;
+  query?: unknown;
+  getSystem?: (name: string) => unknown;
+};
+
 describe('Animal System', () => {
   let world: World;
   let animalSystem: AnimalSystem;
@@ -114,7 +128,7 @@ describe('Animal System', () => {
         bondLevel: 50,
         trustLevel: 50,
       });
-      (entity as any).addComponent(component);
+      entity.addComponent(component);
 
       const entities = [entity];
       animalSystem.update(world, entities, 1);
@@ -144,7 +158,7 @@ describe('Animal System', () => {
         bondLevel: 50,
         trustLevel: 50,
       });
-      (entity as any).addComponent(component);
+      entity.addComponent(component);
 
       const entities = world.query().with(ComponentType.Animal).executeEntities();
       animalSystem.update(world, entities, 1);
@@ -174,7 +188,7 @@ describe('Animal System', () => {
         bondLevel: 50,
         trustLevel: 50,
       });
-      (entity as any).addComponent(component);
+      entity.addComponent(component);
 
       const entities = world.query().with(ComponentType.Animal).executeEntities();
       animalSystem.update(world, entities, 1);
@@ -204,7 +218,7 @@ describe('Animal System', () => {
         bondLevel: 0,
         trustLevel: 0,
       });
-      (entity as any).addComponent(component);
+      entity.addComponent(component);
 
       const entities = world.query().with(ComponentType.Animal).executeEntities();
       animalSystem.update(world, entities, 1);
@@ -236,7 +250,7 @@ describe('Animal System', () => {
         bondLevel: 50,
         trustLevel: 50,
       });
-      (entity as any).addComponent(component);
+      entity.addComponent(component);
 
       const animal = entity.getComponent(ComponentType.Animal) as AnimalComponent;
       const initialHunger = animal.hunger;
@@ -272,7 +286,7 @@ describe('Animal System', () => {
         bondLevel: 50,
         trustLevel: 50,
       });
-      (entity as any).addComponent(component);
+      entity.addComponent(component);
 
       const animal = entity.getComponent(ComponentType.Animal) as AnimalComponent;
       const initialThirst = animal.thirst;
@@ -308,7 +322,7 @@ describe('Animal System', () => {
         bondLevel: 50,
         trustLevel: 50,
       });
-      (entity as any).addComponent(component);
+      entity.addComponent(component);
 
       const animal = entity.getComponent(ComponentType.Animal) as AnimalComponent;
       const initialEnergy = animal.energy;
@@ -344,7 +358,7 @@ describe('Animal System', () => {
         bondLevel: 50,
         trustLevel: 50,
       });
-      (entity as any).addComponent(component);
+      entity.addComponent(component);
 
       const animal = entity.getComponent(ComponentType.Animal) as AnimalComponent;
       const initialEnergy = animal.energy;
@@ -383,7 +397,7 @@ describe('Animal System', () => {
         bondLevel: 50,
         trustLevel: 50,
       });
-      (entity as any).addComponent(component);
+      entity.addComponent(component);
 
       // Advance time to trigger maturation (simulate 1 day passing)
       // deltaTime in seconds: 86400 seconds = 1 day
@@ -419,7 +433,7 @@ describe('Animal System', () => {
         bondLevel: 0,
         trustLevel: 0,
       });
-      (entity as any).addComponent(component);
+      entity.addComponent(component);
 
       // Simulate agent approaching (increase stress)
       const animal = entity.getComponent(ComponentType.Animal) as AnimalComponent;
@@ -452,7 +466,7 @@ describe('Animal System', () => {
         bondLevel: 0,
         trustLevel: 0,
       });
-      (entity as any).addComponent(component);
+      entity.addComponent(component);
 
       const entities = world.query().with(ComponentType.Animal).executeEntities();
       animalSystem.update(world, entities, 1);
@@ -489,7 +503,7 @@ describe('Animal System', () => {
       };
 
       // Force add invalid component for testing
-      (entity as any).components.set('animal', invalidAnimal);
+      (entity as Record<string, unknown>).components.set('animal', invalidAnimal);
 
       expect(() => {
         const entities = world.query().with(ComponentType.Animal).executeEntities();

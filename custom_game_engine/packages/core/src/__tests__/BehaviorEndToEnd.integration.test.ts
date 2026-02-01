@@ -53,7 +53,7 @@ function createFullAgent(
   const agent = harness.createTestAgent(position);
   agent.addComponent(createMovementComponent(0, 0, 2.0)); // speed = 2
   // Pass NO_PRIORITIES when we need stable behavior for testing individual behaviors
-  agent.addComponent(createAgentComponent(behavior as any, 1, false, 0, stableBehavior ? NO_PRIORITIES : undefined)); // thinkInterval=1
+  agent.addComponent(createAgentComponent(behavior as unknown, 1, false, 0, stableBehavior ? NO_PRIORITIES : undefined)); // thinkInterval=1
   agent.addComponent(createInventoryComponent());
   agent.addComponent(new NeedsComponent({
     hunger: 1.0,
@@ -280,7 +280,7 @@ describe('Behavior End-to-End Integration Tests', () => {
 
         // Check inventory has resources
         const inventory = agent.getComponent(ComponentType.Inventory)!;
-        const hasStone = inventory.slots.some((s: any) => s.itemId === 'stone' && s.quantity > 0);
+        const hasStone = inventory.slots.some((s: Record<string, unknown>) => s.itemId === 'stone' && s.quantity > 0);
 
         // Either inventory has resources OR resource was depleted
         const resourceComp = resource.getComponent(ComponentType.Resource)!;
@@ -356,7 +356,7 @@ describe('Behavior End-to-End Integration Tests', () => {
         const seedEvents = harness.getEmittedEvents('seed:gathered');
         const inventory = agent.getComponent(ComponentType.Inventory)!;
         // Filter out null/undefined itemIds before checking
-        const hasSeeds = inventory.slots.some((s: any) => s.itemId && s.itemId.startsWith('seed-'));
+        const hasSeeds = inventory.slots.some((s: Record<string, unknown>) => s.itemId && s.itemId.startsWith('seed-'));
 
         // Either seeds were gathered OR events were emitted OR plant was visited (behavior executed)
         expect(hasSeeds || seedEvents.length > 0 || agent.getComponent(ComponentType.Agent)!.behavior === 'gather').toBe(true);
@@ -483,7 +483,7 @@ describe('Behavior End-to-End Integration Tests', () => {
         // Test that processDecision returns seek_food
         harness.world.advanceTick();
         const agentForDecision = agent.getComponent(ComponentType.Agent)!;
-        const processDecision = (aiSystem as any).processDecision.bind(aiSystem);
+        const processDecision = (aiSystem as Record<string, unknown>).processDecision.bind(aiSystem);
         const decisionResult = processDecision(agent, harness.world, agentForDecision);
 
         // processDecision should return seek_food behavior
@@ -575,7 +575,7 @@ describe('Behavior End-to-End Integration Tests', () => {
 
         const inventory = agent.getComponent(ComponentType.Inventory)!;
         const woodGathered = inventory.slots
-          .filter((s: any) => s.itemId === 'wood')
+          .filter((s: Record<string, unknown>) => s.itemId === 'wood')
           .reduce((sum: number, s: any) => sum + s.quantity, 0);
 
         // Agent should have gathered something (but at reduced speed)
@@ -821,7 +821,8 @@ describe('Behavior End-to-End Integration Tests', () => {
     it('should handle agent without inventory gracefully when gathering', () => {
       const agent = harness.createTestAgent({ x: 10, y: 10 });
       agent.addComponent(createMovementComponent(0, 0, 2.0));
-      agent.addComponent(createAgentComponent('gather' as any, 1, false, 0));
+      agent.addComponent(createAgentComponent(// @ts-expect-error Testing invalid value validation
+      'gather', 1, false, 0));
       agent.addComponent(new NeedsComponent({
     hunger: 1.0,
     energy: 1.0,
@@ -855,7 +856,8 @@ describe('Behavior End-to-End Integration Tests', () => {
       // entities than crash the entire update loop. Behaviors that need position
       // will gracefully skip or fall back to safe behaviors.
       const agent = new EntityImpl(createEntityId(), 0);
-      agent.addComponent(createAgentComponent('wander' as any, 1, false, 0));
+      agent.addComponent(createAgentComponent(// @ts-expect-error Testing invalid value validation
+      'wander', 1, false, 0));
       agent.addComponent(createMovementComponent(0, 0, 2.0));
       agent.addComponent(new NeedsComponent({
         hunger: 1.0,

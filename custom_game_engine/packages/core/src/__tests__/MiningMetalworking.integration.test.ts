@@ -45,11 +45,11 @@ describe('Mining & Metalworking System Integration Tests', () => {
       expect(deposit.hasComponent(ComponentType.Tags)).toBe(true);
       expect(deposit.hasComponent(ComponentType.Resource)).toBe(true);
 
-      const position = deposit.getComponent(ComponentType.Position) as any;
+      const position = deposit.getComponent(ComponentType.Position);
       expect(position.x).toBe(10);
       expect(position.y).toBe(15);
 
-      const resource = deposit.getComponent(ComponentType.Resource) as any;
+      const resource = deposit.getComponent(ComponentType.Resource);
       expect(resource.resourceType).toBe('iron_ore');
       expect(resource.amount).toBe(75);
       expect(resource.regenerationRate).toBe(0); // Finite resource
@@ -58,7 +58,7 @@ describe('Mining & Metalworking System Integration Tests', () => {
     it('should create coal deposit with no regeneration', () => {
       const deposit = createOreDeposit(harness, 'coal', 5, 5, 60);
 
-      const resource = deposit.getComponent(ComponentType.Resource) as any;
+      const resource = deposit.getComponent(ComponentType.Resource);
       expect(resource.resourceType).toBe('coal');
       expect(resource.amount).toBe(60);
       expect(resource.maxAmount).toBe(60);
@@ -68,7 +68,7 @@ describe('Mining & Metalworking System Integration Tests', () => {
     it('should create copper deposit with correct tags', () => {
       const deposit = createOreDeposit(harness, 'copper_ore', 20, 20, 45);
 
-      const tags = deposit.getComponent(ComponentType.Tags) as any;
+      const tags = deposit.getComponent(ComponentType.Tags);
       expect(tags.tags).toContain('copper_deposit');
       expect(tags.tags).toContain('minable');
       expect(tags.tags).toContain('obstacle');
@@ -77,7 +77,7 @@ describe('Mining & Metalworking System Integration Tests', () => {
     it('should create gold deposit as rare resource', () => {
       const deposit = createOreDeposit(harness, 'gold_ore', 30, 30, 20);
 
-      const resource = deposit.getComponent(ComponentType.Resource) as any;
+      const resource = deposit.getComponent(ComponentType.Resource);
       expect(resource.resourceType).toBe('gold_ore');
       expect(resource.amount).toBe(20);
       expect(resource.harvestable).toBe(true);
@@ -86,7 +86,7 @@ describe('Mining & Metalworking System Integration Tests', () => {
     it('should make deposit solid physics obstacle', () => {
       const deposit = createOreDeposit(harness, 'iron_ore', 0, 0, 50);
 
-      const physics = deposit.getComponent(ComponentType.Physics) as any;
+      const physics = deposit.getComponent(ComponentType.Physics);
       expect(physics.solid).toBe(true);
     });
   });
@@ -301,7 +301,7 @@ describe('Mining & Metalworking System Integration Tests', () => {
       stateMutator.update(harness.world, entities, 60.0);
 
       // Verify ore did NOT regenerate (regenerationRate = 0)
-      const resource = deposit.getComponent(ComponentType.Resource) as any;
+      const resource = deposit.getComponent(ComponentType.Resource);
       expect(resource.amount).toBe(50); // Still 50, no regen
     });
 
@@ -314,7 +314,7 @@ describe('Mining & Metalworking System Integration Tests', () => {
         amount: 0,
       }));
 
-      const resource = deposit.getComponent(ComponentType.Resource) as any;
+      const resource = deposit.getComponent(ComponentType.Resource);
       expect(resource.amount).toBe(0);
       expect(resource.harvestable).toBe(true); // Still marked harvestable (empty)
     });
@@ -363,7 +363,7 @@ describe('Mining & Metalworking System Integration Tests', () => {
 
       harness.eventBus.flush();
 
-      const building = forge.getComponent(ComponentType.Building) as any;
+      const building = forge.getComponent(ComponentType.Building);
       expect(building.fuelRequired).toBe(true);
     });
   });
@@ -489,15 +489,15 @@ function createOreDeposit(
 ): EntityImpl {
   const entity = new EntityImpl(createEntityId(), 0);
 
-  (entity as any).addComponent(createPositionComponent(x, y));
-  (entity as any).addComponent(createPhysicsComponent(true, 1, 1));
+  entity.addComponent(createPositionComponent(x, y));
+  entity.addComponent(createPhysicsComponent(true, 1, 1));
 
   // Map resource type to deposit type for tags
   const depositTag = resourceType === 'coal' ? 'coal_deposit' : `${resourceType.replace('_ore', '')}_deposit`;
 
-  (entity as any).addComponent(createRenderableComponent(depositTag, 'object'));
-  (entity as any).addComponent(createTagsComponent(depositTag, 'obstacle', 'minable'));
-  (entity as any).addComponent(createResourceComponent(resourceType, amount, 0)); // 0 = no regen
+  entity.addComponent(createRenderableComponent(depositTag, 'object'));
+  entity.addComponent(createTagsComponent(depositTag, 'obstacle', 'minable'));
+  entity.addComponent(createResourceComponent(resourceType, amount, 0)); // 0 = no regen
 
   harness.world.addEntity(entity);
 

@@ -57,7 +57,7 @@ describe('MovementSystem + SteeringSystem Integration', () => {
     const steeringEntities = harness.world.query().with(ComponentType.Steering).with(ComponentType.Position).with(ComponentType.Velocity).executeEntities();
     steeringSystem.update(harness.world, steeringEntities, 1.0);
 
-    const velocityAfterSteering = agent.getComponent(ComponentType.Velocity) as any;
+    const velocityAfterSteering = agent.getComponent(ComponentType.Velocity);
 
     // Velocity should be set toward target
     expect(velocityAfterSteering.vx).toBeGreaterThan(0);
@@ -70,7 +70,7 @@ describe('MovementSystem + SteeringSystem Integration', () => {
       velocityY: velocityAfterSteering.vy,
     }));
 
-    const initialPosition = agent.getComponent(ComponentType.Position) as any;
+    const initialPosition = agent.getComponent(ComponentType.Position);
     const startX = initialPosition.x;
     const startY = initialPosition.y;
 
@@ -78,7 +78,7 @@ describe('MovementSystem + SteeringSystem Integration', () => {
     const movementEntities = harness.world.query().with(ComponentType.Movement).with(ComponentType.Position).executeEntities();
     movementSystem.update(harness.world, movementEntities, 1/60);
 
-    const finalPosition = agent.getComponent(ComponentType.Position) as any;
+    const finalPosition = agent.getComponent(ComponentType.Position);
 
     // Position should have changed
     expect(finalPosition.x).toBeGreaterThan(startX);
@@ -101,7 +101,7 @@ describe('MovementSystem + SteeringSystem Integration', () => {
     const movementSystem = new MovementSystem();
     harness.registerSystem('MovementSystem', movementSystem);
 
-    const initialPosition = agent.getComponent(ComponentType.Position) as any;
+    const initialPosition = agent.getComponent(ComponentType.Position);
     const startX = initialPosition.x;
     const startY = initialPosition.y;
 
@@ -109,7 +109,7 @@ describe('MovementSystem + SteeringSystem Integration', () => {
     const entities = harness.world.query().with(ComponentType.Movement).with(ComponentType.Position).executeEntities();
     movementSystem.update(harness.world, entities, 1/60);
 
-    const finalPosition = agent.getComponent(ComponentType.Position) as any;
+    const finalPosition = agent.getComponent(ComponentType.Position);
 
     const distanceMoved = Math.sqrt(
       Math.pow(finalPosition.x - startX, 2) + Math.pow(finalPosition.y - startY, 2)
@@ -138,7 +138,7 @@ describe('MovementSystem + SteeringSystem Integration', () => {
   }));
 
     const circadian = createCircadianComponent();
-    (circadian as any).isSleeping = true; // Agent is sleeping
+    (circadian as { isSleeping?: boolean }).isSleeping = true; // Agent is sleeping
     agent.addComponent(circadian);
 
     const movementSystem = new MovementSystem();
@@ -148,7 +148,7 @@ describe('MovementSystem + SteeringSystem Integration', () => {
     const entities = harness.world.query().with(ComponentType.Movement).with(ComponentType.Position).executeEntities();
     movementSystem.update(harness.world, entities, 1/60);
 
-    const movement = agent.getComponent(ComponentType.Movement) as any;
+    const movement = agent.getComponent(ComponentType.Movement);
 
     // Velocity should be forced to 0 while sleeping
     expect(movement.velocityX).toBe(0);
@@ -172,7 +172,7 @@ describe('MovementSystem + SteeringSystem Integration', () => {
     const movementSystem = new MovementSystem();
     harness.registerSystem('MovementSystem', movementSystem);
 
-    const initialPosition = agent.getComponent(ComponentType.Position) as any;
+    const initialPosition = agent.getComponent(ComponentType.Position);
     const startX = initialPosition.x;
     const startY = initialPosition.y;
 
@@ -180,7 +180,7 @@ describe('MovementSystem + SteeringSystem Integration', () => {
     const entities = harness.world.query().with(ComponentType.Movement).with(ComponentType.Position).executeEntities();
     movementSystem.update(harness.world, entities, 1/60);
 
-    const finalPosition = agent.getComponent(ComponentType.Position) as any;
+    const finalPosition = agent.getComponent(ComponentType.Position);
 
     // Agent should not have moved through the obstacle
     // Either stopped or moved around it
@@ -212,7 +212,7 @@ describe('MovementSystem + SteeringSystem Integration', () => {
     const entities = harness.world.query().with(ComponentType.Steering).with(ComponentType.Position).with(ComponentType.Velocity).executeEntities();
     steeringSystem.update(harness.world, entities, 1.0);
 
-    const velocity = agent.getComponent(ComponentType.Velocity) as any;
+    const velocity = agent.getComponent(ComponentType.Velocity);
 
     // Velocity should be reduced as agent is close to target
     expect(velocity.vx).toBeLessThan(2.0);
@@ -241,7 +241,7 @@ describe('MovementSystem + SteeringSystem Integration', () => {
       steeringSystem.update(harness.world, entities, 1.0);
     }
 
-    const velocity = agent.getComponent(ComponentType.Velocity) as any;
+    const velocity = agent.getComponent(ComponentType.Velocity);
 
     // Velocity should have changed due to wandering
     const speed = Math.sqrt(velocity.vx * velocity.vx + velocity.vy * velocity.vy);
@@ -280,7 +280,7 @@ describe('MovementSystem + SteeringSystem Integration', () => {
     const entities = harness.world.query().with(ComponentType.Steering).with(ComponentType.Position).with(ComponentType.Velocity).executeEntities();
     steeringSystem.update(harness.world, entities, 1.0);
 
-    const velocity = agent.getComponent(ComponentType.Velocity) as any;
+    const velocity = agent.getComponent(ComponentType.Velocity);
 
     // Velocity should be adjusted to avoid obstacle
     expect(velocity).toBeDefined();

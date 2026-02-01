@@ -4,6 +4,20 @@ import type { Entity } from '@ai-village/core';
 import { EventBusImpl } from '@ai-village/core/events/EventBus';
 import { ThreatIndicatorRenderer } from '../ThreatIndicatorRenderer.js';
 
+// Type helpers for testing
+type EntityWithMethods = {
+  addComponent?: (comp: unknown) => void;
+  updateComponent?: (type: string, updater: (current: unknown) => unknown) => void;
+  getComponent?: (type: string) => unknown;
+  hasComponent?: (type: string) => boolean;
+};
+type WorldWithMethods = Record<string, unknown> & {
+  getEntity?: (id: string) => unknown;
+  addEntity?: (entity: unknown) => void;
+  query?: unknown;
+  getSystem?: (name: string) => unknown;
+};
+
 describe('ThreatIndicatorRenderer', () => {
   let world: World;
   let canvas: HTMLCanvasElement;
@@ -116,7 +130,8 @@ describe('ThreatIndicatorRenderer', () => {
       wolf.addComponent('position', { x: 100, y: 100 });
 
       world.eventBus.emit({
-        type: 'conflict:started' as any,
+        type: // @ts-expect-error Testing invalid value validation
+      'conflict:started',
         source: 'test',
         data: {
           conflictId: 'pred-1',
@@ -145,7 +160,8 @@ describe('ThreatIndicatorRenderer', () => {
       raider.addComponent('position', { x: 200, y: 200 });
 
       world.eventBus.emit({
-        type: 'conflict:started' as any,
+        type: // @ts-expect-error Testing invalid value validation
+      'conflict:started',
         source: 'test',
         data: {
           conflictId: 'combat-1',
@@ -173,7 +189,8 @@ describe('ThreatIndicatorRenderer', () => {
       });
 
       world.eventBus.emit({
-        type: 'conflict:started' as any,
+        type: // @ts-expect-error Testing invalid value validation
+      'conflict:started',
         source: 'test',
         data: {
           conflictId: 'threat-1',
@@ -326,7 +343,8 @@ describe('ThreatIndicatorRenderer', () => {
 
         // Emit event to track threat
         world.eventBus.emit({
-          type: 'conflict:started' as any,
+          type: // @ts-expect-error Testing invalid value validation
+      'conflict:started',
           source: 'test',
           data: {
             conflictId: `threat-${i}`,
@@ -360,7 +378,8 @@ describe('ThreatIndicatorRenderer', () => {
 
         // Emit event to track threat
         world.eventBus.emit({
-          type: 'conflict:started' as any,
+          type: // @ts-expect-error Testing invalid value validation
+      'conflict:started',
           source: 'test',
           data: {
             conflictId: `threat-${i}`,
@@ -405,7 +424,7 @@ describe('ThreatIndicatorRenderer', () => {
     it('should throw when canvas context cannot be acquired', () => {
       const badCanvas = {
         getContext: () => null,
-      } as unknown as HTMLCanvasElement;
+      } as Partial<HTMLCanvasElement> as HTMLCanvasElement;
 
       expect(() => {
         new ThreatIndicatorRenderer(world, world.eventBus, badCanvas);
@@ -435,7 +454,8 @@ describe('ThreatIndicatorRenderer', () => {
       wolf.addComponent('position', { x: 100, y: 100 });
 
       world.eventBus.emit({
-        type: 'conflict:started' as any,
+        type: // @ts-expect-error Testing invalid value validation
+      'conflict:started',
         source: 'test',
         data: {
           conflictId: 'threat-1',
@@ -449,7 +469,8 @@ describe('ThreatIndicatorRenderer', () => {
       mockCtx.arc.mockClear();
 
       world.eventBus.emit({
-        type: 'conflict:resolved' as any,
+        type: // @ts-expect-error Testing invalid value validation
+      'conflict:resolved',
         source: 'test',
         data: {
           conflictId: 'threat-1',
@@ -475,7 +496,8 @@ describe('ThreatIndicatorRenderer', () => {
       });
 
       world.eventBus.emit({
-        type: 'conflict:started' as any,
+        type: // @ts-expect-error Testing invalid value validation
+      'conflict:started',
         source: 'test',
         data: {
           conflictId: 'threat-1',
@@ -488,7 +510,8 @@ describe('ThreatIndicatorRenderer', () => {
       mockCtx.arc.mockClear();
 
       world.eventBus.emit({
-        type: 'death:occurred' as any,
+        type: // @ts-expect-error Testing invalid value validation
+      'death:occurred',
         source: 'test',
         data: {
           entityId: threat.id,
@@ -514,7 +537,8 @@ describe('ThreatIndicatorRenderer', () => {
       });
 
       world.eventBus.emit({
-        type: 'conflict:started' as any,
+        type: // @ts-expect-error Testing invalid value validation
+      'conflict:started',
         source: 'test',
         data: {
           conflictId: 'threat-1',

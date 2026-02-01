@@ -5,6 +5,20 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { CraftingPanelUI } from '../CraftingPanelUI';
 import { World, EventBusImpl } from '@ai-village/core';
 
+// Type helpers for testing
+type EntityWithMethods = {
+  addComponent?: (comp: unknown) => void;
+  updateComponent?: (type: string, updater: (current: unknown) => unknown) => void;
+  getComponent?: (type: string) => unknown;
+  hasComponent?: (type: string) => boolean;
+};
+type WorldWithMethods = Record<string, unknown> & {
+  getEntity?: (id: string) => unknown;
+  addEntity?: (entity: unknown) => void;
+  query?: unknown;
+  getSystem?: (name: string) => unknown;
+};
+
 describe('CraftingPanelUI (REQ-CRAFT-001)', () => {
   let panel: CraftingPanelUI;
   let world: World;
@@ -58,11 +72,13 @@ describe('CraftingPanelUI (REQ-CRAFT-001)', () => {
     });
 
     it('should throw when initialized without world', () => {
-      expect(() => new CraftingPanelUI(null as any, canvas)).toThrow('World is required');
+      // @ts-expect-error Testing null parameter validation
+      expect(() => new CraftingPanelUI(null, canvas)).toThrow('World is required');
     });
 
     it('should throw when initialized without canvas', () => {
-      expect(() => new CraftingPanelUI(world, null as any)).toThrow('Canvas is required');
+      // @ts-expect-error Testing null parameter validation
+      expect(() => new CraftingPanelUI(world, null)).toThrow('Canvas is required');
     });
   });
 
@@ -420,7 +436,7 @@ describe('CraftingPanelUI (REQ-CRAFT-001)', () => {
     it('should throw when refresh is called without world', () => {
       // Create panel with invalid world
       const invalidPanel = new CraftingPanelUI(world, canvas);
-      (invalidPanel as any).world = null;
+      (invalidPanel as Record<string, unknown>).world = null;
 
       expect(() => invalidPanel.refresh()).toThrow('World is required');
     });

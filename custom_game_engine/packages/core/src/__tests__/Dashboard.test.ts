@@ -67,7 +67,8 @@ describe('ViewRegistry', () => {
     });
 
     it('should throw if view is missing', () => {
-      expect(() => registry.register(null as any)).toThrow('View is required');
+      // @ts-expect-error Testing null parameter validation
+      expect(() => registry.register(null)).toThrow('View is required');
     });
 
     it('should throw if view.id is missing', () => {
@@ -75,7 +76,7 @@ describe('ViewRegistry', () => {
         title: 'No ID',
         category: 'info',
         getData: () => ({ timestamp: Date.now(), available: true }),
-      } as any;
+      } as Record<string, unknown>;
 
       expect(() => registry.register(view)).toThrow('View must have an id');
     });
@@ -86,7 +87,7 @@ describe('ViewRegistry', () => {
         title: 'Empty ID',
         category: 'info',
         getData: () => ({ timestamp: Date.now(), available: true }),
-      } as any;
+      } as Record<string, unknown>;
 
       expect(() => registry.register(view)).toThrow('View id must be a non-empty string');
     });
@@ -96,7 +97,7 @@ describe('ViewRegistry', () => {
         id: 'no-title',
         category: 'info',
         getData: () => ({ timestamp: Date.now(), available: true }),
-      } as any;
+      } as Record<string, unknown>;
 
       expect(() => registry.register(view)).toThrow("View 'no-title' must have a title");
     });
@@ -106,7 +107,7 @@ describe('ViewRegistry', () => {
         id: 'no-category',
         title: 'No Category',
         getData: () => ({ timestamp: Date.now(), available: true }),
-      } as any;
+      } as Record<string, unknown>;
 
       expect(() => registry.register(view)).toThrow("View 'no-category' must have a category");
     });
@@ -116,7 +117,7 @@ describe('ViewRegistry', () => {
         id: 'no-getData',
         title: 'No getData',
         category: 'info',
-      } as any;
+      } as Record<string, unknown>;
 
       expect(() => registry.register(view)).toThrow("View 'no-getData' must have a getData function");
     });

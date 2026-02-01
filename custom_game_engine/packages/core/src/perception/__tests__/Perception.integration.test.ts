@@ -17,6 +17,20 @@ import { HearingProcessor } from '../HearingProcessor.js';
 import { MeetingDetector } from '../MeetingDetector.js';
 import { PerceptionProcessor } from '../index.js';
 
+// Type helpers for testing
+type EntityWithMethods = {
+  addComponent?: (comp: unknown) => void;
+  updateComponent?: (type: string, updater: (current: unknown) => unknown) => void;
+  getComponent?: (type: string) => unknown;
+  hasComponent?: (type: string) => boolean;
+};
+type WorldWithMethods = Record<string, unknown> & {
+  getEntity?: (id: string) => unknown;
+  addEntity?: (entity: unknown) => void;
+  query?: unknown;
+  getSystem?: (name: string) => unknown;
+};
+
 describe('Perception Integration Tests', () => {
   let harness: IntegrationTestHarness;
 
@@ -33,8 +47,8 @@ describe('Perception Integration Tests', () => {
       const agent = new EntityImpl(createEntityId(), 0);
       agent.addComponent(createPositionComponent(50, 50));
       const vision = createVisionComponent(30);
-      (vision as any).canSeeResources = true;
-      (vision as any).canSeeAgents = true;
+      (vision as { canSeeResources?: boolean }).canSeeResources = true;
+      (vision as Record<string, unknown>).canSeeAgents = true;
       agent.addComponent(vision);
       agent.addComponent(new SpatialMemoryComponent());
       agent.addComponent({
@@ -92,7 +106,7 @@ describe('Perception Integration Tests', () => {
       const agent = new EntityImpl(createEntityId(), 0);
       agent.addComponent(createPositionComponent(0, 0));
       const vision = createVisionComponent(25);
-      (vision as any).canSeeResources = true;
+      (vision as { canSeeResources?: boolean }).canSeeResources = true;
       agent.addComponent(vision);
       agent.addComponent(new SpatialMemoryComponent({ maxMemories: 100 })); // Store up to 100 memories
       harness.world.addEntity(agent);
@@ -120,15 +134,15 @@ describe('Perception Integration Tests', () => {
       visionProcessor.process(agent, harness.world);
 
       // Check memory was updated
-      const memory = agent.getComponent(ComponentType.SpatialMemory) as any;
+      const memory = agent.getComponent(ComponentType.SpatialMemory);
       expect(memory.memories.length).toBe(3);
 
       // Check memory contains resource locations
-      const resourceMemories = memory.memories.filter((m: any) => m.type === 'resource_location');
+      const resourceMemories = memory.memories.filter((m: Record<string, unknown>) => m.type === 'resource_location');
       expect(resourceMemories.length).toBe(3);
 
       // Verify memory positions
-      const woodMemory = resourceMemories.find((m: any) => m.metadata?.resourceType === 'wood');
+      const woodMemory = resourceMemories.find((m: Record<string, unknown>) => m.metadata?.resourceType === 'wood');
       expect(woodMemory).toBeDefined();
       expect(woodMemory.x).toBe(10);
       expect(woodMemory.y).toBe(0);
@@ -140,7 +154,7 @@ describe('Perception Integration Tests', () => {
       const agent = new EntityImpl(createEntityId(), 0);
       agent.addComponent(createPositionComponent(0, 0));
       const vision = createVisionComponent(20);
-      (vision as any).canSeeResources = true;
+      (vision as { canSeeResources?: boolean }).canSeeResources = true;
       agent.addComponent(vision);
       agent.addComponent(new SpatialMemoryComponent());
       harness.world.addEntity(agent);
@@ -161,7 +175,7 @@ describe('Perception Integration Tests', () => {
       expect(result.seenResources).toContain(resource.id);
 
       // Deplete resource
-      resource.updateComponent('resource', (current: any) => ({
+      resource.updateComponent('resource', (current: Record<string, unknown>) => ({
         ...current,
         amount: 0,
       }));
@@ -196,12 +210,12 @@ describe('Perception Integration Tests', () => {
       visionProcessor.process(agent, harness.world);
 
       // Check plant was seen
-      const updatedVision = agent.getComponent(ComponentType.Vision) as any;
+      const updatedVision = agent.getComponent(ComponentType.Vision);
       expect(updatedVision.seenPlants).toContain(plant.id);
 
       // Check memory contains plant info
-      const memory = agent.getComponent(ComponentType.SpatialMemory) as any;
-      const plantMemory = memory.memories.find((m: any) => m.type === 'plant_location');
+      const memory = agent.getComponent(ComponentType.SpatialMemory);
+      const plantMemory = memory.memories.find((m: Record<string, unknown>) => m.type === 'plant_location');
       expect(plantMemory).toBeDefined();
       expect(plantMemory.metadata.speciesId).toBe('blueberry-bush');
       expect(plantMemory.metadata.hasSeeds).toBe(true);
@@ -319,7 +333,7 @@ describe('Perception Integration Tests', () => {
 
       // Set up vision with meeting call
       const vision = createVisionComponent(30);
-      (vision as any).heardSpeech = [
+      (vision as Record<string, unknown>).heardSpeech = [
         { speaker: 'Leader', text: 'I am calling a meeting! Everyone gather around.' },
       ];
       listener.addComponent(vision);
@@ -361,7 +375,7 @@ describe('Perception Integration Tests', () => {
       expect(result.attending).toBe(true);
 
       // Verify behavior changed
-      const updatedAgent = listener.getComponent(ComponentType.Agent) as any;
+      const updatedAgent = listener.getComponent(ComponentType.Agent);
       expect(updatedAgent.behavior).toBe('attend_meeting');
       expect(updatedAgent.behaviorState.meetingCallerId).toBe('leader-id');
     });
@@ -378,7 +392,7 @@ describe('Perception Integration Tests', () => {
       });
 
       const vision = createVisionComponent(30);
-      (vision as any).heardSpeech = [
+      (vision as Record<string, unknown>).heardSpeech = [
         { speaker: 'Leader', text: 'Gather around everyone!' },
       ];
       sleepingAgent.addComponent(vision);
@@ -390,7 +404,7 @@ describe('Perception Integration Tests', () => {
       expect(result.detected).toBe(false);
 
       // Behavior should remain unchanged
-      const agent = sleepingAgent.getComponent(ComponentType.Agent) as any;
+      const agent = sleepingAgent.getComponent(ComponentType.Agent);
       expect(agent.behavior).toBe('forced_sleep');
     });
   });
@@ -402,8 +416,8 @@ describe('Perception Integration Tests', () => {
       const agent = new EntityImpl(createEntityId(), 0);
       agent.addComponent(createPositionComponent(0, 0));
       const vision = createVisionComponent(15);
-      (vision as any).canSeeResources = true;
-      (vision as any).canSeeAgents = true;
+      (vision as { canSeeResources?: boolean }).canSeeResources = true;
+      (vision as Record<string, unknown>).canSeeAgents = true;
       agent.addComponent(vision);
       agent.addComponent(new SpatialMemoryComponent());
       harness.world.addEntity(agent);
@@ -435,7 +449,7 @@ describe('Perception Integration Tests', () => {
       expect(result.seenResources).not.toContain(resource2.id);
 
       // Move agent to far position
-      agent.updateComponent('position', (current: any) => ({
+      agent.updateComponent('position', (current: Record<string, unknown>) => ({
         ...current,
         x: 100,
         y: 0,

@@ -323,7 +323,7 @@ describe('Phase 9: Soil/Tile System - Integration Tests', () => {
         // Missing nutrients
       };
 
-      const requireSoilData = (tile: any) => {
+      const requireSoilData = (tile: Record<string, unknown>) => {
         if (!tile.nutrients) {
           throw new Error('Tile missing required nutrients data');
         }
@@ -334,14 +334,14 @@ describe('Phase 9: Soil/Tile System - Integration Tests', () => {
 
     it('should throw error when tilling without biome data', () => {
       const tile = createTestTile('grass', 'plains');
-      delete (tile as any).biome;
+      delete (tile as Record<string, unknown>).biome;
 
       expect(() => soilSystem.tillTile(world, tile, 10, 10)).toThrow(/no biome data/);
     });
 
     it('should throw error when watering tile without nutrients', () => {
       const tile = createTestTile('grass', 'plains');
-      delete (tile as any).nutrients;
+      delete (tile as Record<string, unknown>).nutrients;
 
       expect(() => soilSystem.waterTile(world, tile, 10, 10)).toThrow(/missing required nutrients data/);
     });

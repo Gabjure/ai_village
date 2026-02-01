@@ -88,7 +88,7 @@ describe('University Research Integration', () => {
 
       // Run system for 10 ticks
       for (let i = 0; i < 10; i++) {
-        (world as any)._tick++;
+        (world as { _tick: number })._tick++;
         universitySystem.update(world, [university], 0);
       }
 
@@ -144,7 +144,7 @@ describe('University Research Integration', () => {
 
       // Run system until completion (1000 ticks to reach 100% at 0.1 per tick)
       for (let i = 0; i < 1000; i++) {
-        (world as any)._tick++;
+        (world as { _tick: number })._tick++;
         universitySystem.update(world, [university], 0);
       }
 
@@ -205,7 +205,7 @@ describe('University Research Integration', () => {
       });
 
       // Advance tick to trigger TechnologyUnlockSystem scan (scans every 100 ticks)
-      (world as any)._tick = 100;
+      (world as { _tick: number })._tick = 100;
 
       // Run tech system to detect university
       techSystem.update(world, [], 0);
@@ -239,7 +239,7 @@ describe('University Research Integration', () => {
 
       // Run system for 10 ticks
       for (let i = 0; i < 10; i++) {
-        (world as any)._tick++;
+        (world as { _tick: number })._tick++;
         universitySystem.update(world, [university], 0);
       }
 
@@ -275,7 +275,7 @@ describe('University Research Integration', () => {
 
       // Run system for 10 ticks
       for (let i = 0; i < 10; i++) {
-        (world as any)._tick++;
+        (world as { _tick: number })._tick++;
         universitySystem.update(world, [university], 0);
       }
 
@@ -307,7 +307,7 @@ describe('University Research Integration', () => {
 
       // Run for 200 ticks
       for (let i = 0; i < 200; i++) {
-        (world as any)._tick++;
+        (world as { _tick: number })._tick++;
         universitySystem.update(world, [university], 0);
       }
 
@@ -341,7 +341,7 @@ describe('University Research Integration', () => {
 
       // Run system for 10 ticks
       for (let i = 0; i < 10; i++) {
-        (world as any)._tick++;
+        (world as { _tick: number })._tick++;
         universitySystem.update(world, [uni1, uni2], 0);
       }
 

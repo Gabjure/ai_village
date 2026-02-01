@@ -381,7 +381,8 @@ describe.skip('ContextMenuRenderer', () => {
   describe('error handling', () => {
     it('should throw when rendering without context', () => {
       expect(() => {
-        new ContextMenuRenderer(null as any);
+      // @ts-expect-error Testing null parameter validation
+        new ContextMenuRenderer(null);
       }).toThrow('context');
     });
 

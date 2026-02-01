@@ -9,6 +9,20 @@ import type { DeathBargainComponent } from '../../components/DeathBargainCompone
 import type { LLMProvider } from '@ai-village/llm';
 import type { World } from '../../ecs/World';
 
+// Type helpers for testing
+type EntityWithMethods = {
+  addComponent?: (comp: unknown) => void;
+  updateComponent?: (type: string, updater: (current: unknown) => unknown) => void;
+  getComponent?: (type: string) => unknown;
+  hasComponent?: (type: string) => boolean;
+};
+type WorldWithMethods = Record<string, unknown> & {
+  getEntity?: (id: string) => unknown;
+  addEntity?: (entity: unknown) => void;
+  query?: unknown;
+  getSystem?: (name: string) => unknown;
+};
+
 describe('DeathBargainSystem', () => {
   let system: DeathBargainSystem;
   let world: World;
@@ -24,7 +38,7 @@ describe('DeathBargainSystem', () => {
         text: 'YES',
         usage: { promptTokens: 10, completionTokens: 1 }
       }),
-    } as unknown as LLMProvider;
+    } as Partial<LLMProvider> as LLMProvider;
 
     system.setLLMProvider(mockLLM);
     system.setUseLLM(false); // Disable LLM for most tests
@@ -77,14 +91,14 @@ describe('DeathBargainSystem', () => {
       const events: any[] = [];
 
       // Register event listener BEFORE calling the system
-      (world.eventBus as any).on('death:bargain_offered', (event: any) => {
+      (world.eventBus as Record<string, unknown>).on('death:bargain_offered', (event: Record<string, unknown>) => {
         events.push(event);
       });
 
       system.offerDeathBargain(world, entity, { x: 0, y: 0 }, 'starvation');
 
       // Flush event queue to process events
-      (world.eventBus as any).flush();
+      (world.eventBus as Record<string, unknown>).flush();
 
       // Events should now be processed
       expect(events.length).toBeGreaterThan(0);
@@ -293,7 +307,7 @@ function createMockHero(overrides?: {
   const entity = new EntityImpl('test-hero-123');
 
   // Soul identity with destiny
-  (entity as any).addComponent({
+  entity.addComponent({
     type: 'soul_identity',
     destiny: overrides?.destiny ?? 'unite the kingdoms and save the world',
     soulId: 'soul-123',
@@ -301,19 +315,19 @@ function createMockHero(overrides?: {
   });
 
   // Skills component
-  (entity as any).addComponent({
+  entity.addComponent({
     type: 'skills',
     combat: overrides?.combatSkill ?? 10,
   });
 
   // Agent component
-  (entity as any).addComponent({
+  entity.addComponent({
     type: 'agent',
     reputation: 15,
   });
 
   // Needs component
-  (entity as any).addComponent({
+  entity.addComponent({
     type: 'needs',
     health: overrides?.health ?? 0,
     hunger: 0,
@@ -322,14 +336,14 @@ function createMockHero(overrides?: {
   });
 
   // Position component
-  (entity as any).addComponent({
+  entity.addComponent({
     type: 'position',
     x: 100,
     y: 200,
   });
 
   // Identity component
-  (entity as any).addComponent({
+  entity.addComponent({
     type: 'identity',
     name: 'Heroic McHeroface',
   });

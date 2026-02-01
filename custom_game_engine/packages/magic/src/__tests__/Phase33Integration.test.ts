@@ -24,6 +24,20 @@ import type { EffectExpression } from '../EffectExpression.js';
 import type { SpellDefinition } from '../SpellRegistry.js';
 import type { LLMProvider } from '@ai-village/llm';
 
+// Type helpers for testing
+type EntityWithMethods = {
+  addComponent?: (comp: unknown) => void;
+  updateComponent?: (type: string, updater: (current: unknown) => unknown) => void;
+  getComponent?: (type: string) => unknown;
+  hasComponent?: (type: string) => boolean;
+};
+type WorldWithMethods = Record<string, unknown> & {
+  getEntity?: (id: string) => unknown;
+  addEntity?: (entity: unknown) => void;
+  query?: unknown;
+  getSystem?: (name: string) => unknown;
+};
+
 // ============================================================================
 // MOCK LLM PROVIDER
 // ============================================================================
@@ -35,7 +49,7 @@ class MockLLMProvider implements LLMProvider {
     this.responses.set(description.toLowerCase(), effect);
   }
 
-  async generate(request: any): Promise<any> {
+  async generate(request: Record<string, unknown>): Promise<any> {
     const description = request.prompt.toLowerCase();
 
     // Find matching response
@@ -276,7 +290,7 @@ describe('Phase 33 Integration Tests', () => {
     const { EffectInterpreter } = await import('../EffectInterpreter.js');
 
     // Create real services
-    const generationService = new EffectGenerationService(mockLLM as any);
+    const generationService = new EffectGenerationService(mockLLM as unknown);
     const interpreter = new EffectInterpreter();
     const validationPipeline = new EffectValidationPipeline(interpreter);
     const evaluationService = new EffectEvaluationService();
@@ -419,9 +433,9 @@ describe('Phase 33 Integration Tests', () => {
       expect(result.artifactId).toBeDefined();
 
       // Check artifact metadata through the integration's artifact system
-      const artifactSystem = (integration as any).artifactSystem as any;
+      const artifactSystem = (integration as { artifactSystem: unknown }).artifactSystem;
       const artifacts = artifactSystem.getAllRejected();
-      const artifact = artifacts.find((a: any) => a.id === result.artifactId);
+      const artifact = artifacts.find((a: Record<string, unknown>) => a.id === result.artifactId);
 
       expect(artifact).toBeDefined();
       // Should be categorized as dangerous or too powerful
@@ -457,9 +471,9 @@ describe('Phase 33 Integration Tests', () => {
         expect(result.spellId).toBeDefined();
       } else {
         expect(result.artifactId).toBeDefined();
-        const artifactSystem = (integration as any).artifactSystem as any;
+        const artifactSystem = (integration as { artifactSystem: unknown }).artifactSystem;
         const artifacts = artifactSystem.getAllRejected();
-        const artifact = artifacts.find((a: any) => a.id === result.artifactId);
+        const artifact = artifacts.find((a: Record<string, unknown>) => a.id === result.artifactId);
         expect(artifact).toBeDefined();
       }
     });
@@ -496,9 +510,9 @@ describe('Phase 33 Integration Tests', () => {
       // Verify artifact preserved
       expect(result.artifactId).toBeDefined();
 
-      const artifactSystem = (integration as any).artifactSystem as any;
+      const artifactSystem = (integration as { artifactSystem: unknown }).artifactSystem;
       const artifacts = artifactSystem.getAllRejected();
-      const artifact = artifacts.find((a: any) => a.id === result.artifactId);
+      const artifact = artifacts.find((a: Record<string, unknown>) => a.id === result.artifactId);
 
       expect(artifact).toBeDefined();
       expect(artifact.effect).toBeDefined();
@@ -645,7 +659,7 @@ describe('Phase 33 Integration Tests', () => {
       expect(rejected.every((r) => r.artifactId)).toBe(true);
 
       // Verify artifact system has all rejected effects
-      const artifactSystem = (integration as any).artifactSystem as any;
+      const artifactSystem = (integration as { artifactSystem: unknown }).artifactSystem;
       const artifacts = artifactSystem.getByCreator('batch-test');
       expect(artifacts.length).toBe(rejected.length);
     });
@@ -710,9 +724,9 @@ describe('Phase 33 Integration Tests', () => {
       expect(result.success).toBe(true);
 
       if (!result.blessed && result.artifactId) {
-        const artifactSystem = (integration as any).artifactSystem as any;
+        const artifactSystem = (integration as { artifactSystem: unknown }).artifactSystem;
         const artifacts = artifactSystem.getAllRejected();
-        const artifact = artifacts.find((a: any) => a.id === result.artifactId);
+        const artifact = artifacts.find((a: Record<string, unknown>) => a.id === result.artifactId);
 
         // Should use defaults
         expect(artifact.creatorId).toBe('unknown');
@@ -721,7 +735,7 @@ describe('Phase 33 Integration Tests', () => {
     });
 
     it('should preserve all rejected effects (Conservation of Game Matter)', async () => {
-      const artifactSystem = (integration as any).artifactSystem as any;
+      const artifactSystem = (integration as { artifactSystem: unknown }).artifactSystem;
       const beforeCount = artifactSystem.getAllRejected().length;
 
       // Generate multiple rejected effects
@@ -756,7 +770,7 @@ describe('Phase 33 Integration Tests', () => {
       expect(artifacts.length).toBe(3);
 
       // Each artifact should have complete data
-      artifacts.forEach((artifact: any) => {
+      artifacts.forEach((artifact: Record<string, unknown>) => {
         expect(artifact.id).toBeDefined();
         expect(artifact.effect).toBeDefined();
         expect(artifact.rejectionReason).toBeDefined();
@@ -788,7 +802,7 @@ describe('Phase 33 Integration Tests', () => {
         },
       ];
 
-      const artifactSystem = (integration as any).artifactSystem as any;
+      const artifactSystem = (integration as { artifactSystem: unknown }).artifactSystem;
 
       for (const req of requests) {
         await integration.discoverEffect({
@@ -805,16 +819,16 @@ describe('Phase 33 Integration Tests', () => {
       expect(artifacts.length).toBeGreaterThan(0);
 
       // Each artifact should have a realm assignment
-      artifacts.forEach((a: any) => {
+      artifacts.forEach((a: Record<string, unknown>) => {
         expect(a.banishedTo).toBeDefined();
         expect(['void', 'limbo', 'forbidden_library', 'rejected_realm']).toContain(a.banishedTo);
         expect(a.dangerLevel).toBeGreaterThan(0);
       });
 
       // Verify dangerous effects have high danger levels
-      const dangerousArtifacts = artifacts.filter((a: any) => a.banishedTo === 'void' || a.banishedTo === 'forbidden_library');
+      const dangerousArtifacts = artifacts.filter((a: Record<string, unknown>) => a.banishedTo === 'void' || a.banishedTo === 'forbidden_library');
       if (dangerousArtifacts.length > 0) {
-        dangerousArtifacts.forEach((a: any) => {
+        dangerousArtifacts.forEach((a: Record<string, unknown>) => {
           expect(a.dangerLevel).toBeGreaterThanOrEqual(5);
         });
       }
@@ -827,7 +841,7 @@ describe('Phase 33 Integration Tests', () => {
 
   describe('Artifact Recovery Requirements', () => {
     it('should assign appropriate recovery requirements by realm', async () => {
-      const artifactSystem = (integration as any).artifactSystem as any;
+      const artifactSystem = (integration as { artifactSystem: unknown }).artifactSystem;
 
       // Generate rejected effects
       await integration.discoverEffect({

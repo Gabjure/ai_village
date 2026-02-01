@@ -40,7 +40,7 @@ describe('MemoryConsolidationSystem + SleepSystem + MemorySystem Integration', (
     const agent = harness.createTestAgent({ x: 10, y: 10 });
 
     const circadian = createCircadianComponent();
-    (circadian as any).isSleeping = true;
+    (circadian as { isSleeping?: boolean }).isSleeping = true;
     agent.addComponent(circadian);
 
     agent.addComponent(new MemoryComponent(agent.id));
@@ -65,7 +65,7 @@ describe('MemoryConsolidationSystem + SleepSystem + MemorySystem Integration', (
     const agent = harness.createTestAgent({ x: 10, y: 10 });
 
     const circadian = createCircadianComponent();
-    (circadian as any).isSleeping = true;
+    (circadian as { isSleeping?: boolean }).isSleeping = true;
     agent.addComponent(circadian);
 
     agent.addComponent(new NeedsComponent({
@@ -113,7 +113,7 @@ describe('MemoryConsolidationSystem + SleepSystem + MemorySystem Integration', (
     const agent = harness.createTestAgent({ x: 10, y: 10 });
 
     const circadian = createCircadianComponent();
-    (circadian as any).isSleeping = false; // Awake
+    (circadian as { isSleeping?: boolean }).isSleeping = false; // Awake
     agent.addComponent(circadian);
 
     agent.addComponent(new MemoryComponent(agent.id));
@@ -127,6 +127,6 @@ describe('MemoryConsolidationSystem + SleepSystem + MemorySystem Integration', (
 
     // Verify agent is still awake
     const updatedCircadian = agent.getComponent(ComponentType.Circadian);
-    expect((updatedCircadian as any).isSleeping).toBe(false);
+    expect((updatedCircadian as Record<string, unknown>).isSleeping).toBe(false);
   });
 });

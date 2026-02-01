@@ -114,7 +114,7 @@ describe('ContextActionRegistry', () => {
           icon: 'icon',
           execute: vi.fn(),
           isApplicable: () => true
-        } as any);
+        } as Record<string, unknown>);
       }).toThrow('label');
     });
   });
@@ -511,13 +511,15 @@ describe('ContextActionRegistry', () => {
   describe('error handling', () => {
     it('should throw when creating registry without world', () => {
       expect(() => {
-        new ContextActionRegistry(null as any, eventBus);
+      // @ts-expect-error Testing null parameter validation
+        new ContextActionRegistry(null, eventBus);
       }).toThrow('world');
     });
 
     it('should throw when creating registry without eventBus', () => {
       expect(() => {
-        new ContextActionRegistry(world, null as any);
+      // @ts-expect-error Testing null parameter validation
+        new ContextActionRegistry(world, null);
       }).toThrow('eventBus');
     });
 
@@ -529,7 +531,7 @@ describe('ContextActionRegistry', () => {
           icon: 'icon',
           // Missing execute
           isApplicable: () => true
-        } as any);
+        } as Record<string, unknown>);
       }).toThrow('execute');
     });
 
@@ -541,7 +543,7 @@ describe('ContextActionRegistry', () => {
           icon: 'icon',
           execute: vi.fn()
           // Missing isApplicable
-        } as any);
+        } as Record<string, unknown>);
       }).toThrow('isApplicable');
     });
   });

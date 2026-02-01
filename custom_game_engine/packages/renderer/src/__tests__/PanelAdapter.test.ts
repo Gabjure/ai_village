@@ -62,11 +62,12 @@ describe('PanelAdapter', () => {
         };
 
         expect(() => {
-          new PanelAdapter(null as any, config);
+      // @ts-expect-error Testing null parameter validation
+          new PanelAdapter(null, config);
         }).toThrow();
 
         expect(() => {
-          new PanelAdapter(undefined as any, config);
+          new PanelAdapter(undefined as unknown, config);
         }).toThrow();
       });
 
@@ -80,11 +81,12 @@ describe('PanelAdapter', () => {
         };
 
         expect(() => {
-          new PanelAdapter(mockPanel, null as any);
+      // @ts-expect-error Testing null parameter validation
+          new PanelAdapter(mockPanel, null);
         }).toThrow();
 
         expect(() => {
-          new PanelAdapter(mockPanel, undefined as any);
+          new PanelAdapter(mockPanel, undefined as unknown);
         }).toThrow();
       });
 
@@ -629,7 +631,7 @@ describe('PanelAdapter', () => {
       };
 
       expect(() => {
-        new PanelAdapter(undefined as any, config);
+        new PanelAdapter(undefined as unknown, config);
       }).toThrow(/panel.*required|cannot be null/i);
     });
 
@@ -643,7 +645,8 @@ describe('PanelAdapter', () => {
       };
 
       expect(() => {
-        new PanelAdapter(mockPanel, null as any);
+      // @ts-expect-error Testing null parameter validation
+        new PanelAdapter(mockPanel, null);
       }).toThrow(/config.*required|cannot be null/i);
     });
 
@@ -657,7 +660,7 @@ describe('PanelAdapter', () => {
       };
 
       expect(() => {
-        new PanelAdapter(mockPanel, undefined as any);
+        new PanelAdapter(mockPanel, undefined as unknown);
       }).toThrow(/config.*required|cannot be null/i);
     });
 
@@ -675,7 +678,7 @@ describe('PanelAdapter', () => {
           title: 'Test',
           defaultWidth: 300,
           defaultHeight: 400,
-        } as any);
+        } as Record<string, unknown>);
       }).toThrow(/id.*required/i);
     });
 
@@ -693,7 +696,7 @@ describe('PanelAdapter', () => {
           id: 'test',
           defaultWidth: 300,
           defaultHeight: 400,
-        } as any);
+        } as Record<string, unknown>);
       }).toThrow(/title.*required/i);
     });
 
@@ -711,7 +714,7 @@ describe('PanelAdapter', () => {
           id: 'test',
           title: 'Test',
           defaultHeight: 400,
-        } as any);
+        } as Record<string, unknown>);
       }).toThrow(/defaultWidth.*required/i);
     });
 
@@ -729,7 +732,7 @@ describe('PanelAdapter', () => {
           id: 'test',
           title: 'Test',
           defaultWidth: 300,
-        } as any);
+        } as Record<string, unknown>);
       }).toThrow(/defaultHeight.*required/i);
     });
   });

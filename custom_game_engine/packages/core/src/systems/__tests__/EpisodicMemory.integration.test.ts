@@ -556,7 +556,7 @@ describe('Episodic Memory Integration', () => {
         memory.formMemory({
           summary: 'Test',
           timestamp: Date.now()
-        } as any);
+        } as Record<string, unknown>);
       }).toThrow(/eventType/);
 
       // Missing summary
@@ -564,7 +564,7 @@ describe('Episodic Memory Integration', () => {
         memory.formMemory({
           eventType: 'test',
           timestamp: Date.now()
-        } as any);
+        } as Record<string, unknown>);
       }).toThrow(/summary/);
 
       // Missing timestamp
@@ -572,7 +572,7 @@ describe('Episodic Memory Integration', () => {
         memory.formMemory({
           eventType: 'test',
           summary: 'Test'
-        } as any);
+        } as Record<string, unknown>);
       }).toThrow(/timestamp/);
     });
   });

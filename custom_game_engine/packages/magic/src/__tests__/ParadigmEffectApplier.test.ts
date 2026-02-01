@@ -15,6 +15,20 @@ import type { ParadigmEffect } from '../SpellEffect.js';
 import type { EffectContext } from '../SpellEffectExecutor.js';
 import type { Entity, MagicComponent, World } from '@ai-village/core';
 
+// Type helpers for testing
+type EntityWithMethods = {
+  addComponent?: (comp: unknown) => void;
+  updateComponent?: (type: string, updater: (current: unknown) => unknown) => void;
+  getComponent?: (type: string) => unknown;
+  hasComponent?: (type: string) => boolean;
+};
+type WorldWithMethods = Record<string, unknown> & {
+  getEntity?: (id: string) => unknown;
+  addEntity?: (entity: unknown) => void;
+  query?: unknown;
+  getSystem?: (name: string) => unknown;
+};
+
 // =============================================================================
 // Mock Helpers
 // =============================================================================
@@ -24,7 +38,7 @@ function createMockWorld(): World {
     entities: new Map(),
     getEntity: (id: string) => undefined,
     tick: () => {},
-  } as any;
+  } as Record<string, unknown>;
 }
 
 function createMockEntity(id: string, hasMagic: boolean = true): Entity {
@@ -62,7 +76,7 @@ function createMockEntity(id: string, hasMagic: boolean = true): Entity {
     addComponent: function(type: string, data: any) {
       this.components.set(type, data);
     },
-  } as any;
+  } as Record<string, unknown>;
 }
 
 function createMockContext(tick: number = 1000): EffectContext {
@@ -72,9 +86,12 @@ function createMockContext(tick: number = 1000): EffectContext {
       id: 'test_spell',
       name: 'Test Spell',
       paradigmId: 'test',
-      technique: 'transform' as any,
-      form: 'body' as any,
-      source: 'arcane' as any,
+      technique: // @ts-expect-error Testing invalid value validation
+      'transform',
+      form: // @ts-expect-error Testing invalid value validation
+      'body',
+      source: // @ts-expect-error Testing invalid value validation
+      'arcane',
       manaCost: 10,
       castTime: 5,
       range: 10,
@@ -84,7 +101,7 @@ function createMockContext(tick: number = 1000): EffectContext {
       activeParadigmId: 'academic',
       totalSpellsCast: 10,
       spellcastingProficiency: 50,
-    } as any,
+    } as unknown,
     scaledValues: new Map(),
     isCrit: false,
     powerMultiplier: 1.0,
@@ -191,7 +208,7 @@ describe('ParadigmEffectApplier', () => {
 
       expect(result.success).toBe(true);
       expect(targetMagic.paradigmState.academic).toBeDefined();
-      expect((targetMagic.paradigmState.academic as any).suppressed).toBe(true);
+      expect((targetMagic.paradigmState.academic as Record<string, unknown>).suppressed).toBe(true);
       expect(result.appliedValues.paradigmsSuppressed).toBe(1);
     });
 
@@ -295,7 +312,7 @@ describe('ParadigmEffectApplier', () => {
       expect(result.success).toBe(true);
       expect(targetMagic.activeParadigmId).toBe('divine');
       // Favor should be preserved (not reset)
-      expect((targetMagic.paradigmState.pact as any).patronFavor).toBe(75);
+      expect((targetMagic.paradigmState.pact as Record<string, unknown>).patronFavor).toBe(75);
     });
   });
 

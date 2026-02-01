@@ -293,7 +293,7 @@ describe('GuardDutySystem', () => {
           // Missing targetLocation
           alertness: 1.0,
           responseRadius: 10,
-        } as any));
+        } as Record<string, unknown>));
       }).toThrow('Location guard assignment requires targetLocation');
     });
 
@@ -306,7 +306,7 @@ describe('GuardDutySystem', () => {
           // Missing targetPerson
           alertness: 1.0,
           responseRadius: 10,
-        } as any));
+        } as Record<string, unknown>));
       }).toThrow('Person guard assignment requires targetPerson');
     });
 
@@ -319,7 +319,7 @@ describe('GuardDutySystem', () => {
           // Missing patrolRoute
           alertness: 1.0,
           responseRadius: 10,
-        } as any));
+        } as Record<string, unknown>));
       }).toThrow('Patrol assignment requires patrolRoute');
     });
 

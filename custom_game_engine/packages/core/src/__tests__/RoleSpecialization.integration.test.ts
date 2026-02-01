@@ -120,7 +120,7 @@ describe('Role Specialization Integration', () => {
         const entity = world.createEntity();
         const isBuilder = i < 2;
 
-        (entity as any).addComponent('skills', {
+        entity.addComponent('skills', {
           type: ComponentType.Skills,
           version: 1,
           levels: {
@@ -140,7 +140,7 @@ describe('Role Specialization Integration', () => {
           affinities: {},
         });
 
-        (entity as any).addComponent('identity', {
+        entity.addComponent('identity', {
           type: ComponentType.Identity,
           version: 1,
           name: isBuilder ? `Builder${i}` : `Agent${i}`,
@@ -196,7 +196,7 @@ describe('Role Specialization Integration', () => {
         const entity = world.createEntity();
         const role = i < 2 ? 'cook' : i < 4 ? 'farmer' : 'other';
 
-        (entity as any).addComponent('skills', {
+        entity.addComponent('skills', {
           type: ComponentType.Skills,
           version: 1,
           levels: {
@@ -216,7 +216,7 @@ describe('Role Specialization Integration', () => {
           affinities: {},
         });
 
-        (entity as any).addComponent('identity', {
+        entity.addComponent('identity', {
           type: ComponentType.Identity,
           version: 1,
           name: `${role}${i}`,
@@ -307,7 +307,7 @@ describe('Role Specialization Integration', () => {
         const entity = world.createEntity();
         const isSkilled = i < 3; // 3 skilled, 7 unskilled
 
-        (entity as any).addComponent('skills', {
+        entity.addComponent('skills', {
           type: ComponentType.Skills,
           version: 1,
           levels: {
@@ -327,7 +327,7 @@ describe('Role Specialization Integration', () => {
           affinities: {},
         });
 
-        (entity as any).addComponent('identity', {
+        entity.addComponent('identity', {
           type: ComponentType.Identity,
           version: 1,
           name: isSkilled ? `Skilled${i}` : `Unskilled${i}`,

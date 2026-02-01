@@ -48,7 +48,8 @@ describe('WildAnimalSpawningSystem + World + AnimalSystem Integration', () => {
     const invalidChunk = {
       x: 0,
       y: 0,
-      biome: null as any,
+      // @ts-expect-error Testing null parameter validation
+      biome: null,
       size: 32,
     };
 
@@ -62,7 +63,8 @@ describe('WildAnimalSpawningSystem + World + AnimalSystem Integration', () => {
     harness.registerSystem('WildAnimalSpawningSystem', spawningSystem);
 
     const invalidChunk = {
-      x: null as any,
+      // @ts-expect-error Testing null parameter validation
+      x: null,
       y: 0,
       biome: 'plains',
       size: 32,
@@ -81,7 +83,8 @@ describe('WildAnimalSpawningSystem + World + AnimalSystem Integration', () => {
       x: 0,
       y: 0,
       biome: 'forest',
-      size: null as any,
+      // @ts-expect-error Testing null parameter validation
+      size: null,
     };
 
     expect(() => {
@@ -171,7 +174,7 @@ describe('WildAnimalSpawningSystem + World + AnimalSystem Integration', () => {
     const spawned = spawningSystem.spawnAnimalsInChunk(harness.world, chunkData);
 
     if (spawned.length > 0) {
-      const animalComponent = spawned[0].components.get(ComponentType.Animal) as any;
+      const animalComponent = spawned[0].components.get(ComponentType.Animal) as unknown;
 
       // Should be wild
       expect(animalComponent.wild).toBe(true);
@@ -201,7 +204,7 @@ describe('WildAnimalSpawningSystem + World + AnimalSystem Integration', () => {
       animalSystem.update(harness.world, entities, 1.0);
 
       // Animals should still be alive and processing
-      const animalComponent = spawned[0].components.get(ComponentType.Animal) as any;
+      const animalComponent = spawned[0].components.get(ComponentType.Animal) as unknown;
       expect(animalComponent).toBeDefined();
       expect(animalComponent.health).toBeGreaterThan(0);
     }

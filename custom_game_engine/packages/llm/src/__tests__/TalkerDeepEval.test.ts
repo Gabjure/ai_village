@@ -45,7 +45,7 @@ describe('TalkerDeepEval - Speech Generation', () => {
       getComponent: function(type: string) {
         return this.components.get(type);
       },
-    } as any;
+    } as Record<string, unknown>;
   });
 
   describe('Personality-Based Speech Patterns', () => {
@@ -232,7 +232,7 @@ describe('TalkerDeepEval - Response Format', () => {
         ['position', { x: 0, y: 0 }],
       ]),
       getComponent: function(type: string) { return this.components.get(type); }
-    } as any;
+    } as Record<string, unknown>;
 
     const mockWorld = {
       query: () => ({

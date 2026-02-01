@@ -20,7 +20,7 @@ describe('RiddleGenerator', () => {
     // Mock LLM provider with canned responses
     mockLLM = {
       generate: vi.fn(),
-    } as unknown as LLMProvider;
+    } as Partial<LLMProvider>;
 
     generator = new RiddleGenerator(mockLLM);
   });
@@ -28,7 +28,7 @@ describe('RiddleGenerator', () => {
   describe('generateClassicRiddle', () => {
     it('should generate a valid riddle with all required fields', async () => {
       // Mock LLM response with valid JSON
-      (mockLLM.generate as any).mockResolvedValue({
+      mockLLM.generate.mockResolvedValue({
         text: `{
           "question": "I have cities but no houses, forests but no trees, water but no fish. What am I?",
           "correctAnswer": "a map",
@@ -50,7 +50,7 @@ describe('RiddleGenerator', () => {
     });
 
     it('should handle JSON wrapped in markdown code blocks', async () => {
-      (mockLLM.generate as any).mockResolvedValue({
+      mockLLM.generate.mockResolvedValue({
         text: '```json\n{"question": "What is always in front of you but cannot be seen?", "correctAnswer": "the future", "acceptedAnswers": ["future", "tomorrow"], "difficulty": "easy"}\n```',
         usage: { promptTokens: 50, completionTokens: 80 },
       });
@@ -63,7 +63,7 @@ describe('RiddleGenerator', () => {
     });
 
     it('should throw on missing required fields', async () => {
-      (mockLLM.generate as any).mockResolvedValue({
+      mockLLM.generate.mockResolvedValue({
         text: '{"question": "What am I?"}', // Missing correctAnswer
         usage: { promptTokens: 20, completionTokens: 10 },
       });
@@ -72,7 +72,7 @@ describe('RiddleGenerator', () => {
     });
 
     it('should throw on malformed JSON', async () => {
-      (mockLLM.generate as any).mockResolvedValue({
+      mockLLM.generate.mockResolvedValue({
         text: 'This is not JSON at all',
         usage: { promptTokens: 20, completionTokens: 10 },
       });
@@ -81,7 +81,7 @@ describe('RiddleGenerator', () => {
     });
 
     it('should throw on question too short', async () => {
-      (mockLLM.generate as any).mockResolvedValue({
+      mockLLM.generate.mockResolvedValue({
         text: '{"question": "What?", "correctAnswer": "thing", "acceptedAnswers": []}',
         usage: { promptTokens: 20, completionTokens: 15 },
       });
@@ -90,7 +90,7 @@ describe('RiddleGenerator', () => {
     });
 
     it('should throw on empty correct answer', async () => {
-      (mockLLM.generate as any).mockResolvedValue({
+      mockLLM.generate.mockResolvedValue({
         text: '{"question": "What has no answer?", "correctAnswer": "", "acceptedAnswers": []}',
         usage: { promptTokens: 20, completionTokens: 15 },
       });
@@ -108,7 +108,7 @@ describe('RiddleGenerator', () => {
         notableDeeds: ['saved village from bandits', 'defeated dragon'],
       };
 
-      (mockLLM.generate as any).mockResolvedValue({
+      mockLLM.generate.mockResolvedValue({
         text: `{
           "question": "I was trusted, I was close, yet I struck from the shadows. What ended your mortal thread?",
           "correctAnswer": "betrayal",
@@ -126,7 +126,7 @@ describe('RiddleGenerator', () => {
       expect(riddle.source).toBe('personalized');
 
       // Verify the prompt included hero context
-      const generateCall = (mockLLM.generate as any).mock.calls[0][0];
+      const generateCall = mockLLM.generate.mock.calls[0][0];
       expect(generateCall.prompt).toContain('Aldric the Brave');
       expect(generateCall.prompt).toContain('unite the warring kingdoms');
       expect(generateCall.prompt).toContain('betrayed by trusted ally');
@@ -144,7 +144,7 @@ describe('RiddleGenerator', () => {
       };
 
       // Mock LLM solving the riddle
-      (mockLLM.generate as any).mockResolvedValue({
+      mockLLM.generate.mockResolvedValue({
         text: 'keyboard',
         usage: { promptTokens: 30, completionTokens: 5 },
       });
@@ -165,7 +165,7 @@ describe('RiddleGenerator', () => {
       };
 
       // LLM gives alternative answer
-      (mockLLM.generate as any).mockResolvedValue({
+      mockLLM.generate.mockResolvedValue({
         text: 'human',
         usage: { promptTokens: 40, completionTokens: 5 },
       });
@@ -186,7 +186,7 @@ describe('RiddleGenerator', () => {
       };
 
       // LLM gives wrong answer
-      (mockLLM.generate as any).mockResolvedValue({
+      mockLLM.generate.mockResolvedValue({
         text: 'a telephone',
         usage: { promptTokens: 30, completionTokens: 10 },
       });
@@ -207,7 +207,7 @@ describe('RiddleGenerator', () => {
       };
 
       // LLM gives answer in different case
-      (mockLLM.generate as any).mockResolvedValue({
+      mockLLM.generate.mockResolvedValue({
         text: 'PARIS',
         usage: { promptTokens: 20, completionTokens: 5 },
       });
@@ -220,7 +220,7 @@ describe('RiddleGenerator', () => {
 
   describe('Validation', () => {
     it('should default difficulty to medium if invalid', async () => {
-      (mockLLM.generate as any).mockResolvedValue({
+      mockLLM.generate.mockResolvedValue({
         text: '{"question": "What has no beginning and no end?", "correctAnswer": "a circle", "acceptedAnswers": ["circle", "ring"], "difficulty": "invalid"}',
         usage: { promptTokens: 30, completionTokens: 40 },
       });
@@ -231,7 +231,7 @@ describe('RiddleGenerator', () => {
     });
 
     it('should trim whitespace from answers', async () => {
-      (mockLLM.generate as any).mockResolvedValue({
+      mockLLM.generate.mockResolvedValue({
         text: '{"question": "What am I?", "correctAnswer": "  answer  ", "acceptedAnswers": ["  alt1  ", "  alt2  "]}',
         usage: { promptTokens: 20, completionTokens: 30 },
       });

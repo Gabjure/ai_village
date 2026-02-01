@@ -216,7 +216,7 @@ describe('Building Placement Integration', () => {
       const result = validator.validate(
         { x: 0, y: 0 },
         blueprint,
-        mockWorld as any
+        mockWorld as unknown
       );
 
       expect(result.valid).toBe(true);
@@ -238,7 +238,7 @@ describe('Building Placement Integration', () => {
       const result = validator.validate(
         { x: 0, y: 0 },
         blueprint,
-        mockWorld as any
+        mockWorld as unknown
       );
 
       expect(result.valid).toBe(false);

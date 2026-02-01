@@ -44,13 +44,15 @@ describe('Data Transformers', () => {
 
     it('should throw when nodes array is missing', () => {
       expect(() => {
-        transformNetworkData({ edges: [], communities: [] } as any);
+        // @ts-expect-error Testing missing required property validation
+        transformNetworkData({ edges: [], communities: [] });
       }).toThrow('nodes');
     });
 
     it('should throw when edges array is missing', () => {
       expect(() => {
-        transformNetworkData({ nodes: [], communities: [] } as any);
+        // @ts-expect-error Testing missing required property validation
+        transformNetworkData({ nodes: [], communities: [] });
       }).toThrow('edges');
     });
 
@@ -97,7 +99,8 @@ describe('Data Transformers', () => {
 
     it('should throw when behaviors array is missing', () => {
       expect(() => {
-        transformTimelineData({ innovations: [] } as any);
+        // @ts-expect-error Testing missing required property validation
+        transformTimelineData({ innovations: [] });
       }).toThrow('behaviors');
     });
 
@@ -138,7 +141,8 @@ describe('Data Transformers', () => {
 
     it('should throw when density array is missing', () => {
       expect(() => {
-        transformSpatialData({ trails: [], territories: [], hotspots: [] } as any);
+        // @ts-expect-error Testing missing required property validation
+        transformSpatialData({ trails: [], territories: [], hotspots: [] });
       }).toThrow('density');
     });
 
@@ -182,7 +186,8 @@ describe('Data Transformers', () => {
 
     it('should throw when lorenzCurve is missing', () => {
       expect(() => {
-        transformInequalityData({ giniTrend: [], quartiles: {}, mobilityMatrix: [] } as any);
+        // @ts-expect-error Testing missing required property validation
+        transformInequalityData({ giniTrend: [], quartiles: {}, mobilityMatrix: [] });
       }).toThrow('lorenzCurve');
     });
 
@@ -241,7 +246,8 @@ describe('Data Transformers', () => {
 
     it('should throw when sankeyData is missing', () => {
       expect(() => {
-        transformCulturalData({ cascadeTrees: [], adoptionCurves: {}, influencers: [], transmissionRates: {} } as any);
+        // @ts-expect-error Testing missing required property validation
+        transformCulturalData({ cascadeTrees: [], adoptionCurves: {}, influencers: [], transmissionRates: {} });
       }).toThrow('sankeyData');
     });
 

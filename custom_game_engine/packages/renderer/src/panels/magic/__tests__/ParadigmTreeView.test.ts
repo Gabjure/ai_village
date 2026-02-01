@@ -149,7 +149,7 @@ describe('ParadigmTreeView', () => {
       view.render(ctx, 0, 0, 800, 600, mockEvaluationContext);
 
       // Check that line is drawn with highlight color (yellow)
-      const highlightedStroke = ctx._strokeStyleCalls.find((call: any) =>
+      const highlightedStroke = ctx._strokeStyleCalls.find((call: Record<string, unknown>) =>
         call.toLowerCase().includes('yellow') || call.toLowerCase().includes('#ffff00') || call.toLowerCase().includes('#ff0')
       );
       expect(highlightedStroke).toBeDefined();
@@ -213,7 +213,7 @@ describe('ParadigmTreeView', () => {
       view.render(ctx, 0, 0, 800, 600, mockEvaluationContext);
 
       // Check for green fill (#00ff00)
-      const greenFill = ctx._fillStyleCalls.find((call: any) =>
+      const greenFill = ctx._fillStyleCalls.find((call: Record<string, unknown>) =>
         call.toLowerCase().includes('green') || call.toLowerCase().includes('#00ff00') || call.toLowerCase().includes('#0f0')
       );
       expect(greenFill).toBeDefined();
@@ -242,7 +242,7 @@ describe('ParadigmTreeView', () => {
       view.render(ctx, 0, 0, 800, 600, mockEvaluationContext);
 
       // Check for yellow glow effect (#ffff00)
-      const yellowGlow = ctx._strokeStyleCalls.find((call: any) =>
+      const yellowGlow = ctx._strokeStyleCalls.find((call: Record<string, unknown>) =>
         call.toLowerCase().includes('yellow') || call.toLowerCase().includes('#ffff00') || call.toLowerCase().includes('#ff0')
       );
       expect(yellowGlow).toBeDefined();
@@ -277,7 +277,7 @@ describe('ParadigmTreeView', () => {
       view.render(ctx, 0, 0, 800, 600, mockEvaluationContext);
 
       // Check for gray fill
-      const grayFill = ctx._fillStyleCalls.find((call: any) =>
+      const grayFill = ctx._fillStyleCalls.find((call: Record<string, unknown>) =>
         call.includes('gray') || call.includes('#888')
       );
       expect(grayFill).toBeDefined();
@@ -544,7 +544,7 @@ function createMockNode(overrides: Partial<MagicSkillNode> = {}): MagicSkillNode
 
 function createMockEvaluationContext(): EvaluationContext {
   return {
-    world: {} as any,
+    world: {} as Record<string, unknown>,
     agentId: 'test_agent',
     progress: {
       paradigmId: 'shinto',

@@ -2,6 +2,12 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { ChunkManager } from '../ChunkManager.js';
 import { CHUNK_SIZE } from '../Chunk.js';
 
+// Helper function to access private property for testing purposes
+function getLoadRadius(manager: ChunkManager): number {
+  // @ts-expect-error Accessing private property for testing purposes
+  return manager.loadRadius;
+}
+
 describe('ChunkManager', () => {
   let manager: ChunkManager;
 
@@ -49,7 +55,7 @@ describe('ChunkManager', () => {
     manager.updateLoadedChunks(0, 0);
 
     // Move far away (need to move beyond load radius + unload buffer)
-    const loadRadius = (manager as any).loadRadius;
+    const loadRadius = getLoadRadius(manager);
     const farDistance = (loadRadius + 2) * CHUNK_SIZE;
     const { unloaded } = manager.updateLoadedChunks(farDistance, farDistance);
 

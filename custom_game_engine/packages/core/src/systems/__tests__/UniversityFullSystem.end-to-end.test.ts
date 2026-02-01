@@ -111,7 +111,7 @@ describe('University Research System - Full E2E', () => {
     buildingSystem.update(world, [], 0);
 
     // Advance tick to trigger TechnologyUnlockSystem scan (scans every 100 ticks)
-    (world as any)._tick = 100;
+    (world as { _tick: number })._tick = 100;
     techSystem.update(world, [], 0);
 
     // Verify UniversityComponent was attached
@@ -154,7 +154,7 @@ describe('University Research System - Full E2E', () => {
     console.log('\n=== PHASE 4: Research Progress (30 ticks) ===');
 
     for (let i = 0; i < 30; i++) {
-      (world as any)._tick++;
+      (world as { _tick: number })._tick++;
       universitySystem.update(world, [university1], 0);
     }
 
@@ -181,7 +181,7 @@ describe('University Research System - Full E2E', () => {
 
     // Run a few more ticks to see the boosted progress
     for (let i = 0; i < 20; i++) {
-      (world as any)._tick++;
+      (world as { _tick: number })._tick++;
       universitySystem.update(world, [university1], 0);
     }
 
@@ -205,7 +205,7 @@ describe('University Research System - Full E2E', () => {
     console.log(`  Ticks needed to complete: ${ticksNeeded}`);
 
     for (let i = 0; i < ticksNeeded + 10; i++) {
-      (world as any)._tick++;
+      (world as { _tick: number })._tick++;
       universitySystem.update(world, [university1], 0);
 
       if (project.status === 'published') {

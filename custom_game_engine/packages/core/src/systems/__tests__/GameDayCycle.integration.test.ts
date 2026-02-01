@@ -94,7 +94,7 @@ describe('Complete Game Day Cycle Integration', () => {
 
     const agent = harness.createTestAgent({ x: 10, y: 10 });
     const circadian = createCircadianComponent();
-    (circadian as any).isSleeping = true;
+    (circadian as { isSleeping?: boolean }).isSleeping = true;
     agent.addComponent(circadian);
     agent.addComponent(new NeedsComponent({
     hunger: 1.0,
@@ -121,7 +121,7 @@ describe('Complete Game Day Cycle Integration', () => {
     // Agent should eventually wake up - verify circadian component exists and sleep state can be queried
     const updatedCircadian = agent.getComponent(ComponentType.Circadian);
     expect(updatedCircadian).toBeDefined();
-    expect((updatedCircadian as any).isSleeping).toBeDefined();
+    expect((updatedCircadian as Record<string, unknown>).isSleeping).toBeDefined();
   });
 
   it('should needs decay over time', () => {
@@ -145,7 +145,7 @@ describe('Complete Game Day Cycle Integration', () => {
     const entitiesWithNeeds = harness.world.query().with(ComponentType.Needs).executeEntities();
     const allEntities = Array.from(harness.world.entities.values());
 
-    const initialNeeds = agent.getComponent(ComponentType.Needs) as any;
+    const initialNeeds = agent.getComponent(ComponentType.Needs);
     const initialHunger = initialNeeds.hunger;
     const initialEnergy = initialNeeds.energy;
 
@@ -156,7 +156,7 @@ describe('Complete Game Day Cycle Integration', () => {
       stateMutator.update(harness.world, allEntities, 360.0); // Apply deltas
     }
 
-    const finalNeeds = agent.getComponent(ComponentType.Needs) as any;
+    const finalNeeds = agent.getComponent(ComponentType.Needs);
 
     // Needs should have decayed
     expect(finalNeeds.hunger).toBeLessThan(initialHunger);
@@ -270,7 +270,7 @@ describe('Complete Game Day Cycle Integration', () => {
     agent.addComponent(circadian);
 
     // Circadian sleep drive should exist
-    expect((circadian as any).sleepDrive).toBeDefined();
+    expect((circadian as Record<string, unknown>).sleepDrive).toBeDefined();
   });
 
   it('should temperature system affect health over time', () => {
@@ -306,7 +306,7 @@ describe('Complete Game Day Cycle Integration', () => {
       stateMutator.update(harness.world, allEntities, 60.0); // Apply deltas
     }
 
-    const needs = agent.getComponent(ComponentType.Needs) as any;
+    const needs = agent.getComponent(ComponentType.Needs);
     expect(needs.health).toBeGreaterThan(0);
   });
 

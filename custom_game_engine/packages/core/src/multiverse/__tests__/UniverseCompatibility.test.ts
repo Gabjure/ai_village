@@ -12,7 +12,7 @@ function createMockWorld(): WorldMutator {
     update: vi.fn(),
     getEntity: vi.fn(),
     destroyEntity: vi.fn(),
-  } as unknown as WorldMutator;
+  } as WorldMutator;
 }
 
 // Type-safe accessors for private NetworkManager internals
@@ -40,7 +40,7 @@ interface NetworkManagerInternals {
 function getNetworkManagerInternals(
   manager: MultiverseNetworkManager
 ): NetworkManagerInternals {
-  return manager as unknown as NetworkManagerInternals;
+  return manager as NetworkManagerInternals;
 }
 
 /**

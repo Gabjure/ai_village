@@ -26,6 +26,20 @@ import type { GameEvent } from '../../events/EventMap.js';
 import { ComponentType } from '../../types/ComponentType.js';
 import { BuildingType } from '../../types/BuildingType.js';
 
+// Type helpers for testing
+type EntityWithMethods = {
+  addComponent?: (comp: unknown) => void;
+  updateComponent?: (type: string, updater: (current: unknown) => unknown) => void;
+  getComponent?: (type: string) => unknown;
+  hasComponent?: (type: string) => boolean;
+};
+type WorldWithMethods = Record<string, unknown> & {
+  getEntity?: (id: string) => unknown;
+  addEntity?: (entity: unknown) => void;
+  query?: unknown;
+  getSystem?: (name: string) => unknown;
+};
+
 describe('University Paper Publishing Integration', () => {
   let eventBus: EventBusImpl;
   let world: World;
@@ -109,7 +123,7 @@ describe('University Paper Publishing Integration', () => {
     });
 
     // Advance tick to allow research proposal
-    (world as any)._tick = 600;
+    (world as { _tick: number })._tick = 600;
 
     // Propose research
     researchManagementSystem.update(world, [university], 0);
@@ -131,7 +145,7 @@ describe('University Paper Publishing Integration', () => {
     const maxTicks = 2000; // Safety limit
 
     while (project.progress < 99.99 && ticksToComplete < maxTicks) {
-      (world as any)._tick++;
+      (world as { _tick: number })._tick++;
       universitySystem.update(world, [university], 0);
       ticksToComplete++;
     }
@@ -150,16 +164,16 @@ describe('University Paper Publishing Integration', () => {
     const completionEvent = researchCompletedEvents[0]!;
 
     console.log('\n=== Paper Publishing Verification ===');
-    console.log(`Paper ID: ${(completionEvent.data as any).paperId}`);
-    console.log(`Research Complete: ${(completionEvent.data as any).researchComplete}`);
+    console.log(`Paper ID: ${(completionEvent.data as Record<string, unknown>).paperId}`);
+    console.log(`Research Complete: ${(completionEvent.data as Record<string, unknown>).researchComplete}`);
 
     // Verify event has paper ID
-    expect((completionEvent.data as any).paperId).toBeDefined();
-    expect((completionEvent.data as any).paperId).toBeTruthy();
+    expect((completionEvent.data as Record<string, unknown>).paperId).toBeDefined();
+    expect((completionEvent.data as Record<string, unknown>).paperId).toBeTruthy();
 
     // Verify event has researchComplete flag
-    expect((completionEvent.data as any).researchComplete).toBeDefined();
-    expect(typeof (completionEvent.data as any).researchComplete).toBe('boolean');
+    expect((completionEvent.data as Record<string, unknown>).researchComplete).toBeDefined();
+    expect(typeof (completionEvent.data as Record<string, unknown>).researchComplete).toBe('boolean');
 
     // Verify project status is published
     expect(project.status).toBe('published');

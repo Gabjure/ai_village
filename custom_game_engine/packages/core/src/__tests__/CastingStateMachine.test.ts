@@ -13,6 +13,20 @@ import { SpellRegistry } from '../magic/SpellRegistry.js';
 import { initializeMagicSystem } from '../magic/InitializeMagicSystem.js';
 import { costCalculatorRegistry } from '../magic/costs/CostCalculatorRegistry.js';
 
+// Type helpers for testing
+type EntityWithMethods = {
+  addComponent?: (comp: unknown) => void;
+  updateComponent?: (type: string, updater: (current: unknown) => unknown) => void;
+  getComponent?: (type: string) => unknown;
+  hasComponent?: (type: string) => boolean;
+};
+type WorldWithMethods = Record<string, unknown> & {
+  getEntity?: (id: string) => unknown;
+  addEntity?: (entity: unknown) => void;
+  query?: unknown;
+  getSystem?: (name: string) => unknown;
+};
+
 describe('Multi-Tick Casting State Machine', () => {
   let world: World;
   let magicSystem: MagicSystem;
@@ -137,7 +151,7 @@ describe('Multi-Tick Casting State Machine', () => {
       const initialMana = magic.resourcePools.mana?.current ?? magic.manaPools[0]?.current ?? 100;
 
       // Cast instant spell
-      const result = magicSystem.castSpell(caster as any, world, 'instant_fireball');
+      const result = magicSystem.castSpell(caster as Record<string, unknown>, world, 'instant_fireball');
 
       expect(result).toBe(true);
 
@@ -179,7 +193,7 @@ describe('Multi-Tick Casting State Machine', () => {
       }));
 
       // Start cast
-      const result = magicSystem.castSpell(caster as any, world, 'quick_heal');
+      const result = magicSystem.castSpell(caster as Record<string, unknown>, world, 'quick_heal');
       expect(result).toBe(true);
 
       // Should be casting
@@ -235,7 +249,7 @@ describe('Multi-Tick Casting State Machine', () => {
       }));
 
       // Start cast
-      const result = magicSystem.castSpell(caster as any, world, 'slow_ritual');
+      const result = magicSystem.castSpell(caster as Record<string, unknown>, world, 'slow_ritual');
       expect(result).toBe(true);
 
       // Verify mana is locked
@@ -294,21 +308,21 @@ describe('Multi-Tick Casting State Machine', () => {
       }));
 
       // Start cast
-      const result = magicSystem.castSpell(caster as any, world, 'channeled_beam');
+      const result = magicSystem.castSpell(caster as Record<string, unknown>, world, 'channeled_beam');
       expect(result).toBe(true);
 
       let magic = caster.getComponent<MagicComponent>(CT.Magic);
       expect(magic.casting).toBe(true);
 
       // Move caster slightly (< 1 tile) - should NOT interrupt
-      caster.updateComponent(CT.Position, (pos: any) => ({ ...pos, x: 0.5, y: 0.5 }));
+      caster.updateComponent(CT.Position, (pos: Record<string, unknown>) => ({ ...pos, x: 0.5, y: 0.5 }));
       world.advanceTick();
       magicSystem.update(world, [caster], 0.05);
       magic = caster.getComponent<MagicComponent>(CT.Magic);
       expect(magic.casting).toBe(true); // Still casting
 
       // Move caster more than 1 tile - should interrupt
-      caster.updateComponent(CT.Position, (pos: any) => ({ ...pos, x: 2, y: 2 }));
+      caster.updateComponent(CT.Position, (pos: Record<string, unknown>) => ({ ...pos, x: 2, y: 2 }));
       world.advanceTick();
       magicSystem.update(world, [caster], 0.05);
 
@@ -352,14 +366,14 @@ describe('Multi-Tick Casting State Machine', () => {
       }));
 
       // Start cast
-      const result = magicSystem.castSpell(caster as any, world, 'resurrection');
+      const result = magicSystem.castSpell(caster as Record<string, unknown>, world, 'resurrection');
       expect(result).toBe(true);
 
       let magic = caster.getComponent<MagicComponent>(CT.Magic);
       expect(magic.casting).toBe(true);
 
       // Caster takes lethal damage
-      caster.updateComponent(CT.Needs, (needs: any) => ({ ...needs, health: 0 }));
+      caster.updateComponent(CT.Needs, (needs: Record<string, unknown>) => ({ ...needs, health: 0 }));
 
       // Tick - should cancel
       world.advanceTick();
@@ -403,7 +417,7 @@ describe('Multi-Tick Casting State Machine', () => {
       target.addComponent({ type: 'needs', health: 100, hunger: 0, thirst: 0, energy: 100 });
 
       // Start cast targeting entity
-      const result = magicSystem.castSpell(caster as any, world, 'targeted_curse', target.id);
+      const result = magicSystem.castSpell(caster as Record<string, unknown>, world, 'targeted_curse', target.id);
       expect(result).toBe(true);
 
       let magic = caster.getComponent<MagicComponent>(CT.Magic);
@@ -455,14 +469,14 @@ describe('Multi-Tick Casting State Machine', () => {
       target.addComponent({ type: 'needs', health: 30, hunger: 0, thirst: 0, energy: 100 });
 
       // Start cast
-      const result = magicSystem.castSpell(caster as any, world, 'major_heal', target.id);
+      const result = magicSystem.castSpell(caster as Record<string, unknown>, world, 'major_heal', target.id);
       expect(result).toBe(true);
 
       let magic = caster.getComponent<MagicComponent>(CT.Magic);
       expect(magic.casting).toBe(true);
 
       // Target dies before heal completes
-      target.updateComponent(CT.Needs, (needs: any) => ({ ...needs, health: 0 }));
+      target.updateComponent(CT.Needs, (needs: Record<string, unknown>) => ({ ...needs, health: 0 }));
 
       // Tick - should cancel
       world.advanceTick();
@@ -502,7 +516,7 @@ describe('Multi-Tick Casting State Machine', () => {
       }));
 
       // Start cast
-      const result = magicSystem.castSpell(caster as any, world, 'epic_ritual');
+      const result = magicSystem.castSpell(caster as Record<string, unknown>, world, 'epic_ritual');
       expect(result).toBe(true);
 
       let magic = caster.getComponent<MagicComponent>(CT.Magic);
@@ -564,7 +578,7 @@ describe('Multi-Tick Casting State Machine', () => {
 
       // All start casting
       for (const caster of casters) {
-        const result = magicSystem.castSpell(caster as any, world, 'group_spell');
+        const result = magicSystem.castSpell(caster as Record<string, unknown>, world, 'group_spell');
         expect(result).toBe(true);
       }
 
@@ -613,7 +627,7 @@ describe('Multi-Tick Casting State Machine', () => {
         knownSpells: [{ spellId: 'instant', proficiency: 50, timesCast: 0 }],
       }));
 
-      const result = magicSystem.castSpell(caster as any, world, 'instant');
+      const result = magicSystem.castSpell(caster as Record<string, unknown>, world, 'instant');
       expect(result).toBe(true);
 
       const magic = caster.getComponent<MagicComponent>(CT.Magic);
@@ -643,7 +657,7 @@ describe('Multi-Tick Casting State Machine', () => {
         knownSpells: [{ spellId: 'epic_ritual_hour', proficiency: 50, timesCast: 0 }],
       }));
 
-      const result = magicSystem.castSpell(caster as any, world, 'epic_ritual_hour');
+      const result = magicSystem.castSpell(caster as Record<string, unknown>, world, 'epic_ritual_hour');
       expect(result).toBe(true);
 
       const magic = caster.getComponent<MagicComponent>(CT.Magic);

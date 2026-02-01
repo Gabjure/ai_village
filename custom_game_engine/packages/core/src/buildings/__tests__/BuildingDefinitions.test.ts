@@ -439,10 +439,10 @@ describe('Building Functionality Tracking', () => {
 
       // This will fail - functionality not yet tracked on blueprints
       expect(workbench).toHaveProperty('functionality');
-      expect(Array.isArray((workbench as any).functionality)).toBe(true);
+      expect(Array.isArray((workbench as Record<string, unknown>).functionality)).toBe(true);
 
-      const craftingFunc = (workbench as any).functionality.find(
-        (f: any) => f.type === 'crafting'
+      const craftingFunc = (workbench as Record<string, unknown>).functionality.find(
+        (f: Record<string, unknown>) => f.type === 'crafting'
       );
       expect(craftingFunc).toBeDefined();
     });
@@ -452,8 +452,8 @@ describe('Building Functionality Tracking', () => {
 
       expect(chest).toHaveProperty('functionality');
 
-      const storageFunc = (chest as any).functionality.find(
-        (f: any) => f.type === 'storage'
+      const storageFunc = (chest as Record<string, unknown>).functionality.find(
+        (f: Record<string, unknown>) => f.type === 'storage'
       );
       expect(storageFunc).toBeDefined();
       expect(storageFunc.capacity).toBe(20);
@@ -464,8 +464,8 @@ describe('Building Functionality Tracking', () => {
 
       expect(tent).toHaveProperty('functionality');
 
-      const sleepingFunc = (tent as any).functionality.find(
-        (f: any) => f.type === 'sleeping'
+      const sleepingFunc = (tent as Record<string, unknown>).functionality.find(
+        (f: Record<string, unknown>) => f.type === 'sleeping'
       );
       expect(sleepingFunc).toBeDefined();
     });
@@ -475,8 +475,8 @@ describe('Building Functionality Tracking', () => {
 
       expect(well).toHaveProperty('functionality');
 
-      const gatheringFunc = (well as any).functionality.find(
-        (f: any) => f.type === 'gathering_boost'
+      const gatheringFunc = (well as Record<string, unknown>).functionality.find(
+        (f: Record<string, unknown>) => f.type === 'gathering_boost'
       );
       expect(gatheringFunc).toBeDefined();
       expect(gatheringFunc.resourceTypes).toContain('water');
@@ -511,11 +511,11 @@ describe('Building Functionality Tracking', () => {
       // Specifically verify the missing functions from playtest
       const researchFunction = allFunctions.find((f) => f.type === 'research');
       expect(researchFunction).toBeDefined();
-      expect((researchFunction as any).fields).toBeDefined();
+      expect((researchFunction as Record<string, unknown>).fields).toBeDefined();
 
       const automationFunction = allFunctions.find((f) => f.type === 'automation');
       expect(automationFunction).toBeDefined();
-      expect((automationFunction as any).tasks).toBeDefined();
+      expect((automationFunction as Record<string, unknown>).tasks).toBeDefined();
     });
   });
 });
@@ -549,7 +549,7 @@ describe('Error Handling', () => {
         rotationAngles: [0],
         snapToGrid: true,
         requiresFoundation: false,
-      } as any;
+      } as Record<string, unknown>;
 
       expect(() => registry.register(invalidBlueprint)).toThrow();
     });

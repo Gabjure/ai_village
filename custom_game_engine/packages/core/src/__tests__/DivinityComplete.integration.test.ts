@@ -176,7 +176,7 @@ describe('Divinity System - Complete Integration', () => {
         (agent.components as Map<string, any>).set(CT.Agent, createAgentComponent('wander', false, 20));
         const spiritual = createSpiritualComponent();
         spiritual.faith = 0.7;
-        (spiritual as any).prayerHistory = ['harvest', 'harvest', 'harvest'];
+        (spiritual as Record<string, unknown>).prayerHistory = ['harvest', 'harvest', 'harvest'];
         (agent.components as Map<string, any>).set(CT.Spiritual, spiritual);
       }
 
