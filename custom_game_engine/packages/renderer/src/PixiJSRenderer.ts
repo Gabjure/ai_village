@@ -48,7 +48,6 @@ let _globalPixiRenderer: PixiJSRenderer | null = null;
  */
 export function cleanupExistingRenderer(): void {
   if (_globalPixiRenderer) {
-    console.log('[PixiJSRenderer] Cleaning up existing renderer before creating new one');
     try {
       _globalPixiRenderer.destroy();
     } catch (e) {
@@ -67,8 +66,7 @@ if (typeof window !== 'undefined') {
   // Also cleanup on visibility change (tab backgrounded) to help with context limits
   document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'hidden' && _globalPixiRenderer) {
-      console.log('[PixiJSRenderer] Tab backgrounded - renderer still active');
-      // Don't destroy on background, but log for debugging context issues
+      // Don't destroy on background to preserve context
     }
   });
 }
@@ -158,24 +156,24 @@ function getWebGLDiagnostics(): Record<string, string | number | boolean> {
 export function logWebGLDiagnostics(): void {
   // Context count
   const contextInfo = countActiveWebGLContexts();
-  console.log(`[WebGL Diagnostics] Active WebGL contexts: ${contextInfo.total}`);
-  console.log('[WebGL Diagnostics] Browser limit: typically 8-16 contexts');
+  console.warn(`[WebGL Diagnostics] Active WebGL contexts: ${contextInfo.total}`);
+  console.warn('[WebGL Diagnostics] Browser limit: typically 8-16 contexts');
   for (const detail of contextInfo.details) {
-    console.log(`[WebGL Diagnostics]   ${detail}`);
+    console.warn(`[WebGL Diagnostics]   ${detail}`);
   }
 
   // GPU info
-  console.log('[WebGL Diagnostics] GPU/WebGL capabilities:');
+  console.warn('[WebGL Diagnostics] GPU/WebGL capabilities:');
   const diagnostics = getWebGLDiagnostics();
   for (const [key, value] of Object.entries(diagnostics)) {
-    console.log(`[WebGL Diagnostics]   ${key}: ${value}`);
+    console.warn(`[WebGL Diagnostics]   ${key}: ${value}`);
   }
 
   // Memory info (Chrome only)
   if ((performance as Performance & { memory?: { usedJSHeapSize: number; jsHeapSizeLimit: number } }).memory) {
     const mem = (performance as Performance & { memory: { usedJSHeapSize: number; jsHeapSizeLimit: number } }).memory;
-    console.log('[WebGL Diagnostics] Memory:');
-    console.log(`[WebGL Diagnostics]   JS Heap: ${(mem.usedJSHeapSize / 1024 / 1024).toFixed(1)} MB / ${(mem.jsHeapSizeLimit / 1024 / 1024).toFixed(1)} MB`);
+    console.warn('[WebGL Diagnostics] Memory:');
+    console.warn(`[WebGL Diagnostics]   JS Heap: ${(mem.usedJSHeapSize / 1024 / 1024).toFixed(1)} MB / ${(mem.jsHeapSizeLimit / 1024 / 1024).toFixed(1)} MB`);
   }
 }
 
@@ -199,8 +197,7 @@ function setupContextLostHandlers(canvas: HTMLCanvasElement): void {
   });
 
   canvas.addEventListener('webglcontextrestored', () => {
-    console.log('[PixiJSRenderer] ✓ WebGL context restored');
-    console.log('The renderer should automatically recover.');
+    console.warn('[PixiJSRenderer] WebGL context restored - renderer should automatically recover');
   });
 
   // WebGPU equivalent
@@ -373,10 +370,6 @@ export class PixiJSRenderer implements IRenderer {
     // This will alert us if WebGL gets lost after initialization
     setupContextLostHandlers(this._canvas);
 
-    // Log initial diagnostics for debugging intermittent failures
-    console.log('[PixiJSRenderer] Initializing...');
-    logWebGLDiagnostics();
-
     // Determine preferred backend
     const preference = this.options.preference ?? 'auto';
     let preferenceForPixi: 'webgpu' | 'webgl' | undefined;
@@ -400,7 +393,6 @@ export class PixiJSRenderer implements IRenderer {
                 // Full WebGPU pipeline verified
                 preferenceForPixi = 'webgpu';
                 this.backend = 'webgpu';
-                console.log('[PixiJSRenderer] WebGPU fully verified, using WebGPU backend');
               } else {
                 console.warn('[PixiJSRenderer] WebGPU context unavailable, falling back to WebGL');
               }
@@ -427,7 +419,6 @@ export class PixiJSRenderer implements IRenderer {
 
           preferenceForPixi = 'webgl';
           this.backend = 'webgl';
-          console.log('[PixiJSRenderer] WebGL verified, using WebGL backend');
         } else {
           throw new Error('WebGL not available - cannot create context');
         }
@@ -507,7 +498,7 @@ export class PixiJSRenderer implements IRenderer {
             backgroundColor: 0x1a1a2e,
             autoDensity: false,
           });
-          console.log('[PixiJSRenderer] ✓ WebGL fallback succeeded');
+          console.warn('[PixiJSRenderer] WebGL fallback succeeded after WebGPU failure');
         } catch (webglError) {
           console.error('[PixiJSRenderer] ❌ WebGL fallback ALSO FAILED!');
           console.error('WebGL error:', webglError);
@@ -594,7 +585,6 @@ export class PixiJSRenderer implements IRenderer {
         parent.style.position = 'relative';
       }
       this._canvas.parentElement.appendChild(this._overlayCanvas);
-      console.log('[PixiJSRenderer] Created Canvas2D UI overlay');
     }
 
     // Set initial size from parent element (critical for proper viewport)
@@ -604,8 +594,6 @@ export class PixiJSRenderer implements IRenderer {
 
     // Register as global renderer for cleanup on HMR/reload
     _globalPixiRenderer = this;
-
-    console.log(`[PixiJSRenderer] Initialized with ${this.backend.toUpperCase()} backend`);
   }
 
   private handleResize = (): void => {
@@ -638,8 +626,6 @@ export class PixiJSRenderer implements IRenderer {
         this._overlayCanvas.width = width;
         this._overlayCanvas.height = height;
       }
-
-      console.log(`[PixiJSRenderer] Resized to ${width}x${height}`);
     }
   };
 
@@ -1404,7 +1390,6 @@ export class PixiJSRenderer implements IRenderer {
 
   initCombatUI(world: World, eventBus: EventBus): void {
     // TODO: Port health bar and threat indicator renderers
-    console.log('[PixiJSRenderer] Combat UI initialization placeholder');
   }
 
   /**
@@ -1418,11 +1403,11 @@ export class PixiJSRenderer implements IRenderer {
    * - Steering (behavior + target)
    */
   debugAgentPositions(): void {
-    console.log('[PixiJSRenderer] Agent Debug Info');
-    console.log(`[PixiJSRenderer] Cached agents: ${this._cachedAgentEntities.length}`);
-    console.log(`[PixiJSRenderer] Entity sprites: ${this.entitySprites.size}`);
-    console.log(`[PixiJSRenderer] Visible entities: ${this._visibleEntities.length}`);
-    console.log(`[PixiJSRenderer] Cache refresh ticks - agents: ${this._agentCacheLastRefresh}, renderables: ${this._renderableCacheLastRefresh}`);
+    console.warn('[PixiJSRenderer] Agent Debug Info');
+    console.warn(`[PixiJSRenderer] Cached agents: ${this._cachedAgentEntities.length}`);
+    console.warn(`[PixiJSRenderer] Entity sprites: ${this.entitySprites.size}`);
+    console.warn(`[PixiJSRenderer] Visible entities: ${this._visibleEntities.length}`);
+    console.warn(`[PixiJSRenderer] Cache refresh ticks - agents: ${this._agentCacheLastRefresh}, renderables: ${this._renderableCacheLastRefresh}`);
 
     // Diagnostic counters
     let hasPosition = 0;
@@ -1455,21 +1440,21 @@ export class PixiJSRenderer implements IRenderer {
     }
 
     const total = this._cachedAgentEntities.length;
-    console.log('[PixiJSRenderer] === COMPONENT COVERAGE ===');
-    console.log(`[PixiJSRenderer] Position:  ${hasPosition}/${total} (${((hasPosition/total)*100).toFixed(0)}%)`);
-    console.log(`[PixiJSRenderer] Velocity:  ${hasVelocity}/${total} (${((hasVelocity/total)*100).toFixed(0)}%) - REQUIRED for SteeringSystem`);
-    console.log(`[PixiJSRenderer] Movement:  ${hasMovement}/${total} (${((hasMovement/total)*100).toFixed(0)}%) - REQUIRED for MovementSystem`);
-    console.log(`[PixiJSRenderer] Steering:  ${hasSteering}/${total} (${((hasSteering/total)*100).toFixed(0)}%) - REQUIRED for SteeringSystem`);
-    console.log(`[PixiJSRenderer]   - with target: ${hasSteeringTarget}/${hasSteering}`);
-    console.log(`[PixiJSRenderer] Non-zero velocity: ${hasNonZeroVelocity}/${total}`);
+    console.warn('[PixiJSRenderer] === COMPONENT COVERAGE ===');
+    console.warn(`[PixiJSRenderer] Position:  ${hasPosition}/${total} (${((hasPosition/total)*100).toFixed(0)}%)`);
+    console.warn(`[PixiJSRenderer] Velocity:  ${hasVelocity}/${total} (${((hasVelocity/total)*100).toFixed(0)}%) - REQUIRED for SteeringSystem`);
+    console.warn(`[PixiJSRenderer] Movement:  ${hasMovement}/${total} (${((hasMovement/total)*100).toFixed(0)}%) - REQUIRED for MovementSystem`);
+    console.warn(`[PixiJSRenderer] Steering:  ${hasSteering}/${total} (${((hasSteering/total)*100).toFixed(0)}%) - REQUIRED for SteeringSystem`);
+    console.warn(`[PixiJSRenderer]   - with target: ${hasSteeringTarget}/${hasSteering}`);
+    console.warn(`[PixiJSRenderer] Non-zero velocity: ${hasNonZeroVelocity}/${total}`);
 
-    console.log('[PixiJSRenderer] === STEERING BEHAVIORS ===');
+    console.warn('[PixiJSRenderer] === STEERING BEHAVIORS ===');
     for (const [behavior, count] of Object.entries(steeringBehaviors)) {
-      console.log(`[PixiJSRenderer]   ${behavior}: ${count}`);
+      console.warn(`[PixiJSRenderer]   ${behavior}: ${count}`);
     }
 
     // DIAGNOSIS
-    console.log('[PixiJSRenderer] === DIAGNOSIS ===');
+    console.warn('[PixiJSRenderer] === DIAGNOSIS ===');
     if (hasVelocity === 0) {
       console.error('[PixiJSRenderer] PROBLEM: No agents have Velocity component - SteeringSystem cannot run!');
     }
@@ -1490,7 +1475,7 @@ export class PixiJSRenderer implements IRenderer {
     }
 
     // Sample first 3 agents in detail
-    console.log('[PixiJSRenderer] === SAMPLE AGENTS (first 3) ===');
+    console.warn('[PixiJSRenderer] === SAMPLE AGENTS (first 3) ===');
     for (const entity of this._cachedAgentEntities.slice(0, 3)) {
       const pos = entity.getComponent('position') as { x: number; y: number } | undefined;
       const vel = entity.getComponent('velocity') as { vx: number; vy: number } | undefined;
@@ -1502,28 +1487,28 @@ export class PixiJSRenderer implements IRenderer {
       } | undefined;
       const sprite = this.entitySprites.get(entity.id);
 
-      console.log(`[PixiJSRenderer] Agent ${entity.id.slice(0, 8)}:`);
-      console.log(`[PixiJSRenderer]   Position: ${pos ? `(${pos.x.toFixed(2)}, ${pos.y.toFixed(2)})` : 'MISSING'}`);
-      console.log(`[PixiJSRenderer]   Velocity: ${vel ? `vx=${vel.vx.toFixed(3)}, vy=${vel.vy.toFixed(3)}` : 'MISSING'}`);
-      console.log(`[PixiJSRenderer]   Movement: ${movement ? `vX=${movement.velocityX.toFixed(3)}, vY=${movement.velocityY.toFixed(3)}` : 'MISSING'}`);
-      console.log(`[PixiJSRenderer]   Steering: ${steering ? `behavior="${steering.behavior}", target=${steering.target ? `(${steering.target.x.toFixed(1)}, ${steering.target.y.toFixed(1)})` : 'none'}, maxSpeed=${steering.maxSpeed}` : 'MISSING'}`);
-      console.log(`[PixiJSRenderer]   Sprite: ${sprite ? `visible=${sprite.visible}, pos=(${sprite.x.toFixed(1)}, ${sprite.y.toFixed(1)})` : 'no sprite'}`);
+      console.warn(`[PixiJSRenderer] Agent ${entity.id.slice(0, 8)}:`);
+      console.warn(`[PixiJSRenderer]   Position: ${pos ? `(${pos.x.toFixed(2)}, ${pos.y.toFixed(2)})` : 'MISSING'}`);
+      console.warn(`[PixiJSRenderer]   Velocity: ${vel ? `vx=${vel.vx.toFixed(3)}, vy=${vel.vy.toFixed(3)}` : 'MISSING'}`);
+      console.warn(`[PixiJSRenderer]   Movement: ${movement ? `vX=${movement.velocityX.toFixed(3)}, vY=${movement.velocityY.toFixed(3)}` : 'MISSING'}`);
+      console.warn(`[PixiJSRenderer]   Steering: ${steering ? `behavior="${steering.behavior}", target=${steering.target ? `(${steering.target.x.toFixed(1)}, ${steering.target.y.toFixed(1)})` : 'none'}, maxSpeed=${steering.maxSpeed}` : 'MISSING'}`);
+      console.warn(`[PixiJSRenderer]   Sprite: ${sprite ? `visible=${sprite.visible}, pos=(${sprite.x.toFixed(1)}, ${sprite.y.toFixed(1)})` : 'no sprite'}`);
     }
 
-    console.log('[PixiJSRenderer] === HOW TO FIX ===');
+    console.warn('[PixiJSRenderer] === HOW TO FIX ===');
     if (hasVelocity === 0 || hasMovement === 0 || hasSteering === 0) {
-      console.log('[PixiJSRenderer] Agents are missing required components. Check agent creation code.');
-      console.log('[PixiJSRenderer] Required components for movement: Position, Velocity, Movement, Steering');
+      console.warn('[PixiJSRenderer] Agents are missing required components. Check agent creation code.');
+      console.warn('[PixiJSRenderer] Required components for movement: Position, Velocity, Movement, Steering');
     } else if (steeringBehaviors['none'] === hasSteering || hasSteeringTarget === 0) {
-      console.log('[PixiJSRenderer] Agents have components but no active steering behavior/target.');
-      console.log('[PixiJSRenderer] Check AgentBrainSystem - it should set steering.behavior and steering.target.');
+      console.warn('[PixiJSRenderer] Agents have components but no active steering behavior/target.');
+      console.warn('[PixiJSRenderer] Check AgentBrainSystem - it should set steering.behavior and steering.target.');
     } else if (hasNonZeroVelocity === 0) {
-      console.log('[PixiJSRenderer] SteeringSystem may not be running or not computing velocity.');
-      console.log('[PixiJSRenderer] Check system registry: window.game.gameLoop.systemRegistry.systems');
+      console.warn('[PixiJSRenderer] SteeringSystem may not be running or not computing velocity.');
+      console.warn('[PixiJSRenderer] Check system registry: window.game.gameLoop.systemRegistry.systems');
     } else {
-      console.log('[PixiJSRenderer] Components look OK - check MovementSystem execution.');
+      console.warn('[PixiJSRenderer] Components look OK - check MovementSystem execution.');
     }
-    console.log('[PixiJSRenderer] To check if simulation is running, run: window.game.gameLoop.world.tick');
+    console.warn('[PixiJSRenderer] To check if simulation is running, run: window.game.gameLoop.world.tick');
   }
 
   getEntityAt(screenX: number, screenY: number, world: World): Entity | null {
@@ -1559,12 +1544,10 @@ export class PixiJSRenderer implements IRenderer {
 
   toggleDebugOverlay(): void {
     // TODO: Implement debug overlay
-    console.log('[PixiJSRenderer] Debug overlay toggle placeholder');
   }
 
   toggleTemperatureOverlay(): void {
     // TODO: Implement temperature overlay
-    console.log('[PixiJSRenderer] Temperature overlay toggle placeholder');
   }
 
   destroy(): void {
@@ -1608,6 +1591,5 @@ export class PixiJSRenderer implements IRenderer {
     }
 
     this.initialized = false;
-    console.log('[PixiJSRenderer] Destroyed');
   }
 }
