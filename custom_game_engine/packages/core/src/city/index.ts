@@ -12,3 +12,12 @@ export {
   type CityDecision,
   type CityManagerConfig,
 } from './CityManager.js';
+
+// City spawning functions for dev tools and dashboard
+export {
+  spawnCity,
+  getCityTemplates,
+  type CityTemplate,
+  type CitySpawnConfig,
+  type SpawnedCityInfo,
+} from './CitySpawner.js';

@@ -140,11 +140,82 @@ const llmCapability = defineCapability({
       requiresGame: false,
       handler: async (params, gameClient, context) => {
         try {
-          // TODO: Implement cost tracking API endpoint
-          return { message: 'Cost tracking coming soon - API endpoint needed' };
+          const costs = await fetchFromMetricsServer('/api/llm/costs');
+
+          // Filter by session if specified
+          let sessionCosts = costs.sessions || [];
+          if (params.session && params.session !== 'all') {
+            sessionCosts = sessionCosts.filter((s: { sessionId: string }) =>
+              s.sessionId === params.session
+            );
+          }
+
+          // Filter by provider if specified
+          let providerCosts = costs.providers || [];
+          if (params.provider && params.provider !== 'all') {
+            providerCosts = providerCosts.filter((p: { provider: string }) =>
+              p.provider === params.provider
+            );
+          }
+
+          return {
+            summary: costs.summary || {},
+            sessions: sessionCosts,
+            providers: providerCosts,
+            apiKeys: costs.apiKeys || [],
+          };
         } catch (error) {
           return { error: `Failed to fetch costs: ${error}` };
         }
+      },
+      renderResult: (data: unknown) => {
+        const result = data as {
+          summary?: { totalCost: number; totalRequests: number; totalTokens: number };
+          sessions?: Array<{ sessionId: string; totalCost: number; requestCount: number; totalInputTokens: number; totalOutputTokens: number }>;
+          providers?: Array<{ provider: string; totalCost: number; requestCount: number; totalInputTokens: number; totalOutputTokens: number }>;
+          error?: string;
+        };
+
+        if (result.error) {
+          return `Error: ${result.error}`;
+        }
+
+        let output = `LLM COST TRACKING\n\n`;
+
+        // Summary
+        if (result.summary) {
+          output += `SUMMARY\n`;
+          output += `  Total Cost:     $${result.summary.totalCost?.toFixed(4) || '0.0000'}\n`;
+          output += `  Total Requests: ${result.summary.totalRequests || 0}\n`;
+          output += `  Total Tokens:   ${(result.summary.totalTokens || 0).toLocaleString()}\n\n`;
+        }
+
+        // Provider costs
+        if (result.providers && result.providers.length > 0) {
+          output += `PROVIDERS\n`;
+          for (const provider of result.providers) {
+            output += `  ${provider.provider.toUpperCase()}:\n`;
+            output += `    Cost: $${provider.totalCost?.toFixed(4) || '0.0000'}\n`;
+            output += `    Requests: ${provider.requestCount || 0}\n`;
+            output += `    Tokens: ${((provider.totalInputTokens || 0) + (provider.totalOutputTokens || 0)).toLocaleString()}\n`;
+          }
+          output += '\n';
+        }
+
+        // Session costs (top 5)
+        if (result.sessions && result.sessions.length > 0) {
+          output += `SESSIONS (top 5)\n`;
+          const topSessions = result.sessions
+            .sort((a, b) => (b.totalCost || 0) - (a.totalCost || 0))
+            .slice(0, 5);
+          for (const session of topSessions) {
+            output += `  ${session.sessionId.slice(0, 8)}...:\n`;
+            output += `    Cost: $${session.totalCost?.toFixed(4) || '0.0000'}\n`;
+            output += `    Requests: ${session.requestCount || 0}\n`;
+          }
+        }
+
+        return output;
       },
     }),
 
