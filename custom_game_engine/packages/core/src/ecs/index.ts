@@ -55,3 +55,13 @@ export {
   type ResourceRecord,
   type DroppedItemRecord,
 } from './EntityDemotion.js';
+
+// BeltNetwork - Factorio-style belt network merging optimization
+// Groups consecutive same-direction belts into segments to reduce per-tick processing
+export * from './BeltNetwork.js';
+export {
+  BeltNetworkManager,
+  beltNetworkManager,
+  type BeltNetworkSegment,
+  type TransitItem,
+} from './BeltNetwork.js';

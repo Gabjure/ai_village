@@ -41,7 +41,7 @@ const DEFAULT_CONFIG: Renderer3DConfig = {
   fogNear: 50,
   fogFar: 150,
   moveSpeed: 15,
-  useInstancedSprites: false, // Enable for better performance (experimental)
+  useInstancedSprites: true, // GPU instanced rendering for O(1) draw calls
 };
 
 // Animation directions for walking sprites
