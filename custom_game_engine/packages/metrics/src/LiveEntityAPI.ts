@@ -11,8 +11,7 @@ import type { World, WorldMutator } from '@ai-village/core';
 import type { Entity } from '@ai-village/core';
 import type { MetricsStreamClient, QueryRequest, QueryResponse, ActionRequest, ActionResponse } from './MetricsStreamClient.js';
 import { pendingApprovalRegistry, type AgentDebugManager } from '@ai-village/core';
-// TODO: Re-export these from core or import directly from source files
-// import { spawnCity, getCityTemplates, type CitySpawnConfig } from '@ai-village/core';
+import { spawnCity, getCityTemplates, type CitySpawnConfig } from '@ai-village/core';
 import { createLLMAgent, createWanderingAgent } from '@ai-village/agents';
 import { DeityComponent, createTagsComponent, createIdentityComponent } from '@ai-village/core';
 
@@ -907,44 +906,42 @@ export class LiveEntityAPI {
       };
     }
 
-    // TODO: Re-enable once spawnCity is exported from core
-    // const config: CitySpawnConfig = {
-    //   template: template as any,
-    //   x,
-    //   y,
-    //   name: typeof name === 'string' ? name : undefined,
-    //   agentCount: typeof agentCount === 'number' ? agentCount : undefined,
-    //   useLLM: typeof useLLM === 'boolean' ? useLLM : true,
-    // };
-
-    // try {
-    //   const cityInfo = await spawnCity(this.world, config);
-
-    //   return {
-    //     requestId: action.requestId,
-    //     success: true,
-    //     data: cityInfo,
-    //   };
-    // } catch (error) {
-    return {
-      requestId: action.requestId,
-      success: false,
-      error: 'City spawning temporarily disabled during refactor',
+    const config: CitySpawnConfig = {
+      template: template as CitySpawnConfig['template'],
+      x,
+      y,
+      name: typeof name === 'string' ? name : undefined,
+      agentCount: typeof agentCount === 'number' ? agentCount : undefined,
+      useLLM: typeof useLLM === 'boolean' ? useLLM : true,
     };
-    // }
+
+    try {
+      const cityInfo = await spawnCity(this.world, config);
+
+      return {
+        requestId: action.requestId,
+        success: true,
+        data: cityInfo,
+      };
+    } catch (error) {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: `Failed to spawn city: ${error}`,
+      };
+    }
   }
 
   /**
    * List available city templates
    */
   private handleListCityTemplates(action: ActionRequest): ActionResponse {
-    // TODO: Re-enable once getCityTemplates is exported from core
-    // const templates = getCityTemplates();
+    const templates = getCityTemplates();
 
     return {
       requestId: action.requestId,
-      success: false,
-      error: 'City templates listing temporarily disabled during refactor',
+      success: true,
+      data: templates,
     };
   }
 
