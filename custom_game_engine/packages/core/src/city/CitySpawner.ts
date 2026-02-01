@@ -14,18 +14,14 @@ import { createBuildingComponent, BuildingType } from '../components/BuildingCom
 import { createPositionComponent } from '../components/PositionComponent.js';
 import { createRenderableComponent } from '../components/RenderableComponent.js';
 import { createProfessionComponent, type ProfessionRole } from '../components/ProfessionComponent.js';
+import { container, type AgentFactory } from '../di/index.js';
 
-// Agent creation functions - lazy loaded to avoid circular dependency with @ai-village/agents
-type AgentModule = { createLLMAgent: (world: WorldMutator, x: number, y: number, speed: number) => string; createWanderingAgent: (world: WorldMutator, x: number, y: number, speed: number) => string };
-let _agentModule: AgentModule | null = null;
-async function getAgentModule(): Promise<AgentModule> {
-  if (!_agentModule) {
-    // Dynamic import to break circular dependency: core -> agents -> core
-    // The agents package exports these functions, so we can safely cast to AgentModule
-    const module = await import('@ai-village/agents');
-    _agentModule = module as AgentModule;
-  }
-  return _agentModule!;
+/**
+ * Get agent factory from DI container.
+ * Returns null if agents package hasn't been registered yet.
+ */
+function getAgentFactory(): AgentFactory | null {
+  return container.getAgentFactory();
 }
 
 /**
@@ -877,14 +873,18 @@ export async function spawnCity(
     const agentX = config.x + Math.cos(angle) * spawnRadius;
     const agentY = config.y + Math.sin(angle) * spawnRadius;
 
-    // Create agent using existing agent creation functions (lazy-loaded)
+    // Create agent using agent factory from DI container
     // Use LLM agents if configured, otherwise use wandering agents (scripted)
-    const agentModule = await getAgentModule();
+    const agentFactory = getAgentFactory();
+    if (!agentFactory) {
+      console.warn('[CitySpawner] Agent factory not registered - cannot spawn agents');
+      break;
+    }
     let agentId: string;
     if (useLLM) {
-      agentId = agentModule.createLLMAgent(world, agentX, agentY, 2.0);
+      agentId = agentFactory.createLLMAgent(world, agentX, agentY, { name: undefined, profession });
     } else {
-      agentId = agentModule.createWanderingAgent(world, agentX, agentY, 2.0);
+      agentId = agentFactory.createWanderingAgent(world, agentX, agentY, { name: undefined, profession });
     }
 
     spawnedAgentIds.push(agentId);
