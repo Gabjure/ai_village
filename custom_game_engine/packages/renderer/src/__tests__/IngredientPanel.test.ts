@@ -32,7 +32,7 @@ describe('IngredientPanel - Fake Implementation Cleanup', () => {
     for (const recipeId of testRecipeIds) {
       try {
         // Remove from registry's internal map (accessing private field via cast)
-        const registry = globalRecipeRegistry as any;
+        const registry = globalRecipeRegistry as unknown;
         registry.recipes?.delete(recipeId);
       } catch {
         // Ignore errors during cleanup
@@ -80,8 +80,8 @@ describe('IngredientPanel - Fake Implementation Cleanup', () => {
       inventory.slots[1] = { itemId: 'stone', quantity: 15 };
       inventory.slots[2] = { itemId: 'iron', quantity: 7 };
 
-      (agent as any).addComponent(inventory);
-      (agent as any).addComponent(createAgentComponent('Test Agent'));
+      (agent as Record<string, unknown>).addComponent(inventory);
+      (agent as Record<string, unknown>).addComponent(createAgentComponent('Test Agent'));
 
       // Set recipe on panel
       panel.setRecipe('test_recipe_1', agent.id);
@@ -120,8 +120,8 @@ describe('IngredientPanel - Fake Implementation Cleanup', () => {
       const inventory = createInventoryComponent(20, 100);
       inventory.slots[0] = { itemId: 'wood', quantity: 3 };
 
-      (agent as any).addComponent(inventory);
-      (agent as any).addComponent(createAgentComponent('Test Agent'));
+      (agent as Record<string, unknown>).addComponent(inventory);
+      (agent as Record<string, unknown>).addComponent(createAgentComponent('Test Agent'));
 
       panel.setRecipe('test_recipe_2', agent.id);
 
@@ -198,8 +198,8 @@ describe('IngredientPanel - Fake Implementation Cleanup', () => {
       inventory.slots[1] = { itemId: 'stone', quantity: 3 }; // PARTIAL (< required)
       // iron not in inventory - MISSING
 
-      (agent as any).addComponent(inventory);
-      (agent as any).addComponent(createAgentComponent('Test Agent'));
+      (agent as Record<string, unknown>).addComponent(inventory);
+      (agent as Record<string, unknown>).addComponent(createAgentComponent('Test Agent'));
 
       panel.setRecipe('test_recipe_4', agent.id);
 

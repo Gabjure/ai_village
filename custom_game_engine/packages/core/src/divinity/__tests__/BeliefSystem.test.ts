@@ -176,7 +176,7 @@ describe('Belief Decay', () => {
       believers: [],
       growthRate: 0,
       decayRate: 0.01, // 1% per tick
-    } as any;
+    } as Record<string, unknown>;
 
     const decayed = applyBeliefDecay(state, 100); // 100 ticks
 
@@ -195,7 +195,7 @@ describe('Belief Decay', () => {
       ],
       growthRate: 0,
       decayRate: 0.01,
-    } as any;
+    } as Record<string, unknown>;
 
     const inactiveState: DeityBeliefState = {
       totalBelief: 1000,
@@ -203,7 +203,7 @@ describe('Belief Decay', () => {
       believers: [], // No believers!
       growthRate: 0,
       decayRate: 0.01,
-    } as any;
+    } as Record<string, unknown>;
 
     const activeDecay = applyBeliefDecay(activeState, 100);
     const inactiveDecay = applyBeliefDecay(inactiveState, 100);
@@ -221,7 +221,7 @@ describe('Belief Decay', () => {
       believers: [],
       growthRate: 0,
       decayRate: 0.01,
-    } as any;
+    } as Record<string, unknown>;
 
     const decayed = applyBeliefDecay(state, 100);
 
@@ -239,7 +239,7 @@ describe('Belief Decay', () => {
       believers: [],
       growthRate: 0,
       decayRate: 0.5, // Heavy decay
-    } as any;
+    } as Record<string, unknown>;
 
     const decayed = applyBeliefDecay(state, 100);
 
@@ -330,7 +330,7 @@ describe('Belief Quality and Growth', () => {
       believers: [],
       growthRate: 0,
       decayRate: 0.01,
-    } as any;
+    } as Record<string, unknown>;
 
     const quality = calculateBeliefQuality(state);
 
@@ -449,7 +449,7 @@ function createMockDeity(id: string): Deity {
       alignment: { law_chaos: 0, good_evil: 0, selfless_selfish: 0 },
       forms: [],
     },
-  } as any;
+  } as Record<string, unknown>;
 }
 
 function createBeliever(id: string, belief: any): any {
@@ -460,7 +460,7 @@ function createBeliever(id: string, belief: any): any {
 }
 
 function createMockWorld(): World {
-  return {} as any;
+  return {} as Partial<World> as World;
 }
 
 function calculateBeliefGeneration(believer: any, activity: BeliefActivity, deity: Deity): BeliefGeneration {
@@ -484,7 +484,7 @@ function createEmptyBeliefState(): DeityBeliefState {
     believers: [],
     growthRate: 0,
     decayRate: 0.01,
-  } as any;
+  } as Record<string, unknown>;
 }
 
 function addBeliefGeneration(state: DeityBeliefState, gen: BeliefGeneration): void {

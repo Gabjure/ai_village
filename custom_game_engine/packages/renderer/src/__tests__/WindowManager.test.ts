@@ -107,7 +107,7 @@ describe('WindowManager', () => {
       const invalidConfig = {
         defaultX: 100,
         // Missing defaultY, defaultWidth, defaultHeight
-      } as any;
+      } as Record<string, unknown>;
 
       expect(() => {
         windowManager.registerWindow('test', panel, invalidConfig);
@@ -357,7 +357,8 @@ describe('WindowManager', () => {
       };
 
       expect(() => {
-        windowManager.registerWindow('null-panel', null as any, config);
+      // @ts-expect-error Testing null parameter validation
+        windowManager.registerWindow('null-panel', null, config);
       }).toThrow('Panel cannot be null or undefined');
     });
   });

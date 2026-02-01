@@ -157,7 +157,8 @@ describe('BeliefComponent', () => {
   describe('AC10: No Silent Fallbacks (CLAUDE.md Compliance)', () => {
     it('should throw error for invalid belief type', () => {
       expect(() => {
-        component.recordEvidence('invalid' as any, 'subject', 'observation', 100);
+        component.recordEvidence(// @ts-expect-error Testing invalid value validation
+      'invalid', 'subject', 'observation', 100);
       }).toThrow('belief type');
     });
 
@@ -169,7 +170,8 @@ describe('BeliefComponent', () => {
 
     it('should throw error for invalid evidence type', () => {
       expect(() => {
-        component.recordEvidence('character', 'alice', '' as any, 100);
+        component.recordEvidence('character', 'alice', // @ts-expect-error Testing invalid value validation
+      '', 100);
       }).toThrow('evidence');
     });
 

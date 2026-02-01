@@ -55,7 +55,7 @@ describe('SleepSystem Integration', () => {
     }
 
     // Get updated circadian component
-    const circadian = agent.getComponent(ComponentType.Circadian) as any;
+    const circadian = agent.getComponent(ComponentType.Circadian);
 
     // Sleep drive should be around 95-100 after 18 game hours
     // Base rate: 5.5/hour * 18 = 99 (correct)
@@ -99,7 +99,7 @@ describe('SleepSystem Integration', () => {
       stateMutator.update(world, entities, 2.0); // Apply sleep drive deltas
     }
 
-    const circadian = agent.getComponent(ComponentType.Circadian) as any;
+    const circadian = agent.getComponent(ComponentType.Circadian);
 
     // With tired multiplier (1.5x), rate is 8.25/hour (correct)
     // 8.25 * 12 = 99 (should be near max)
@@ -116,9 +116,9 @@ describe('SleepSystem Integration', () => {
 
     const agent = new EntityImpl(createEntityId(), 0);
     const circadian = createCircadianComponent();
-    (circadian as any).sleepDrive = 100; // Start at max
-    (circadian as any).isSleeping = true; // Agent is sleeping
-    (circadian as any).sleepQuality = 0.5; // Default quality
+    (circadian as Record<string, unknown>).sleepDrive = 100; // Start at max
+    (circadian as { isSleeping?: boolean }).isSleeping = true; // Agent is sleeping
+    (circadian as Record<string, unknown>).sleepQuality = 0.5; // Default quality
 
     agent.addComponent(circadian);
     agent.addComponent(new NeedsComponent({
@@ -147,7 +147,7 @@ describe('SleepSystem Integration', () => {
       stateMutator.update(world, entities, 2.0); // Apply sleep drive deltas
     }
 
-    const updatedCircadian = agent.getComponent(ComponentType.Circadian) as any;
+    const updatedCircadian = agent.getComponent(ComponentType.Circadian);
 
     // Sleep drive should be nearly depleted after 6 game hours
     // Rate: -17 / 60 = -0.283 per game minute (correct: -17 per hour)
@@ -165,9 +165,9 @@ describe('SleepSystem Integration', () => {
 
     const agent = new EntityImpl(createEntityId(), 0);
     const circadian = createCircadianComponent();
-    (circadian as any).sleepDrive = 100;
-    (circadian as any).isSleeping = true;
-    (circadian as any).sleepQuality = 0.5; // Ground sleep
+    (circadian as Record<string, unknown>).sleepDrive = 100;
+    (circadian as { isSleeping?: boolean }).isSleeping = true;
+    (circadian as Record<string, unknown>).sleepQuality = 0.5; // Ground sleep
 
     agent.addComponent(circadian);
     agent.addComponent(new NeedsComponent({
@@ -196,7 +196,7 @@ describe('SleepSystem Integration', () => {
       stateMutator.update(world, entities, 2.0); // Apply energy recovery deltas
     }
 
-    const needs = agent.getComponent(ComponentType.Needs) as any;
+    const needs = agent.getComponent(ComponentType.Needs);
 
     // Energy recovery: 0.1 * quality / 60 = 0.000833 per game minute (with quality 0.5)
     // After 600 game minutes: 0.1 + (0.000833 * 600) ≈ 0.6
@@ -215,8 +215,8 @@ describe('SleepSystem Integration', () => {
 
     const agent = new EntityImpl(createEntityId(), 0);
     const circadian = createCircadianComponent();
-    (circadian as any).sleepDrive = 50; // Mid-range
-    (circadian as any).isSleeping = true;
+    (circadian as Record<string, unknown>).sleepDrive = 50; // Mid-range
+    (circadian as { isSleeping?: boolean }).isSleeping = true;
 
     agent.addComponent(circadian);
     agent.addComponent(new NeedsComponent({
@@ -245,7 +245,7 @@ describe('SleepSystem Integration', () => {
       stateMutator.update(world, entities, 2.0); // Apply sleep drive deltas
     }
 
-    const updatedCircadian = agent.getComponent(ComponentType.Circadian) as any;
+    const updatedCircadian = agent.getComponent(ComponentType.Circadian);
 
     // Sleep drive should DECREASE during sleep, not increase
     // Depletion rate: -17 / 60 = -0.283 per game minute (correct: -17 per hour)

@@ -138,7 +138,7 @@ describe('Decision Integration Tests', () => {
       });
       harness.world.addEntity(agent);
 
-      const agentComp = agent.getComponent(ComponentType.Agent) as any;
+      const agentComp = agent.getComponent(ComponentType.Agent);
       const result = processor.process(
         agent,
         harness.world,
@@ -177,7 +177,7 @@ describe('Decision Integration Tests', () => {
       agent.addComponent(inventory);
       harness.world.addEntity(agent);
 
-      const agentComp = agent.getComponent(ComponentType.Agent) as any;
+      const agentComp = agent.getComponent(ComponentType.Agent);
       const result = processor.process(
         agent,
         harness.world,
@@ -306,8 +306,8 @@ describe('Decision Integration Tests', () => {
       });
       harness.world.addEntity(healthyAgent);
 
-      const exhaustedComp = exhaustedAgent.getComponent(ComponentType.Agent) as any;
-      const healthyComp = healthyAgent.getComponent(ComponentType.Agent) as any;
+      const exhaustedComp = exhaustedAgent.getComponent(ComponentType.Agent);
+      const healthyComp = healthyAgent.getComponent(ComponentType.Agent);
 
       const resultExhausted = processor.process(
         exhaustedAgent,

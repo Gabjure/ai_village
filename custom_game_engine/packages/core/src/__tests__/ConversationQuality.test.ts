@@ -31,7 +31,7 @@ function msg(speakerId: string, message: string, tick: number = 0): Conversation
 // Helper to create an interest
 function interest(topic: string, intensity: number = 0.5): Interest {
   return {
-    topic: topic as any,
+    topic: topic as unknown,
     category: 'philosophy',
     intensity,
     source: 'innate',
@@ -180,27 +180,27 @@ describe('ConversationQuality', () => {
 
   describe('calculateTopicOverlap', () => {
     it('should return 0 when no shared interests', () => {
-      const overlap = calculateTopicOverlap([], ['farming', 'cooking'] as any);
+      const overlap = calculateTopicOverlap([], ['farming', 'cooking'] as string[]);
       expect(overlap).toBe(0);
     });
 
     it('should return 0 when topics not discussed', () => {
-      const sharedInterests = ['afterlife', 'farming'] as any;
-      const topicsDiscussed = ['cooking', 'weather'] as any;
+      const sharedInterests = ['afterlife', 'farming'] as string[];
+      const topicsDiscussed = ['cooking', 'weather'] as string[];
       const overlap = calculateTopicOverlap(sharedInterests, topicsDiscussed);
       expect(overlap).toBe(0);
     });
 
     it('should calculate partial overlap', () => {
-      const sharedInterests = ['afterlife', 'farming', 'cooking'] as any;
-      const topicsDiscussed = ['afterlife', 'weather'] as any;
+      const sharedInterests = ['afterlife', 'farming', 'cooking'] as string[];
+      const topicsDiscussed = ['afterlife', 'weather'] as string[];
       const overlap = calculateTopicOverlap(sharedInterests, topicsDiscussed);
       expect(overlap).toBeCloseTo(1 / 3, 5);
     });
 
     it('should return 1 when all shared interests are discussed', () => {
-      const sharedInterests = ['afterlife', 'farming'] as any;
-      const topicsDiscussed = ['afterlife', 'farming', 'cooking'] as any;
+      const sharedInterests = ['afterlife', 'farming'] as string[];
+      const topicsDiscussed = ['afterlife', 'farming', 'cooking'] as string[];
       const overlap = calculateTopicOverlap(sharedInterests, topicsDiscussed);
       expect(overlap).toBe(1);
     });

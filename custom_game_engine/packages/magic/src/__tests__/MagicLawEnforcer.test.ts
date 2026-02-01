@@ -76,13 +76,13 @@ describe('MagicLawEnforcer', () => {
 
       // evaluateCrossParadigm takes (spell, caster, interaction?) - without interaction, transforms is false
       // The transforms field comes from the interaction parameter, not the paradigm directly
-      const mockSpell = { technique: 'create', form: 'fire', manaCost: 10 } as any;
+      const mockSpell = { technique: 'create', form: 'fire', manaCost: 10 } as unknown;
       const mockCaster = {
         knownParadigmIds: ['transformer'],
         techniqueProficiency: {},
         formProficiency: {},
         paradigmState: {},
-      } as any;
+      } as unknown;
 
       const result = enforcer.evaluateCrossParadigm(mockSpell, mockCaster, undefined);
 

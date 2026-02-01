@@ -24,7 +24,7 @@ function flushAll(eventBus: EventBusImpl): void {
   let iterations = 0;
 
   while (iterations < maxIterations) {
-    const queueLength = (eventBus as any).eventQueue.length;
+    const queueLength = (eventBus as Record<string, unknown>).eventQueue.length;
     if (queueLength === 0) break;
 
     eventBus.flush();
@@ -349,8 +349,8 @@ describe('GoalGenerationSystem Integration', () => {
     expect(completionHandler).toHaveBeenCalled();
 
     // Completed goals are filtered out of getActiveGoals(), so check all goals
-    const allGoals = (goalsComp as any).goals;
-    const completedGoal = allGoals.find((g: any) => g.id === 'goal-exploration-1');
+    const allGoals = (goalsComp as Record<string, unknown>).goals;
+    const completedGoal = allGoals.find((g: Record<string, unknown>) => g.id === 'goal-exploration-1');
     expect(completedGoal).toBeDefined();
     expect(completedGoal.progress).toBe(1.0);
     expect(completedGoal.completed).toBe(true);

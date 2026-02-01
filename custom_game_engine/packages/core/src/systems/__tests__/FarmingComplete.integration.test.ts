@@ -178,7 +178,7 @@ describe('SoilSystem + PlantSystem + WeatherSystem Integration', () => {
     weatherSystem.update(harness.world, entities, 0.1);
 
     // Weather component should still exist and have valid properties
-    const weather = weatherEntity.getComponent(ComponentType.Weather) as any;
+    const weather = weatherEntity.getComponent(ComponentType.Weather);
     expect(weather.weatherType).toBeDefined();
     expect(['clear', 'rain', 'storm', 'snow']).toContain(weather.weatherType);
     expect(weather.intensity).toBeGreaterThanOrEqual(0);
@@ -349,7 +349,7 @@ describe('SoilSystem + PlantSystem + WeatherSystem Integration', () => {
     });
 
     // Verify weather component and event
-    const weather = weatherEntity.getComponent(ComponentType.Weather) as any;
+    const weather = weatherEntity.getComponent(ComponentType.Weather);
     expect(weather.tempModifier).toBe(5);
 
     const weatherEvents = harness.getEmittedEvents('weather:changed');

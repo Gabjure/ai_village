@@ -142,8 +142,11 @@ describe('LanguageSystem Tests', () => {
 
     // Track number of actual entity updates
     let updateCount = 0;
-    const originalUpdate = (system as any).updateLanguageLearning.bind(system);
-    (system as any).updateLanguageLearning = (...args: any[]) => {
+    // Access private method for testing throttling behavior
+    type SystemWithPrivate = typeof system & { updateLanguageLearning: (...args: unknown[]) => void };
+    const privateSystem = system as SystemWithPrivate;
+    const originalUpdate = privateSystem.updateLanguageLearning.bind(system);
+    privateSystem.updateLanguageLearning = (...args: unknown[]) => {
       updateCount++;
       return originalUpdate(...args);
     };

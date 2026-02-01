@@ -13,7 +13,7 @@ describe('StateMutatorSystem', () => {
     world = new World();
     system = new StateMutatorSystem();
     // Initialize events (BaseSystem requires this for SystemContext)
-    system['events'] = { cleanup: () => {}, emit: () => {} } as any;
+    system['events'] = { cleanup: () => {}, emit: () => {} } as unknown;
   });
 
   describe('Basic Mutation Application', () => {

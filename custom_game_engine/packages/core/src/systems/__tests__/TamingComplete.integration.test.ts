@@ -57,7 +57,7 @@ describe('TamingSystem + AnimalSystem + InventorySystem Integration', () => {
     // Attempt taming with high chance (feeding preferred food)
     const result = tamingSystem.attemptTaming(
       harness.world,
-      animalComponent as any,
+      animalComponent,
       agent.id,
       'feeding',
       'grain' // Preferred food for chickens
@@ -103,7 +103,7 @@ describe('TamingSystem + AnimalSystem + InventorySystem Integration', () => {
 
     const result = tamingSystem.attemptTaming(
       harness.world,
-      animalComponent as any,
+      animalComponent,
       agent.id,
       'feeding'
     );
@@ -145,7 +145,7 @@ describe('TamingSystem + AnimalSystem + InventorySystem Integration', () => {
     for (let i = 0; i < 5; i++) {
       tamingSystem.attemptTaming(
         harness.world,
-        animalComponent as any,
+        animalComponent,
         agent.id,
         'patience'
       );
@@ -185,7 +185,7 @@ describe('TamingSystem + AnimalSystem + InventorySystem Integration', () => {
     // Rescue has 40 bonus, should be effective
     const result = tamingSystem.attemptTaming(
       harness.world,
-      animalComponent as any,
+      animalComponent,
       agent.id,
       'rescue'
     );
@@ -224,7 +224,7 @@ describe('TamingSystem + AnimalSystem + InventorySystem Integration', () => {
     // Raising gives 60 bonus - should be very effective
     const result = tamingSystem.attemptTaming(
       harness.world,
-      animalComponent as any,
+      animalComponent,
       agent.id,
       'raising'
     );
@@ -266,7 +266,7 @@ describe('TamingSystem + AnimalSystem + InventorySystem Integration', () => {
     // Interact with animal
     const result = tamingSystem.interact(
       harness.world,
-      animalComponent as any,
+      animalComponent,
       agent.id,
       'playing'
     );
@@ -307,7 +307,7 @@ describe('TamingSystem + AnimalSystem + InventorySystem Integration', () => {
 
     const result = tamingSystem.interact(
       harness.world,
-      animalComponent as any,
+      animalComponent,
       agent.id,
       'grooming'
     );
@@ -348,7 +348,7 @@ describe('TamingSystem + AnimalSystem + InventorySystem Integration', () => {
     // Stranger tries to interact
     const result = tamingSystem.interact(
       harness.world,
-      animalComponent as any,
+      animalComponent,
       stranger.id,
       'feeding'
     );
@@ -389,7 +389,7 @@ describe('TamingSystem + AnimalSystem + InventorySystem Integration', () => {
     // Attempt taming with raising method (60 bonus)
     const result = tamingSystem.attemptTaming(
       harness.world,
-      animalComponent as any,
+      animalComponent,
       agent.id,
       'raising'
     );

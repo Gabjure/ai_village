@@ -1,6 +1,20 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import type { InventoryComponent } from '@ai-village/core';
 
+// Type helpers for testing
+type EntityWithMethods = {
+  addComponent?: (comp: unknown) => void;
+  updateComponent?: (type: string, updater: (current: unknown) => unknown) => void;
+  getComponent?: (type: string) => unknown;
+  hasComponent?: (type: string) => boolean;
+};
+type WorldWithMethods = Record<string, unknown> & {
+  getEntity?: (id: string) => unknown;
+  addEntity?: (entity: unknown) => void;
+  query?: unknown;
+  getSystem?: (name: string) => unknown;
+};
+
 // Import components that will be implemented
 // @ts-expect-error - Will be implemented
 import { DragDropSystem } from '../ui/DragDropSystem.js';
@@ -296,7 +310,7 @@ describe('DragDropSystem', () => {
       const result2 = dragDrop.drop({ type: 'equipment', slot: 'main_hand' }, result1.updatedInventory);
 
       // Old sword should be in backpack
-      expect(result2.updatedInventory.slots.some((s: any) => s.itemId === 'sword')).toBe(true);
+      expect(result2.updatedInventory.slots.some((s: Record<string, unknown>) => s.itemId === 'sword')).toBe(true);
       expect(result2.equipped?.itemId).toBe('axe');
     });
 
@@ -499,7 +513,7 @@ describe('DragDropSystem', () => {
 
     it('should throw when inventory is missing during drag', () => {
       expect(() => {
-        dragDrop.startDrag({ type: 'backpack', index: 0 }, undefined as any);
+        dragDrop.startDrag({ type: 'backpack', index: 0 }, undefined as unknown);
       }).toThrow('missing required');
     });
 

@@ -13,7 +13,8 @@ describe('MetricsCollector', () => {
 
   describe('Initialization', () => {
     it('should require a world instance', () => {
-      expect(() => new MetricsCollector(null as any)).toThrow('MetricsCollector requires a World instance');
+      // @ts-expect-error Testing null parameter validation
+      expect(() => new MetricsCollector(null)).toThrow('MetricsCollector requires a World instance');
     });
 
     it('should initialize with empty metrics', () => {
@@ -71,13 +72,13 @@ describe('MetricsCollector', () => {
 
     it('should throw when recording event without type', () => {
       expect(() => {
-        collector.recordEvent({ timestamp: Date.now() } as any);
+        collector.recordEvent({ timestamp: Date.now() } as Record<string, unknown>);
       }).toThrow('Event must have a type field');
     });
 
     it('should throw when recording event without timestamp', () => {
       expect(() => {
-        collector.recordEvent({ type: 'test' } as any);
+        collector.recordEvent({ type: 'test' } as Record<string, unknown>);
       }).toThrow('Event must have a timestamp field');
     });
   });
@@ -995,7 +996,8 @@ describe('MetricsCollector', () => {
 
     it('should throw on unknown aggregation type', () => {
       expect(() => {
-        collector.getAggregatedMetric('hunger', { aggregation: 'invalid' as any });
+        collector.getAggregatedMetric('hunger', { aggregation: // @ts-expect-error Testing invalid value validation
+      'invalid' });
       }).toThrow('Unknown aggregation type: invalid');
     });
   });
@@ -1035,7 +1037,8 @@ describe('MetricsCollector', () => {
 
     it('should throw on unsupported export format', () => {
       expect(() => {
-        collector.exportMetrics('xml' as any);
+        collector.exportMetrics(// @ts-expect-error Testing invalid value validation
+      'xml');
       }).toThrow('Unsupported export format: xml');
     });
   });
@@ -1121,7 +1124,7 @@ describe('MetricsCollector', () => {
         collector.recordEvent({
           type: 'invalid:event',
           timestamp: Date.now()
-        } as any);
+        } as Record<string, unknown>);
       }).toThrow('Unknown event type: invalid:event');
     });
 

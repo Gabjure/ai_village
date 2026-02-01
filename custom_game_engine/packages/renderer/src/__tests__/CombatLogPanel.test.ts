@@ -2,6 +2,20 @@ import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 import { EventBus } from '@ai-village/core/events/EventBus';
 import { World } from '@ai-village/core/ecs/World';
 
+// Type helpers for testing
+type EntityWithMethods = {
+  addComponent?: (comp: unknown) => void;
+  updateComponent?: (type: string, updater: (current: unknown) => unknown) => void;
+  getComponent?: (type: string) => unknown;
+  hasComponent?: (type: string) => boolean;
+};
+type WorldWithMethods = Record<string, unknown> & {
+  getEntity?: (id: string) => unknown;
+  addEntity?: (entity: unknown) => void;
+  query?: unknown;
+  getSystem?: (name: string) => unknown;
+};
+
 // Mock CombatLogPanel - will be implemented
 class CombatLogPanel {
   private eventBus: EventBus;
@@ -465,7 +479,7 @@ describe.skip('CombatLogPanel', () => {
 
         const focusSpy = vi.fn();
         // Mock camera focus function
-        (window as any).focusOnEntity = focusSpy;
+        (window as Record<string, unknown>).focusOnEntity = focusSpy;
 
         event.click();
 

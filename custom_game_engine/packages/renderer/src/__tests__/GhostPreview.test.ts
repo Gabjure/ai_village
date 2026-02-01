@@ -9,6 +9,20 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { GhostPreview } from '../GhostPreview.js';
 import type { BuildingBlueprint, PlacementValidationResult } from '@ai-village/core';
 
+// Type helpers for testing
+type EntityWithMethods = {
+  addComponent?: (comp: unknown) => void;
+  updateComponent?: (type: string, updater: (current: unknown) => unknown) => void;
+  getComponent?: (type: string) => unknown;
+  hasComponent?: (type: string) => boolean;
+};
+type WorldWithMethods = Record<string, unknown> & {
+  getEntity?: (id: string) => unknown;
+  addEntity?: (entity: unknown) => void;
+  query?: unknown;
+  getSystem?: (name: string) => unknown;
+};
+
 // Mock canvas context
 function createMockContext(): CanvasRenderingContext2D {
   return {
@@ -30,7 +44,7 @@ function createMockContext(): CanvasRenderingContext2D {
     fill: vi.fn(),
     stroke: vi.fn(),
     setTransform: vi.fn(),
-  } as unknown as CanvasRenderingContext2D;
+  } as Partial<CanvasRenderingContext2D> as CanvasRenderingContext2D;
 }
 
 function createTestBlueprint(overrides: Partial<BuildingBlueprint> = {}): BuildingBlueprint {
@@ -77,7 +91,8 @@ describe('GhostPreview', () => {
     });
 
     it('should throw when setting null blueprint', () => {
-      expect(() => ghost.setBlueprint(null as any)).toThrow(
+      // @ts-expect-error Testing null parameter validation
+      expect(() => ghost.setBlueprint(null)).toThrow(
         'Blueprint is required to create ghost preview'
       );
     });
@@ -252,7 +267,8 @@ describe('GhostPreview', () => {
     it('should throw when setting invalid rotation type', () => {
       ghost.setBlueprint(createTestBlueprint());
 
-      expect(() => ghost.setRotation('north' as any)).toThrow(
+      expect(() => ghost.setRotation(// @ts-expect-error Testing invalid value validation
+      'north')).toThrow(
         'Rotation must be a number'
       );
     });

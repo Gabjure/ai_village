@@ -738,7 +738,8 @@ describe('CourtshipStateMachine', () => {
       (agent1 as EntityImpl).addComponent(courtship1);
 
       expect(() => {
-        stateMachine.initiateCourtship(agent1, null as any, world);
+        // @ts-expect-error Testing null target validation
+        stateMachine.initiateCourtship(agent1, null, world);
       }).toThrow('Invalid target entity');
     });
 

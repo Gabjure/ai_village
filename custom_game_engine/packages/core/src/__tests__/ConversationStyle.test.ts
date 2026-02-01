@@ -187,7 +187,8 @@ describe('ConversationStyle', () => {
     });
 
     test('falls back to category if specific topic not found', () => {
-      const categoryWeight = getTopicWeight('adult', 'farming' as any, 'practical');
+      const categoryWeight = getTopicWeight('adult', // @ts-expect-error Testing invalid value validation
+      'farming', 'practical');
       expect(typeof categoryWeight).toBe('number');
     });
   });

@@ -48,6 +48,20 @@ import {
   hasSkillTree,
 } from '../index.js';
 
+// Type helpers for testing
+type EntityWithMethods = {
+  addComponent?: (comp: unknown) => void;
+  updateComponent?: (type: string, updater: (current: unknown) => unknown) => void;
+  getComponent?: (type: string) => unknown;
+  hasComponent?: (type: string) => boolean;
+};
+type WorldWithMethods = Record<string, unknown> & {
+  getEntity?: (id: string) => unknown;
+  addEntity?: (entity: unknown) => void;
+  query?: unknown;
+  getSystem?: (name: string) => unknown;
+};
+
 // ============================================================================
 // Test Fixtures
 // ============================================================================
@@ -672,7 +686,7 @@ describe('MagicSkillTreeRegistry', () => {
 
     it('throws on invalid tree', () => {
       const registry = getSkillTreeRegistry();
-      const invalidTree = { nodes: [] } as unknown as MagicSkillTree;
+      const invalidTree = { nodes: [] } as Partial<MagicSkillTree> as MagicSkillTree;
       expect(() => registry.register(invalidTree)).toThrow();
     });
 

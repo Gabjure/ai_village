@@ -6,6 +6,20 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { DeityEmergenceSystem } from '../DeityEmergenceSystem.js';
 import type { LLMDecisionQueue } from '../../decision/LLMDecisionProcessor.js';
 
+// Type helpers for testing
+type EntityWithMethods = {
+  addComponent?: (comp: unknown) => void;
+  updateComponent?: (type: string, updater: (current: unknown) => unknown) => void;
+  getComponent?: (type: string) => unknown;
+  hasComponent?: (type: string) => boolean;
+};
+type WorldWithMethods = Record<string, unknown> & {
+  getEntity?: (id: string) => unknown;
+  addEntity?: (entity: unknown) => void;
+  query?: unknown;
+  getSystem?: (name: string) => unknown;
+};
+
 describe('DeityEmergenceSystem - LLM Prayer Domain Inference', () => {
   let mockLLMQueue: LLMDecisionQueue;
   let system: DeityEmergenceSystem;
@@ -19,14 +33,14 @@ describe('DeityEmergenceSystem - LLM Prayer Domain Inference', () => {
       getActiveCount: vi.fn().mockReturnValue(0),
       setMaxTokens: vi.fn(),
       getMaxTokens: vi.fn().mockReturnValue(4096),
-    } as unknown as LLMDecisionQueue;
+    } as Partial<LLMDecisionQueue> as LLMDecisionQueue;
 
     system = new DeityEmergenceSystem({}, mockLLMQueue);
   });
 
   it('should use keyword matching as immediate fallback', () => {
     // Access private method via type assertion for testing
-    const inferDomain = (system as any).inferDomainFromPrayer.bind(system);
+    const inferDomain = (system as Record<string, unknown>).inferDomainFromPrayer.bind(system);
 
     // Test keyword matching
     expect(inferDomain('Please bless our harvest and crops')).toBe('harvest');
@@ -38,14 +52,14 @@ describe('DeityEmergenceSystem - LLM Prayer Domain Inference', () => {
 
   it('should request LLM inference when available', () => {
     // Access private method
-    const inferDomain = (system as any).inferDomainFromPrayer.bind(system);
+    const inferDomain = (system as Record<string, unknown>).inferDomainFromPrayer.bind(system);
 
     const prayer = 'Please help my family survive this terrible winter';
     inferDomain(prayer);
 
     // Should have queued an LLM request
     expect(mockLLMQueue.requestDecision).toHaveBeenCalled();
-    const callArgs = (mockLLMQueue.requestDecision as any).mock.calls[0];
+    const callArgs = (mockLLMQueue.requestDecision as Record<string, unknown>).mock.calls[0];
     expect(callArgs[1]).toContain(prayer);
     expect(callArgs[1]).toContain('divine domain');
   });
@@ -61,8 +75,8 @@ describe('DeityEmergenceSystem - LLM Prayer Domain Inference', () => {
     mockLLMQueue.getDecision = vi.fn().mockReturnValue(mockResponse);
 
     // Access private methods
-    const processLLM = (system as any).processLLMDomainInferences.bind(system);
-    const inferDomain = (system as any).inferDomainFromPrayer.bind(system);
+    const processLLM = (system as Record<string, unknown>).processLLMDomainInferences.bind(system);
+    const inferDomain = (system as Record<string, unknown>).inferDomainFromPrayer.bind(system);
 
     // First call - triggers LLM request
     const prayer = 'Please heal my father';
@@ -72,7 +86,7 @@ describe('DeityEmergenceSystem - LLM Prayer Domain Inference', () => {
     processLLM();
 
     // Second call - should use cache
-    (mockLLMQueue.requestDecision as any).mockClear();
+    (mockLLMQueue.requestDecision as Record<string, unknown>).mockClear();
     const domain2 = inferDomain(prayer);
 
     // Should not make another LLM request (uses cache)
@@ -84,7 +98,7 @@ describe('DeityEmergenceSystem - LLM Prayer Domain Inference', () => {
     mockLLMQueue.getDecision = vi.fn().mockReturnValue('invalid json');
 
     // Access private method
-    const processLLM = (system as any).processLLMDomainInferences.bind(system);
+    const processLLM = (system as Record<string, unknown>).processLLMDomainInferences.bind(system);
 
     // Should not throw
     expect(() => processLLM()).not.toThrow();
@@ -100,7 +114,7 @@ describe('DeityEmergenceSystem - LLM Prayer Domain Inference', () => {
     mockLLMQueue.getDecision = vi.fn().mockReturnValue(mockResponse);
 
     // Access private method
-    const processLLM = (system as any).processLLMDomainInferences.bind(system);
+    const processLLM = (system as Record<string, unknown>).processLLMDomainInferences.bind(system);
 
     // Should handle gracefully
     expect(() => processLLM()).not.toThrow();
@@ -110,18 +124,18 @@ describe('DeityEmergenceSystem - LLM Prayer Domain Inference', () => {
     const systemNoLLM = new DeityEmergenceSystem({});
 
     // Access private method
-    const inferDomain = (systemNoLLM as any).inferDomainFromPrayer.bind(systemNoLLM);
+    const inferDomain = (systemNoLLM as Record<string, unknown>).inferDomainFromPrayer.bind(systemNoLLM);
 
     // Should still work with keyword matching
     expect(inferDomain('Please bless our harvest')).toBe('harvest');
   });
 
   it('should include all valid domains in prompt', () => {
-    const inferDomain = (system as any).inferDomainFromPrayer.bind(system);
+    const inferDomain = (system as Record<string, unknown>).inferDomainFromPrayer.bind(system);
 
     inferDomain('Test prayer');
 
-    const callArgs = (mockLLMQueue.requestDecision as any).mock.calls[0];
+    const callArgs = (mockLLMQueue.requestDecision as Record<string, unknown>).mock.calls[0];
     const prompt = callArgs[1];
 
     // Check that prompt includes valid domains

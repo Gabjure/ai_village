@@ -56,7 +56,7 @@ describe.skip('AgentInfoPanel - Thought and Speech History Display', () => {
       removeComponent: vi.fn(),
       getComponent: vi.fn((type: string) => components[type]),
       hasComponent: vi.fn((type: string) => type in components),
-    } as any;
+    } as Record<string, unknown>;
 
     // Set up mock world to return this entity
     mockWorld.getEntity.mockReturnValue(entity);
@@ -77,7 +77,7 @@ describe.skip('AgentInfoPanel - Thought and Speech History Display', () => {
       panel.setSelectedEntity(entity);
       panel.render(mockCtx, 1024, 768, mockWorld);
 
-      const fillTextCalls = (mockCtx.fillText as any).mock.calls;
+      const fillTextCalls = mockCtx.fillText.mock.calls;
       const thoughtHeaderCall = fillTextCalls.find(
         (call: any[]) => call[0] === 'Last Thought'
       );
@@ -98,7 +98,7 @@ describe.skip('AgentInfoPanel - Thought and Speech History Display', () => {
       panel.setSelectedEntity(entity);
       panel.render(mockCtx, 1024, 768, mockWorld);
 
-      const fillTextCalls = (mockCtx.fillText as any).mock.calls;
+      const fillTextCalls = mockCtx.fillText.mock.calls;
       // Check that thought text is rendered (may be word-wrapped)
       const hasThoughtText = fillTextCalls.some(
         (call: any[]) => typeof call[0] === 'string' && call[0].includes('food')
@@ -119,7 +119,7 @@ describe.skip('AgentInfoPanel - Thought and Speech History Display', () => {
       panel.setSelectedEntity(entity);
       panel.render(mockCtx, 1024, 768, mockWorld);
 
-      const fillTextCalls = (mockCtx.fillText as any).mock.calls;
+      const fillTextCalls = mockCtx.fillText.mock.calls;
       const thoughtHeaderCall = fillTextCalls.find(
         (call: any[]) => call[0] === 'Last Thought'
       );
@@ -139,7 +139,7 @@ describe.skip('AgentInfoPanel - Thought and Speech History Display', () => {
       panel.setSelectedEntity(entity);
       panel.render(mockCtx, 1024, 768, mockWorld);
 
-      const fillTextCalls = (mockCtx.fillText as any).mock.calls;
+      const fillTextCalls = mockCtx.fillText.mock.calls;
       const thoughtHeaderCall = fillTextCalls.find(
         (call: any[]) => call[0] === 'Last Thought'
       );
@@ -160,7 +160,7 @@ describe.skip('AgentInfoPanel - Thought and Speech History Display', () => {
       panel.render(mockCtx, 1024, 768, mockWorld);
 
       // Verify dividers are drawn
-      const strokeCalls = (mockCtx.stroke as any).mock.calls;
+      const strokeCalls = (mockCtx.stroke as Record<string, unknown>).mock.calls;
       expect(strokeCalls.length).toBeGreaterThan(0);
     });
   });
@@ -181,7 +181,7 @@ describe.skip('AgentInfoPanel - Thought and Speech History Display', () => {
       panel.setSelectedEntity(entity);
       panel.render(mockCtx, 1024, 768, mockWorld);
 
-      const fillTextCalls = (mockCtx.fillText as any).mock.calls;
+      const fillTextCalls = mockCtx.fillText.mock.calls;
       const speechHeaderCall = fillTextCalls.find(
         (call: any[]) => call[0] === 'Speech History'
       );
@@ -203,7 +203,7 @@ describe.skip('AgentInfoPanel - Thought and Speech History Display', () => {
       panel.setSelectedEntity(entity);
       panel.render(mockCtx, 1024, 768, mockWorld);
 
-      const fillTextCalls = (mockCtx.fillText as any).mock.calls;
+      const fillTextCalls = mockCtx.fillText.mock.calls;
       // Check for quoted speech
       const hasSpeechText = fillTextCalls.some(
         (call: any[]) => typeof call[0] === 'string' && call[0].includes('"Hello!"')
@@ -224,7 +224,7 @@ describe.skip('AgentInfoPanel - Thought and Speech History Display', () => {
       panel.setSelectedEntity(entity);
       panel.render(mockCtx, 1024, 768, mockWorld);
 
-      const fillTextCalls = (mockCtx.fillText as any).mock.calls;
+      const fillTextCalls = mockCtx.fillText.mock.calls;
       const speechHeaderCall = fillTextCalls.find(
         (call: any[]) => call[0] === 'Speech History'
       );
@@ -244,7 +244,7 @@ describe.skip('AgentInfoPanel - Thought and Speech History Display', () => {
       panel.setSelectedEntity(entity);
       panel.render(mockCtx, 1024, 768, mockWorld);
 
-      const fillTextCalls = (mockCtx.fillText as any).mock.calls;
+      const fillTextCalls = mockCtx.fillText.mock.calls;
       const speechHeaderCall = fillTextCalls.find(
         (call: any[]) => call[0] === 'Speech History'
       );
@@ -268,7 +268,7 @@ describe.skip('AgentInfoPanel - Thought and Speech History Display', () => {
       panel.setSelectedEntity(entity);
       panel.render(mockCtx, 1024, 768, mockWorld);
 
-      const fillTextCalls = (mockCtx.fillText as any).mock.calls;
+      const fillTextCalls = mockCtx.fillText.mock.calls;
 
       // Check for each message (may be word-wrapped)
       const hasFirst = fillTextCalls.some(
@@ -301,7 +301,7 @@ describe.skip('AgentInfoPanel - Thought and Speech History Display', () => {
       panel.setSelectedEntity(entity);
       panel.render(mockCtx, 1024, 768, mockWorld);
 
-      const fillTextCalls = (mockCtx.fillText as any).mock.calls;
+      const fillTextCalls = mockCtx.fillText.mock.calls;
 
       // Find positions of Oldest and Newest
       const oldestIndex = fillTextCalls.findIndex(
@@ -335,7 +335,7 @@ describe.skip('AgentInfoPanel - Thought and Speech History Display', () => {
       panel.setSelectedEntity(entity);
       panel.render(mockCtx, 1024, 768, mockWorld);
 
-      const fillTextCalls = (mockCtx.fillText as any).mock.calls;
+      const fillTextCalls = mockCtx.fillText.mock.calls;
 
       // Entry1 and Entry2 should NOT appear (only last 5 shown)
       const hasEntry1 = fillTextCalls.some(
@@ -371,7 +371,7 @@ describe.skip('AgentInfoPanel - Thought and Speech History Display', () => {
       panel.setSelectedEntity(entity);
       panel.render(mockCtx, 1024, 768, mockWorld);
 
-      const fillTextCalls = (mockCtx.fillText as any).mock.calls;
+      const fillTextCalls = mockCtx.fillText.mock.calls;
 
       const thoughtHeaderCall = fillTextCalls.find(
         (call: any[]) => call[0] === 'Last Thought'
@@ -399,7 +399,7 @@ describe.skip('AgentInfoPanel - Thought and Speech History Display', () => {
       panel.setSelectedEntity(entity);
       panel.render(mockCtx, 1024, 768, mockWorld);
 
-      const fillTextCalls = (mockCtx.fillText as any).mock.calls;
+      const fillTextCalls = mockCtx.fillText.mock.calls;
 
       const thoughtIndex = fillTextCalls.findIndex(
         (call: any[]) => call[0] === 'Last Thought'
@@ -426,7 +426,7 @@ describe.skip('AgentInfoPanel - Thought and Speech History Display', () => {
       panel.setSelectedEntity(entity);
       panel.render(mockCtx, 1024, 768, mockWorld);
 
-      const fillTextCalls = (mockCtx.fillText as any).mock.calls;
+      const fillTextCalls = mockCtx.fillText.mock.calls;
 
       const thoughtHeaderCall = fillTextCalls.find(
         (call: any[]) => call[0] === 'Last Thought'

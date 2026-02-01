@@ -103,7 +103,8 @@ describe('SectorTierAdapter', () => {
 
   it('should throw error if systems parameter is null', () => {
     expect(() => {
-      SectorTierAdapter.convertSystemsToSectorTier(null as any, sectorConfig);
+      // @ts-expect-error Testing null parameter validation
+      SectorTierAdapter.convertSystemsToSectorTier(null, sectorConfig);
     }).toThrow('systems parameter is required');
   });
 });
@@ -239,7 +240,8 @@ describe('GalaxyTierAdapter', () => {
 
   it('should throw error if sectors parameter is null', () => {
     expect(() => {
-      GalaxyTierAdapter.convertSectorsToGalaxyTier(null as any, galaxyConfig);
+      // @ts-expect-error Testing null parameter validation
+      GalaxyTierAdapter.convertSectorsToGalaxyTier(null, galaxyConfig);
     }).toThrow('sectors parameter is required');
   });
 });

@@ -37,7 +37,7 @@ describe('Animal Component and Entity', () => {
       };
 
       const component = new AnimalComponent(animalData);
-      (entity as any).addComponent(component);
+      entity.addComponent(component);
       const animal = entity.getComponent(ComponentType.Animal) as AnimalComponent;
 
       expect(animal).toBeDefined();
@@ -84,7 +84,8 @@ describe('Animal Component and Entity', () => {
       };
 
       expect(() => {
-        new AnimalComponent(invalidData as any);
+        // @ts-expect-error Testing invalid input
+        new AnimalComponent(invalidData);
       }).toThrow();
     });
 
@@ -112,7 +113,8 @@ describe('Animal Component and Entity', () => {
       };
 
       expect(() => {
-        new AnimalComponent(invalidData as any);
+        // @ts-expect-error Testing invalid input
+        new AnimalComponent(invalidData);
       }).toThrow();
     });
 
@@ -140,7 +142,8 @@ describe('Animal Component and Entity', () => {
       };
 
       expect(() => {
-        new AnimalComponent(invalidData as any);
+        // @ts-expect-error Testing invalid input
+        new AnimalComponent(invalidData);
       }).toThrow();
     });
 
@@ -168,7 +171,7 @@ describe('Animal Component and Entity', () => {
       };
 
       const component = new AnimalComponent(wildAnimalData);
-      (entity as any).addComponent(component);
+      entity.addComponent(component);
       const animal = entity.getComponent(ComponentType.Animal) as AnimalComponent;
 
       expect(animal.wild).toBe(true);
@@ -202,7 +205,7 @@ describe('Animal Component and Entity', () => {
       };
 
       const component = new AnimalComponent(tamedAnimalData);
-      (entity as any).addComponent(component);
+      entity.addComponent(component);
       const animal = entity.getComponent(ComponentType.Animal) as AnimalComponent;
 
       expect(animal.wild).toBe(false);
@@ -244,7 +247,7 @@ describe('Animal Component and Entity', () => {
         };
 
         const component = new AnimalComponent(animalData);
-        (entity as any).addComponent(component);
+        entity.addComponent(component);
         const animal = entity.getComponent(ComponentType.Animal) as AnimalComponent;
         expect(animal.lifeStage).toBe(stage);
       });
@@ -285,7 +288,7 @@ describe('Animal Component and Entity', () => {
         };
 
         const component = new AnimalComponent(animalData);
-        (entity as any).addComponent(component);
+        entity.addComponent(component);
         const animal = entity.getComponent(ComponentType.Animal) as AnimalComponent;
         expect(animal.state).toBe(state);
       });

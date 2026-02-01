@@ -10,6 +10,20 @@ import type {
 import type { WorldMutator } from '../../ecs/World.js';
 import type { Entity, EntityId } from '../../ecs/Entity.js';
 
+// Type helpers for testing
+type EntityWithMethods = {
+  addComponent?: (comp: unknown) => void;
+  updateComponent?: (type: string, updater: (current: unknown) => unknown) => void;
+  getComponent?: (type: string) => unknown;
+  hasComponent?: (type: string) => boolean;
+};
+type WorldWithMethods = Record<string, unknown> & {
+  getEntity?: (id: string) => unknown;
+  addEntity?: (entity: unknown) => void;
+  query?: unknown;
+  getSystem?: (name: string) => unknown;
+};
+
 // Mock WebSocket for testing
 interface MessageEvent {
   data: string;
@@ -123,7 +137,7 @@ function createMockWorld(): WorldMutator {
     update: vi.fn(),
     getEntity: vi.fn(),
     destroyEntity: vi.fn(),
-  } as unknown as WorldMutator;
+  } as WorldMutator;
 }
 
 // Type-safe accessors for private NetworkManager internals
@@ -169,7 +183,7 @@ interface UniverseSubscription {
 function getNetworkManagerInternals(
   manager: MultiverseNetworkManager
 ): NetworkManagerInternals {
-  return manager as unknown as NetworkManagerInternals;
+  return manager as NetworkManagerInternals;
 }
 
 // Helper to create mock passages for testing
@@ -194,7 +208,7 @@ describe('MultiverseNetworkManager', () => {
     networkManager = new MultiverseNetworkManager(coordinator);
 
     // Mock WebSocket globally
-    global.WebSocket = MockWebSocket as unknown as typeof WebSocket;
+    global.WebSocket = MockWebSocket as typeof WebSocket;
   });
 
   describe('Initialization', () => {
@@ -230,7 +244,7 @@ describe('MultiverseNetworkManager', () => {
         }
       }
 
-      global.WebSocket = TimeoutWebSocket as unknown as typeof WebSocket;
+      global.WebSocket = TimeoutWebSocket as typeof WebSocket;
 
       await expect(
         networkManager.connectToPeer('ws://localhost:8080')
@@ -423,7 +437,7 @@ describe('MultiverseNetworkManager', () => {
       (mockWorldA.getEntity as ReturnType<typeof vi.fn>).mockImplementation((id: EntityId) => ({
         id,
         components: new Map(),
-      } as unknown as Entity));
+      } as Entity));
 
       const mockWorldB = createMockWorld();
 

@@ -9,6 +9,20 @@ import {
 } from '../SpatialMemoryComponent';
 import { ResourceType } from '../../types/resources';
 
+// Type helpers for testing
+type EntityWithMethods = {
+  addComponent?: (comp: unknown) => void;
+  updateComponent?: (type: string, updater: (current: unknown) => unknown) => void;
+  getComponent?: (type: string) => unknown;
+  hasComponent?: (type: string) => boolean;
+};
+type WorldWithMethods = Record<string, unknown> & {
+  getEntity?: (id: string) => unknown;
+  addEntity?: (entity: unknown) => void;
+  query?: unknown;
+  getSystem?: (name: string) => unknown;
+};
+
 describe('SpatialMemoryComponent', () => {
   let component: SpatialMemoryComponent;
 
@@ -67,7 +81,7 @@ describe('SpatialMemoryComponent', () => {
 
     it('should throw error when querying without required resource type', () => {
       expect(() => {
-        (component as any).queryResourceLocations(undefined);
+        (component as Record<string, unknown>).queryResourceLocations(undefined);
       }).toThrow();
     });
 
@@ -181,7 +195,8 @@ describe('SpatialMemoryComponent', () => {
 
       it('should throw error when component is missing', () => {
         expect(() => {
-          getSpatialMemoriesByType(null as any, 'resource_location');
+      // @ts-expect-error Testing null parameter validation
+          getSpatialMemoriesByType(null, 'resource_location');
         }).toThrow('component parameter is required');
       });
 
@@ -249,7 +264,8 @@ describe('SpatialMemoryComponent', () => {
       it('should throw error when component is missing', () => {
         expect(() => {
           getSpatialMemoriesByLocation(
-            null as any,
+      // @ts-expect-error Testing null parameter validation
+            null,
             { x: 50, y: 50 },
             10
           );
@@ -260,7 +276,8 @@ describe('SpatialMemoryComponent', () => {
         expect(() => {
           getSpatialMemoriesByLocation(
             component,
-            null as any,
+      // @ts-expect-error Testing null parameter validation
+            null,
             10
           );
         }).toThrow();
@@ -270,7 +287,7 @@ describe('SpatialMemoryComponent', () => {
         expect(() => {
           getSpatialMemoriesByLocation(
             component,
-            { x: undefined, y: 50 } as any,
+            { x: undefined, y: 50 } as unknown,
             10
           );
         }).toThrow();
@@ -291,7 +308,8 @@ describe('SpatialMemoryComponent', () => {
           getSpatialMemoriesByLocation(
             component,
             { x: 50, y: 50 },
-            undefined as any
+      // @ts-expect-error Testing with undefined parameter
+            undefined
           );
         }).toThrow();
       });
@@ -362,13 +380,14 @@ describe('SpatialMemoryComponent', () => {
 
       it('should throw error when component is missing', () => {
         expect(() => {
-          getRecentSpatialMemories(null as any, 5);
+      // @ts-expect-error Testing null parameter validation
+          getRecentSpatialMemories(null, 5);
         }).toThrow('component parameter is required');
       });
 
       it('should throw error when count is missing', () => {
         expect(() => {
-          getRecentSpatialMemories(component, undefined as any);
+          getRecentSpatialMemories(component, undefined as unknown);
         }).toThrow();
       });
 
@@ -443,13 +462,14 @@ describe('SpatialMemoryComponent', () => {
 
       it('should throw error when component is missing', () => {
         expect(() => {
-          getSpatialMemoriesByImportance(null as any, 80);
+      // @ts-expect-error Testing null parameter validation
+          getSpatialMemoriesByImportance(null, 80);
         }).toThrow('component parameter is required');
       });
 
       it('should throw error when threshold is missing', () => {
         expect(() => {
-          getSpatialMemoriesByImportance(component, undefined as any);
+          getSpatialMemoriesByImportance(component, undefined as unknown);
         }).toThrow();
       });
 

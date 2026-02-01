@@ -350,8 +350,10 @@ describe('Automation Edge Cases', () => {
       }
 
       // Get updated components
-      let updatedAssembly = machine.getComponent('assembly_machine' as any);
-      let updatedConnection = machine.getComponent('machine_connection' as any);
+      let updatedAssembly = machine.getComponent(// @ts-expect-error Testing invalid value validation
+      'assembly_machine');
+      let updatedConnection = machine.getComponent(// @ts-expect-error Testing invalid value validation
+      'machine_connection');
 
       // Should be blocked at 100%
       expect(updatedAssembly!.progress).toBeGreaterThanOrEqual(100);
@@ -365,7 +367,8 @@ describe('Automation Edge Cases', () => {
       stateMutatorSystem.update(world, [], 0.05);
 
       // Get components again
-      updatedConnection = machine.getComponent('machine_connection' as any);
+      updatedConnection = machine.getComponent(// @ts-expect-error Testing invalid value validation
+      'machine_connection');
 
       // Should have consumed ingredients and reset progress
       // (Might not be exactly 0 due to continued progress)
@@ -439,7 +442,8 @@ describe('Automation Edge Cases', () => {
       }
 
       // Get the updated component from the entity
-      const updatedAssembly = machine.getComponent('assembly_machine' as any);
+      const updatedAssembly = machine.getComponent(// @ts-expect-error Testing invalid value validation
+      'assembly_machine');
 
       // Should have made 5% progress (5s / 100s)
       expect(updatedAssembly!.progress).toBeGreaterThan(4);
@@ -482,7 +486,8 @@ describe('Automation Edge Cases', () => {
       stateMutatorSystem.update(world, [], 0.0001);
 
       // Get the updated component from the entity (not the initial reference)
-      const updatedAssembly = machine.getComponent('assembly_machine' as any);
+      const updatedAssembly = machine.getComponent(// @ts-expect-error Testing invalid value validation
+      'assembly_machine');
 
       // Should still make tiny progress
       expect(updatedAssembly!.progress).toBeGreaterThan(0);
@@ -518,8 +523,10 @@ describe('Automation Edge Cases', () => {
       assemblySystem.update(world, [machine], 0.05);
 
       // Get the updated component from the entity
-      const updatedAssembly = machine.getComponent('assembly_machine' as any);
-      const updatedConnection = machine.getComponent('machine_connection' as any);
+      const updatedAssembly = machine.getComponent(// @ts-expect-error Testing invalid value validation
+      'assembly_machine');
+      const updatedConnection = machine.getComponent(// @ts-expect-error Testing invalid value validation
+      'machine_connection');
 
       // Should complete and produce output
       expect(updatedAssembly!.progress).toBeLessThanOrEqual(100);

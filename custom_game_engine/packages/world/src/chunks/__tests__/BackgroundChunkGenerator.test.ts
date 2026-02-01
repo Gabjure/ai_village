@@ -5,11 +5,20 @@ import { TerrainGenerator } from '../../terrain/TerrainGenerator.js';
 import { createChunk } from '../Chunk.js';
 import type { WorldMutator } from '@ai-village/core';
 
+// Mock WorldMutator type for testing - defines only the properties we actually use
+type MockWorldMutator = {
+  tick: number;
+  eventBus: { emit: (...args: any[]) => void };
+  query: () => any;
+  addEntity: (...args: any[]) => void;
+  createEntity: () => any;
+};
+
 describe('BackgroundChunkGenerator', () => {
   let chunkManager: ChunkManager;
   let terrainGenerator: TerrainGenerator;
   let generator: BackgroundChunkGenerator;
-  let mockWorld: WorldMutator;
+  let mockWorld: MockWorldMutator;
 
   beforeEach(() => {
     chunkManager = new ChunkManager();
@@ -36,7 +45,7 @@ describe('BackgroundChunkGenerator', () => {
         hasComponent: vi.fn(() => false),
         getComponent: vi.fn(),
       })),
-    } as unknown as WorldMutator;
+    };
   });
 
   describe('queueChunk', () => {
@@ -101,6 +110,7 @@ describe('BackgroundChunkGenerator', () => {
     it('should not queue already generated chunks', () => {
       // Pre-generate chunk
       const chunk = chunkManager.getChunk(0, 0);
+      // @ts-expect-error MockWorldMutator doesn't implement full WorldMutator interface (test-only properties)
       terrainGenerator.generateChunk(chunk, mockWorld);
 
       generator.queueChunk({
@@ -153,7 +163,8 @@ describe('BackgroundChunkGenerator', () => {
 
       // Process at tick 0
       try {
-        generator.processQueue(mockWorld, 0);
+        // @ts-expect-error MockWorldMutator doesn't implement full WorldMutator interface (test-only properties)
+      generator.processQueue(mockWorld, 0);
       } catch (e) {
         console.error('Process queue error:', e);
         throw e;
@@ -170,6 +181,7 @@ describe('BackgroundChunkGenerator', () => {
         priority: 'HIGH',
         requestedBy: 'test',
       });
+      // @ts-expect-error MockWorldMutator doesn't implement full WorldMutator interface (test-only properties)
       generator.processQueue(mockWorld, 1);
 
       // Should not have processed
@@ -185,6 +197,7 @@ describe('BackgroundChunkGenerator', () => {
       });
 
       // Process at tick 0
+      // @ts-expect-error MockWorldMutator doesn't implement full WorldMutator interface (test-only properties)
       generator.processQueue(mockWorld, 0);
       expect(mockWorld.eventBus.emit).toHaveBeenCalled();
 
@@ -198,6 +211,7 @@ describe('BackgroundChunkGenerator', () => {
         priority: 'HIGH',
         requestedBy: 'test',
       });
+      // @ts-expect-error MockWorldMutator doesn't implement full WorldMutator interface (test-only properties)
       generator.processQueue(mockWorld, 2);
 
       // Should have processed
@@ -226,6 +240,7 @@ describe('BackgroundChunkGenerator', () => {
       });
 
       // Process first chunk
+      // @ts-expect-error MockWorldMutator doesn't implement full WorldMutator interface (test-only properties)
       generator.processQueue(mockWorld, 0);
 
       // Should process HIGH priority chunk (2,2)
@@ -242,6 +257,7 @@ describe('BackgroundChunkGenerator', () => {
 
       // Process second chunk
       vi.clearAllMocks();
+      // @ts-expect-error MockWorldMutator doesn't implement full WorldMutator interface (test-only properties)
       generator.processQueue(mockWorld, 2);
 
       // Should process MEDIUM priority chunk (1,1)
@@ -258,6 +274,7 @@ describe('BackgroundChunkGenerator', () => {
 
       // Process third chunk
       vi.clearAllMocks();
+      // @ts-expect-error MockWorldMutator doesn't implement full WorldMutator interface (test-only properties)
       generator.processQueue(mockWorld, 4);
 
       // Should process LOW priority chunk (0,0)
@@ -281,6 +298,7 @@ describe('BackgroundChunkGenerator', () => {
         requestedBy: 'test',
       });
 
+      // @ts-expect-error MockWorldMutator doesn't implement full WorldMutator interface (test-only properties)
       generator.processQueue(mockWorld, 0);
 
       // Verify chunk was generated
@@ -298,6 +316,7 @@ describe('BackgroundChunkGenerator', () => {
         requestedBy: 'soul_creation',
       });
 
+      // @ts-expect-error MockWorldMutator doesn't implement full WorldMutator interface (test-only properties)
       generator.processQueue(mockWorld, 0);
 
       expect(mockWorld.eventBus.emit).toHaveBeenCalledWith({
@@ -401,6 +420,7 @@ describe('BackgroundChunkGenerator', () => {
       });
 
       // Process at tick 0
+      // @ts-expect-error MockWorldMutator doesn't implement full WorldMutator interface (test-only properties)
       customGenerator.processQueue(mockWorld, 0);
       expect(mockWorld.eventBus.emit).toHaveBeenCalled();
 
@@ -414,6 +434,7 @@ describe('BackgroundChunkGenerator', () => {
         priority: 'HIGH',
         requestedBy: 'test',
       });
+      // @ts-expect-error MockWorldMutator doesn't implement full WorldMutator interface (test-only properties)
       customGenerator.processQueue(mockWorld, 4);
 
       // Should not have processed

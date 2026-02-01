@@ -496,7 +496,7 @@ describe('AgentCombatSystem', () => {
         target: defender.id,
         state: 'initiated',
         startTime: 0,
-      } as any);
+      } as Record<string, unknown>);
 
       expect(() => system.update(world, Array.from(world.entities.values()), 1)).toThrow('Combat cause is required');
     });

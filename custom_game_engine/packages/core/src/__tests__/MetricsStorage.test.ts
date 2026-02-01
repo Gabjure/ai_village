@@ -3,6 +3,20 @@ import { MetricsStorage } from '../metrics/MetricsStorage';
 import { promises as fs } from 'fs';
 import * as path from 'path';
 
+// Type helpers for testing
+type EntityWithMethods = {
+  addComponent?: (comp: unknown) => void;
+  updateComponent?: (type: string, updater: (current: unknown) => unknown) => void;
+  getComponent?: (type: string) => unknown;
+  hasComponent?: (type: string) => boolean;
+};
+type WorldWithMethods = Record<string, unknown> & {
+  getEntity?: (id: string) => unknown;
+  addEntity?: (entity: unknown) => void;
+  query?: unknown;
+  getSystem?: (name: string) => unknown;
+};
+
 describe('MetricsStorage', () => {
   let storage: MetricsStorage;
   let tempDir: string;
@@ -399,7 +413,8 @@ describe('MetricsStorage', () => {
       expect(() => {
         storage.addToHotStorage({
           type: 'test',
-          timestamp: null as any,
+      // @ts-expect-error Testing null parameter validation
+          timestamp: null,
           agentId: 'agent-1',
           data: {}
         });
@@ -463,7 +478,7 @@ describe('MetricsStorage', () => {
 
     it('should recover from corrupted hot storage', () => {
       // Corrupt the hot storage
-      (storage as any).hotStorage = null;
+      (storage as Record<string, unknown>).hotStorage = null;
 
       expect(() => {
         storage.getHotStorage();

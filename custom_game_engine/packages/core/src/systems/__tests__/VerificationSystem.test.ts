@@ -24,7 +24,7 @@ describe('VerificationSystem', () => {
   }) {
     const socialGradient = entity.getComponent('SocialGradient');
     socialGradient.addGradient({
-      resourceType: data.resourceType as any,
+      resourceType: data.resourceType as unknown,
       bearing: data.bearing,
       distance: data.distance,
       confidence: 1.0,
@@ -104,7 +104,8 @@ describe('VerificationSystem', () => {
 
     it('should throw error for invalid verification result type', () => {
       expect(() => {
-        system.recordVerification('alice', 'bob', 'invalid' as any, 100);
+        system.recordVerification('alice', 'bob', // @ts-expect-error Testing invalid value validation
+      'invalid', 100);
       }).toThrow('verification result');
     });
 

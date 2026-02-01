@@ -211,10 +211,10 @@ describe('EventBus Propagation Integration', () => {
   }));
 
     // Subscribe to event and modify agent
-    const unsub = harness.world.eventBus.subscribe('test:modify_agent', (event: any) => {
+    const unsub = harness.world.eventBus.subscribe('test:modify_agent', (event: Record<string, unknown>) => {
       const targetEntity = harness.world.getEntity(event.data.entityId);
       if (targetEntity) {
-        (targetEntity as any).updateComponent('needs', (current: any) => ({
+        (targetEntity as EntityWithMethods).updateComponent('needs', (current: Record<string, unknown>) => ({
           ...current,
           hunger: 50,
         }));
@@ -237,7 +237,7 @@ describe('EventBus Propagation Integration', () => {
     unsub();
 
     // Agent's state should be modified
-    const needs = agent.getComponent(ComponentType.Needs) as any;
+    const needs = agent.getComponent(ComponentType.Needs);
     expect(needs.hunger).toBe(50);
   });
 

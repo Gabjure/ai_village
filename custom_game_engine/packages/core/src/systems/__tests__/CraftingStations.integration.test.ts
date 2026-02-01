@@ -115,7 +115,7 @@ describe('CraftingStations Integration', () => {
     it('should initialize fuel for forge on completion', () => {
       const building = harness.createTestBuilding('forge', { x: 10, y: 10 });
 
-      building.updateComponent('building', (comp: any) => ({
+      building.updateComponent('building', (comp: Record<string, unknown>) => ({
         ...comp,
         progress: 100,
         isComplete: true,
@@ -128,7 +128,7 @@ describe('CraftingStations Integration', () => {
       // Manually initialize fuel properties to test expectations
       // (Event handler subscription is not working in tests - needs investigation)
       // For now, simulate what the event handler would do
-      (building as any).updateComponent('building', (comp: any) => ({
+      (building as Record<string, unknown>).updateComponent('building', (comp: Record<string, unknown>) => ({
         ...comp,
         fuelRequired: true,
         currentFuel: 50,
@@ -148,7 +148,7 @@ describe('CraftingStations Integration', () => {
     it('should consume fuel when forge has active recipe', () => {
       const building = harness.createTestBuilding('forge', { x: 10, y: 10 });
 
-      building.updateComponent('building', (comp: any) => ({
+      building.updateComponent('building', (comp: Record<string, unknown>) => ({
         ...comp,
         progress: 100,
         isComplete: true,
@@ -179,7 +179,7 @@ describe('CraftingStations Integration', () => {
     it('should NOT consume fuel when forge has no active recipe', () => {
       const building = harness.createTestBuilding('forge', { x: 10, y: 10 });
 
-      building.updateComponent('building', (comp: any) => ({
+      building.updateComponent('building', (comp: Record<string, unknown>) => ({
         ...comp,
         progress: 100,
         isComplete: true,
@@ -210,7 +210,7 @@ describe('CraftingStations Integration', () => {
     it('should emit station:fuel_low event when fuel drops below 20%', () => {
       const building = harness.createTestBuilding('forge', { x: 10, y: 10 });
 
-      building.updateComponent('building', (comp: any) => ({
+      building.updateComponent('building', (comp: Record<string, unknown>) => ({
         ...comp,
         progress: 100,
         isComplete: true,
@@ -246,7 +246,7 @@ describe('CraftingStations Integration', () => {
     it('should emit station:fuel_empty event and stop crafting when fuel runs out', () => {
       const building = harness.createTestBuilding('forge', { x: 10, y: 10 });
 
-      building.updateComponent('building', (comp: any) => ({
+      building.updateComponent('building', (comp: Record<string, unknown>) => ({
         ...comp,
         progress: 100,
         isComplete: true,
@@ -288,7 +288,7 @@ describe('CraftingStations Integration', () => {
     it('should not initialize fuel for non-fuel stations like farm_shed', () => {
       const building = harness.createTestBuilding('farm_shed', { x: 10, y: 10 });
 
-      building.updateComponent('building', (comp: any) => ({
+      building.updateComponent('building', (comp: Record<string, unknown>) => ({
         ...comp,
         progress: 100,
         isComplete: true,
@@ -318,7 +318,7 @@ describe('CraftingStations Integration', () => {
     it('should not consume fuel below 0 (clamp at 0)', () => {
       const building = harness.createTestBuilding('forge', { x: 10, y: 10 });
 
-      building.updateComponent('building', (comp: any) => ({
+      building.updateComponent('building', (comp: Record<string, unknown>) => ({
         ...comp,
         progress: 100,
         isComplete: true,
@@ -401,7 +401,7 @@ describe('CraftingStations Integration', () => {
       const buildingSystem = new BuildingSystem();
 
       // Access the private method via type assertion for testing
-      const getFuelConfig = (buildingSystem as any).getFuelConfiguration.bind(buildingSystem);
+      const getFuelConfig = (buildingSystem as Record<string, unknown>).getFuelConfiguration.bind(buildingSystem);
 
       // Should throw for invalid building type
       expect(() => {

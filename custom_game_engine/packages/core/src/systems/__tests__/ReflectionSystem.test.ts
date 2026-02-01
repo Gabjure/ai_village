@@ -468,7 +468,7 @@ describe('ReflectionSystem', () => {
         emotionalIntensity: 0.7
       });
 
-      const llmSpy = vi.spyOn(system as any, 'generateReflection');
+      const llmSpy = vi.spyOn(system as unknown, 'generateReflection');
 
       eventBus.emit('agent:sleep_start', {
         agentId: agent.id,
@@ -491,7 +491,7 @@ describe('ReflectionSystem', () => {
       });
 
       // Mock LLM failure
-      vi.spyOn(system as any, 'generateReflection').mockRejectedValue(
+      vi.spyOn(system as unknown, 'generateReflection').mockRejectedValue(
         new Error('LLM service unavailable')
       );
 
@@ -537,7 +537,7 @@ describe('ReflectionSystem', () => {
 
     it('should NOT silently skip reflection failures', () => {
       // Mock reflection that would fail
-      vi.spyOn(system as any, '_performDailyReflection').mockImplementation(() => {
+      vi.spyOn(system as unknown, '_performDailyReflection').mockImplementation(() => {
         throw new Error('Reflection failed');
       });
 

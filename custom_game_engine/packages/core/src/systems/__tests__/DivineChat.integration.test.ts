@@ -18,6 +18,20 @@ import { ChatRoomSystem, type ChatRoomComponent, DIVINE_CHAT_CONFIG } from '../.
 import { createIdentityComponent } from '../../components/IdentityComponent.js';
 import { createTagsComponent } from '../../components/TagsComponent.js';
 
+// Type helpers for testing
+type EntityWithMethods = {
+  addComponent?: (comp: unknown) => void;
+  updateComponent?: (type: string, updater: (current: unknown) => unknown) => void;
+  getComponent?: (type: string) => unknown;
+  hasComponent?: (type: string) => boolean;
+};
+type WorldWithMethods = Record<string, unknown> & {
+  getEntity?: (id: string) => unknown;
+  addEntity?: (entity: unknown) => void;
+  query?: unknown;
+  getSystem?: (name: string) => unknown;
+};
+
 describe('Chat Room System - Integration (Divine Chat)', () => {
   let world: World;
   let chatSystem: ChatRoomSystem;
@@ -35,10 +49,10 @@ describe('Chat Room System - Integration (Divine Chat)', () => {
     const deity = world.createEntity();
 
     const identity = createIdentityComponent(name, 'deity');
-    (deity as any).addComponent(identity);
+    (deity as Record<string, unknown>).addComponent(identity);
 
     const tags = createTagsComponent('deity');
-    (deity as any).addComponent(tags);
+    (deity as Record<string, unknown>).addComponent(tags);
 
     return deity.id;
   }
@@ -526,7 +540,7 @@ describe('Chat Room System - Integration (Divine Chat)', () => {
       // Create entity with deity tag but no identity - criteria-based membership requires identity
       const entity = world.createEntity();
       const tags = createTagsComponent('deity');
-      (entity as any).addComponent(tags);
+      entity.addComponent(tags);
 
       chatSystem.update(world, [], 0);
 

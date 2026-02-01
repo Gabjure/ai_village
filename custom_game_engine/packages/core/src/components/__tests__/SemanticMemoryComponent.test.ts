@@ -248,7 +248,7 @@ describe('SemanticMemoryComponent', () => {
           content: 'Some belief',
           confidence: 0.8,
           sourceMemories: []
-        } as any);
+        } as Record<string, unknown>);
       }).toThrow();
     });
 
@@ -260,7 +260,7 @@ describe('SemanticMemoryComponent', () => {
           category: 'farming',
           confidence: 0.8,
           sourceMemories: []
-        } as any);
+        } as Record<string, unknown>);
       }).toThrow();
     });
 
@@ -272,7 +272,7 @@ describe('SemanticMemoryComponent', () => {
           category: 'farming',
           content: 'Test belief',
           confidence: 0.8
-        } as any);
+        } as Record<string, unknown>);
       }).toThrow();
     });
 
@@ -297,7 +297,7 @@ describe('SemanticMemoryComponent', () => {
           category: 'test',
           content: 'Test',
           sourceMemories: []
-        } as any);
+        } as Record<string, unknown>);
       }).toThrow();
     });
   });

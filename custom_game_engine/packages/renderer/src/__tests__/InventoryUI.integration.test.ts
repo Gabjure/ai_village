@@ -34,7 +34,7 @@ describe('InventoryUI Integration Tests', () => {
         emit: vi.fn(),
         on: vi.fn(),
       },
-    } as any;
+    } as unknown;
 
     // Create player inventory
     playerInventory = createTestInventory([
@@ -377,7 +377,7 @@ describe('InventoryUI Integration Tests', () => {
         maxSlots: 8,
         maxWeight: 100,
         currentWeight: 0,
-      } as any;
+      } as Record<string, unknown>;
 
       expect(() => {
         inventoryUI.setPlayerInventory(invalidInventory);
@@ -392,7 +392,7 @@ describe('InventoryUI Integration Tests', () => {
         maxSlots: 8,
         maxWeight: 100,
         currentWeight: 0,
-      } as any;
+      } as Record<string, unknown>;
 
       expect(() => {
         inventoryUI.setPlayerInventory(invalidInventory);
@@ -407,7 +407,7 @@ describe('InventoryUI Integration Tests', () => {
         // maxSlots missing
         maxWeight: 100,
         currentWeight: 0,
-      } as any;
+      } as Record<string, unknown>;
 
       expect(() => {
         inventoryUI.setPlayerInventory(invalidInventory);
@@ -422,7 +422,7 @@ describe('InventoryUI Integration Tests', () => {
         maxSlots: 8,
         // maxWeight missing
         currentWeight: 0,
-      } as any;
+      } as Record<string, unknown>;
 
       expect(() => {
         inventoryUI.setPlayerInventory(invalidInventory);
@@ -437,7 +437,7 @@ describe('InventoryUI Integration Tests', () => {
         maxSlots: 8,
         maxWeight: 100,
         // currentWeight missing
-      } as any;
+      } as Record<string, unknown>;
 
       expect(() => {
         inventoryUI.setPlayerInventory(invalidInventory);
@@ -446,13 +446,14 @@ describe('InventoryUI Integration Tests', () => {
 
     it('should throw when setPlayerInventory called with null', () => {
       expect(() => {
-        inventoryUI.setPlayerInventory(null as any);
+      // @ts-expect-error Testing null parameter validation
+        inventoryUI.setPlayerInventory(null);
       }).toThrow('missing required');
     });
 
     it('should throw when setPlayerInventory called with undefined', () => {
       expect(() => {
-        inventoryUI.setPlayerInventory(undefined as any);
+        inventoryUI.setPlayerInventory(undefined as unknown);
       }).toThrow('missing required');
     });
   });

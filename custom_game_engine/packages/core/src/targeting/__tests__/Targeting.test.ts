@@ -20,6 +20,20 @@ import { BuildingTargeting, findNearestBuilding, findNearestStorageBuilding } fr
 import { AgentTargeting, findNearestAgent, findConversationPartner } from '../AgentTargeting.js';
 import { ThreatTargeting, assessThreats, findNearestThreat } from '../ThreatTargeting.js';
 
+// Type helpers for testing
+type EntityWithMethods = {
+  addComponent?: (comp: unknown) => void;
+  updateComponent?: (type: string, updater: (current: unknown) => unknown) => void;
+  getComponent?: (type: string) => unknown;
+  hasComponent?: (type: string) => boolean;
+};
+type WorldWithMethods = Record<string, unknown> & {
+  getEntity?: (id: string) => unknown;
+  addEntity?: (entity: unknown) => void;
+  query?: unknown;
+  getSystem?: (name: string) => unknown;
+};
+
 describe('Targeting Module', () => {
   let world: World;
 
@@ -35,7 +49,7 @@ describe('Targeting Module', () => {
   ): EntityImpl {
     const entity = world.createEntity() as EntityImpl;
     for (const [type, data] of Object.entries(components)) {
-      (entity as any).addComponent({ type, ...data });
+      entity.addComponent({ type, ...data });
     }
     return entity;
   }
@@ -299,7 +313,7 @@ describe('Targeting Module', () => {
 
       const agent = createAgentWithVision({ x: 0, y: 0 });
       // Add building to vision range via query (buildings aren't in seenBuildings by default)
-      (agent.getComponent(ComponentType.Vision) as any).range = 15;
+      (agent.getComponent(ComponentType.Vision)).range = 15;
 
       const targeting = new BuildingTargeting();
       const nearest = targeting.findNearest(agent, world, { buildingType: BuildingType.StorageChest });
@@ -395,7 +409,7 @@ describe('Targeting Module', () => {
 
       // Add self to seen agents
       const vision = agent.getComponent(ComponentType.Vision)!;
-      (vision as any).seenAgents = [agent.id];
+      (vision as Record<string, unknown>).seenAgents = [agent.id];
 
       const targeting = new AgentTargeting();
       const nearest = targeting.findNearest(agent, world, { excludeSelf: true });
@@ -504,7 +518,7 @@ describe('Targeting Module', () => {
 
       // Add predator to prey's vision
       const vision = prey.getComponent(ComponentType.Vision)!;
-      (vision as any).seenAgents = [predator.id];
+      (vision as Record<string, unknown>).seenAgents = [predator.id];
 
       const targeting = new ThreatTargeting();
       const threat = targeting.findNearest(prey, world);
@@ -539,7 +553,7 @@ describe('Targeting Module', () => {
       });
 
       const vision = animal.getComponent(ComponentType.Vision)!;
-      (vision as any).seenAgents = [threat1.id, threat2.id];
+      (vision as Record<string, unknown>).seenAgents = [threat1.id, threat2.id];
 
       const assessment = assessThreats(animal, world);
 
@@ -583,7 +597,7 @@ describe('Targeting Module', () => {
       });
 
       const vision = agent.getComponent(ComponentType.Vision)!;
-      (vision as any).seenResources = [fire.id];
+      (vision as Record<string, unknown>).seenResources = [fire.id];
 
       const threat = findNearestThreat(agent, world);
 

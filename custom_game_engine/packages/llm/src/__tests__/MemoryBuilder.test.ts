@@ -2,6 +2,9 @@ import { describe, it, expect } from 'vitest';
 import { MemoryBuilder } from '../prompt-builders/MemoryBuilder';
 import type { EpisodicMemory, EpisodicMemoryComponent } from '@ai-village/core';
 
+// Mock type for EpisodicMemoryComponent - only includes fields needed for testing
+type MockEpisodicMemoryComponent = Pick<EpisodicMemoryComponent, 'type' | 'episodicMemories'>;
+
 describe('MemoryBuilder', () => {
   const builder = new MemoryBuilder();
 
@@ -29,7 +32,7 @@ describe('MemoryBuilder', () => {
     return {
       type: 'episodic_memory',
       episodicMemories: memories,
-    } as unknown as EpisodicMemoryComponent;
+    } as MockEpisodicMemoryComponent;
   }
 
   describe('deduplication', () => {

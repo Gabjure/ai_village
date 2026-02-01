@@ -9,24 +9,35 @@ import { MutationService } from '../../mutation/MutationService.js';
 import type { World, Entity } from '@ai-village/core';
 import type { EntityChangeEvent } from '../../types/IntrospectionTypes.js';
 
+// Mock types for testing
+type MockWorld = Pick<World, 'tick' | 'query'> & {
+  entities: Map<string, Entity>;
+  getEntity: (id: string) => Entity | undefined;
+};
+
+type MockEntity = Pick<Entity, 'id' | 'hasComponent' | 'getComponent' | 'updateComponent'> & {
+  components: Map<string, Record<string, unknown>>;
+};
+
 // Mock World
 function createMockWorld(): World {
   const entities = new Map<string, Entity>();
 
   const world = {
     tick: 100,
+    entities,
     getEntity: (id: string) => entities.get(id),
     query: () => ({
       with: () => ({ executeEntities: () => [] }),
       executeEntities: () => [],
     }),
-  } as any;
+  } as MockWorld;
 
-  return world;
+  return world as World;
 }
 
 // Mock Entity
-function createMockEntity(id: string, components: Map<string, any>): Entity {
+function createMockEntity(id: string, components: Map<string, Record<string, unknown>>): Entity {
   return {
     id,
     components,
@@ -39,7 +50,7 @@ function createMockEntity(id: string, components: Map<string, any>): Entity {
       }
       return comp;
     },
-    updateComponent: (type: string, updater: (current: any) => any) => {
+    updateComponent: (type: string, updater: (current: Record<string, unknown>) => Record<string, unknown>) => {
       const current = components.get(type);
       if (current && typeof current === 'object') {
         const componentWithType = { type, ...current };
@@ -51,7 +62,7 @@ function createMockEntity(id: string, components: Map<string, any>): Entity {
         }
       }
     },
-  } as any;
+  } as MockEntity;
 }
 
 describe('GameIntrospectionAPI - Observability', () => {
@@ -80,8 +91,8 @@ describe('GameIntrospectionAPI - Observability', () => {
       ]);
       const entity = createMockEntity(entityId, components);
       // Add entity to world
-      (world as any).entities = new Map([[entityId, entity]]);
-      (world as any).getEntity = (id: string) => (world as any).entities.get(id);
+      (world as MockWorld).entities = new Map([[entityId, entity]]);
+      (world as MockWorld).getEntity = (id: string) => (world as MockWorld).entities.get(id);
 
       // Watch entity
       const events: EntityChangeEvent[] = [];
@@ -139,8 +150,8 @@ describe('GameIntrospectionAPI - Observability', () => {
       ]);
       const entity = createMockEntity(entityId, components);
       // Add entity to world
-      (world as any).entities = new Map([[entityId, entity]]);
-      (world as any).getEntity = (id: string) => (world as any).entities.get(id);
+      (world as MockWorld).entities = new Map([[entityId, entity]]);
+      (world as MockWorld).getEntity = (id: string) => (world as MockWorld).entities.get(id);
 
       const events: EntityChangeEvent[] = [];
       const unsubscribe = api.watchEntity(entityId, {
@@ -209,8 +220,8 @@ describe('GameIntrospectionAPI - Observability', () => {
       ]);
       const entity = createMockEntity(entityId, components);
       // Add entity to world
-      (world as any).entities = new Map([[entityId, entity]]);
-      (world as any).getEntity = (id: string) => (world as any).entities.get(id);
+      (world as MockWorld).entities = new Map([[entityId, entity]]);
+      (world as MockWorld).getEntity = (id: string) => (world as MockWorld).entities.get(id);
 
       const events: EntityChangeEvent[] = [];
       const unsubscribe = api.watchEntity(entityId, {
@@ -263,8 +274,8 @@ describe('GameIntrospectionAPI - Observability', () => {
       ]);
       const entity = createMockEntity(entityId, components);
       // Add entity to world
-      (world as any).entities = new Map([[entityId, entity]]);
-      (world as any).getEntity = (id: string) => (world as any).entities.get(id);
+      (world as MockWorld).entities = new Map([[entityId, entity]]);
+      (world as MockWorld).getEntity = (id: string) => (world as MockWorld).entities.get(id);
 
       const events: EntityChangeEvent[] = [];
       const unsubscribe = api.watchEntity(entityId, {
@@ -310,8 +321,8 @@ describe('GameIntrospectionAPI - Observability', () => {
       ]);
       const entity = createMockEntity(entityId, components);
       // Add entity to world
-      (world as any).entities = new Map([[entityId, entity]]);
-      (world as any).getEntity = (id: string) => (world as any).entities.get(id);
+      (world as MockWorld).entities = new Map([[entityId, entity]]);
+      (world as MockWorld).getEntity = (id: string) => (world as MockWorld).entities.get(id);
 
       ComponentRegistry.register({
         type: 'needs',
@@ -362,8 +373,8 @@ describe('GameIntrospectionAPI - Observability', () => {
       ]);
       const entity = createMockEntity(entityId, components);
       // Add entity to world
-      (world as any).entities = new Map([[entityId, entity]]);
-      (world as any).getEntity = (id: string) => (world as any).entities.get(id);
+      (world as MockWorld).entities = new Map([[entityId, entity]]);
+      (world as MockWorld).getEntity = (id: string) => (world as MockWorld).entities.get(id);
 
       ComponentRegistry.register({
         type: 'needs',
@@ -426,8 +437,8 @@ describe('GameIntrospectionAPI - Observability', () => {
       ]);
       const entity = createMockEntity(entityId, components);
       // Add entity to world
-      (world as any).entities = new Map([[entityId, entity]]);
-      (world as any).getEntity = (id: string) => (world as any).entities.get(id);
+      (world as MockWorld).entities = new Map([[entityId, entity]]);
+      (world as MockWorld).getEntity = (id: string) => (world as MockWorld).entities.get(id);
 
       ComponentRegistry.register({
         type: 'needs',

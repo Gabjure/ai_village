@@ -128,7 +128,7 @@ describe('HeroProtection', () => {
     });
 
     // Access private method via reflection for testing
-    const getLuck = (combatSystem as any).getDestinyLuckModifier.bind(combatSystem);
+    const getLuck = (combatSystem as { getDestinyLuckModifier: (entity: unknown) => number }).getDestinyLuckModifier.bind(combatSystem);
     const luck = getLuck(world, hero.id);
 
     // +0.8 alignment × 0.10 base = +0.08 luck
@@ -144,7 +144,7 @@ describe('HeroProtection', () => {
       combatSkill: 10,
     });
 
-    const getLuck = (combatSystem as any).getDestinyLuckModifier.bind(combatSystem);
+    const getLuck = (combatSystem as { getDestinyLuckModifier: (entity: unknown) => number }).getDestinyLuckModifier.bind(combatSystem);
     const luck = getLuck(world, hero.id);
 
     // -1.0 alignment × 0.10 base = -0.10 luck
@@ -160,7 +160,7 @@ describe('HeroProtection', () => {
       combatSkill: 10,
     });
 
-    const getLuck = (combatSystem as any).getDestinyLuckModifier.bind(combatSystem);
+    const getLuck = (combatSystem as { getDestinyLuckModifier: (entity: unknown) => number }).getDestinyLuckModifier.bind(combatSystem);
     const luck = getLuck(world, hero.id);
 
     // 0.0 alignment × 0.10 base = 0.0 luck
@@ -175,7 +175,7 @@ describe('HeroProtection', () => {
       combatSkill: 10,
     });
 
-    const getLuck = (combatSystem as any).getDestinyLuckModifier.bind(combatSystem);
+    const getLuck = (combatSystem as { getDestinyLuckModifier: (entity: unknown) => number }).getDestinyLuckModifier.bind(combatSystem);
     const luck = getLuck(world, hero.id);
 
     // No destiny = no luck
@@ -191,7 +191,7 @@ describe('HeroProtection', () => {
       combatSkill: 10,
     });
 
-    const getLuck = (combatSystem as any).getDestinyLuckModifier.bind(combatSystem);
+    const getLuck = (combatSystem as { getDestinyLuckModifier: (entity: unknown) => number }).getDestinyLuckModifier.bind(combatSystem);
     const luck = getLuck(world, hero.id);
 
     // Destiny realized = no more protection

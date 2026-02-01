@@ -421,7 +421,7 @@ describe('Divine Form Development', () => {
 
 // Helper functions
 function createMockWorld(): World {
-  return {} as any;
+  return {} as Record<string, unknown>;
 }
 
 function createMockDeity(id: string): Deity {
@@ -438,10 +438,10 @@ function createMockDeity(id: string): Deity {
       forms: [],
     },
     emergencePhase: 'nascent',
-  } as any;
+  } as Record<string, unknown>;
 }
 
-function checkEmergenceThreshold(patterns: any[], config: any): boolean {
+function checkEmergenceThreshold(patterns: any[], config:Record<string, unknown>): boolean {
   if (patterns.length < config.minBelievers) return false;
   const avgStrength = patterns.reduce((sum, p) => sum + p.strength, 0) / patterns.length;
   if (avgStrength < config.minAverageStrength) return false;
@@ -450,7 +450,7 @@ function checkEmergenceThreshold(patterns: any[], config: any): boolean {
 
 function emergeDeity(patterns: any[], world: World): Deity {
   const deity = createMockDeity(`deity_${Date.now()}`);
-  deity.believers = patterns.map((p: any) => p.agentId);
+  deity.believers = patterns.map((p:Record<string, unknown>) => p.agentId);
   deity.identity.perceivedName = patterns[0].concept;
   deity.emergencePhase = 'nascent';
   return deity;
@@ -476,7 +476,7 @@ function synthesizeIdentity(perceptions: any[]): DeityIdentity {
   // Average personality
   for (const p of perceptions) {
     for (const [trait, strength] of Object.entries(p.personality)) {
-      (identity.personality as any)[trait] = ((identity.personality as any)[trait] || 0) + strength / perceptions.length;
+      (identity.personality as unknown)[trait] = ((identity.personality as unknown)[trait] || 0) + strength / perceptions.length;
     }
   }
 
@@ -495,8 +495,8 @@ function incorporateNewPerception(deity: Deity, perception: any, world: World): 
 
   const updated = { ...deity };
   for (const [domain, strength] of Object.entries(perception.domains)) {
-    const current = (updated.identity.domains as any)[domain] || 0;
-    (updated.identity.domains as any)[domain] = current + (strength as number) * flexibility;
+    const current = (updated.identity.domains as unknown)[domain] || 0;
+    (updated.identity.domains as unknown)[domain] = current + (strength as number) * flexibility;
   }
 
   return updated;
@@ -504,9 +504,9 @@ function incorporateNewPerception(deity: Deity, perception: any, world: World): 
 
 function reinforceDomain(deity: Deity, domain: string, prayers: any[]): Deity {
   const updated = { ...deity };
-  const current = (updated.identity.domains as any)[domain] || 0;
+  const current = (updated.identity.domains as unknown)[domain] || 0;
   const increase = Math.min(prayers.length * 0.01, 0.3);
-  (updated.identity.domains as any)[domain] = Math.min(1.0, current + increase);
+  (updated.identity.domains as unknown)[domain] = Math.min(1.0, current + increase);
   return updated;
 }
 
@@ -517,10 +517,10 @@ function updateDomainsFromPrayers(deity: Deity, prayers: any[], ticksPassed: num
   for (const domain of Object.keys(updated.identity.domains)) {
     const prayerCount = prayers.filter((p) => p.domain === domain).length;
     if (prayerCount === 0) {
-      const current = (updated.identity.domains as any)[domain];
-      (updated.identity.domains as any)[domain] = Math.max(0, current - decay);
-      if ((updated.identity.domains as any)[domain] === 0) {
-        delete (updated.identity.domains as any)[domain];
+      const current = (updated.identity.domains as unknown)[domain];
+      (updated.identity.domains as unknown)[domain] = Math.max(0, current - decay);
+      if ((updated.identity.domains as unknown)[domain] === 0) {
+        delete (updated.identity.domains as unknown)[domain];
       }
     }
   }
@@ -528,13 +528,13 @@ function updateDomainsFromPrayers(deity: Deity, prayers: any[], ticksPassed: num
   return updated;
 }
 
-function addDomainFromMythology(deity: Deity, story: any): Deity {
+function addDomainFromMythology(deity: Deity, story:Record<string, unknown>): Deity {
   const updated = { ...deity };
   const influence = (story.retoldCount / 10) * (story.believedBy.length / deity.believers.length);
 
   for (const [domain, strength] of Object.entries(story.domains)) {
-    const current = (updated.identity.domains as any)[domain] || 0;
-    (updated.identity.domains as any)[domain] = Math.min(1.0, current + (strength as number) * influence * 0.5);
+    const current = (updated.identity.domains as unknown)[domain] || 0;
+    (updated.identity.domains as unknown)[domain] = Math.min(1.0, current + (strength as number) * influence * 0.5);
   }
 
   return updated;
@@ -552,7 +552,7 @@ function synthesizePersonality(perceptions: any[]): any {
   return personality;
 }
 
-function updatePersonalityFromAction(deity: Deity, action: any): Deity {
+function updatePersonalityFromAction(deity: Deity, action:Record<string, unknown>): Deity {
   const updated = { ...deity };
   const impact = action.witnessed ? (action.witnessCount / deity.believers.length) * 0.1 : 0.02;
 
@@ -562,8 +562,8 @@ function updatePersonalityFromAction(deity: Deity, action: any): Deity {
   } else if (action.type === 'curse') {
     const currentBenevolent = updated.identity.personality.benevolent || 0;
     updated.identity.personality.benevolent = Math.max(0, currentBenevolent - impact);
-    const currentWrathful = (updated.identity.personality as any).wrathful || 0;
-    (updated.identity.personality as any).wrathful = Math.min(1.0, currentWrathful + impact);
+    const currentWrathful = (updated.identity.personality as Record<string, unknown>).wrathful || 0;
+    (updated.identity.personality as Record<string, unknown>).wrathful = Math.min(1.0, currentWrathful + impact);
   }
 
   return updated;
@@ -606,7 +606,7 @@ function synthesizeFormsFromVisions(visions: any[]): any[] {
   return [form];
 }
 
-function addFormFromVision(deity: Deity, vision: any): Deity {
+function addFormFromVision(deity: Deity, vision:Record<string, unknown>): Deity {
   const updated = { ...deity };
 
   if (deity.emergencePhase === 'nascent') {

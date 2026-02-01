@@ -19,8 +19,10 @@ describe('MetricsDashboard Integration', () => {
 
   describe('Initialization', () => {
     it('should require collector and analysis instances', () => {
-      expect(() => new MetricsDashboard(null as any, analysis)).toThrow('MetricsDashboard requires MetricsCollector');
-      expect(() => new MetricsDashboard(collector, null as any)).toThrow('MetricsDashboard requires MetricsAnalysis');
+      // @ts-expect-error Testing null parameter validation
+      expect(() => new MetricsDashboard(null, analysis)).toThrow('MetricsDashboard requires MetricsCollector');
+      // @ts-expect-error Testing null parameter validation
+      expect(() => new MetricsDashboard(collector, null)).toThrow('MetricsDashboard requires MetricsAnalysis');
     });
 
     it('should initialize with default dashboard state', () => {
@@ -566,7 +568,8 @@ describe('MetricsDashboard Integration', () => {
   describe('Error Handling', () => {
     it('should handle chart generation errors gracefully', () => {
       expect(() => {
-        dashboard.generateChart('invalid_chart', 'unknown_type' as any);
+        dashboard.generateChart('invalid_chart', // @ts-expect-error Testing invalid value validation
+      'unknown_type');
       }).toThrow('Unsupported chart type: unknown_type');
     });
 

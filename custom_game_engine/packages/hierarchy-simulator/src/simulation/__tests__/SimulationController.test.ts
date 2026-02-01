@@ -3,11 +3,14 @@ import { SimulationController } from '../SimulationController.js';
 import { TIME_SCALE } from '../../renormalization/index.js';
 
 // Mock requestAnimationFrame/cancelAnimationFrame for Node.js environment
+let rafId = 0;
 global.requestAnimationFrame = vi.fn((cb) => {
-  return setTimeout(cb, 16) as unknown as number;
+  // Schedule callback with setTimeout, but return a mock ID
+  setTimeout(cb, 16);
+  return ++rafId;
 });
 global.cancelAnimationFrame = vi.fn((id) => {
-  clearTimeout(id);
+  // No-op in tests - we don't need to track/cancel in test environment
 });
 
 describe('SimulationController', () => {

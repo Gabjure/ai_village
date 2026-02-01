@@ -91,7 +91,7 @@ export class ParallelSystemAnalyzer {
         ...system.requiredComponents,
         ...(metadata?.readsComponents ?? []),
       ],
-      writesComponents: metadata?.writesComponents ?? [],
+      writesComponents: [...(metadata?.writesComponents ?? [])],
       dependsOn: [...(metadata?.dependsOn ?? [])],
       parallelWith: [],
       conflictsWith: [],
@@ -109,8 +109,12 @@ export class ParallelSystemAnalyzer {
     // For each pair of systems, check for conflicts
     for (let i = 0; i < systemIds.length; i++) {
       for (let j = i + 1; j < systemIds.length; j++) {
-        const a = this.analyses.get(systemIds[i])!;
-        const b = this.analyses.get(systemIds[j])!;
+        const aId = systemIds[i];
+        const bId = systemIds[j];
+        if (!aId || !bId) continue;
+
+        const a = this.analyses.get(aId)!;
+        const b = this.analyses.get(bId)!;
 
         const conflict = this.findConflict(a, b);
         if (conflict) {
@@ -239,6 +243,8 @@ export class ParallelSystemAnalyzer {
     const groups = this.getParallelGroups();
     for (let i = 0; i < groups.length; i++) {
       const group = groups[i];
+      if (!group) continue;
+
       if (group.length > 1) {
         lines.push(`### Group ${i + 1} (${group.length} systems - PARALLELIZABLE)`);
       } else {

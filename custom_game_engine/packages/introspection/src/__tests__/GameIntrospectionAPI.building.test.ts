@@ -12,6 +12,17 @@ import { EntityImpl, createEntityId } from '@ai-village/core';
 import { ComponentRegistry } from '../registry/ComponentRegistry.js';
 import { defineComponent } from '../types/ComponentSchema.js';
 import type { World } from '@ai-village/core';
+
+// Type helpers for testing
+type EntityWithMethods = {
+  addComponent: (comp: unknown) => void;
+  updateComponent: (type: string, updater: (current: unknown) => unknown) => void;
+  getComponent: (type: string) => unknown;
+};
+type QueryMock = ReturnType<typeof vi.fn> & {
+  with: ReturnType<typeof vi.fn>;
+  executeEntities: ReturnType<typeof vi.fn>;
+};
 import type { Component } from '../types/index.js';
 import type {
   PlaceBuildingRequest,
@@ -152,12 +163,12 @@ const TestBuildingSchema = defineComponent<TestBuildingComponent>({
   },
 
   validate: (data): data is TestBuildingComponent => {
+    if (typeof data !== 'object' || data === null) return false;
+    const obj = data as Record<string, unknown>;
     return (
-      typeof data === 'object' &&
-      data !== null &&
-      (data as any).type === 'building' &&
-      typeof (data as any).buildingType === 'string' &&
-      typeof (data as any).tier === 'number'
+      obj.type === 'building' &&
+      typeof obj.buildingType === 'string' &&
+      typeof obj.tier === 'number'
     );
   },
 
@@ -211,12 +222,12 @@ const TestPositionSchema = defineComponent<TestPositionComponent>({
   },
 
   validate: (data): data is TestPositionComponent => {
+    if (typeof data !== 'object' || data === null) return false;
+    const obj = data as Record<string, unknown>;
     return (
-      typeof data === 'object' &&
-      data !== null &&
-      (data as any).type === 'position' &&
-      typeof (data as any).x === 'number' &&
-      typeof (data as any).y === 'number'
+      obj.type === 'position' &&
+      typeof obj.x === 'number' &&
+      typeof obj.y === 'number'
     );
   },
 
@@ -339,7 +350,7 @@ function createMockWorld(buildingRegistry?: MockBuildingRegistry): World {
     simulationScheduler: {
       filterActiveEntities: vi.fn((entities) => entities),
     },
-  } as unknown as World;
+  } as World;
 }
 
 /**
@@ -390,7 +401,7 @@ class MockGameIntrospectionAPI {
 
     // Create building entity
     const buildingEntity = createMockEntity();
-    (buildingEntity as any).addComponent({
+    (buildingEntity as EntityWithMethods).addComponent({
       type: 'building',
       version: 1,
       buildingType: request.blueprintId,
@@ -405,7 +416,7 @@ class MockGameIntrospectionAPI {
       sharedWith: [],
     });
 
-    (buildingEntity as any).addComponent({
+    (buildingEntity as EntityWithMethods).addComponent({
       type: 'position',
       version: 1,
       x: request.position.x,
@@ -455,8 +466,8 @@ class MockGameIntrospectionAPI {
     const results: BuildingInfo[] = [];
 
     for (const entity of buildingEntities) {
-      const building = (entity as any).getComponent('building') as TestBuildingComponent;
-      const position = (entity as any).getComponent('position') as TestPositionComponent;
+      const building = (entity as EntityWithMethods).getComponent('building') as TestBuildingComponent;
+      const position = (entity as EntityWithMethods).getComponent('position') as TestPositionComponent;
 
       if (!building || !position) {
         continue;
@@ -555,8 +566,8 @@ class MockGameIntrospectionAPI {
     const collisions: Array<{ entityId: string; type: string; position: { x: number; y: number } }> = [];
 
     for (const entity of buildingEntities) {
-      const building = (entity as any).getComponent('building') as TestBuildingComponent;
-      const existingPos = (entity as any).getComponent('position') as TestPositionComponent;
+      const building = (entity as EntityWithMethods).getComponent('building') as TestBuildingComponent;
+      const existingPos = (entity as EntityWithMethods).getComponent('position') as TestPositionComponent;
 
       if (!building || !existingPos) {
         continue;
@@ -926,7 +937,7 @@ describe('GameIntrospectionAPI Phase 2 - Building Management', () => {
     it('should handle buildings with no position component gracefully', async () => {
       // Create entity with building but no position
       const brokenEntity = createMockEntity();
-      (brokenEntity as any).addComponent({
+      (brokenEntity as EntityWithMethods).addComponent({
         type: 'building',
         version: 1,
         buildingType: 'workbench',

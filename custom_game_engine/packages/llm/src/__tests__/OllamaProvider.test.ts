@@ -25,11 +25,11 @@ describe('OllamaProvider', () => {
         })
       };
 
-      (global.fetch as any).mockResolvedValueOnce(mockResponse);
+      global.fetch.mockResolvedValueOnce(mockResponse);
 
       await provider.generate({ prompt: 'test' });
 
-      const fetchCall = (global.fetch as any).mock.calls[0];
+      const fetchCall = global.fetch.mock.calls[0];
       const requestBody = JSON.parse(fetchCall[1].body);
 
       expect(requestBody.tools).toBeDefined();
@@ -63,11 +63,11 @@ describe('OllamaProvider', () => {
         })
       };
 
-      (global.fetch as any).mockResolvedValueOnce(mockResponse);
+      global.fetch.mockResolvedValueOnce(mockResponse);
 
       await provider.generate({ prompt: 'test' });
 
-      const fetchCall = (global.fetch as any).mock.calls[0];
+      const fetchCall = global.fetch.mock.calls[0];
       const requestBody = JSON.parse(fetchCall[1].body);
 
       // Some tools like plan_build have parameters, others don't
@@ -105,7 +105,7 @@ describe('OllamaProvider', () => {
         })
       };
 
-      (global.fetch as any).mockResolvedValueOnce(mockResponse);
+      global.fetch.mockResolvedValueOnce(mockResponse);
 
       const result = await provider.generate({ prompt: 'What should you do?' });
 
@@ -134,7 +134,7 @@ describe('OllamaProvider', () => {
         })
       };
 
-      (global.fetch as any).mockResolvedValueOnce(mockResponse);
+      global.fetch.mockResolvedValueOnce(mockResponse);
 
       const result = await provider.generate({ prompt: 'test' });
       const parsed = JSON.parse(result.text);
@@ -161,7 +161,7 @@ describe('OllamaProvider', () => {
         })
       };
 
-      (global.fetch as any).mockResolvedValueOnce(mockResponse);
+      global.fetch.mockResolvedValueOnce(mockResponse);
 
       const result = await provider.generate({ prompt: 'test' });
       const parsed = JSON.parse(result.text);
@@ -182,7 +182,7 @@ describe('OllamaProvider', () => {
         })
       };
 
-      (global.fetch as any).mockResolvedValueOnce(mockResponse);
+      global.fetch.mockResolvedValueOnce(mockResponse);
 
       const result = await provider.generate({ prompt: 'test' });
 
@@ -199,11 +199,11 @@ describe('OllamaProvider', () => {
         })
       };
 
-      (global.fetch as any).mockResolvedValueOnce(mockResponse);
+      global.fetch.mockResolvedValueOnce(mockResponse);
 
       await provider.generate({ prompt: 'test' });
 
-      const fetchCall = (global.fetch as any).mock.calls[0];
+      const fetchCall = global.fetch.mock.calls[0];
       expect(fetchCall[0]).toBe('http://localhost:11434/api/chat');
     });
 
@@ -215,7 +215,7 @@ describe('OllamaProvider', () => {
         })
       };
 
-      (global.fetch as any).mockResolvedValueOnce(mockResponse);
+      global.fetch.mockResolvedValueOnce(mockResponse);
 
       await provider.generate({
         prompt: 'What to do?',
@@ -223,7 +223,7 @@ describe('OllamaProvider', () => {
         maxTokens: 1500
       });
 
-      const fetchCall = (global.fetch as any).mock.calls[0];
+      const fetchCall = global.fetch.mock.calls[0];
       const requestBody = JSON.parse(fetchCall[1].body);
 
       expect(requestBody.model).toBe('qwen3:4b');
@@ -244,11 +244,11 @@ describe('OllamaProvider', () => {
         })
       };
 
-      (global.fetch as any).mockResolvedValueOnce(mockResponse);
+      global.fetch.mockResolvedValueOnce(mockResponse);
 
       await provider.generate({ prompt: 'test' });
 
-      const fetchCall = (global.fetch as any).mock.calls[0];
+      const fetchCall = global.fetch.mock.calls[0];
       const requestBody = JSON.parse(fetchCall[1].body);
 
       expect(requestBody.options.temperature).toBe(0.7);
@@ -264,14 +264,14 @@ describe('OllamaProvider', () => {
         statusText: 'Internal Server Error'
       };
 
-      (global.fetch as any).mockResolvedValueOnce(mockResponse);
+      global.fetch.mockResolvedValueOnce(mockResponse);
 
       await expect(provider.generate({ prompt: 'test' }))
         .rejects.toThrow('Ollama API error: 500 Internal Server Error');
     });
 
     it('should throw on network error', async () => {
-      (global.fetch as any).mockRejectedValueOnce(new Error('Network error'));
+      global.fetch.mockRejectedValueOnce(new Error('Network error'));
 
       await expect(provider.generate({ prompt: 'test' }))
         .rejects.toThrow('Network error');
@@ -287,7 +287,7 @@ describe('OllamaProvider', () => {
         })
       };
 
-      (global.fetch as any).mockResolvedValueOnce(mockResponse);
+      global.fetch.mockResolvedValueOnce(mockResponse);
 
       await provider.generate({ prompt: 'test' });
 
@@ -306,7 +306,7 @@ describe('OllamaProvider', () => {
   describe('Availability Check', () => {
     it('should check server availability', async () => {
       const mockResponse = { ok: true };
-      (global.fetch as any).mockResolvedValueOnce(mockResponse);
+      global.fetch.mockResolvedValueOnce(mockResponse);
 
       const available = await provider.isAvailable();
 
@@ -318,7 +318,7 @@ describe('OllamaProvider', () => {
     });
 
     it('should return false when server unavailable', async () => {
-      (global.fetch as any).mockRejectedValueOnce(new Error('Connection refused'));
+      global.fetch.mockRejectedValueOnce(new Error('Connection refused'));
 
       const available = await provider.isAvailable();
 

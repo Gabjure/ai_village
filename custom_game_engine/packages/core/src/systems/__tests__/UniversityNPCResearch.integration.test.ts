@@ -118,7 +118,7 @@ describe('University NPC Research Integration', () => {
     // Run research management system (should propose research)
     // Note: The system has a minProposalInterval of 600 ticks by default
     // For testing, we'll advance the tick to meet the interval
-    (world as any)._tick = 600;
+    (world as { _tick: number })._tick = 600;
 
     researchManagementSystem.update(world, [university], 0);
 
@@ -161,7 +161,7 @@ describe('University NPC Research Integration', () => {
 
     // Run university system to process research
     for (let i = 0; i < 100; i++) {
-      (world as any)._tick++;
+      (world as { _tick: number })._tick++;
       universitySystem.update(world, [university], 0);
     }
 
@@ -176,7 +176,7 @@ describe('University NPC Research Integration', () => {
     console.log('\n=== Testing Research Capacity ===');
 
     // Advance tick to allow more proposals
-    (world as any)._tick += 600;
+    (world as { _tick: number })._tick += 600;
 
     // Propose more research
     researchManagementSystem.update(world, [university], 0);
@@ -187,7 +187,7 @@ describe('University NPC Research Integration', () => {
     expect(universityComp!.activeProjects.length).toBeGreaterThan(1);
 
     // Advance and propose again
-    (world as any)._tick += 600;
+    (world as { _tick: number })._tick += 600;
     researchManagementSystem.update(world, [university], 0);
 
     console.log(`Active projects after third proposal: ${universityComp!.activeProjects.length}`);
@@ -237,7 +237,7 @@ describe('University NPC Research Integration', () => {
     expect(universityComp).toBeDefined();
 
     // Try to propose research
-    (world as any)._tick = 600;
+    (world as { _tick: number })._tick = 600;
     researchManagementSystem.update(world, [university], 0);
 
     // Should not have proposed any research (no agents available)

@@ -55,7 +55,7 @@ describe('ExecutorDeepEval - Action Selection', () => {
       getComponent: function(type: string) {
         return this.components.get(type);
       },
-    } as any;
+    } as Record<string, unknown>;
   });
 
   describe('Skill-Gated Action Selection', () => {

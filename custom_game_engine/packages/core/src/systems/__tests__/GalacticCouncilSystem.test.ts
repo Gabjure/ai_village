@@ -22,6 +22,20 @@ import type {
 import type { SpeciesComponent } from '../../components/SpeciesComponent.js';
 import type { NavyComponent } from '../../components/NavyComponent.js';
 
+// Type helpers for testing
+type EntityWithMethods = {
+  addComponent?: (comp: unknown) => void;
+  updateComponent?: (type: string, updater: (current: unknown) => unknown) => void;
+  getComponent?: (type: string) => unknown;
+  hasComponent?: (type: string) => boolean;
+};
+type WorldWithMethods = Record<string, unknown> & {
+  getEntity?: (id: string) => unknown;
+  addEntity?: (entity: unknown) => void;
+  query?: unknown;
+  getSystem?: (name: string) => unknown;
+};
+
 describe('GalacticCouncilSystem', () => {
   let world: World;
   let system: GalacticCouncilSystem;
@@ -185,7 +199,7 @@ describe('GalacticCouncilSystem', () => {
       );
 
       // Get proposal
-      const proposal = (system as any).pendingLawProposals.get(councilComp.name)?.[0];
+      const proposal = (system as Record<string, unknown>).pendingLawProposals.get(councilComp.name)?.[0];
       expect(proposal).toBeDefined();
 
       // Cast votes: 2 approve (66.6%), 1 reject
@@ -197,7 +211,7 @@ describe('GalacticCouncilSystem', () => {
       expect(councilComp.universalLaws).toHaveLength(0);
 
       // Reset and vote again with 3 approvals
-      (system as any).pendingLawProposals.set(councilComp.name, []);
+      (system as Record<string, unknown>).pendingLawProposals.set(councilComp.name, []);
       councilComp.universalLaws = [];
 
       system.proposeLaw(
@@ -211,7 +225,7 @@ describe('GalacticCouncilSystem', () => {
         2
       );
 
-      const proposal2 = (system as any).pendingLawProposals.get(councilComp.name)?.[0];
+      const proposal2 = (system as Record<string, unknown>).pendingLawProposals.get(councilComp.name)?.[0];
 
       // Cast votes: 3 approve (100%)
       system.voteOnLaw(
@@ -340,7 +354,7 @@ describe('GalacticCouncilSystem', () => {
       world.tick = 72000 * 11;
 
       // Process update (system is throttled, so manually call private method)
-      (system as any).managePeacekeepingMissions(world, councilComp, councilEntity, world.tick);
+      (system as Record<string, unknown>).managePeacekeepingMissions(world, councilComp, councilEntity, world.tick);
 
       // Mission should be completed and removed
       expect(councilComp.peacekeepingForces.activeMissions).toHaveLength(0);
@@ -398,10 +412,10 @@ describe('GalacticCouncilSystem', () => {
       });
 
       // Trigger crisis response
-      (system as any).respondToCrises(world, councilComp, councilEntity, 0);
+      (system as Record<string, unknown>).respondToCrises(world, councilComp, councilEntity, 0);
 
       // Verify response mobilized
-      const responses = (system as any).activeCrisisResponses.get(councilComp.name);
+      const responses = (system as Record<string, unknown>).activeCrisisResponses.get(councilComp.name);
       expect(responses).toHaveLength(1);
 
       const response = responses[0];
@@ -425,7 +439,7 @@ describe('GalacticCouncilSystem', () => {
         containmentStatus: 'contained',
       });
 
-      (system as any).respondToCrises(world, councilComp, councilEntity, 0);
+      (system as Record<string, unknown>).respondToCrises(world, councilComp, councilEntity, 0);
 
       expect(events).toHaveLength(1);
       expect(events[0]?.data.crisisType).toBe('extradimensional_invasion');
@@ -482,7 +496,7 @@ describe('GalacticCouncilSystem', () => {
       });
 
       // Mediate disputes
-      (system as any).mediateDisputes(world, councilComp, councilEntity, 0);
+      (system as Record<string, unknown>).mediateDisputes(world, councilComp, councilEntity, 0);
 
       const dispute = councilComp.disputes.activeDisputes[0];
       expect(dispute?.status).toBe('mediation');
@@ -502,7 +516,7 @@ describe('GalacticCouncilSystem', () => {
       });
 
       // Start mediation
-      (system as any).mediateDisputes(world, councilComp, councilEntity, 0);
+      (system as Record<string, unknown>).mediateDisputes(world, councilComp, councilEntity, 0);
 
       expect(councilComp.disputes.activeDisputes).toHaveLength(1);
 
@@ -510,7 +524,7 @@ describe('GalacticCouncilSystem', () => {
       world.tick = 72000 * 6;
 
       // Process mediation
-      (system as any).mediateDisputes(world, councilComp, councilEntity, world.tick);
+      (system as Record<string, unknown>).mediateDisputes(world, councilComp, councilEntity, world.tick);
 
       // Dispute should be resolved or escalated (removed from active)
       const activeDispute = councilComp.disputes.activeDisputes.find((d) => d.id === 'dispute_2');

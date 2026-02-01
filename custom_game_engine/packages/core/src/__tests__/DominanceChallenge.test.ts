@@ -316,7 +316,7 @@ describe('DominanceChallengeSystem', () => {
         target: alpha.id,
         state: 'active',
         startTime: 0,
-      } as any);
+      } as Record<string, unknown>);
 
       expect(() => system.update(world, Array.from(world.entities.values()), 1)).toThrow('Challenge method is required');
     });
@@ -327,7 +327,8 @@ describe('DominanceChallengeSystem', () => {
         version: 1,
         conflictType: 'dominance_challenge',
         target: alpha.id,
-        method: 'invalid_method' as any,
+        method: // @ts-expect-error Testing invalid value validation
+      'invalid_method',
         state: 'active',
         startTime: 0,
       });

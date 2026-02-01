@@ -22,6 +22,20 @@ import { createExplorationMissionComponent } from '../../components/ExplorationM
 import { createTagsComponent } from '../../components/TagsComponent.js';
 import { ComponentType as CT } from '../../types/ComponentType.js';
 
+// Type helpers for testing
+type EntityWithMethods = {
+  addComponent?: (comp: unknown) => void;
+  updateComponent?: (type: string, updater: (current: unknown) => unknown) => void;
+  getComponent?: (type: string) => unknown;
+  hasComponent?: (type: string) => boolean;
+};
+type WorldWithMethods = Record<string, unknown> & {
+  getEntity?: (id: string) => unknown;
+  addEntity?: (entity: unknown) => void;
+  query?: unknown;
+  getSystem?: (name: string) => unknown;
+};
+
 describe('Resource Discovery Integration Tests', () => {
   let harness: IntegrationTestHarness;
 
@@ -148,7 +162,7 @@ describe('Resource Discovery Integration Tests', () => {
       const initialStockpile = warehouseComp.stockpile.get('iron_ore') || 0;
 
       // Simulate extraction cycle
-      const resourceComp = deposit.getComponent(CT.Resource) as any;
+      const resourceComp = deposit.getComponent(CT.Resource) as unknown;
       const extractedAmount = 20;
       resourceComp.amount -= extractedAmount;
 
@@ -192,7 +206,7 @@ describe('Resource Discovery Integration Tests', () => {
       miningComp.status = 'active';
       miningOp.addComponent(miningComp);
 
-      const resourceComp = deposit.getComponent(CT.Resource) as any;
+      const resourceComp = deposit.getComponent(CT.Resource) as unknown;
 
       // Try to extract
       const availableAmount = resourceComp.amount;
@@ -236,7 +250,8 @@ describe('Resource Discovery Integration Tests', () => {
       const miningOp = harness.world.createEntity() as EntityImpl;
       miningOp.addComponent(createPositionComponent(100, 100));
       miningOp.addComponent(
-        createMiningOperationComponent(phenomenon.id, civilization.id, 'strange_matter' as any, {
+        createMiningOperationComponent(phenomenon.id, civilization.id, // @ts-expect-error Testing invalid value validation
+      'strange_matter', {
           yieldRate: 1, // Very slow extraction
           efficiency: 0.3, // Difficult to extract
           workers: 100, // Requires many workers
@@ -265,7 +280,8 @@ describe('Resource Discovery Integration Tests', () => {
       const miningComp = createMiningOperationComponent(
         advancedDeposit.id,
         lowEraCiv.id,
-        'exotic_matter' as any,
+        // @ts-expect-error Testing invalid value validation
+      'exotic_matter',
         {
           yieldRate: 5,
           efficiency: 0.1,
@@ -274,7 +290,7 @@ describe('Resource Discovery Integration Tests', () => {
       );
 
       // Check if civilization meets era requirement
-      const tags = advancedDeposit.getComponent(CT.Tags) as any;
+      const tags = advancedDeposit.getComponent(CT.Tags) as unknown;
       const requiresEra = 8; // Extract from tags
 
       const civComp = lowEraCiv.getComponent(CT.Civilization);
@@ -347,7 +363,8 @@ describe('Resource Discovery Integration Tests', () => {
       phenomenon.addComponent(resourceComp);
 
       const miningOp = harness.world.createEntity() as EntityImpl;
-      const miningComp = createMiningOperationComponent(phenomenon.id, 'civ_1', 'dark_energy' as any, {
+      const miningComp = createMiningOperationComponent(phenomenon.id, 'civ_1', // @ts-expect-error Testing invalid value validation
+      'dark_energy', {
         yieldRate: 15,
         efficiency: 1.0,
         workers: 5,
@@ -363,14 +380,14 @@ describe('Resource Discovery Integration Tests', () => {
       expect(extracted).toBe(10); // Only got what was available
 
       // Mark phenomenon as exhausted
-      phenomenon.updateComponent('tags', (tags: any) => ({
+      phenomenon.updateComponent('tags', (tags: Record<string, unknown>) => ({
         ...tags,
         tags: [...tags.tags, 'exhausted'],
       }));
 
       miningComp.status = 'exhausted';
 
-      const tags = phenomenon.getComponent(CT.Tags) as any;
+      const tags = phenomenon.getComponent(CT.Tags) as unknown;
       expect(tags.tags).toContain('exhausted');
       expect(miningComp.status).toBe('exhausted');
     });
@@ -383,7 +400,7 @@ describe('Resource Discovery Integration Tests', () => {
       harness.clearEvents();
 
       // Deplete phenomenon
-      const resourceComp = phenomenon.getComponent(CT.Resource) as any;
+      const resourceComp = phenomenon.getComponent(CT.Resource) as unknown;
       resourceComp.amount = 0;
 
       harness.eventBus.emit({
@@ -538,7 +555,7 @@ describe('Resource Discovery Integration Tests', () => {
 
       // 7. Extract resources
       const extractedAmount = miningComp.yieldRate * miningComp.efficiency;
-      const resourceComp = deposit.getComponent(CT.Resource) as any;
+      const resourceComp = deposit.getComponent(CT.Resource) as unknown;
       resourceComp.amount -= extractedAmount;
 
       // 8. Store in warehouse

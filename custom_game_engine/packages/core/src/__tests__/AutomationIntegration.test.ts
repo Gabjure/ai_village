@@ -318,8 +318,10 @@ describe('Automation Integration Tests', () => {
       }
 
       // Get updated components after delta application
-      const updatedAssembly = machine.getComponent('assembly_machine' as any);
-      const updatedConnection = machine.getComponent('machine_connection' as any);
+      const updatedAssembly = machine.getComponent(// @ts-expect-error Testing invalid value validation
+      'assembly_machine');
+      const updatedConnection = machine.getComponent(// @ts-expect-error Testing invalid value validation
+      'machine_connection');
 
       // Should have progress but no production (output full)
       expect(updatedAssembly!.progress).toBeGreaterThan(0);
@@ -362,7 +364,8 @@ describe('Automation Integration Tests', () => {
       }
 
       // Get updated component after delta application
-      const updatedAssembly = machine.getComponent('assembly_machine' as any);
+      const updatedAssembly = machine.getComponent(// @ts-expect-error Testing invalid value validation
+      'assembly_machine');
 
       // After 1 game minute at 50% efficiency with continuous ingredients:
       // Will have completed crafts and be in progress on next one

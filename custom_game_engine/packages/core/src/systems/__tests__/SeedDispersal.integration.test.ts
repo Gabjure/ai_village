@@ -100,8 +100,8 @@ describe('Seed Dispersal Integration (Bug Fix Verification)', () => {
     });
 
     const entity = new EntityImpl(createEntityId(), 0);
-    (entity as any).addComponent(plant);
-    (entity as any).addComponent({
+    entity.addComponent(plant);
+    entity.addComponent({
       type: ComponentType.Position,
       version: 1,
       x: 10,
@@ -119,7 +119,7 @@ describe('Seed Dispersal Integration (Bug Fix Verification)', () => {
     plant.stageProgress = 1.0;
     eventBus.emitImmediate({ type: 'time:day_changed', source: 'test', data: {} });
 
-    const entities = (world as any).query().with(ComponentType.Plant).executeEntities();
+    const entities = world.query().with(ComponentType.Plant).executeEntities();
     plantSystem.update(world, entities, 0.1);
 
     // Flush event bus to process queued events
@@ -178,8 +178,8 @@ describe('Seed Dispersal Integration (Bug Fix Verification)', () => {
     });
 
     const entity = new EntityImpl(createEntityId(), 0);
-    (entity as any).addComponent(plant);
-    (entity as any).addComponent({
+    entity.addComponent(plant);
+    entity.addComponent({
       type: ComponentType.Position,
       version: 1,
       x: 15,
@@ -195,7 +195,7 @@ describe('Seed Dispersal Integration (Bug Fix Verification)', () => {
     plant.stageProgress = 1.0;
     eventBus.emitImmediate({ type: 'time:day_changed', source: 'test', data: {} });
 
-    const entities = (world as any).query().with(ComponentType.Plant).executeEntities();
+    const entities = world.query().with(ComponentType.Plant).executeEntities();
     plantSystem.update(world, entities, 0.1);
 
     // Flush event bus to process queued events
@@ -255,8 +255,8 @@ describe('Seed Dispersal Integration (Bug Fix Verification)', () => {
     });
 
     const entity = new EntityImpl(createEntityId(), 0);
-    (entity as any).addComponent(plant);
-    (entity as any).addComponent({
+    entity.addComponent(plant);
+    entity.addComponent({
       type: ComponentType.Position,
       version: 1,
       x: 20,
@@ -272,7 +272,7 @@ describe('Seed Dispersal Integration (Bug Fix Verification)', () => {
     plant.stageProgress = 1.0;
     eventBus.emitImmediate({ type: 'time:day_changed', source: 'test', data: {} });
 
-    const entities = (world as any).query().with(ComponentType.Plant).executeEntities();
+    const entities = world.query().with(ComponentType.Plant).executeEntities();
     plantSystem.update(world, entities, 0.1);
 
     // Flush event bus to process queued events
@@ -319,8 +319,8 @@ describe('Seed Dispersal Integration (Bug Fix Verification)', () => {
     });
 
     const entity = new EntityImpl(createEntityId(), 0);
-    (entity as any).addComponent(plant);
-    (entity as any).addComponent({
+    entity.addComponent(plant);
+    entity.addComponent({
       type: ComponentType.Position,
       version: 1,
       x: 25,
@@ -359,7 +359,7 @@ describe('Seed Dispersal Integration (Bug Fix Verification)', () => {
     plant.stageProgress = 1.0;
     eventBus.emitImmediate({ type: 'time:day_changed', source: 'test', data: {} });
 
-    const entities = (world as any).query().with(ComponentType.Plant).executeEntities();
+    const entities = world.query().with(ComponentType.Plant).executeEntities();
 
     // Should NOT throw
     expect(() => {
@@ -386,8 +386,8 @@ describe('Seed Dispersal Integration (Bug Fix Verification)', () => {
     });
 
     const entity = new EntityImpl(createEntityId(), 0);
-    (entity as any).addComponent(plant);
-    (entity as any).addComponent({
+    entity.addComponent(plant);
+    entity.addComponent({
       type: ComponentType.Position,
       version: 1,
       x: 30,
@@ -403,7 +403,7 @@ describe('Seed Dispersal Integration (Bug Fix Verification)', () => {
     plant.stageProgress = 1.0;
     eventBus.emitImmediate({ type: 'time:day_changed', source: 'test', data: {} });
 
-    const entities = (world as any).query().with(ComponentType.Plant).executeEntities();
+    const entities = world.query().with(ComponentType.Plant).executeEntities();
     plantSystem.update(world, entities, 0.1);
 
     // Flush event bus to process queued events

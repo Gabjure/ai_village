@@ -108,7 +108,7 @@ describe('RecipeListSection - Research Unlock Filtering', () => {
       };
 
       // Without unlock service, all recipes should be treated as unlocked
-      expect(recipeListSection.isRecipeUnlocked(mockRecipe as any)).toBe(true);
+      expect(recipeListSection.isRecipeUnlocked(mockRecipe as unknown)).toBe(true);
     });
   });
 
@@ -130,8 +130,8 @@ describe('RecipeListSection - Research Unlock Filtering', () => {
         researchRequirements: ['metallurgy_i'],
       };
 
-      expect(recipeListSection.isRecipeUnlocked(unlockedRecipe as any)).toBe(true);
-      expect(recipeListSection.isRecipeUnlocked(lockedRecipe as any)).toBe(false);
+      expect(recipeListSection.isRecipeUnlocked(unlockedRecipe as unknown)).toBe(true);
+      expect(recipeListSection.isRecipeUnlocked(lockedRecipe as unknown)).toBe(false);
     });
 
     it('should unlock recipes when research is completed', () => {
@@ -142,14 +142,14 @@ describe('RecipeListSection - Research Unlock Filtering', () => {
       };
 
       // Initially locked
-      expect(recipeListSection.isRecipeUnlocked(lockedRecipe as any)).toBe(false);
+      expect(recipeListSection.isRecipeUnlocked(lockedRecipe as unknown)).toBe(false);
 
       // Complete metallurgy_i
       researchState.completed.add('metallurgy_i');
       unlockService.updateResearchState(researchState);
 
       // Now unlocked
-      expect(recipeListSection.isRecipeUnlocked(lockedRecipe as any)).toBe(true);
+      expect(recipeListSection.isRecipeUnlocked(lockedRecipe as unknown)).toBe(true);
     });
 
     it('should require all research requirements to be met', () => {
@@ -160,21 +160,21 @@ describe('RecipeListSection - Research Unlock Filtering', () => {
       };
 
       // Initially locked
-      expect(recipeListSection.isRecipeUnlocked(multiRequirementRecipe as any)).toBe(false);
+      expect(recipeListSection.isRecipeUnlocked(multiRequirementRecipe as unknown)).toBe(false);
 
       // Complete only metallurgy_i
       researchState.completed.add('metallurgy_i');
       unlockService.updateResearchState(researchState);
 
       // Still locked (needs metallurgy_ii)
-      expect(recipeListSection.isRecipeUnlocked(multiRequirementRecipe as any)).toBe(false);
+      expect(recipeListSection.isRecipeUnlocked(multiRequirementRecipe as unknown)).toBe(false);
 
       // Complete metallurgy_ii
       researchState.completed.add('metallurgy_ii');
       unlockService.updateResearchState(researchState);
 
       // Now unlocked
-      expect(recipeListSection.isRecipeUnlocked(multiRequirementRecipe as any)).toBe(true);
+      expect(recipeListSection.isRecipeUnlocked(multiRequirementRecipe as unknown)).toBe(true);
     });
   });
 
@@ -189,13 +189,13 @@ describe('RecipeListSection - Research Unlock Filtering', () => {
       };
 
       // Initially locked with service
-      expect(recipeListSection.isRecipeUnlocked(lockedRecipe as any)).toBe(false);
+      expect(recipeListSection.isRecipeUnlocked(lockedRecipe as unknown)).toBe(false);
 
       // Clear the unlock service
       recipeListSection.setUnlockService(null);
 
       // Now treated as unlocked
-      expect(recipeListSection.isRecipeUnlocked(lockedRecipe as any)).toBe(true);
+      expect(recipeListSection.isRecipeUnlocked(lockedRecipe as unknown)).toBe(true);
     });
   });
 });
@@ -274,7 +274,7 @@ describe('BuildingPlacementUI - Research Unlock Filtering', () => {
     // Create BuildingPlacementUI
     buildingUI = new BuildingPlacementUI({
       registry: buildingRegistry,
-      validator: mockValidator as any,
+      validator: mockValidator as unknown,
       camera,
       eventBus,
     });

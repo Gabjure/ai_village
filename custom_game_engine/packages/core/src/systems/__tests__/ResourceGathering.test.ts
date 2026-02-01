@@ -503,7 +503,7 @@ describe('Resource Gathering System', () => {
       // Test invalid case
       tree.updateComponent('resource', (r) => ({
         ...r,
-        resourceType: undefined as any,
+        resourceType: undefined as unknown,
       }));
 
       expect(() => {

@@ -56,7 +56,7 @@ describe('Integration: Magic Skill Tree UI', () => {
       const isUnlocked = context.progress?.unlockedNodes?.[node.id] !== undefined;
 
       // Check prerequisites - all must be in unlockedNodes
-      const hasPrerequisites = node.unlockConditions?.every((cond: any) => {
+      const hasPrerequisites = node.unlockConditions?.every((cond: Record<string, unknown>) => {
         if (cond.type === 'prerequisite_node') {
           return context.progress?.unlockedNodes?.[cond.nodeId] !== undefined;
         }
@@ -143,7 +143,7 @@ describe('Integration: Magic Skill Tree UI', () => {
       const ctx = createMockCanvasContext();
       panel.render(ctx, 0, 0, 800, 600, mockWorld);
 
-      const yellowGlowCalls = ctx._strokeStyleCalls.filter((call: any) =>
+      const yellowGlowCalls = ctx._strokeStyleCalls.filter((call: Record<string, unknown>) =>
         call.includes('yellow') || call.includes('#ffff00') || call.toLowerCase().includes('ff0')
       );
       expect(yellowGlowCalls.length).toBeGreaterThan(0);
@@ -171,7 +171,7 @@ describe('Integration: Magic Skill Tree UI', () => {
       
       panel.render(ctx, 0, 0, 800, 600, mockWorld);
 
-      const greenFillCalls = ctx._fillStyleCalls.filter((call: any) =>
+      const greenFillCalls = ctx._fillStyleCalls.filter((call: Record<string, unknown>) =>
         call.includes('green') || call.includes('#00ff00') || call.toLowerCase().includes('0f0')
       );
       expect(greenFillCalls.length).toBeGreaterThan(0);
@@ -298,7 +298,7 @@ describe('Integration: Magic Skill Tree UI', () => {
       panel.render(ctx, 0, 0, 800, 600, mockWorld);
 
       // Verify UI updated (node now green)
-      const greenFills = ctx._fillStyleCalls.filter((call: any) =>
+      const greenFills = ctx._fillStyleCalls.filter((call: Record<string, unknown>) =>
         call.includes('green') || call.includes('#00ff00') || call.toLowerCase().includes('0f0')
       );
       expect(greenFills.length).toBeGreaterThan(0);
@@ -408,7 +408,7 @@ describe('Integration: Magic Skill Tree UI', () => {
       panel.render(ctx, 0, 0, 800, 600, mockWorld);
 
       // Verify node now shows as available (yellow glow)
-      const yellowGlows = ctx._strokeStyleCalls.filter((call: any) =>
+      const yellowGlows = ctx._strokeStyleCalls.filter((call: Record<string, unknown>) =>
         call.includes('yellow') || call.includes('#ffff00') || call.toLowerCase().includes('ff0')
       );
       expect(yellowGlows.length).toBeGreaterThan(0);
@@ -631,7 +631,7 @@ function createMockWorld(): World {
     getRegistry: vi.fn(() => ({
       getTree: vi.fn(),
     })),
-  } as any;
+  } as Record<string, unknown>;
 }
 
 function createMockMagicEntity(config: {
@@ -678,7 +678,7 @@ function createMockMagicEntity(config: {
       return undefined;
     }),
     hasComponent: vi.fn((type: string) => type === 'magic'),
-  } as any;
+  } as Record<string, unknown>;
 }
 
 function createMockWindowManager(): any {
@@ -885,7 +885,7 @@ function setupMockSkillTrees() {
   };
 
   // Register trees
-  (registry as any).trees = new Map([
+  (registry as Record<string, unknown>).trees = new Map([
     ['shinto', shintoTree],
     ['allomancy', allomancyTree],
     ['sympathy', sympathyTree],

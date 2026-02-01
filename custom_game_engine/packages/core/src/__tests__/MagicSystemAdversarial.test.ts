@@ -41,7 +41,8 @@ describe('Adversarial - Type Safety Violations', () => {
       name: 'Broken',
       technique: 'create',
       form: 'fire',
-      source: 'invalid_source' as any, // Type violation!
+      source: // @ts-expect-error Testing invalid value validation
+      'invalid_source', // Type violation!
       manaCost: 30,
       castTime: 50,
       range: 20,
@@ -52,7 +53,7 @@ describe('Adversarial - Type Safety Violations', () => {
     // System doesn't validate source type at runtime
     expect(invalidSpell.source).toBe('invalid_source');
 
-    const mana = getMana(caster, invalidSpell.source as any);
+    const mana = getMana(caster, invalidSpell.source as unknown);
     expect(mana).toBe(0); // Returns 0 for unknown source - safe but silent
   });
 

@@ -505,11 +505,11 @@ function createMockDeity(id: string): Deity {
       forms: [],
     },
     pendingPrayers: [],
-  } as any;
+  } as Record<string, unknown>;
 }
 
 function createMockWorld(): World {
-  return {} as any;
+  return {} as Partial<World> as World;
 }
 
 function createMockBeliever(id: string, deityId: string): any {
@@ -547,7 +547,7 @@ function calculateMiracleCost(deity: Deity, power: DivinePower): number {
   // Domain alignment
   if (power.domains) {
     for (const domain of power.domains) {
-      const alignment = (deity.identity.domains as any)[domain] || 0;
+      const alignment = (deity.identity.domains as Record<string, number>)[domain] || 0;
       if (alignment > 0.7) {
         cost *= 0.7; // 30% discount
       } else if (alignment < 0.3) {

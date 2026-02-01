@@ -15,6 +15,20 @@ import { ComponentType as CT } from '../../types/ComponentType.js';
 import { EventBusImpl } from '../../events/EventBus.js';
 import type { EventBus } from '../../events/EventBus.js';
 
+// Type helpers for testing
+type EntityWithMethods = {
+  addComponent?: (comp: unknown) => void;
+  updateComponent?: (type: string, updater: (current: unknown) => unknown) => void;
+  getComponent?: (type: string) => unknown;
+  hasComponent?: (type: string) => boolean;
+};
+type WorldWithMethods = Record<string, unknown> & {
+  getEntity?: (id: string) => unknown;
+  addEntity?: (entity: unknown) => void;
+  query?: unknown;
+  getSystem?: (name: string) => unknown;
+};
+
 describe('Fallback Deity', () => {
   let world: World;
   let prayerSystem: PrayerSystem;
@@ -32,9 +46,9 @@ describe('Fallback Deity', () => {
     const fallbackDeity = world.createEntity('deity');
     const deityComp = new DeityComponent('The Unknown', 'dormant');
     deityComp.identity.domain = 'mystery';
-    (fallbackDeity as any).addComponent(deityComp);
-    (fallbackDeity as any).addComponent(createTagsComponent('deity', 'divine', 'fallback_deity'));
-    (fallbackDeity as any).addComponent(createIdentityComponent('The Unknown', 'deity'));
+    (fallbackDeity as Record<string, unknown>).addComponent(deityComp);
+    (fallbackDeity as Record<string, unknown>).addComponent(createTagsComponent('deity', 'divine', 'fallback_deity'));
+    (fallbackDeity as Record<string, unknown>).addComponent(createIdentityComponent('The Unknown', 'deity'));
 
     // Create agent with spiritual component (no specific deity belief)
     const agent = world.createEntity('agent');
@@ -42,7 +56,7 @@ describe('Fallback Deity', () => {
     spiritual.faith = 0.8;
     spiritual.prayerFrequency = 1; // Pray every tick
     spiritual.lastPrayerTime = -1000; // Long time ago
-    (agent as any).addComponent(spiritual);
+    (agent as Record<string, unknown>).addComponent(spiritual);
 
     const personality = new PersonalityComponent({
       openness: 0.5,
@@ -52,7 +66,7 @@ describe('Fallback Deity', () => {
       neuroticism: 0.3,
       spirituality: 0.8,
     });
-    (agent as any).addComponent(personality);
+    (agent as Record<string, unknown>).addComponent(personality);
 
     // Track prayer events
     let prayerOffered = false;
@@ -82,7 +96,7 @@ describe('Fallback Deity', () => {
     spiritual.faith = 0.8;
     spiritual.prayerFrequency = 1;
     spiritual.lastPrayerTime = -1000;
-    (agent as any).addComponent(spiritual);
+    (agent as Record<string, unknown>).addComponent(spiritual);
 
     const personality = new PersonalityComponent({
       openness: 0.5,
@@ -92,7 +106,7 @@ describe('Fallback Deity', () => {
       neuroticism: 0.3,
       spirituality: 0.8,
     });
-    (agent as any).addComponent(personality);
+    (agent as Record<string, unknown>).addComponent(personality);
 
     // Track proto_deity events
     let protoDeityEvent = false;
@@ -127,8 +141,8 @@ describe('Fallback Deity', () => {
 
     deityComp.belief.currentBelief = 10;
 
-    (fallbackDeity as any).addComponent(deityComp);
-    (fallbackDeity as any).addComponent(createTagsComponent('deity', 'fallback_deity'));
+    (fallbackDeity as Record<string, unknown>).addComponent(deityComp);
+    (fallbackDeity as Record<string, unknown>).addComponent(createTagsComponent('deity', 'fallback_deity'));
 
     // Verify configuration
     const retrievedDeity = world.query().with(CT.Deity).executeEntities()[0];

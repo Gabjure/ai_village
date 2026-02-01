@@ -59,7 +59,7 @@ describe('IdleBehaviorSystem Integration', () => {
 
     // Run 100 iterations
     for (let i = 0; i < 100; i++) {
-      const actionQueue = agent.getComponent(ComponentType.ActionQueue) as any;
+      const actionQueue = agent.getComponent(ComponentType.ActionQueue);
       actionQueue.clear();
 
       idleBehaviorSystem.update(world, 1);
@@ -108,7 +108,7 @@ describe('IdleBehaviorSystem Integration', () => {
 
     // Run 50 iterations
     for (let i = 0; i < 50; i++) {
-      const actionQueue = agent.getComponent(ComponentType.ActionQueue) as any;
+      const actionQueue = agent.getComponent(ComponentType.ActionQueue);
       actionQueue.clear();
 
       idleBehaviorSystem.update(world, 1);
@@ -152,7 +152,7 @@ describe('IdleBehaviorSystem Integration', () => {
 
     // Run 50 iterations
     for (let i = 0; i < 50; i++) {
-      const actionQueue = agent.getComponent(ComponentType.ActionQueue) as any;
+      const actionQueue = agent.getComponent(ComponentType.ActionQueue);
       actionQueue.clear();
 
       idleBehaviorSystem.update(world, 1);
@@ -187,7 +187,7 @@ describe('IdleBehaviorSystem Integration', () => {
     agent.addComponent(createMoodComponent());
 
     const memory = new MemoryComponent(agent.id);
-    (memory as any).lastReflectionTime = 0; // Haven't reflected recently
+    (memory as Record<string, unknown>).lastReflectionTime = 0; // Haven't reflected recently
     agent.addComponent(memory);
     agent.addComponent(new GoalsComponent());
     agent.addComponent(new ActionQueue(agent.id));
@@ -197,7 +197,7 @@ describe('IdleBehaviorSystem Integration', () => {
 
     // Run 50 iterations
     for (let i = 0; i < 50; i++) {
-      const actionQueue = agent.getComponent(ComponentType.ActionQueue) as any;
+      const actionQueue = agent.getComponent(ComponentType.ActionQueue);
       actionQueue.clear();
 
       idleBehaviorSystem.update(world, 1);
@@ -287,7 +287,7 @@ describe('IdleBehaviorSystem Integration', () => {
 
     // Run 50 iterations
     for (let i = 0; i < 50; i++) {
-      const actionQueue = agent.getComponent(ComponentType.ActionQueue) as any;
+      const actionQueue = agent.getComponent(ComponentType.ActionQueue);
       actionQueue.clear();
 
       idleBehaviorSystem.update(world, 1);
@@ -329,7 +329,7 @@ describe('IdleBehaviorSystem Integration', () => {
 
     // Run 50 iterations
     for (let i = 0; i < 50; i++) {
-      const actionQueue = agent.getComponent(ComponentType.ActionQueue) as any;
+      const actionQueue = agent.getComponent(ComponentType.ActionQueue);
       actionQueue.clear();
 
       idleBehaviorSystem.update(world, 1);

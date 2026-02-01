@@ -59,7 +59,7 @@ describe('Targeting Integration Tests', () => {
       const farWood = createResource(50, 50, 'wood', 200); // Out of vision
 
       // Populate vision with visible resources
-      const vision = agent.getComponent(ComponentType.Vision) as any;
+      const vision = agent.getComponent(ComponentType.Vision);
       vision.seenResources = [wood1.id, wood2.id, stone1.id]; // farWood not visible
 
       // Find nearest wood - should be wood1
@@ -132,7 +132,7 @@ describe('Targeting Integration Tests', () => {
       });
       harness.world.addEntity(farLarge);
 
-      const vision = agent.getComponent(ComponentType.Vision) as any;
+      const vision = agent.getComponent(ComponentType.Vision);
       vision.seenResources = [closeSmall.id, farLarge.id];
 
       // Should find closer one first
@@ -283,7 +283,7 @@ describe('Targeting Integration Tests', () => {
       availableAgent.addComponent(createIdentityComponent('Carol'));
       harness.world.addEntity(availableAgent);
 
-      const vision = mainAgent.getComponent(ComponentType.Vision) as any;
+      const vision = mainAgent.getComponent(ComponentType.Vision);
       vision.seenAgents = [mainAgent.id, busyAgent.id, availableAgent.id];
 
       // Find conversation partner (not in conversation)
@@ -342,7 +342,7 @@ describe('Targeting Integration Tests', () => {
       stranger.addComponent(createIdentityComponent('Stranger'));
       harness.world.addEntity(stranger);
 
-      const vision = mainAgent.getComponent(ComponentType.Vision) as any;
+      const vision = mainAgent.getComponent(ComponentType.Vision);
       vision.seenAgents = [mainAgent.id, friend.id, stranger.id];
 
       // Find friend (min relationship 50)
@@ -372,7 +372,7 @@ describe('Targeting Integration Tests', () => {
       otherAgent.addComponent(createIdentityComponent('Charlie'));
       harness.world.addEntity(otherAgent);
 
-      const vision = mainAgent.getComponent(ComponentType.Vision) as any;
+      const vision = mainAgent.getComponent(ComponentType.Vision);
       vision.seenAgents = [otherAgent.id];
 
       // See Charlie
@@ -427,7 +427,7 @@ describe('Targeting Integration Tests', () => {
       });
       harness.world.addEntity(fox);
 
-      const vision = rabbit.getComponent(ComponentType.Vision) as any;
+      const vision = rabbit.getComponent(ComponentType.Vision);
       vision.seenAgents = [fox.id];
 
       // Assess threats
@@ -468,7 +468,7 @@ describe('Targeting Integration Tests', () => {
       });
       harness.world.addEntity(fire);
 
-      const vision = deer.getComponent(ComponentType.Vision) as any;
+      const vision = deer.getComponent(ComponentType.Vision);
       vision.seenResources = [fire.id];
 
       // Find threat
@@ -520,7 +520,7 @@ describe('Targeting Integration Tests', () => {
       });
       harness.world.addEntity(fox);
 
-      const vision = chicken.getComponent(ComponentType.Vision) as any;
+      const vision = chicken.getComponent(ComponentType.Vision);
       vision.seenAgents = [hawk.id, fox.id];
 
       // Assess all threats
@@ -572,7 +572,7 @@ describe('Targeting Integration Tests', () => {
       });
       harness.world.addEntity(oakTree);
 
-      const vision = agent.getComponent(ComponentType.Vision) as any;
+      const vision = agent.getComponent(ComponentType.Vision);
       vision.seenPlants = [berryBush.id, oakTree.id];
 
       // Find edible plants (blueberry-bush is edible in plantRegistry)
@@ -617,7 +617,7 @@ describe('Targeting Integration Tests', () => {
       });
       harness.world.addEntity(maturePlant);
 
-      const vision = agent.getComponent(ComponentType.Vision) as any;
+      const vision = agent.getComponent(ComponentType.Vision);
       vision.seenPlants = [youngPlant.id, maturePlant.id];
 
       // Find plants with seeds
@@ -655,7 +655,7 @@ describe('Targeting Integration Tests', () => {
       }
 
       // Only first 3 are "visible"
-      const vision = agent.getComponent(ComponentType.Vision) as any;
+      const vision = agent.getComponent(ComponentType.Vision);
       vision.seenResources = [resources[0].id, resources[1].id, resources[2].id];
 
       // Should only find 3, even though 10 exist
@@ -675,7 +675,7 @@ describe('Targeting Integration Tests', () => {
       harness.world.addEntity(agent);
 
       // No visible resources
-      const vision = agent.getComponent(ComponentType.Vision) as any;
+      const vision = agent.getComponent(ComponentType.Vision);
       vision.seenResources = [];
 
       // Should return unknown when nothing visible and no memory
@@ -705,7 +705,7 @@ describe('Targeting Integration Tests', () => {
       });
       harness.world.addEntity(resource);
 
-      const vision = agent.getComponent(ComponentType.Vision) as any;
+      const vision = agent.getComponent(ComponentType.Vision);
       vision.seenResources = [resource.id];
 
       // Should return visible
@@ -761,7 +761,7 @@ describe('Targeting Integration Tests', () => {
       });
       harness.world.addEntity(storage);
 
-      const vision = agent.getComponent(ComponentType.Vision) as any;
+      const vision = agent.getComponent(ComponentType.Vision);
       vision.seenResources = [wood.id, food.id];
 
       // Find wood for building

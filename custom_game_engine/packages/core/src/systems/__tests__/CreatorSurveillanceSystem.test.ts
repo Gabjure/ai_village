@@ -743,7 +743,7 @@ describe('CreatorSurveillanceSystem', () => {
         // Non-string source
         eventBus.emit({
           type: 'magic:spell_cast',
-          source: 12345 as any,
+          source: 12345 as unknown,
           data: {
             spellId: 'test',
           },
@@ -757,7 +757,7 @@ describe('CreatorSurveillanceSystem', () => {
         eventBus.emit({
           type: 'magic:spell_cast',
           source: caster.id,
-          data: undefined as any,
+          data: undefined as unknown,
         });
         eventBus.flush();
         eventBus.flush();
@@ -1135,7 +1135,7 @@ describe('CreatorSurveillanceSystem', () => {
       expect(stats1.alertLevel).toBe('critical');
 
       // Clear recent detections by manually manipulating (adversarial!)
-      const systemAny = system as any;
+      const systemAny = system as unknown;
       systemAny.stats.recentDetections = [];
 
       // Alert should drop

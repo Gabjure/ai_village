@@ -69,7 +69,8 @@ describe('EmpireDynastyManager', () => {
       lowSkill.addComponent(createDynastyComponent('dynasty1', 'TestDynasty', 'spare', 1, 0));
       lowSkill.addComponent(createAgentComponent('LowSkill', 0, 0));
       lowSkill.addComponent({
-        type: 'skills' as any,
+        type: // @ts-expect-error Testing invalid value validation
+      'skills',
         version: 1,
         skills: new Map([['governance', 3], ['diplomacy', 2], ['military', 1]]),
       });
@@ -79,7 +80,8 @@ describe('EmpireDynastyManager', () => {
       highSkill.addComponent(createDynastyComponent('dynasty1', 'TestDynasty', 'spare', 1, 0));
       highSkill.addComponent(createAgentComponent('HighSkill', 0, 0));
       highSkill.addComponent({
-        type: 'skills' as any,
+        type: // @ts-expect-error Testing invalid value validation
+      'skills',
         version: 1,
         skills: new Map([['governance', 10], ['diplomacy', 9], ['military', 8]]),
       });

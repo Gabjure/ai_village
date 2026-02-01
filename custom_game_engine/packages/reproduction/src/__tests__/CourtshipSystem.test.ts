@@ -712,7 +712,8 @@ describe('CourtshipSystem', () => {
       expect(() => {
         agent1.addComponent(CourtshipComponent, {
           state: 'idle',
-          paradigm: null as any, // Invalid: required field
+          // @ts-expect-error Testing null paradigm validation
+          paradigm: null,
           preferredTactics: [],
           dislikedTactics: [],
           style: 'bold',
@@ -732,7 +733,8 @@ describe('CourtshipSystem', () => {
     it('should throw when state is invalid', () => {
       expect(() => {
         agent1.addComponent(CourtshipComponent, {
-          state: 'invalid_state' as any,
+          // @ts-expect-error Testing invalid state validation
+          state: 'invalid_state',
           paradigm: createHumanCourtshipParadigm(),
           preferredTactics: [],
           dislikedTactics: [],
@@ -752,6 +754,7 @@ describe('CourtshipSystem', () => {
 
     it('should NOT use fallback for missing required fields', () => {
       expect(() => {
+        // @ts-expect-error Testing missing required field validation
         agent1.addComponent(CourtshipComponent, {
           state: 'idle',
           // Missing paradigm - should throw, not default
@@ -767,7 +770,7 @@ describe('CourtshipSystem', () => {
           rejectionCooldown: new Map(),
           currentCourtshipTarget: null,
           currentCourtshipInitiator: null,
-        } as any);
+        });
       }).toThrow();
     });
 

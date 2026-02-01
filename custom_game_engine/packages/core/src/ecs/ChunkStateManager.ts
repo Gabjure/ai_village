@@ -170,6 +170,7 @@ export class ChunkStateManager {
     let minDistance = Infinity;
     for (const agentKey of this.agentChunks) {
       const [ax, ay] = agentKey.split(',').map(Number);
+      if (ax === undefined || ay === undefined) continue;
       const distance = chunkDistance(cx, cy, ax, ay);
       minDistance = Math.min(minDistance, distance);
     }

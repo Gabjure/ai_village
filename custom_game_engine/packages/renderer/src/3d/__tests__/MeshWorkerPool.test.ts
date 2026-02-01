@@ -153,7 +153,7 @@ describe('MeshWorkerPool', () => {
 
   beforeEach(() => {
     // Mock the Worker constructor
-    global.Worker = MockWorker as any;
+    global.Worker = MockWorker as unknown;
 
     // Mock navigator for hardware concurrency detection
     Object.defineProperty(global, 'navigator', {
@@ -524,7 +524,7 @@ describe('MeshWorkerPool', () => {
         }
       }
 
-      global.Worker = ErrorWorker as any;
+      global.Worker = ErrorWorker as unknown;
       errorWorker = new ErrorWorker();
 
       pool.dispose();

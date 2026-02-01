@@ -15,6 +15,20 @@ import { EventBusImpl } from '../../events/EventBus.js';
 import { ChunkManager } from '@ai-village/world';
 import type { UniverseSnapshot } from '../types.js';
 
+// Type helpers for testing
+type EntityWithMethods = {
+  addComponent?: (comp: unknown) => void;
+  updateComponent?: (type: string, updater: (current: unknown) => unknown) => void;
+  getComponent?: (type: string) => unknown;
+  hasComponent?: (type: string) => boolean;
+};
+type WorldWithMethods = Record<string, unknown> & {
+  getEntity?: (id: string) => unknown;
+  addEntity?: (entity: unknown) => void;
+  query?: unknown;
+  getSystem?: (name: string) => unknown;
+};
+
 // Helper: Create test world with ChunkManager
 function createTestWorld(): World {
   const eventBus = new EventBusImpl();
@@ -39,22 +53,22 @@ function generateTestTerrain(chunkManager: ChunkManager, numChunks: number = 5) 
       // Vary terrain based on chunk to test different compressions
       if (i === 0) {
         // Chunk 0: Uniform (will use RLE)
-        (tile as any).terrain = 'grass';
-        (tile as any).biome = 'plains';
+        (tile as Record<string, unknown>).terrain = 'grass';
+        (tile as Record<string, unknown>).biome = 'plains';
       } else if (i === 1) {
         // Chunk 1: Mostly uniform (will use delta)
-        (tile as any).terrain = j < 900 ? 'grass' : 'dirt';
-        (tile as any).biome = 'plains';
+        (tile as Record<string, unknown>).terrain = j < 900 ? 'grass' : 'dirt';
+        (tile as Record<string, unknown>).biome = 'plains';
       } else {
         // Other chunks: Varied (will use full)
-        (tile as any).terrain = j % 2 === 0 ? 'grass' : 'dirt';
-        (tile as any).biome = j % 3 === 0 ? 'plains' : 'forest';
-        (tile as any).elevation = j % 5;
+        (tile as Record<string, unknown>).terrain = j % 2 === 0 ? 'grass' : 'dirt';
+        (tile as Record<string, unknown>).biome = j % 3 === 0 ? 'plains' : 'forest';
+        (tile as Record<string, unknown>).elevation = j % 5;
       }
 
       // Add some test data to verify preservation
-      (tile as any).moisture = 50 + (j % 10);
-      (tile as any).fertility = 60 + (i * 5);
+      (tile as Record<string, unknown>).moisture = 50 + (j % 10);
+      (tile as Record<string, unknown>).fertility = 60 + (i * 5);
     }
   }
 }
@@ -115,8 +129,8 @@ describe('WorldSerializer terrain integration', () => {
     // Remember original data for comparison
     const originalChunk0 = sourceChunkManager.getChunk(0, 0);
     const originalTile0 = originalChunk0.tiles[0];
-    const originalTerrain = (originalTile0 as any).terrain;
-    const originalMoisture = (originalTile0 as any).moisture;
+    const originalTerrain = (originalTile0 as Record<string, unknown>).terrain;
+    const originalMoisture = (originalTile0 as Record<string, unknown>).moisture;
 
     // Act 1: Serialize
     const snapshot = await serializer.serializeWorld(
@@ -135,8 +149,8 @@ describe('WorldSerializer terrain integration', () => {
     const restoredTile0 = restoredChunk0.tiles[0];
 
     expect(restoredChunk0.generated).toBe(true);
-    expect((restoredTile0 as any).terrain).toBe(originalTerrain);
-    expect((restoredTile0 as any).moisture).toBe(originalMoisture);
+    expect((restoredTile0 as Record<string, unknown>).terrain).toBe(originalTerrain);
+    expect((restoredTile0 as Record<string, unknown>).moisture).toBe(originalMoisture);
   });
 
   it('should preserve all tile properties through save/load', async () => {
@@ -147,7 +161,7 @@ describe('WorldSerializer terrain integration', () => {
     chunk.generated = true;
 
     // Set specific values on first tile
-    const tile = chunk.tiles[0] as any;
+    const tile = chunk.tiles[0] as unknown;
     tile.terrain = 'dirt';
     tile.biome = 'desert';
     tile.elevation = 5;
@@ -163,7 +177,7 @@ describe('WorldSerializer terrain integration', () => {
     await serializer.deserializeWorld(snapshot, newWorld);
 
     // Assert: All properties preserved
-    const restoredTile = newWorld.getChunkManager()!.getChunk(0, 0).tiles[0] as any;
+    const restoredTile = newWorld.getChunkManager()!.getChunk(0, 0).tiles[0] as unknown;
     expect(restoredTile.terrain).toBe('dirt');
     expect(restoredTile.biome).toBe('desert');
     expect(restoredTile.elevation).toBe(5);

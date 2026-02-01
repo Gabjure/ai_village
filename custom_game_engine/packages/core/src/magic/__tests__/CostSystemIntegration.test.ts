@@ -258,7 +258,7 @@ describe('Cost System Integration', () => {
       };
 
       // Access private method
-      const checkCosts = (service as any).checkCosts.bind(service);
+      const checkCosts = (service as ServiceWithPrivateMethods).checkCosts.bind(service);
 
       expect(() => {
         checkCosts(spell, magic);
@@ -296,7 +296,7 @@ describe('Cost System Integration', () => {
       const resourcesSpent: Record<string, number> = {};
 
       // Access private method
-      const deductCosts = (service as any).deductCosts.bind(service);
+      const deductCosts = (service as ServiceWithPrivateMethods).deductCosts.bind(service);
 
       expect(() => {
         deductCosts(spell, magic, resourcesSpent);
@@ -555,7 +555,7 @@ describe('Cost System Integration', () => {
       costCalculatorRegistry.clear();
 
       // Access private method for testing
-      const checkCosts = (service as any).checkCosts.bind(service);
+      const checkCosts = (service as ServiceWithPrivateMethods).checkCosts.bind(service);
 
       expect(() => {
         checkCosts(

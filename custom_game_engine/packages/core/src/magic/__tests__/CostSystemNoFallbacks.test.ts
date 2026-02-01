@@ -14,6 +14,20 @@ import { getCoreParadigm } from '../CoreParadigms.js';
 import type { ComposedSpell, MagicComponent } from '../../components/MagicComponent.js';
 import type { SpellDefinition } from '../SpellRegistry.js';
 
+// Type helpers for testing
+type EntityWithMethods = {
+  addComponent?: (comp: unknown) => void;
+  updateComponent?: (type: string, updater: (current: unknown) => unknown) => void;
+  getComponent?: (type: string) => unknown;
+  hasComponent?: (type: string) => boolean;
+};
+type WorldWithMethods = Record<string, unknown> & {
+  getEntity?: (id: string) => unknown;
+  addEntity?: (entity: unknown) => void;
+  query?: unknown;
+  getSystem?: (name: string) => unknown;
+};
+
 describe('Cost System: No Fallbacks Policy', () => {
   beforeEach(() => {
     // Start with NO calculators registered
@@ -170,7 +184,7 @@ describe('Cost System: No Fallbacks Policy', () => {
       };
 
       // Access private method for testing
-      const checkCosts = (service as any).checkCosts.bind(service);
+      const checkCosts = (service as ServiceWithPrivateMethods).checkCosts.bind(service);
 
       expect(() => {
         checkCosts(spell, magic);
@@ -211,7 +225,7 @@ describe('Cost System: No Fallbacks Policy', () => {
       const resourcesSpent: Record<string, number> = {};
 
       // Access private method for testing
-      const deductCosts = (service as any).deductCosts.bind(service);
+      const deductCosts = (service as ServiceWithPrivateMethods).deductCosts.bind(service);
 
       expect(() => {
         deductCosts(spell, magic, resourcesSpent);
@@ -250,7 +264,7 @@ describe('Cost System: No Fallbacks Policy', () => {
       const resourcesSpent: Record<string, number> = {};
 
       // Access private method for testing
-      const checkCosts = (service as any).checkCosts.bind(service);
+      const checkCosts = (service as ServiceWithPrivateMethods).checkCosts.bind(service);
 
       expect(() => {
         checkCosts(spell, magic);
@@ -294,7 +308,7 @@ describe('Cost System: No Fallbacks Policy', () => {
       };
 
       // Access private method for testing
-      const checkCosts = (service as any).checkCosts.bind(service);
+      const checkCosts = (service as ServiceWithPrivateMethods).checkCosts.bind(service);
 
       // Should THROW, not fall back to checking manaPools
       expect(() => {
@@ -397,13 +411,13 @@ describe('Cost System: No Fallbacks Policy', () => {
         activeEffects: [],
       };
 
-      const checkCosts = (service as any).checkCosts.bind(service);
-      const deductCosts = (service as any).deductCosts.bind(service);
+      const checkCosts = (service as ServiceWithPrivateMethods).checkCosts.bind(service);
+      const deductCosts = (service as ServiceWithPrivateMethods).deductCosts.bind(service);
 
       let error1 = '';
       try {
         checkCosts(spell1, magic1);
-      } catch (e: any) {
+      } catch (e: Record<string, unknown>) {
         error1 = e.message;
       }
 
@@ -438,7 +452,7 @@ describe('Cost System: No Fallbacks Policy', () => {
       let error2 = '';
       try {
         deductCosts(spell2, magic2, {});
-      } catch (e: any) {
+      } catch (e: Record<string, unknown>) {
         error2 = e.message;
       }
 
@@ -484,7 +498,7 @@ describe('Cost System: No Fallbacks Policy', () => {
         description: 'Test',
       };
 
-      const deductCosts = (service as any).deductCosts.bind(service);
+      const deductCosts = (service as ServiceWithPrivateMethods).deductCosts.bind(service);
 
       try {
         deductCosts(spell, magic, {});
@@ -526,7 +540,7 @@ describe('Cost System: No Fallbacks Policy', () => {
         description: 'Test',
       };
 
-      const checkCosts = (service as any).checkCosts.bind(service);
+      const checkCosts = (service as ServiceWithPrivateMethods).checkCosts.bind(service);
 
       // First attempt: should fail
       expect(() => checkCosts(spell, magic)).toThrow();

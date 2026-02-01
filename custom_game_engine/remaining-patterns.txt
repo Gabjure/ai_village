@@ -1,0 +1,15 @@
+     29     } as any;
+     21  {} as any,
+     18       } as any;
+     14       const checkCosts = (service as unknown as ServiceWithPrivateMethods).checkCosts.bind(service);
+      8  string) => Record<string, unknown> };
+      8       const deductCosts = (service as unknown as ServiceWithPrivateMethods).deductCosts.bind(service);
+      7  Map<string, unknown> }).entities.get(id);
+      7   return {} as any;
+      5       (vision as any).canSeeAgents = true;
+      5         const entity = world.getEntity?.('test-entity-1') as unknown as {
+      4  {} } as any;
+      4  any) => ({
+      4  0 } as any;
+      4     const inferDomain = (system as any).inferDomainFromPrayer.bind(system);
+      4     const current = (updated.identity.domains as any)[domain] || 0;

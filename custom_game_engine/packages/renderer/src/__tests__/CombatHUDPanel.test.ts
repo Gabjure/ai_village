@@ -9,17 +9,20 @@ describe('CombatHUDPanel', () => {
 
   // Helper to emit and flush events
   const emitConflictStarted = (bus: EventBus, data: any) => {
-    bus.emit({ type: 'conflict:started' as any, source: 'test', data });
+    bus.emit({ type: // @ts-expect-error Testing invalid value validation
+      'conflict:started', source: 'test', data });
     bus.flush();
   };
 
   const emitConflictResolved = (bus: EventBus, data: any) => {
-    bus.emit({ type: 'conflict:resolved' as any, source: 'test', data });
+    bus.emit({ type: // @ts-expect-error Testing invalid value validation
+      'conflict:resolved', source: 'test', data });
     bus.flush();
   };
 
   const emitCombatAttack = (bus: EventBus, data: any) => {
-    bus.emit({ type: 'combat:attack' as any, source: 'test', data });
+    bus.emit({ type: // @ts-expect-error Testing invalid value validation
+      'combat:attack', source: 'test', data });
     bus.flush();
   };
 
@@ -44,10 +47,12 @@ describe('CombatHUDPanel', () => {
     it('should subscribe to conflict:started events on construction', () => {
       const handler = vi.fn();
       const testBus = new EventBusImpl();
-      testBus.on('conflict:started' as any, handler);
+      testBus.on(// @ts-expect-error Testing invalid value validation
+      'conflict:started', handler);
 
       testBus.emit({
-        type: 'conflict:started' as any,
+        type: // @ts-expect-error Testing invalid value validation
+      'conflict:started',
         source: 'test',
         data: {
           conflictId: 'test-conflict',
@@ -135,7 +140,8 @@ describe('CombatHUDPanel', () => {
   describe('Criterion 1: Combat HUD Activation', () => {
     it('should activate HUD when combat:started event is emitted', () => {
       const handler = vi.fn();
-      eventBus.on('conflict:started' as any, handler);
+      eventBus.on(// @ts-expect-error Testing invalid value validation
+      'conflict:started', handler);
 
       emitConflictStarted(eventBus, {
         conflictId: 'test-1',
@@ -262,7 +268,8 @@ describe('CombatHUDPanel', () => {
   describe('user interactions', () => {
     it('should focus camera when conflict is clicked', () => {
       const handler = vi.fn();
-      eventBus.on('ui:entity:selected' as any, handler);
+      eventBus.on(// @ts-expect-error Testing invalid value validation
+      'ui:entity:selected', handler);
 
       // Start a conflict first
       emitConflictStarted(eventBus, {

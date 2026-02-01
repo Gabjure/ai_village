@@ -20,6 +20,21 @@ import { ComponentRegistry } from '../registry/ComponentRegistry.js';
 import { MutationService } from '../mutation/index.js';
 import { defineComponent } from '../types/ComponentSchema.js';
 import type { World } from '@ai-village/core';
+
+// Type helpers for testing
+type EntityWithMethods = {
+  addComponent: (comp: unknown) => void;
+  updateComponent: (type: string, updater: (current: unknown) => unknown) => void;
+  getComponent: (type: string) => unknown;
+  hasComponent?: (type: string) => boolean;
+};
+type EntityWithComponent = {
+  getComponent: (type: string) => Record<string, unknown>;
+};
+type QueryMock = ReturnType<typeof vi.fn> & {
+  with: ReturnType<typeof vi.fn>;
+  executeEntities: ReturnType<typeof vi.fn>;
+};
 import type { Component } from '../types/index.js';
 import type {
   SnapshotId,
@@ -314,10 +329,7 @@ class MockGameIntrospectionAPI {
       if (!entity) {
         throw new Error(`Entity ${entityId} not found`);
       }
-      const entityWithComponents = entity as unknown as {
-        hasComponent: (type: string) => boolean;
-        getComponent: (type: string) => unknown;
-      };
+      const entityWithComponents = entity as EntityWithMethods;
 
       // Serialize all components
       const components: Record<string, unknown> = {};
@@ -375,11 +387,7 @@ class MockGameIntrospectionAPI {
         continue;
       }
 
-      const entityWithComponents = entity as unknown as {
-        hasComponent: (type: string) => boolean;
-        getComponent: (type: string) => unknown;
-        updateComponent: (type: string, updater: (current: unknown) => unknown) => void;
-      };
+      const entityWithComponents = entity as EntityWithMethods;
 
       // Restore each component
       for (const [componentType, componentData] of Object.entries(
@@ -470,10 +478,8 @@ class MockGameIntrospectionAPI {
       throw new Error(`Entity ${mutation.entityId} not found`);
     }
 
-    const entityWithComponents = entity as unknown as {
-      getComponent: (type: string) => Record<string, unknown> | undefined;
-    };
-    const component = entityWithComponents.getComponent(mutation.componentType);
+    const entityWithComponents = entity as EntityWithMethods;
+    const component = entityWithComponents.getComponent(mutation.componentType) as Record<string, unknown> | undefined;
     const oldValue = component ? component[mutation.field] : undefined;
 
     const result = MutationService.mutate(
@@ -519,19 +525,19 @@ describe('GameIntrospectionAPI - Snapshots & Time Travel', () => {
 
     // Create test entities
     entity1 = createMockEntity('entity-1');
-    (entity1 as unknown as { addComponent: (comp: unknown) => void }).addComponent(TestAgentSchema.createDefault());
-    (entity1 as unknown as { addComponent: (comp: unknown) => void }).addComponent(TestNeedsSchema.createDefault());
-    (entity1 as unknown as { addComponent: (comp: unknown) => void }).addComponent(TestPositionSchema.createDefault());
+    (entity1 as EntityWithMethods).addComponent(TestAgentSchema.createDefault());
+    (entity1 as EntityWithMethods).addComponent(TestNeedsSchema.createDefault());
+    (entity1 as EntityWithMethods).addComponent(TestPositionSchema.createDefault());
 
     entity2 = createMockEntity('entity-2');
-    (entity2 as unknown as { addComponent: (comp: unknown) => void }).addComponent({
+    (entity2 as EntityWithMethods).addComponent({
       type: 'test_agent',
       version: 1,
       name: 'Alice',
       level: 5,
       species: 'elf' as const,
     });
-    (entity2 as unknown as { addComponent: (comp: unknown) => void }).addComponent({
+    (entity2 as EntityWithMethods).addComponent({
       type: 'test_needs',
       version: 1,
       hunger: 0.3,
@@ -595,7 +601,7 @@ describe('GameIntrospectionAPI - Snapshots & Time Travel', () => {
       // Verify by restoring and checking values
       await api.restoreSnapshot(snapshotId);
 
-      const entity = world.getEntity?.('entity-2') as unknown as { getComponent: (type: string) => Record<string, unknown> };
+      const entity = world.getEntity?.('entity-2') as EntityWithComponent;
       const agent = entity.getComponent('test_agent');
       const needs = entity.getComponent('test_needs');
 
@@ -654,7 +660,7 @@ describe('GameIntrospectionAPI - Snapshots & Time Travel', () => {
         value: 'Modified',
       });
 
-      const entityBefore = world.getEntity?.('entity-1') as unknown as { getComponent: (type: string) => Record<string, unknown> };
+      const entityBefore = world.getEntity?.('entity-1') as EntityWithComponent;
       expect(entityBefore.getComponent('test_agent').name).toBe('Modified');
 
       // Restore
@@ -663,7 +669,7 @@ describe('GameIntrospectionAPI - Snapshots & Time Travel', () => {
       expect(result.success).toBe(true);
       expect(result.entitiesRestored).toBe(1);
 
-      const entityAfter = world.getEntity?.('entity-1') as unknown as { getComponent: (type: string) => Record<string, unknown> };
+      const entityAfter = world.getEntity?.('entity-1') as EntityWithComponent;
       expect(entityAfter.getComponent('test_agent').name).toBe('Unknown');
     });
 
@@ -691,8 +697,8 @@ describe('GameIntrospectionAPI - Snapshots & Time Travel', () => {
       expect(result.success).toBe(true);
       expect(result.entitiesRestored).toBe(2);
 
-      const entity1After = world.getEntity?.('entity-1') as unknown as { getComponent: (type: string) => Record<string, unknown> };
-      const entity2After = world.getEntity?.('entity-2') as unknown as { getComponent: (type: string) => Record<string, unknown> };
+      const entity1After = world.getEntity?.('entity-1') as EntityWithComponent;
+      const entity2After = world.getEntity?.('entity-2') as EntityWithComponent;
 
       expect(entity1After.getComponent('test_needs').hunger).toBe(0.5);
       expect(entity2After.getComponent('test_needs').energy).toBe(0.7);
@@ -714,10 +720,7 @@ describe('GameIntrospectionAPI - Snapshots & Time Travel', () => {
 
     it('should restore component values correctly', async () => {
       // Create snapshot with specific values
-      const entity = world.getEntity?.('entity-2') as unknown as {
-        getComponent: (type: string) => Record<string, unknown>;
-        updateComponent: (type: string, updater: (c: Record<string, unknown>) => Record<string, unknown>) => void;
-      };
+      const entity = world.getEntity?.('entity-2') as EntityWithMethods;
       entity.updateComponent('test_agent', (c) => ({ ...c, level: 10 }));
       entity.updateComponent('test_needs', (c) => ({
         ...c,
@@ -729,8 +732,8 @@ describe('GameIntrospectionAPI - Snapshots & Time Travel', () => {
       const snapshotId = await api.createSnapshot(['entity-2']);
 
       // Modify values
-      entity.updateComponent('test_agent', (c: any) => ({ ...c, level: 1 }));
-      entity.updateComponent('test_needs', (c: any) => ({
+      entity.updateComponent('test_agent', (c: Record<string, unknown>) => ({ ...c, level: 1 }));
+      entity.updateComponent('test_needs', (c: Record<string, unknown>) => ({
         ...c,
         hunger: 1.0,
         thirst: 1.0,
@@ -773,10 +776,7 @@ describe('GameIntrospectionAPI - Snapshots & Time Travel', () => {
       const snapshotId = await api.createSnapshot(['entity-1']);
 
       // Modify multiple components
-      const entity = world.getEntity?.('entity-1') as unknown as {
-        getComponent: (type: string) => Record<string, unknown>;
-        updateComponent: (type: string, updater: (c: Record<string, unknown>) => Record<string, unknown>) => void;
-      };
+      const entity = world.getEntity?.('entity-1') as EntityWithMethods;
       entity.updateComponent('test_agent', (c) => ({ ...c, name: 'Bob', level: 20 }));
       entity.updateComponent('test_needs', (c) => ({
         ...c,
@@ -997,8 +997,8 @@ describe('GameIntrospectionAPI - Snapshots & Time Travel', () => {
         { phase: 'initial' }
       );
 
-      const entity1 = world.getEntity?.('entity-1') as unknown as { getComponent: (type: string) => Record<string, unknown> };
-      const entity2 = world.getEntity?.('entity-2') as unknown as { getComponent: (type: string) => Record<string, unknown> };
+      const entity1 = world.getEntity?.('entity-1') as EntityWithComponent;
+      const entity2 = world.getEntity?.('entity-2') as EntityWithComponent;
 
       // 2. Verify initial state
       expect(entity1.getComponent('test_agent').name).toBe('Unknown');
@@ -1042,9 +1042,7 @@ describe('GameIntrospectionAPI - Snapshots & Time Travel', () => {
     });
 
     it('should support multiple snapshot checkpoints', async () => {
-      const entity = world.getEntity?.('entity-1') as unknown as {
-        getComponent: (type: string) => Record<string, unknown>;
-      };
+      const entity = world.getEntity?.('entity-1') as EntityWithComponent;
 
       // Checkpoint 1: Initial state
       const checkpoint1 = await api.createSnapshot(['entity-1'], { name: 'checkpoint-1' });
@@ -1088,9 +1086,7 @@ describe('GameIntrospectionAPI - Snapshots & Time Travel', () => {
     });
 
     it('should preserve snapshots independently', async () => {
-      const entity = world.getEntity?.('entity-1') as unknown as {
-        getComponent: (type: string) => Record<string, unknown>;
-      };
+      const entity = world.getEntity?.('entity-1') as EntityWithComponent;
 
       // Create snapshot 1
       const snap1 = await api.createSnapshot(['entity-1']);
@@ -1126,7 +1122,7 @@ describe('GameIntrospectionAPI - Snapshots & Time Travel', () => {
     });
 
     it('should handle complex multi-component state restoration', async () => {
-      const entity = world.getEntity?.('entity-2') as unknown as { getComponent: (type: string) => Record<string, unknown> };
+      const entity = world.getEntity?.('entity-2') as EntityWithComponent;
 
       // Create snapshot
       const snapshotId = await api.createSnapshot(['entity-2']);

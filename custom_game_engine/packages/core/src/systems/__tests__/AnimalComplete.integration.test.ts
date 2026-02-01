@@ -57,7 +57,7 @@ describe('AnimalSystem + AnimalProductionSystem + AnimalHousingSystem Integratio
     // Query entities with Animal component
     const entities = harness.world.query().with(ComponentType.Animal).executeEntities();
 
-    const initialAnimal = animal.getComponent(ComponentType.Animal) as any;
+    const initialAnimal = animal.getComponent(ComponentType.Animal);
     const initialHunger = initialAnimal.hunger;
 
     // Simulate time passing (advance tick and apply deltas)
@@ -65,7 +65,7 @@ describe('AnimalSystem + AnimalProductionSystem + AnimalHousingSystem Integratio
     animalSystem.update(harness.world, entities, 60.0); // 60s = 1 game minute
     stateMutator.update(harness.world, entities, 60.0); // Apply deltas
 
-    const updatedAnimal = animal.getComponent(ComponentType.Animal) as any;
+    const updatedAnimal = animal.getComponent(ComponentType.Animal);
 
     // Hunger and thirst should increase
     expect(updatedAnimal.hunger).toBeGreaterThan(initialHunger);
@@ -102,7 +102,7 @@ describe('AnimalSystem + AnimalProductionSystem + AnimalHousingSystem Integratio
     // Query entities with Animal component
     const entities = harness.world.query().with(ComponentType.Animal).executeEntities();
 
-    const initialAnimal = animal.getComponent(ComponentType.Animal) as any;
+    const initialAnimal = animal.getComponent(ComponentType.Animal);
     const initialAge = initialAnimal.age;
 
     // Simulate time (1 day = 1440 game minutes)
@@ -112,7 +112,7 @@ describe('AnimalSystem + AnimalProductionSystem + AnimalHousingSystem Integratio
       stateMutator.update(harness.world, entities, 60.0);
     }
 
-    const updatedAnimal = animal.getComponent(ComponentType.Animal) as any;
+    const updatedAnimal = animal.getComponent(ComponentType.Animal);
 
     // Age should increase
     expect(updatedAnimal.age).toBeGreaterThan(initialAge);
@@ -195,7 +195,7 @@ describe('AnimalSystem + AnimalProductionSystem + AnimalHousingSystem Integratio
     // Query entities with Animal component
     const entities = harness.world.query().with(ComponentType.Animal).executeEntities();
 
-    const initialAnimal = animal.getComponent(ComponentType.Animal) as any;
+    const initialAnimal = animal.getComponent(ComponentType.Animal);
     const initialHealth = initialAnimal.health;
 
     // Simulate extended starvation (several game minutes)
@@ -205,7 +205,7 @@ describe('AnimalSystem + AnimalProductionSystem + AnimalHousingSystem Integratio
       stateMutator.update(harness.world, entities, 60.0);
     }
 
-    const updatedAnimal = animal.getComponent(ComponentType.Animal) as any;
+    const updatedAnimal = animal.getComponent(ComponentType.Animal);
 
     // Health should decrease from starvation
     expect(updatedAnimal.health).toBeLessThan(initialHealth);
@@ -242,7 +242,7 @@ describe('AnimalSystem + AnimalProductionSystem + AnimalHousingSystem Integratio
     // Query entities with Animal component
     const entities = harness.world.query().with(ComponentType.Animal).executeEntities();
 
-    const initialAnimal = animal.getComponent(ComponentType.Animal) as any;
+    const initialAnimal = animal.getComponent(ComponentType.Animal);
     const initialEnergy = initialAnimal.energy;
 
     // Simulate sleep time (several game minutes)
@@ -252,7 +252,7 @@ describe('AnimalSystem + AnimalProductionSystem + AnimalHousingSystem Integratio
       stateMutator.update(harness.world, entities, 60.0);
     }
 
-    const updatedAnimal = animal.getComponent(ComponentType.Animal) as any;
+    const updatedAnimal = animal.getComponent(ComponentType.Animal);
 
     // Energy should not decay as fast during sleep (AnimalSystem reduces energy decay for sleeping animals)
     // Note: Full energy recovery requires SleepSystem, this just tests reduced decay
@@ -290,7 +290,7 @@ describe('AnimalSystem + AnimalProductionSystem + AnimalHousingSystem Integratio
     // Query entities with Animal component
     const entities = harness.world.query().with(ComponentType.Animal).executeEntities();
 
-    const initialAnimal = animal.getComponent(ComponentType.Animal) as any;
+    const initialAnimal = animal.getComponent(ComponentType.Animal);
     const initialStress = initialAnimal.stress;
 
     // Simulate time for stress to decay (several game minutes)
@@ -300,7 +300,7 @@ describe('AnimalSystem + AnimalProductionSystem + AnimalHousingSystem Integratio
       stateMutator.update(harness.world, entities, 60.0);
     }
 
-    const updatedAnimal = animal.getComponent(ComponentType.Animal) as any;
+    const updatedAnimal = animal.getComponent(ComponentType.Animal);
 
     // Stress should decrease
     expect(updatedAnimal.stress).toBeLessThan(initialStress);
@@ -337,7 +337,7 @@ describe('AnimalSystem + AnimalProductionSystem + AnimalHousingSystem Integratio
 
     // Production system should process the animal without errors
     // Verify animal still has correct properties after production update
-    const animalComp = animal.getComponent(ComponentType.Animal) as any;
+    const animalComp = animal.getComponent(ComponentType.Animal);
     expect(animalComp).toBeDefined();
     expect(animalComp.lifeStage).toBe('adult');
     expect(animalComp.isDomesticated).toBe(true);
