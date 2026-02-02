@@ -383,7 +383,8 @@ export class DivinePowerSystem extends BaseSystem {
     content: string,
     powerType: string,
     cost: number,
-    timestamp: number
+    timestamp: number,
+    symbols: string[] = []
   ): void {
     const deityEntity = world.getEntity(deityId);
     if (!deityEntity) return;
@@ -397,6 +398,7 @@ export class DivinePowerSystem extends BaseSystem {
       targetName,
       content,
       powerType,
+      symbols,
       cost,
       timestamp,
       wasReceived: true, // Assume received for now

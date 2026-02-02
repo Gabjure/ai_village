@@ -72,6 +72,7 @@ export class MultiverseNetworkManager {
   // WebSocket connections
   private wsServer: WebSocketServerLike | null = null;
   private wsConnections: Map<PeerId, WebSocketLike> = new Map();
+  private peerAddresses: Map<PeerId, string> = new Map();
 
   // Remote passages
   private remotePassages: Map<PassageId, RemotePassage> = new Map();
@@ -213,6 +214,7 @@ export class MultiverseNetworkManager {
 
     const peerId = this.generatePeerId();
     this.wsConnections.set(peerId, ws);
+    this.peerAddresses.set(peerId, address);
 
     // Setup handlers (browser style)
     ws.onmessage = (event: { data: string }) => {
@@ -253,6 +255,7 @@ export class MultiverseNetworkManager {
    */
   private handlePeerDisconnect(peerId: PeerId): void {
     this.wsConnections.delete(peerId);
+    this.peerAddresses.delete(peerId);
 
     // Clean up passages for this peer
     for (const [_passageId, passage] of this.remotePassages) {
@@ -1607,8 +1610,9 @@ export class MultiverseNetworkManager {
    * Get peer address (for display)
    */
   private getPeerAddress(peerId: PeerId): string {
-    // TODO: Store actual addresses
-    return `peer://${peerId}`;
+    // Return stored address if available, otherwise use peer ID as fallback
+    const address = this.peerAddresses.get(peerId);
+    return address ?? `peer://${peerId}`;
   }
 
   /**

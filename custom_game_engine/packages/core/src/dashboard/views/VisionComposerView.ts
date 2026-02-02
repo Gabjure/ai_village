@@ -253,7 +253,7 @@ export const VisionComposerView: DashboardView<VisionComposerViewData> = {
       const recentVisions: SentVision[] = deityComp.sentVisions?.map((sv) => ({
         targetName: sv.targetName,
         type: sv.powerType,
-        symbols: [], // TODO: Track symbols used
+        symbols: sv.symbols ?? [],
         intensity: sv.powerType === 'whisper' ? 0.3 : sv.powerType === 'dream_hint' ? 0.5 : 0.9,
         timestamp: sv.timestamp,
         wasReceived: sv.wasReceived,

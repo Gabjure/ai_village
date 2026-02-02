@@ -213,6 +213,7 @@ export class DeityComponent extends ComponentBase {
     targetName: string;
     content: string;
     powerType: string;
+    symbols: string[];
     cost: number;
     timestamp: number;
     wasReceived: boolean;
