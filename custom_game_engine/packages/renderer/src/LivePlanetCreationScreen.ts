@@ -25,6 +25,7 @@ export interface GeneratedSpecies {
   spriteUrl?: string;  // South-facing sprite URL
   spriteStatus: 'pending' | 'generating' | 'ready' | 'failed';
   otherDirectionsQueued: boolean;
+  folderId?: string;  // Sanitized name for sprite folder
 }
 
 export interface BiomeGroup {
@@ -642,7 +643,7 @@ export class LivePlanetCreationScreen {
     const interval = setInterval(() => {
       if (index >= speciesNames.length) {
         clearInterval(interval);
-        this.addLog('Planet generation complete!');
+        this.addLog('Planet generation complete! Sprites generating in background...');
         this.isGenerating = false;
         this.generationPhase = 'complete';
         this.render();
@@ -656,25 +657,14 @@ export class LivePlanetCreationScreen {
         type: Math.random() > 0.3 ? 'animal' : 'plant',
         biome,
         traits: { diet: Math.random() > 0.5 ? 'herbivore' : 'carnivore' },
-        spriteStatus: 'pending',
+        spriteStatus: 'pending',  // Real status will be set by queueSpriteGeneration
         otherDirectionsQueued: false,
       };
 
       this.addSpecies(species);
       this.addLog(`Discovered: ${species.name} in ${biome}`);
-
-      // Simulate sprite generation
-      setTimeout(() => {
-        species.spriteStatus = 'generating';
-        this.render();
-
-        setTimeout(() => {
-          species.spriteStatus = 'ready';
-          species.otherDirectionsQueued = true;
-          this.addLog(`Sprite ready: ${species.name} (south view, others queued)`);
-          this.render();
-        }, 1500);
-      }, 500);
+      // Note: queueSpriteGeneration is called in addSpecies, which handles
+      // the real sprite generation via PixelLab daemon and status polling
 
       index++;
       this.render();
@@ -704,10 +694,12 @@ export class LivePlanetCreationScreen {
    * Queue sprite generation for a species via the metrics server API.
    * This creates a placeholder folder with metadata.json immediately,
    * allowing the species to appear in the sprite gallery (with "No preview").
+   * Then starts polling for generation completion.
    */
   private async queueSpriteGeneration(species: GeneratedSpecies): Promise<void> {
     const METRICS_API = 'http://localhost:8766';
     const folderId = this.sanitizeFolderId(species.name);
+    species.folderId = folderId;
 
     // Build a description for PixelLab
     const artStyleString = this.useCustomArtStyle
@@ -738,11 +730,116 @@ export class LivePlanetCreationScreen {
 
       if (!response.ok) {
         console.warn(`[LivePlanetCreation] Failed to queue sprite for ${species.name}`);
+        species.spriteStatus = 'failed';
+      } else {
+        species.spriteStatus = 'generating';
+        // Start polling for this species' sprite completion
+        this.pollSpriteStatus(species);
       }
     } catch (error) {
       // Non-fatal - species still appears in local UI even if sprite queue fails
       console.warn(`[LivePlanetCreation] Error queueing sprite for ${species.name}:`, error);
+      species.spriteStatus = 'failed';
     }
+    this.render();
+  }
+
+  /**
+   * Poll the metrics server to check if a sprite has been generated.
+   * Updates the species with the sprite URL when complete.
+   */
+  private async pollSpriteStatus(species: GeneratedSpecies): Promise<void> {
+    const METRICS_API = 'http://localhost:8766';
+    const folderId = species.folderId;
+    if (!folderId) return;
+
+    const poll = async (): Promise<void> => {
+      try {
+        const response = await fetch(`${METRICS_API}/api/sprites/generate/status/${folderId}`);
+        if (!response.ok) {
+          // Keep polling if not found yet
+          setTimeout(poll, 3000);
+          return;
+        }
+
+        const status = await response.json();
+        if (status.status === 'complete') {
+          // Sprite is ready - set the URL
+          species.spriteUrl = `${METRICS_API}/api/sprites/${folderId}/south.png`;
+          species.spriteStatus = 'ready';
+          species.otherDirectionsQueued = true;
+          this.addLog(`Sprite ready: ${species.name}`);
+          this.render();
+        } else if (status.status === 'failed' || status.error) {
+          species.spriteStatus = 'failed';
+          this.render();
+        } else {
+          // Still generating - poll again in 3 seconds
+          species.spriteStatus = 'generating';
+          setTimeout(poll, 3000);
+        }
+      } catch (error) {
+        // Network error - retry after delay
+        setTimeout(poll, 5000);
+      }
+    };
+
+    // Start polling after initial delay (daemon needs time to process)
+    setTimeout(poll, 2000);
+  }
+
+  /**
+   * Regenerate a sprite for a species.
+   * Deletes the existing sprite and re-queues generation.
+   */
+  private async regenerateSprite(species: GeneratedSpecies): Promise<void> {
+    const METRICS_API = 'http://localhost:8766';
+    const folderId = species.folderId || this.sanitizeFolderId(species.name);
+
+    // Reset status
+    species.spriteStatus = 'pending';
+    species.spriteUrl = undefined;
+    this.render();
+
+    // Delete existing sprite folder by re-queuing with force flag
+    try {
+      const artStyleString = this.useCustomArtStyle
+        ? this.customArtStyleInput
+        : `${this.artStyleConfig.bitDepth} ${this.artStyleConfig.era} pixel art`;
+
+      const description = `${species.name}, ${species.type} from ${species.biome} biome, ${artStyleString}, game sprite`;
+
+      const response = await fetch(`${METRICS_API}/api/sprites/generate`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          folderId,
+          description,
+          regenerate: true,  // Signal to regenerate
+          traits: {
+            category: 'planet_species',
+            speciesName: species.name,
+            speciesType: species.type,
+            biome: species.biome,
+            planetId: this.planetId,
+            planetName: this.planetName,
+            artStyle: artStyleString,
+            ...species.traits,
+          },
+        }),
+      });
+
+      if (response.ok) {
+        species.spriteStatus = 'generating';
+        this.addLog(`Regenerating sprite: ${species.name}`);
+        this.pollSpriteStatus(species);
+      } else {
+        species.spriteStatus = 'failed';
+      }
+    } catch (error) {
+      species.spriteStatus = 'failed';
+    }
+    this.render();
   }
 
   /**
@@ -938,47 +1035,107 @@ export class LivePlanetCreationScreen {
         animation: pop-in 0.3s ease-out;
       `;
 
-      // Sprite placeholder or actual sprite
+      // Sprite box - show actual image when ready
       const spriteBox = document.createElement('div');
       spriteBox.style.cssText = `
-        width: 32px;
-        height: 32px;
-        background: ${species.spriteStatus === 'ready' ? '#333' : 'rgba(255,255,255,0.1)'};
+        width: 48px;
+        height: 48px;
+        background: rgba(0, 0, 0, 0.3);
         border-radius: 4px;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 12px;
+        font-size: 16px;
+        overflow: hidden;
+        flex-shrink: 0;
       `;
 
       if (species.spriteStatus === 'pending') {
-        spriteBox.textContent = '⏳';
+        spriteBox.innerHTML = '<span style="opacity: 0.5;">⏳</span>';
+        spriteBox.title = 'Waiting to generate...';
       } else if (species.spriteStatus === 'generating') {
         spriteBox.innerHTML = '<span style="animation: pulse 0.5s infinite;">🎨</span>';
-      } else if (species.spriteStatus === 'ready') {
-        spriteBox.textContent = species.type === 'animal' ? '🦎' : '🌿';
+        spriteBox.title = 'Generating sprite...';
+      } else if (species.spriteStatus === 'ready' && species.spriteUrl) {
+        // Show actual sprite image
+        const img = document.createElement('img');
+        img.src = species.spriteUrl;
+        img.style.cssText = `
+          width: 100%;
+          height: 100%;
+          object-fit: contain;
+          image-rendering: pixelated;
+          image-rendering: crisp-edges;
+        `;
+        img.onerror = () => {
+          // If image fails to load, show fallback
+          spriteBox.innerHTML = species.type === 'animal' ? '🦎' : '🌿';
+        };
+        spriteBox.appendChild(img);
+        spriteBox.title = `${species.name} sprite`;
+      } else if (species.spriteStatus === 'failed') {
+        spriteBox.innerHTML = '<span style="color: #f44336;">❌</span>';
+        spriteBox.title = 'Generation failed';
       } else {
-        spriteBox.textContent = '❌';
+        // Fallback to emoji
+        spriteBox.textContent = species.type === 'animal' ? '🦎' : '🌿';
       }
 
       item.appendChild(spriteBox);
 
       const info = document.createElement('div');
-      info.style.cssText = 'flex: 1;';
+      info.style.cssText = 'flex: 1; min-width: 0;';
       info.innerHTML = `
-        <div style="font-size: 13px; color: #fff;">${species.name}</div>
+        <div style="font-size: 13px; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${species.name}</div>
         <div style="font-size: 10px; color: #666;">${species.type}</div>
       `;
       item.appendChild(info);
 
-      if (species.otherDirectionsQueued) {
-        const queued = document.createElement('span');
-        queued.textContent = '📥';
-        queued.title = 'Other directions queued';
-        queued.style.cssText = 'font-size: 12px; opacity: 0.5;';
-        item.appendChild(queued);
+      // Action buttons container
+      const actions = document.createElement('div');
+      actions.style.cssText = 'display: flex; gap: 4px; align-items: center;';
+
+      // Regenerate button (show when ready or failed)
+      if (species.spriteStatus === 'ready' || species.spriteStatus === 'failed') {
+        const regenBtn = document.createElement('button');
+        regenBtn.innerHTML = '🔄';
+        regenBtn.title = 'Regenerate sprite';
+        regenBtn.style.cssText = `
+          width: 24px;
+          height: 24px;
+          padding: 0;
+          font-size: 12px;
+          background: rgba(255, 255, 255, 0.1);
+          border: 1px solid rgba(255, 255, 255, 0.2);
+          border-radius: 4px;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        `;
+        regenBtn.onmouseenter = () => { regenBtn.style.background = 'rgba(255, 255, 255, 0.2)'; };
+        regenBtn.onmouseleave = () => { regenBtn.style.background = 'rgba(255, 255, 255, 0.1)'; };
+        regenBtn.onclick = (e) => {
+          e.stopPropagation();
+          this.regenerateSprite(species);
+        };
+        actions.appendChild(regenBtn);
       }
 
+      // Status indicator
+      if (species.spriteStatus === 'generating') {
+        const status = document.createElement('span');
+        status.innerHTML = '<span style="animation: pulse 1s infinite; font-size: 10px; color: #ff9800;">generating...</span>';
+        actions.appendChild(status);
+      } else if (species.otherDirectionsQueued && species.spriteStatus === 'ready') {
+        const queued = document.createElement('span');
+        queued.textContent = '✓';
+        queued.title = 'All directions queued';
+        queued.style.cssText = 'font-size: 10px; color: #4CAF50;';
+        actions.appendChild(queued);
+      }
+
+      item.appendChild(actions);
       list.appendChild(item);
     }
 

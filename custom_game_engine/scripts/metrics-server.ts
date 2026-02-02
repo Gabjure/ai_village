@@ -8690,12 +8690,33 @@ ENDPOINTS:
 
     req.on('end', () => {
       try {
-        const { folderId, traits, description } = JSON.parse(body);
+        const { folderId, traits, description, regenerate } = JSON.parse(body);
 
         if (!folderId || !description) {
           res.statusCode = 400;
           res.end(JSON.stringify({ error: 'Missing folderId or description' }));
           return;
+        }
+
+        // If regenerate flag is set, delete existing sprite folder first
+        if (regenerate) {
+          const spritePath = path.join(SPRITES_DIR, folderId);
+          if (fs.existsSync(spritePath)) {
+            try {
+              // Delete all files in the folder except metadata.json (which we'll update)
+              const files = fs.readdirSync(spritePath);
+              for (const file of files) {
+                if (file !== 'metadata.json') {
+                  fs.unlinkSync(path.join(spritePath, file));
+                }
+              }
+              console.log(`[SpriteGen] Cleared existing sprite files for regeneration: ${folderId}`);
+            } catch (err) {
+              console.error(`[SpriteGen] Failed to clear sprite folder for regeneration: ${err}`);
+            }
+          }
+          // Clear any existing job status so it gets re-queued
+          spriteGenerationJobs.delete(folderId);
         }
 
         // Queue the generation request
@@ -8705,7 +8726,10 @@ ENDPOINTS:
         res.end(JSON.stringify({
           status: job?.status || 'queued',
           folderId,
-          message: 'Sprite generation queued. Check sprite-generation-queue.json and process with PixelLab MCP tools.',
+          regenerate: regenerate || false,
+          message: regenerate
+            ? 'Sprite regeneration queued. Previous sprite cleared.'
+            : 'Sprite generation queued. Check sprite-generation-queue.json and process with PixelLab MCP tools.',
         }));
       } catch (error) {
         res.statusCode = 500;
@@ -8720,12 +8744,14 @@ ENDPOINTS:
 
   if (pathname.startsWith('/api/sprites/generate/status/')) {
     res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Access-Control-Allow-Origin', '*');
 
     const folderId = pathname.replace('/api/sprites/generate/status/', '');
 
-    // Check if sprite exists on disk
+    // Check if sprite IMAGE exists on disk (not just the folder)
     const spritePath = path.join(SPRITES_DIR, folderId);
-    if (fs.existsSync(spritePath)) {
+    const southSprite = path.join(spritePath, 'south.png');
+    if (fs.existsSync(southSprite)) {
       res.end(JSON.stringify({ status: 'complete', folderId }));
       return;
     }
