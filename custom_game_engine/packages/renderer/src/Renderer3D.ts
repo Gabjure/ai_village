@@ -12,6 +12,9 @@ import type { Entity } from '@ai-village/core';
 import { ComponentType as CT } from '@ai-village/core';
 import type { ChunkManager, TerrainGenerator, Chunk } from '@ai-village/world';
 import type { PixelLabEntityRenderer } from './sprites/PixelLabEntityRenderer.js';
+import { getPixelLabSpriteLoader, type PixelLabSpriteLoader, PixelLabDirection } from './sprites/PixelLabSpriteLoader.js';
+import { findSprite, type SpriteTraits } from './sprites/SpriteRegistry.js';
+import { lookupSprite } from './sprites/SpriteService.js';
 import { ChunkManager3D } from './3d/ChunkManager3D.js';
 import { SpriteAtlasBuilder } from './3d/SpriteAtlasBuilder.js';
 import { InstancedSpriteRenderer } from './3d/InstancedSpriteRenderer.js';
@@ -299,6 +302,11 @@ export class Renderer3D {
   private instancedSpriteRenderer: InstancedSpriteRenderer | null = null;
   private instancedEntityIds: Set<string> = new Set(); // Track which entities use instanced rendering
 
+  // PixelLab sprite loading
+  private pixelLabLoader: PixelLabSpriteLoader;
+  private loadingSprites: Set<string> = new Set();
+  private failedSprites: Map<string, number> = new Map(); // folderId -> timestamp
+
   constructor(
     config: Partial<Renderer3DConfig> = {},
     chunkManager?: ChunkManager,
@@ -306,6 +314,9 @@ export class Renderer3D {
     pixelLabEntityRenderer?: PixelLabEntityRenderer
   ) {
     this.config = { ...DEFAULT_CONFIG, ...config };
+
+    // Initialize PixelLab sprite loader
+    this.pixelLabLoader = getPixelLabSpriteLoader();
 
     // Store terrain generator reference (chunkManager parameter kept for backwards compatibility but unused)
     if (terrainGenerator) this.terrainGenerator = terrainGenerator;
@@ -1033,8 +1044,7 @@ export class Renderer3D {
 
   /**
    * Add an entity's sprite to the texture atlas.
-   * Creates a placeholder sprite based on entity appearance.
-   * TODO: Integrate with PixelLabSpriteLoader for actual sprite images.
+   * Tries to load from PixelLabSpriteLoader first, falls back to placeholder.
    */
   private async addEntitySpriteToAtlas(entity: Entity, spriteKey: string): Promise<void> {
     if (!this.spriteAtlas) return;
@@ -1043,44 +1053,121 @@ export class Renderer3D {
     if (this.spriteAtlas.hasSprite(spriteKey)) return;
 
     try {
-      // Create a placeholder sprite based on entity properties
-      const canvas = document.createElement('canvas');
-      canvas.width = 48;
-      canvas.height = 48;
-      const ctx = canvas.getContext('2d');
-      if (!ctx) return;
+      // Try to get appearance component for sprite lookup
+      const appearance = entity.components.get('appearance') as {
+        species?: string;
+        gender?: string;
+        hairColor?: string;
+        skinTone?: string;
+      } | undefined;
 
-      // Get entity color based on appearance
-      const agent = entity.components.get(CT.Agent) as { appearance?: string } | undefined;
-      const appearance = agent?.appearance ?? 'default';
+      const animal = entity.components.get('animal') as { speciesId?: string } | undefined;
 
-      // Simple color hash based on appearance string
-      let colorHash = 0;
-      for (let i = 0; i < appearance.length; i++) {
-        colorHash = appearance.charCodeAt(i) + ((colorHash << 5) - colorHash);
+      // Build traits for sprite lookup
+      const traits: SpriteTraits = animal ? {
+        species: animal.speciesId,
+      } : {
+        species: appearance?.species || 'human',
+        gender: appearance?.gender,
+        hairColor: appearance?.hairColor,
+        skinTone: appearance?.skinTone,
+      };
+
+      // Find the best matching sprite folder
+      const spriteResult = lookupSprite(traits);
+      const spriteFolderId = spriteResult.folderId;
+
+      // Check if sprite has failed recently
+      const failedTime = this.failedSprites.get(spriteFolderId);
+      const RETRY_DELAY_MS = 5000;
+      if (failedTime !== undefined && Date.now() - failedTime < RETRY_DELAY_MS) {
+        // Too soon to retry, use placeholder
+        await this.addPlaceholderSprite(entity, spriteKey);
+        return;
       }
-      const hue = Math.abs(colorHash) % 360;
-      const color = `hsl(${hue}, 60%, 50%)`;
 
-      // Draw a simple humanoid placeholder
-      ctx.fillStyle = color;
+      // Try to load the PixelLab sprite
+      if (!this.pixelLabLoader.isLoaded(spriteFolderId)) {
+        if (!this.loadingSprites.has(spriteFolderId)) {
+          this.loadingSprites.add(spriteFolderId);
+          this.pixelLabLoader.loadCharacter(spriteFolderId)
+            .then(async (character) => {
+              this.loadingSprites.delete(spriteFolderId);
+              this.failedSprites.delete(spriteFolderId);
 
-      // Body (circle)
-      ctx.beginPath();
-      ctx.arc(24, 28, 12, 0, Math.PI * 2);
-      ctx.fill();
+              // Get the south-facing rotation image and add to atlas
+              const rotationImage = character.rotations.get('south');
+              if (rotationImage && this.spriteAtlas) {
+                const bitmap = await createImageBitmap(rotationImage);
+                this.spriteAtlas.addSprite(spriteKey, bitmap);
+              }
+            })
+            .catch(() => {
+              this.loadingSprites.delete(spriteFolderId);
+              this.failedSprites.set(spriteFolderId, Date.now());
+            });
+        }
+        // Add placeholder while loading
+        await this.addPlaceholderSprite(entity, spriteKey);
+        return;
+      }
 
-      // Head (smaller circle)
-      ctx.beginPath();
-      ctx.arc(24, 12, 8, 0, Math.PI * 2);
-      ctx.fill();
-
-      // Convert canvas to ImageBitmap and add to atlas
-      const bitmap = await createImageBitmap(canvas);
-      this.spriteAtlas.addSprite(spriteKey, bitmap);
+      // Sprite is loaded, get the character and add to atlas
+      const character = await this.pixelLabLoader.loadCharacter(spriteFolderId);
+      const rotationImage = character.rotations.get('south');
+      if (rotationImage) {
+        const bitmap = await createImageBitmap(rotationImage);
+        this.spriteAtlas.addSprite(spriteKey, bitmap);
+      } else {
+        // No rotation image found, use placeholder
+        await this.addPlaceholderSprite(entity, spriteKey);
+      }
     } catch (e) {
       console.warn('[Renderer3D] Failed to add sprite to atlas:', spriteKey, e);
+      await this.addPlaceholderSprite(entity, spriteKey);
     }
+  }
+
+  /**
+   * Add a placeholder sprite to the atlas for entities without PixelLab sprites.
+   */
+  private async addPlaceholderSprite(entity: Entity, spriteKey: string): Promise<void> {
+    if (!this.spriteAtlas || this.spriteAtlas.hasSprite(spriteKey)) return;
+
+    const canvas = document.createElement('canvas');
+    canvas.width = 48;
+    canvas.height = 48;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    // Get entity color based on appearance
+    const agent = entity.components.get(CT.Agent) as { appearance?: string } | undefined;
+    const appearance = agent?.appearance ?? 'default';
+
+    // Simple color hash based on appearance string
+    let colorHash = 0;
+    for (let i = 0; i < appearance.length; i++) {
+      colorHash = appearance.charCodeAt(i) + ((colorHash << 5) - colorHash);
+    }
+    const hue = Math.abs(colorHash) % 360;
+    const color = `hsl(${hue}, 60%, 50%)`;
+
+    // Draw a simple humanoid placeholder
+    ctx.fillStyle = color;
+
+    // Body (circle)
+    ctx.beginPath();
+    ctx.arc(24, 28, 12, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Head (smaller circle)
+    ctx.beginPath();
+    ctx.arc(24, 12, 8, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Convert canvas to ImageBitmap and add to atlas
+    const bitmap = await createImageBitmap(canvas);
+    this.spriteAtlas.addSprite(spriteKey, bitmap);
   }
 
   private addOrUpdateEntity(entity: Entity, x: number, y: number, elevation: number): void {
