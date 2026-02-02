@@ -8,6 +8,8 @@ export class DimensionalControls {
   private wLabel: HTMLSpanElement | null = null;
   private collapseButton: HTMLButtonElement | null = null;
   private phaseIndicator: HTMLSpanElement | null = null;
+  private floorSlider: HTMLInputElement | null = null;
+  private floorLabel: HTMLSpanElement | null = null;
 
   constructor() {
     // Create UI container
@@ -114,6 +116,41 @@ export class DimensionalControls {
   }
 
   /**
+   * Show floor selector for multi-floor buildings.
+   */
+  showFloorSelector(currentFloor: number, floors: Array<{ name?: string }>, onChange: (floor: number) => void): void {
+    this.hideAll();
+    this.container.style.display = 'block';
+
+    const label = document.createElement('label');
+    label.textContent = 'Floor: ';
+
+    this.floorSlider = document.createElement('input');
+    this.floorSlider.type = 'range';
+    this.floorSlider.min = '0';
+    this.floorSlider.max = String(floors.length - 1);
+    this.floorSlider.value = String(currentFloor);
+    this.floorSlider.style.width = '150px';
+    this.floorSlider.addEventListener('input', (e) => {
+      const value = parseInt((e.target as HTMLInputElement).value);
+      onChange(value);
+      if (this.floorLabel) {
+        const floorName = floors[value]?.name || `Floor ${value + 1}`;
+        this.floorLabel.textContent = `${floorName} (${value + 1}/${floors.length})`;
+      }
+    });
+
+    this.floorLabel = document.createElement('span');
+    const initialName = floors[currentFloor]?.name || `Floor ${currentFloor + 1}`;
+    this.floorLabel.textContent = `${initialName} (${currentFloor + 1}/${floors.length})`;
+    this.floorLabel.style.marginLeft = '10px';
+
+    this.container.appendChild(label);
+    this.container.appendChild(this.floorSlider);
+    this.container.appendChild(this.floorLabel);
+  }
+
+  /**
    * Hide all controls.
    */
   hideAll(): void {
@@ -123,6 +160,8 @@ export class DimensionalControls {
     this.wLabel = null;
     this.collapseButton = null;
     this.phaseIndicator = null;
+    this.floorSlider = null;
+    this.floorLabel = null;
   }
 
   /**

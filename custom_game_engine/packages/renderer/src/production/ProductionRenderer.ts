@@ -471,8 +471,7 @@ export class ProductionRenderer {
   }
 
   /**
-   * Render character using PixelLab or other AI service
-   * This is a placeholder - integrate with actual rendering service
+   * Render character using PixelLab via the sprite generation API
    */
   private async renderCharacter(
     prompt: ProductionPrompt,
@@ -481,13 +480,51 @@ export class ProductionRenderer {
     // Build description for PixelLab
     const description = this.buildPixelLabDescription(prompt);
 
+    // Generate a unique folder ID for this production render
+    const folderId = `production_${Date.now()}_${Math.random().toString(36).substring(7)}`;
 
-    // TODO: Integrate with PixelLab MCP or other rendering service
-    // For now, return placeholder
-    return {
-      imageUrl: `/assets/productions/placeholder_${resolution}.png`,
-      imageData: undefined,
-    };
+    // Queue the sprite generation via metrics server API
+    try {
+      const response = await fetch('http://localhost:8766/api/sprites/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          folderId,
+          description: `${description}, ${prompt.detailLevel}, ${prompt.shading}, ${prompt.lighting} lighting, pixel art style`,
+          traits: {
+            category: 'production',
+            size: Math.min(resolution, 200), // PixelLab Bitforge max is 200x200
+            production: true,
+            pose: prompt.pose,
+            expression: prompt.expression,
+            resolution: resolution,
+          },
+        }),
+      });
+
+      if (!response.ok) {
+        console.warn('[ProductionRenderer] Failed to queue sprite generation:', response.statusText);
+        // Fall back to placeholder
+        return {
+          imageUrl: `/assets/productions/placeholder_${resolution}.png`,
+          imageData: undefined,
+        };
+      }
+
+      // Return the expected path where the sprite will be generated
+      // The daemon will save sprites to /assets/sprites/pixellab/{folderId}/
+      return {
+        imageUrl: `/assets/sprites/pixellab/${folderId}/south.png`,
+        imageData: undefined,
+      };
+    } catch (error) {
+      console.warn('[ProductionRenderer] Error queuing sprite generation:', error);
+      // Fall back to placeholder on network errors
+      return {
+        imageUrl: `/assets/productions/placeholder_${resolution}.png`,
+        imageData: undefined,
+      };
+    }
   }
 
   /**

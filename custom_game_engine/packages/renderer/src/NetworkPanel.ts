@@ -38,6 +38,15 @@ interface InputField {
   focused: boolean;
 }
 
+interface RadioButton {
+  x: number;
+  y: number;
+  radius: number;
+  label: string;
+  value: string;
+  selected: boolean;
+}
+
 export class NetworkPanel implements IWindowPanel {
   private visible: boolean = false;
   private networkManager: MultiverseNetworkManager;
@@ -45,8 +54,10 @@ export class NetworkPanel implements IWindowPanel {
   // UI state
   private buttons: Button[] = [];
   private inputFields: InputField[] = [];
+  private radioButtons: RadioButton[] = [];
   private selectedPeerId: PeerId | null = null;
   private showPassageDialog: boolean = false;
+  private selectedViewMode: 'none' | 'observe' | 'participate' = 'observe';
 
   // Input state
   private connectAddressInput: InputField;
@@ -130,6 +141,10 @@ export class NetworkPanel implements IWindowPanel {
     height: number,
     _world?: World
   ): void {
+    // Clear interactive element arrays before re-registering
+    this.buttons = [];
+    this.radioButtons = [];
+
     // Clear background
     ctx.fillStyle = '#1a1a1a';
     ctx.fillRect(x, y, width, height);
@@ -192,6 +207,18 @@ export class NetworkPanel implements IWindowPanel {
         adjustedY <= button.y + button.height
       ) {
         button.action();
+        return true;
+      }
+    }
+
+    // Check radio buttons
+    for (const radio of this.radioButtons) {
+      const dx = x - radio.x;
+      const dy = adjustedY - radio.y;
+      // Check if click is within the radio button circle or its label area
+      if (dx * dx + dy * dy <= radio.radius * radio.radius * 4 ||
+          (dx >= 0 && dx <= 100 && Math.abs(dy) <= radio.radius)) {
+        this.selectedViewMode = radio.value as 'none' | 'observe' | 'participate';
         return true;
       }
     }
@@ -486,9 +513,20 @@ export class NetworkPanel implements IWindowPanel {
       { label: 'Participate', value: 'participate' },
     ];
 
-    // TODO: Add view mode selection UI
+    // Render view mode radio buttons
+    for (const mode of viewModes) {
+      this.renderRadioButton(ctx, {
+        x: x + 30,
+        y: currentY,
+        radius: 8,
+        label: mode.label,
+        value: mode.value,
+        selected: this.selectedViewMode === mode.value,
+      });
+      currentY += 25;
+    }
 
-    currentY += 100;
+    currentY += 15;
 
     // Buttons
     this.renderButton(
@@ -611,6 +649,43 @@ export class NetworkPanel implements IWindowPanel {
   }
 
   /**
+   * Render radio button
+   */
+  private renderRadioButton(
+    ctx: CanvasRenderingContext2D,
+    radio: RadioButton,
+    register: boolean = true
+  ): void {
+    if (register) {
+      this.radioButtons.push(radio);
+    }
+
+    const radius = radio.radius;
+
+    // Outer circle
+    ctx.strokeStyle = radio.selected ? '#4a9eff' : '#666';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.arc(radio.x, radio.y, radius, 0, Math.PI * 2);
+    ctx.stroke();
+
+    // Inner circle (filled if selected)
+    if (radio.selected) {
+      ctx.fillStyle = '#4a9eff';
+      ctx.beginPath();
+      ctx.arc(radio.x, radio.y, radius * 0.5, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    // Label
+    ctx.fillStyle = radio.selected ? '#fff' : '#ccc';
+    ctx.font = '12px monospace';
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(radio.label, radio.x + radius + 8, radio.y);
+  }
+
+  /**
    * Render scrollbar
    */
   private renderScrollbar(
@@ -682,7 +757,7 @@ export class NetworkPanel implements IWindowPanel {
         remoteUniverseId,
         remotePeerId: this.selectedPeerId,
         creatorId: 'player',
-        viewMode: 'observe',
+        viewMode: this.selectedViewMode,
         interactionMode: 'limited',
       });
 
@@ -707,6 +782,7 @@ export class NetworkPanel implements IWindowPanel {
    */
   private updateState(): void {
     this.buttons = [];
+    this.radioButtons = [];
     this.connectedPeers = this.networkManager.getConnectedPeers();
     this.remotePassages = Array.from(
       this.networkManager.getAllRemotePassages().values()

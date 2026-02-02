@@ -735,8 +735,10 @@ export class Renderer {
           }
           // 3D multi-floor or standard layout
           else if (blueprint.floors && blueprint.floors.length > 0) {
-            // Use first floor for now (TODO: floor selection UI)
-            layoutToRender = blueprint.floors[0]?.layout;
+            // Get current floor from building state, default to 0
+            const currentFloor = this.buildingRenderer.getFloor(entity.id);
+            const floorIndex = Math.min(currentFloor, blueprint.floors.length - 1);
+            layoutToRender = blueprint.floors[floorIndex]?.layout;
           }
           else if (blueprint.layout) {
             layoutToRender = blueprint.layout;
@@ -955,14 +957,24 @@ export class Renderer {
       return;
     }
 
-    // Only show controls for dimensional or realm pocket buildings
-    if (!blueprint.dimensional && !blueprint.realmPocket) {
+    // Only show controls for dimensional, realm pocket, or multi-floor buildings
+    const hasMultipleFloors = blueprint.floors && blueprint.floors.length > 1;
+    if (!blueprint.dimensional && !blueprint.realmPocket && !hasMultipleFloors) {
       this.selectedDimensionalBuildingId = null;
       this.dimensionalControls.hideAll();
       return;
     }
 
     this.selectedDimensionalBuildingId = entity.id;
+
+    // Multi-floor buildings - show floor selector
+    if (hasMultipleFloors && !blueprint.dimensional) {
+      const currentFloor = this.buildingRenderer.getFloor(entity.id);
+      this.dimensionalControls.showFloorSelector(currentFloor, blueprint.floors!, (newFloor) => {
+        this.buildingRenderer.setFloor(entity.id, newFloor);
+      });
+      return;
+    }
 
     // 4D W-axis buildings - show slider
     if (blueprint.dimensional?.w_axis) {

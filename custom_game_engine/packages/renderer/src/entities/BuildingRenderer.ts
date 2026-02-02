@@ -11,7 +11,7 @@ export class BuildingRenderer {
   public showResourceAmounts: boolean = true;
 
   // Dimensional building state (per-building)
-  private dimensionalState: Map<string, { currentWSlice: number; currentVPhase: number; collapsedUState: number }> = new Map();
+  private dimensionalState: Map<string, { currentWSlice: number; currentVPhase: number; collapsedUState: number; currentFloor: number }> = new Map();
 
   // PERF: Cache formatted building type labels to avoid string operations per frame
   // Building types are static, so this is a permanent cache
@@ -29,7 +29,8 @@ export class BuildingRenderer {
       this.dimensionalState.set(buildingId, {
         currentWSlice: dimensional?.w_axis?.currentSlice || 0,
         currentVPhase: dimensional?.v_axis?.currentPhase || 0,
-        collapsedUState: dimensional?.u_axis?.collapsed ? 0 : -1 // -1 = not collapsed yet
+        collapsedUState: dimensional?.u_axis?.collapsed ? 0 : -1, // -1 = not collapsed yet
+        currentFloor: 0
       });
     }
     return this.dimensionalState.get(buildingId)!;
@@ -39,8 +40,32 @@ export class BuildingRenderer {
    * Get dimensional state for rendering (public access for Renderer).
    * Returns undefined if building has no dimensional state yet.
    */
-  getDimensionalStateForRendering(buildingId: string): { currentWSlice: number; currentVPhase: number; collapsedUState: number } | undefined {
+  getDimensionalStateForRendering(buildingId: string): { currentWSlice: number; currentVPhase: number; collapsedUState: number; currentFloor: number } | undefined {
     return this.dimensionalState.get(buildingId);
+  }
+
+  /**
+   * Set the current floor for a multi-floor building.
+   */
+  setFloor(buildingId: string, floor: number): void {
+    const state = this.dimensionalState.get(buildingId);
+    if (state) {
+      state.currentFloor = floor;
+    } else {
+      this.dimensionalState.set(buildingId, {
+        currentWSlice: 0,
+        currentVPhase: 0,
+        collapsedUState: -1,
+        currentFloor: floor
+      });
+    }
+  }
+
+  /**
+   * Get the current floor for a building.
+   */
+  getFloor(buildingId: string): number {
+    return this.dimensionalState.get(buildingId)?.currentFloor ?? 0;
   }
 
   /**
