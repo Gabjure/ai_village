@@ -18,7 +18,9 @@ import type { StoredMetric } from '../metrics/MetricsStorage.js';
 import { CanonEventRecorder, type CanonEventConfig } from '../metrics/CanonEventRecorder.js';
 import type { AgentComponent } from '../components/AgentComponent.js';
 import type { IdentityComponent } from '../components/IdentityComponent.js';
+import type { TemperatureComponent } from '../components/TemperatureComponent.js';
 import type { TimeComponent } from './TimeSystem.js';
+import { BODY_TEMP_NORMAL } from '../constants/NeedsConstants.js';
 import { STAGGER } from '../ecs/SystemThrottleConfig.js';
 
 interface MetricsCollectionConfig {
@@ -970,6 +972,10 @@ export class MetricsCollectionSystem extends BaseSystem {
         );
       }
 
+      // Get temperature from TemperatureComponent if available, otherwise use normal body temp
+      const tempComponent = agent.getComponent<TemperatureComponent>(CT.Temperature);
+      const temperature = tempComponent?.currentTemp ?? BODY_TEMP_NORMAL;
+
       try {
         this.collector.sampleMetrics(
           agent.id,
@@ -977,7 +983,7 @@ export class MetricsCollectionSystem extends BaseSystem {
             hunger: needs.hunger,
             thirst: needs.thirst,
             energy: needs.energy,
-            temperature: 20, // TODO: Add temperature component
+            temperature,
             health: needs.health,
           },
           Date.now()

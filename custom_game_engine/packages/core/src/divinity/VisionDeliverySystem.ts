@@ -260,6 +260,7 @@ export class VisionDeliverySystem {
       targetName: this.getTargetName(targetId),
       content: content.subject,
       powerType: method,
+      symbols: content.symbols ?? [],
       cost,
       timestamp: this.world.tick,
       wasReceived: false,
