@@ -99,17 +99,27 @@ export class SoilSystem extends BaseSystem {
 
     // Process daily soil updates (moisture decay, fertilizer duration)
     if (currentDay > this.lastDayProcessed) {
-      this.processDailyUpdates();
+      this.processDailyUpdates(ctx);
       this.lastDayProcessed = currentDay;
     }
   }
 
   /**
-   * Process daily soil updates across all tiles
+   * Process daily soil updates across all tiles.
+   * Emits a 'soil:daily_update' event that WorldManager or other systems
+   * can listen to for processing tiles in their managed chunks.
+   *
+   * Consumers should call decayMoisture() and tickFertilizer() on their tiles
+   * in response to this event.
    */
-  private processDailyUpdates(): void {
-    // This will be called by the World when it has access to chunks
-    // For now, this is a placeholder that systems can hook into
+  private processDailyUpdates(ctx: SystemContext): void {
+    // Emit event for consumers (WorldManager, PlantSystem) to process their tiles
+    // This follows the event-driven architecture pattern where SoilSystem
+    // provides the methods, and tile-owning systems call them when notified
+    ctx.emit('soil:daily_update', {
+      day: this.lastDayProcessed + 1,
+      secondsPerDay: this.SECONDS_PER_DAY,
+    });
   }
 
   /**

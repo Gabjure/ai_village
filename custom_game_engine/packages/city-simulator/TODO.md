@@ -16,16 +16,9 @@ The city-simulator package is a well-implemented, fully functional demo package 
 
 ## Unused Code (Clean-up Opportunities)
 
-- [ ] `HeadlessCitySimulator.ts:37` - Unused imports: `TerrainGenerator`, `ChunkManager`
-  - **Impact**: Minor - unused imports increase bundle size slightly
-  - **Fix**: Remove unused imports from line 37
-  ```typescript
-  // Current:
-  import { createWanderingAgent, TerrainGenerator, ChunkManager } from '@ai-village/world';
-
-  // Should be:
-  import { createWanderingAgent } from '@ai-village/world';
-  ```
+- [x] `HeadlessCitySimulator.ts` - Unused imports: `TerrainGenerator`, `ChunkManager`
+  - **Status**: RESOLVED - These imports have been removed from the codebase
+  - No `@ai-village/world` imports exist in the current implementation
 
 ## Missing Testing Infrastructure
 

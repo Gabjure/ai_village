@@ -104,12 +104,16 @@ export class WeatherSystem extends BaseSystem {
     const newIntensity = this.selectIntensity(pattern);
     const newDuration = this.selectDuration(pattern);
 
+    // Calculate tempModifier scaled by intensity (base modifier * intensity)
+    const tempModifier = pattern.temperatureModifier * newIntensity;
+
     comps.update(CT.Weather, (current: WeatherComponent) => ({
       ...current,
       weatherType: newWeatherType,
       intensity: newIntensity,
       duration: newDuration,
       movementModifier: 1.0 - (1.0 - pattern.movementModifier) * newIntensity,
+      tempModifier,
     }));
 
     // Emit weather change event if type actually changed

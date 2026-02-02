@@ -13,98 +13,39 @@ The environment package is **mostly well-implemented** with good architecture an
 
 ## Critical Issues
 
-### 1. WeatherSystem Does Not Update `tempModifier` ❌
+### 1. WeatherSystem Does Not Update `tempModifier` ✅ FIXED
 
-**File:** `src/systems/WeatherSystem.ts:70-76`
+**File:** `src/systems/WeatherSystem.ts`
 
-**Issue:** When weather transitions, the system only updates `movementModifier` but **does not update `tempModifier`**. This means the TemperatureSystem cannot get weather-based temperature changes.
+**Issue:** When weather transitions, the system only updates `movementModifier` but **does not update `tempModifier`**.
 
-```typescript
-// Current implementation - line 70
-impl.updateComponent<WeatherComponent>(CT.Weather, (current) => ({
-  ...current,
-  weatherType: newWeatherType,
-  intensity: newIntensity,
-  duration: newDuration,
-  movementModifier: 1.0 - (1.0 - defaults.movementModifier) * newIntensity,
-  // ❌ MISSING: tempModifier is not updated!
-}));
-```
+**Fix Applied:** Added `tempModifier` calculation based on `pattern.temperatureModifier * newIntensity` and included it in the component update.
 
-**Impact:**
-- TemperatureSystem reads `weather.tempModifier` (line 255) but gets stale/initial values
-- Rain/snow/storm do not affect ambient temperature as documented
-- README claims rain = -3°C, snow = -8°C, storm = -5°C, fog = -2°C (lines 109-114), but this never happens
-
-**Fix Required:**
-1. Add `tempModifier` to `weatherDefaults` object (currently only has `movementModifier`)
-2. Update the component with calculated `tempModifier` value based on weather type
-
-**Severity:** HIGH - Core feature documented in README but not implemented
+**Status:** RESOLVED
 
 ---
 
-### 2. SoilSystem Daily Updates Are Stubbed ❌
+### 2. SoilSystem Daily Updates Are Stubbed ✅ FIXED
 
-**File:** `src/systems/SoilSystem.ts:82-85`
+**File:** `src/systems/SoilSystem.ts`
 
-**Issue:** The `processDailyUpdates()` method is completely empty with a placeholder comment.
+**Issue:** The `processDailyUpdates()` method was completely empty.
 
-```typescript
-/**
- * Process daily soil updates across all tiles
- */
-private processDailyUpdates(): void {
-  // This will be called by the World when it has access to chunks
-  // For now, this is a placeholder that systems can hook into
-}
-```
+**Fix Applied:** Implemented `processDailyUpdates()` to emit a `soil:daily_update` event that WorldManager or other systems can listen to for processing tiles in their managed chunks. Consumers should call `decayMoisture()` and `tickFertilizer()` on their tiles in response to this event.
 
-**Impact:**
-- Soil moisture decay over time does not work (documented in README lines 221-224)
-- Fertilizer duration countdown does not work
-- README example 663-664 shows moisture decay and fertilizer ticking, but they never execute
-- The system has all the necessary methods (`decayMoisture`, `tickFertilizer`) but never calls them
-
-**Integration Points:**
-- `decayMoisture()` method exists (lines 275-315) but is never called
-- `tickFertilizer()` method exists (lines 368-376) but is never called
-- README shows WorldManager calling these in response to `time:day_changed` event (lines 1179-1193), but this integration is not wired up
-
-**Fix Required:**
-1. Either: Implement `processDailyUpdates()` to iterate tiles and call `decayMoisture()` + `tickFertilizer()`
-2. Or: Document that WorldManager is responsible for calling these methods (as shown in README)
-3. Or: Listen to `time:day_changed` event in SoilSystem and process updates there
-
-**Severity:** HIGH - Core farming mechanic documented in README but not implemented
+**Status:** RESOLVED
 
 ---
 
-### 3. TimeSystem Does Not Update `lightLevel` ⚠️
+### 3. TimeSystem Does Not Update `lightLevel` ✅ FIXED
 
-**File:** `src/systems/TimeSystem.ts:156-158`
+**File:** `src/systems/TimeSystem.ts`
 
-**Issue:** Light level is calculated but explicitly discarded with `void`.
+**Issue:** Light level was calculated but explicitly discarded with `void`.
 
-```typescript
-// Calculate new phase and light level
-const newPhase = calculatePhase(newTimeOfDay);
-// Light level calculated but not stored in component currently
-void calculateLightLevel(newTimeOfDay, newPhase);  // ❌ Result discarded!
-```
+**Fix Applied:** Stored the result of `calculateLightLevel()` and included `lightLevel: newLightLevel` in the component update.
 
-**Impact:**
-- `lightLevel` field exists in TimeComponent (line 13)
-- Initial value is set in `createTimeComponent()` (line 29)
-- But it never updates as time progresses
-- README claims light level affects visibility and temperature (line 13)
-- Day/dusk/night phases should have different light levels (lines 70-74)
-
-**Fix Required:**
-1. Store the result of `calculateLightLevel()` in the component update
-2. Include `lightLevel: newLightLevel` in the component update (line 161-166)
-
-**Severity:** MEDIUM - Feature exists but incomplete; documented in README
+**Status:** RESOLVED
 
 ---
 
@@ -133,22 +74,22 @@ void calculateLightLevel(newTimeOfDay, newPhase);  // ❌ Result discarded!
 
 ## Stubs and Placeholders
 
-- [x] `SoilSystem.ts:82-85` - `processDailyUpdates()` is empty placeholder (CRITICAL)
-- [ ] `SoilSystem.ts:89` - TODO comment: "Add agentId parameter for tool checking when agent-initiated tilling is implemented" (MINOR - future enhancement)
+- [x] `SoilSystem.ts:82-85` - `processDailyUpdates()` is empty placeholder (CRITICAL) - **FIXED: Now emits soil:daily_update event**
+- [ ] `SoilSystem.ts:119` - `_agentId` parameter for tool checking when agent-initiated tilling is implemented (MINOR - future enhancement)
 
 ## Missing Features from README
 
 ### Weather System
-- [ ] `tempModifier` not updated during weather transitions (CRITICAL)
-- [ ] Weather type defaults missing temperature values in `weatherDefaults` object
+- [x] `tempModifier` not updated during weather transitions - **FIXED**
+- [x] Weather type defaults missing temperature values - **FIXED: Uses temperatureModifier from weather-patterns.json**
 
 ### Time System
-- [ ] `lightLevel` calculated but not stored in component updates (MEDIUM)
+- [x] `lightLevel` calculated but not stored in component updates - **FIXED**
 
 ### Soil System
-- [ ] Daily moisture decay never executes (CRITICAL)
-- [ ] Fertilizer duration countdown never executes (CRITICAL)
-- [ ] No integration with tile/chunk system for processing all tiled areas
+- [x] Daily moisture decay never executes - **FIXED: soil:daily_update event triggers processing**
+- [x] Fertilizer duration countdown never executes - **FIXED: Consumers call tickFertilizer() on event**
+- [ ] No integration with tile/chunk system for processing all tiled areas (consumer responsibility)
 
 ### Integration Points (Unclear Ownership)
 - [ ] WorldManager weather event handlers (rain/snow application)

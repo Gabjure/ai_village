@@ -1,4 +1,4 @@
-const WS_URL = 'ws://localhost:8765';
+const WS_URL = 'ws://localhost:8766';
 const RECONNECT_DELAY = 3000;
 const MAX_RECONNECT_ATTEMPTS = 10;
 

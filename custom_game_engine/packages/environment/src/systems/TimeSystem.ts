@@ -172,8 +172,7 @@ export class TimeSystem extends BaseSystem {
       // Calculate new phase, light level, and season
       const newPhase = calculatePhase(newTimeOfDay);
       const newSeason = calculateSeason(newDay);
-      // Light level calculated but not stored in component currently
-      void calculateLightLevel(newTimeOfDay, newPhase);
+      const newLightLevel = calculateLightLevel(newTimeOfDay, newPhase);
 
       // Update component
       impl.updateComponent<TimeComponent>(CT.Time, (current) => ({
@@ -182,7 +181,8 @@ export class TimeSystem extends BaseSystem {
         phase: newPhase,
         day: newDay,
         season: newSeason,
-        }));
+        lightLevel: newLightLevel,
+      }));
 
       // Emit phase change event if phase changed
       if (this.lastPhase !== null && this.lastPhase !== newPhase) {

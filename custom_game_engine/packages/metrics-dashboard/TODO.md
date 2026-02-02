@@ -19,11 +19,11 @@ The metrics-dashboard package is **mostly complete** with working React componen
 
 ## Critical Issues
 
-### 1. WebSocket Port Mismatch (BLOCKING)
+### 1. WebSocket Port Mismatch ✅ FIXED
 - **File:** `src/utils/websocket.ts:1`
 - **Issue:** WebSocket connects to `ws://localhost:8765` but README says server runs on port `8766`
-- **Impact:** Dashboard cannot receive real-time updates
-- **Fix:** Change `WS_URL` to `'ws://localhost:8766'` to match metrics server
+- **Fix Applied:** Changed `WS_URL` to `'ws://localhost:8766'` to match metrics server
+- **Status:** RESOLVED
 
 ### 2. Missing Backend API Endpoints (BLOCKING)
 - **Issue:** Dashboard expects HTTP REST API at `/api/metrics/*` but these endpoints don't exist in `metrics-server.ts`
@@ -115,20 +115,14 @@ None found. All exported functions/components are used.
 | Component | Expected Port | Actual Port | Status |
 |-----------|--------------|-------------|---------|
 | HTTP API | 8766 | 8766 | ✅ Correct |
-| WebSocket | 8765 | 8766 | ❌ **WRONG** |
+| WebSocket | 8766 | 8766 | ✅ FIXED |
 | Dashboard UI | 8766 | 8766 | ✅ Correct |
 
 ## Priority Fixes
 
-### 1. Fix WebSocket Port (CRITICAL - 5 minutes)
+### 1. Fix WebSocket Port ✅ FIXED
 **File:** `src/utils/websocket.ts:1`
-```typescript
-// BEFORE:
-const WS_URL = 'ws://localhost:8765';
-
-// AFTER:
-const WS_URL = 'ws://localhost:8766';
-```
+**Status:** WebSocket URL changed from `ws://localhost:8765` to `ws://localhost:8766`
 
 ### 2. Implement HTTP API Endpoints (CRITICAL - 2-4 hours)
 **File:** `scripts/metrics-server.ts`
