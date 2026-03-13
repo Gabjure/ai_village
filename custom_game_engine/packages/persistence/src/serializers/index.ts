@@ -37,6 +37,10 @@ import { CourtshipSerializer } from './CourtshipSerializer.js';
 // Admin Angel serializer (handles Map in AdminAngelMemory.agentFamiliarity)
 import { AdminAngelSerializer } from './AdminAngelSerializer.js';
 
+// Sprint 3 component serializers (handle Map fields)
+import { MarketStateSerializer } from './MarketStateSerializer.js';
+import { TechnologyUnlockSerializer } from './TechnologyUnlockSerializer.js';
+
 /**
  * Register all component serializers.
  * Called automatically when this module is imported.
@@ -77,6 +81,10 @@ export function registerAllSerializers(): void {
   // Register admin_angel serializer (handles Map in AdminAngelMemory.agentFamiliarity)
   componentSerializerRegistry.register('admin_angel', new AdminAngelSerializer());
 
+  // Register Sprint 3 serializers (components with Map fields)
+  componentSerializerRegistry.register('market_state', new MarketStateSerializer());
+  componentSerializerRegistry.register('technology_unlock', new TechnologyUnlockSerializer());
+
   // Register generic serializers for all other components
   // These can be replaced with specific serializers later
   const genericComponents = [
@@ -111,6 +119,7 @@ export function registerAllSerializers(): void {
     'crafting_station',
     'deity',
     'divine_power',
+    'divine_ability',  // DivineAbility component (newer name)
     'avatar',
     'angel',
     'blessed',
@@ -181,6 +190,176 @@ export function registerAllSerializers(): void {
     'realm',
     'llm_history', // LLM interaction history for debugging UI
     'mutation_vector', // Entity-local mutation rates for StateMutatorSystem
+    'working_animal',  // Working animal roles, skills, tasks (Phase 2)
+    'animal_group',    // Pack/herd social structures (Phase 5)
+
+    // --- Sprint 1 additions ---
+    'movement_intention',  // Factorio-style movement optimization
+
+    // --- Sprint 2 additions ---
+    'behavior',            // Agent behavior queue
+    'exploration_mission', // Active exploration mission
+    'knowledge_loss',      // Singleton: tracks knowledge lost from deaths
+    'intelligence',        // LLM model quality / thinking depth
+
+    // --- Sprint 3 additions (governance) ---
+    'village_governance',
+    'city_governance',
+    'province_governance',
+    'nation_governance',
+    'empire_governance',
+    'federation_governance',
+    'galactic_council',
+    'governor',
+    'political_entity',
+    'governance_history',
+    'directive_acknowledgment',
+    'governance_archive',
+    'negotiation',
+    'dynasty',
+    'province',
+    'nation',
+    'empire',
+
+    // --- Sprint 3 additions (economy) ---
+    'currency',
+    // 'market_state' - has specific serializer (Map fields)
+    'shipping_lane',
+    'trade_caravan',
+    'trade_network',
+    'blockade',
+    'mining_operation',
+
+    // --- Sprint 3 additions (technology) ---
+    // 'technology_unlock' - has specific serializer (Map fields)
+    'technology_era',
+    'knowledge_repository',
+    'uplift_agreement',
+    'civilization_reputation',
+
+    // --- Sprint 3 additions (building) ---
+    'building_condition',
+    'building_upgrade',
+
+    // --- Sprint 3 additions (bodyReproduction) ---
+    'postpartum',
+    'infant',
+    'nursing',
+    'parasitic_colonization',
+    'collective_mind',
+
+    // --- Sprint 3 additions (animals) ---
+    'bioluminescent',
+
+    // --- Sprint 3 additions (combat) ---
+    'pack_member',
+    'hive_queen',
+    'hive_worker',
+    'projectile',
+    'burning',
+
+    // --- Sprint 3 additions (research / publishing) ---
+    'library',
+    'bookstore',
+    'university',
+    'university_library',
+    'biography',
+    'publishing_company',
+    'newspaper',
+
+    // --- City / uplift (Sprint 3+) ---
+    'city_director',
+    'profession',
+    'uplift_candidate',
+    'uplift_program',
+    'uplifted_trait',
+    'proto_sapience',
+    'settlement',
+
+    // --- Multiverse / time (Sprint 4+, register now for forward compatibility) ---
+    'corrupted',
+    'universe_fork_metadata',
+    'divergence_tracking',
+    'canon_event',
+    'causal_chain',
+    'merge_compatibility',
+    'timeline_merger_operation',
+    'time_compression',
+    'time_compression_snapshot',
+    'passage_extended',
+
+    // --- Divinity / rebellion (Sprint 4+) ---
+    'reality_anchor',
+    'rebellion_threshold',
+    'supreme_creator',
+    'power_vacuum',
+    'position_holder',
+    'dimensional_rift',
+    'rebellion_outcome',
+
+    // --- Soul / death (Sprint 3+) ---
+    'silver_thread',
+    'plot_lines',
+    'current_life_memory',
+    'veil_of_forgetting',
+    'planet_location',
+
+    // --- Television (Sprint 4+) ---
+    'tv_content',
+    'tv_station',
+    'tv_show',
+    'tv_broadcast',
+    'recording',
+    'video_replay',
+
+    // --- Navigation / fleet (Sprint 4+) ---
+    'spaceship',
+    'ship_crew',
+    'squadron',
+    'fleet',
+    'armada',
+    'navy',
+    'rainbow_planet',
+    'planet_travel',
+    'planet_portal',
+    'emotion_theater',
+    'memory_hall',
+    'meditation_chamber',
+    'heart_chamber',
+    'straggler',
+
+    // --- Invasion / megastructures (Sprint 4+) ---
+    'invasion',
+    'megastructure',
+    'construction_project',
+    'archaeological_site',
+    'probability_scout_mission',
+    'svetz_retrieval_mission',
+
+    // --- Automation (Sprint 4+) ---
+    'belt',
+    'assembly_machine',
+    'machine_connection',
+    'machine_placement',
+    'roboport',
+    'robot',
+    'logistics_chest',
+    'chunk_production_state',
+    'factory_ai',
+    'production_capability',
+
+    // --- Player / progression ---
+    'milestone',
+    'generated_content',
+    'god_crafted_artifact',
+    'discovery_marker',
+    'avatar_entity',
+    'avatar_roster',
+
+    // --- Multi-village (Sprint 4+) ---
+    'village',
+    'trade_route',
+    'inter_village_caravan',
   ];
 
   for (const componentType of genericComponents) {
@@ -251,3 +430,7 @@ export * from './SpatialMemorySerializer.js';
 export * from './JournalSerializer.js';
 export * from './CourtshipSerializer.js';
 export * from './AdminAngelSerializer.js';
+
+// Sprint 3 specific serializers
+export { MarketStateSerializer } from './MarketStateSerializer.js';
+export { TechnologyUnlockSerializer } from './TechnologyUnlockSerializer.js';

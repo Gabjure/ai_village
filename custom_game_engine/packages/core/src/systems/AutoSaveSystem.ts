@@ -58,6 +58,11 @@ export class AutoSaveSystem extends BaseSystem {
   /** Pending name generation requests (checkpoint key -> request tick) */
   private pendingNameRequests = new Map<string, number>();
 
+  /** Real-time auto-save: timestamp of last 60-second save (ms) */
+  private lastRealTimeSaveMs: number = 0;
+  /** Real-time auto-save interval in milliseconds (60 seconds) */
+  private static readonly REAL_TIME_SAVE_INTERVAL_MS = 60_000;
+
   /**
    * Create an AutoSaveSystem.
    *
@@ -99,6 +104,18 @@ export class AutoSaveSystem extends BaseSystem {
     }
 
     this.lastSaveDay = currentDay;
+
+    // Real-time auto-save every 60 seconds (crash recovery, not time-travel)
+    const nowMs = Date.now();
+    if (this.lastRealTimeSaveMs === 0) {
+      // Initialize on first tick — don't save immediately
+      this.lastRealTimeSaveMs = nowMs;
+    } else if (nowMs - this.lastRealTimeSaveMs >= AutoSaveSystem.REAL_TIME_SAVE_INTERVAL_MS) {
+      this.lastRealTimeSaveMs = nowMs;
+      saveLoadService.autoSave(world).catch((error) => {
+        console.error('[AutoSave] Real-time auto-save failed:', error);
+      });
+    }
 
     // Process pending LLM name generation responses
     if (this.llmQueue) {
