@@ -336,6 +336,8 @@ export {
   type FeatureFlags,
   ALL_SYSTEMS_ON,
   SPRINT_1_FLAGS,
+  SPRINT_2_FLAGS,
+  getSprintFlags,
   getActiveFeatureFlags,
   getFeatureFlagSummary,
 } from './FeatureFlags.js';

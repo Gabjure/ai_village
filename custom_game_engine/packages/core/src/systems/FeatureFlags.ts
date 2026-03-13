@@ -207,6 +207,36 @@ export const SPRINT_1_FLAGS: Readonly<FeatureFlags> = {
   advancedComms: false,
 };
 
+/**
+ * Sprint 2: Living World
+ *
+ * NPCs walk, talk, have needs. Plants grow. Basic skills.
+ * Extends Sprint 1 with: plants, agentBrain, memory, social, exploration, skills.
+ */
+export const SPRINT_2_FLAGS: Readonly<FeatureFlags> = {
+  ...SPRINT_1_FLAGS,
+
+  // ON: Living world additions
+  plants: true,
+  agentBrain: true,
+  memory: true,
+  social: true,
+  exploration: true,
+  skills: true,
+};
+
+/**
+ * Look up the flags preset for a given sprint number.
+ * Defaults to ALL_SYSTEMS_ON for unknown sprint values.
+ */
+export function getSprintFlags(sprint: number): Readonly<FeatureFlags> {
+  switch (sprint) {
+    case 1: return SPRINT_1_FLAGS;
+    case 2: return SPRINT_2_FLAGS;
+    default: return ALL_SYSTEMS_ON;
+  }
+}
+
 // --- Runtime query ---
 
 let _activeFlags: FeatureFlags = { ...ALL_SYSTEMS_ON };

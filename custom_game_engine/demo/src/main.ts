@@ -75,6 +75,8 @@ import {
   createPlayerControlComponent,
   createVelocityComponent,
   PlayerInputSystem,
+  // Feature flags (sprint gating)
+  getSprintFlags,
 } from '@ai-village/core';
 import { saveLoadService, IndexedDBStorage, migrateLocalSaves, checkMigrationStatus, planetClient, multiverseClient, creationStateManager, EntityPersistenceStream, type PlanetMetadata, type CreationState, type SettlementData } from '@ai-village/persistence';
 import { LiveEntityAPI } from '@ai-village/metrics';
@@ -850,6 +852,13 @@ async function registerAllSystems(
     PlantDiseaseSystem: BotanyPlantDiseaseSystem,
     WildPlantPopulationSystem: BotanyWildPlantPopulationSystem,
   };
+  // Select feature flags based on VITE_MVEE_SPRINT env var (defaults to all systems)
+  const sprintNumber = parseInt(import.meta.env.VITE_MVEE_SPRINT || '0', 10);
+  const featureFlags = sprintNumber > 0 ? getSprintFlags(sprintNumber) : undefined;
+  if (featureFlags) {
+    console.log(`[Main] Using Sprint ${sprintNumber} feature flags`);
+  }
+
   const coreResult = coreRegisterAllSystems(gameLoop, {
     llmQueue: llmQueue || undefined,
     promptBuilder: promptBuilder || undefined,
@@ -861,6 +870,7 @@ async function registerAllSystems(
     plantSystems,
     chunkManager,
     terrainGenerator,
+    featureFlags,
   });
 
   // Set up plant species lookup (injected from @ai-village/world)
