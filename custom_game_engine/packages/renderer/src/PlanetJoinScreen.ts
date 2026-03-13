@@ -40,6 +40,8 @@ const BIOME_CONFIG: Record<string, { icon: string; color: string }> = {
   unknown: { icon: '🌍', color: '#666666' },
 };
 
+import { LLM_PROXY_URL } from './urlConfig.js';
+
 export class PlanetJoinScreen {
   private container: HTMLElement;
   private callbacks: PlanetJoinCallbacks;
@@ -51,7 +53,7 @@ export class PlanetJoinScreen {
   private spritesChecked: number = 0;
   private spritesReady: number = 0;
 
-  private readonly METRICS_API = 'http://localhost:8766';
+  private readonly METRICS_API = LLM_PROXY_URL;
 
   constructor(containerId: string = 'planet-join-screen', callbacks: PlanetJoinCallbacks) {
     this.callbacks = callbacks;

@@ -7,6 +7,7 @@
 
 // Note: Not using planetClient - it connects to port 8766 but planets API is on 3001
 import type { PlanetMetadata } from '@ai-village/persistence';
+import { API_BASE_URL } from './urlConfig.js';
 
 export interface ServerPlanetInfo {
   id: string;
@@ -46,7 +47,7 @@ export class PlanetListScreen {
   private loading: boolean = false;
   private error: string | null = null;
 
-  private readonly API_BASE = 'http://localhost:3001/api';
+  private readonly API_BASE = `${API_BASE_URL}/api`;
 
   constructor(containerId: string = 'planet-list-screen', callbacks: PlanetListCallbacks) {
     this.callbacks = callbacks;

@@ -9,6 +9,8 @@
  * - Species appear as they're generated
  */
 
+import { API_BASE_URL, LLM_PROXY_URL } from './urlConfig.js';
+
 export interface ArtStyleConfig {
   preset: string | null;  // null if custom
   custom: string | null;  // Custom input if preset is null
@@ -97,7 +99,7 @@ export class LivePlanetCreationScreen {
   // Animation
   private animationFrame: number | null = null;
 
-  private readonly API_BASE = 'http://localhost:3001/api';
+  private readonly API_BASE = `${API_BASE_URL}/api`;
 
   constructor(containerId: string = 'live-planet-creation-screen', callbacks: LivePlanetCreationCallbacks) {
     this.callbacks = callbacks;
@@ -697,7 +699,7 @@ export class LivePlanetCreationScreen {
    * Then starts polling for generation completion.
    */
   private async queueSpriteGeneration(species: GeneratedSpecies): Promise<void> {
-    const METRICS_API = 'http://localhost:8766';
+    const METRICS_API = LLM_PROXY_URL;
     const folderId = this.sanitizeFolderId(species.name);
     species.folderId = folderId;
 
@@ -749,7 +751,7 @@ export class LivePlanetCreationScreen {
    * Updates the species with the sprite URL when complete.
    */
   private async pollSpriteStatus(species: GeneratedSpecies): Promise<void> {
-    const METRICS_API = 'http://localhost:8766';
+    const METRICS_API = LLM_PROXY_URL;
     const folderId = species.folderId;
     if (!folderId) return;
 
@@ -793,7 +795,7 @@ export class LivePlanetCreationScreen {
    * Deletes the existing sprite and re-queues generation.
    */
   private async regenerateSprite(species: GeneratedSpecies): Promise<void> {
-    const METRICS_API = 'http://localhost:8766';
+    const METRICS_API = LLM_PROXY_URL;
     const folderId = species.folderId || this.sanitizeFolderId(species.name);
 
     // Reset status

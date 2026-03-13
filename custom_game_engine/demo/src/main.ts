@@ -71,6 +71,10 @@ import {
   generateSettlementId,
   // Chunk spatial query injection functions
   // Injection functions removed - use world.spatialQuery instead
+  // Player avatar (MVEE Sprint 1)
+  createPlayerControlComponent,
+  createVelocityComponent,
+  PlayerInputSystem,
 } from '@ai-village/core';
 import { saveLoadService, IndexedDBStorage, migrateLocalSaves, checkMigrationStatus, planetClient, multiverseClient, creationStateManager, EntityPersistenceStream, type PlanetMetadata, type CreationState, type SettlementData } from '@ai-village/persistence';
 import { LiveEntityAPI } from '@ai-village/metrics';
@@ -223,6 +227,15 @@ import {
 import { TerrainGenerator, ChunkManager, ServerBackedChunkManager, createBerryBush, getPlantSpecies, ChunkSpatialQuery, initializePlanet, generateRandomPlanetConfig, chunkSerializer, ChunkNameRegistry } from '@ai-village/world';
 import { createLLMAgent, createWanderingAgent } from '@ai-village/agents';
 import { getLanguageRegistry } from '@ai-village/language';
+
+// ============================================================================
+// URL CONFIGURATION
+// Use Vite env vars in production, fall back to localhost for local dev.
+// Set VITE_API_URL, VITE_LLM_PROXY_URL, VITE_METRICS_WS_URL in .env or at build time.
+// ============================================================================
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+const LLM_PROXY_URL = import.meta.env.VITE_LLM_PROXY_URL || 'http://localhost:8766';
+const METRICS_WS_URL = import.meta.env.VITE_METRICS_WS_URL || 'ws://localhost:8765';
 
 // ============================================================================
 // DEPENDENCY INJECTION SETUP
@@ -585,7 +598,7 @@ async function createSoulsForInitialAgents(
         }
 
         // Send soul to server repository for persistence
-        fetch('http://localhost:3001/api/souls/save', {
+        fetch(`${API_BASE_URL}/api/souls/save`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -842,7 +855,7 @@ async function registerAllSystems(
     promptBuilder: promptBuilder || undefined,
     scheduledProcessor: scheduledProcessor || undefined,
     gameSessionId,
-    metricsServerUrl: 'ws://localhost:8765',
+    metricsServerUrl: METRICS_WS_URL,
     enableMetrics: true,
     enableAutoSave: true,
     plantSystems,
@@ -928,6 +941,10 @@ async function registerAllSystems(
 
   // Initialize governance data system
   coreResult.governanceDataSystem.initialize(gameLoop.world, gameLoop.world.eventBus);
+
+  // Initialize governor LLM integration (enables soul agents to make governance decisions)
+  const { initializeGovernorLLM } = await import('@ai-village/core');
+  await initializeGovernorLLM(gameLoop.world);
 
 
   return {
@@ -3152,7 +3169,7 @@ function setupDebugAPI(
       console.log('[Diagnose] Universe ID:', universeId);
 
       console.log('[Diagnose] === STEP 4: Check Server ===');
-      const serverUrl = 'http://localhost:3001/api/multiverse/stats';
+      const serverUrl = `${API_BASE_URL}/api/multiverse/stats`;
       try {
         const statsResp = await fetch(serverUrl);
         const stats = await statsResp.json();
@@ -3164,7 +3181,7 @@ function setupDebugAPI(
 
       console.log('[Diagnose] === STEP 5: Check Universe on Server ===');
       try {
-        const univResp = await fetch(`http://localhost:3001/api/multiverse/universe/${universeId}`);
+        const univResp = await fetch(`${API_BASE_URL}/api/multiverse/universe/${universeId}`);
         console.log('[Diagnose] Universe check status:', univResp.status);
         if (univResp.status === 404) {
           console.log('[Diagnose] Universe does not exist on server');
@@ -3182,7 +3199,7 @@ function setupDebugAPI(
       // Try creating universe if it doesn't exist
       console.log('[Diagnose] Creating test universe...');
       try {
-        const createResp = await fetch('http://localhost:3001/api/multiverse/universe', {
+        const createResp = await fetch(`${API_BASE_URL}/api/multiverse/universe`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -3206,7 +3223,7 @@ function setupDebugAPI(
       console.log('[Diagnose] Snapshot size:', JSON.stringify(firstSave).length, 'bytes');
 
       try {
-        const uploadResp = await fetch(`http://localhost:3001/api/multiverse/universe/${universeId}/snapshot`, {
+        const uploadResp = await fetch(`${API_BASE_URL}/api/multiverse/universe/${universeId}/snapshot`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -3345,12 +3362,12 @@ function setupDebugAPI(
         return (window as any).__DIAGNOSTICS_ENABLED__ === true;
       },
       summary: () => {
-        console.log('[Diagnostics] Visit http://localhost:8766/admin and select Diagnostics tab');
-        console.log('[Diagnostics] Or use curl: curl http://localhost:8766/admin/queries/diagnostics/summary?format=json');
+        console.log(`[Diagnostics] Visit ${LLM_PROXY_URL}/admin and select Diagnostics tab`);
+        console.log(`[Diagnostics] Or use curl: curl ${LLM_PROXY_URL}/admin/queries/diagnostics/summary?format=json`);
       },
       exportJSON: () => {
-        console.log('[Diagnostics] Visit: http://localhost:8766/admin/queries/diagnostics/export?format=json');
-        console.log('[Diagnostics] Or use: curl http://localhost:8766/admin/queries/diagnostics/export?format=json > diagnostics.json');
+        console.log(`[Diagnostics] Visit: ${LLM_PROXY_URL}/admin/queries/diagnostics/export?format=json`);
+        console.log(`[Diagnostics] Or use: curl ${LLM_PROXY_URL}/admin/queries/diagnostics/export?format=json > diagnostics.json`);
       }
     },
   };
@@ -3563,7 +3580,7 @@ async function main() {
 
   if (useProxy) {
     // Default: Use ProxyLLMProvider for server-side API calls with automatic fallback
-    llmProvider = new ProxyLLMProvider('http://localhost:8766');
+    llmProvider = new ProxyLLMProvider(LLM_PROXY_URL);
   } else {
     // Legacy mode: Direct client-side API calls (for local Ollama or explicit settings)
     const providers: LLMProvider[] = [];
@@ -4077,7 +4094,7 @@ async function main() {
     // TODO: Implement server snapshot loading
     // For now, fetch the snapshot and apply it to the world
     try {
-      const API_BASE = 'http://localhost:3001/api';
+      const API_BASE = `${API_BASE_URL}/api`;
       const tick = browserResult.snapshotTick ?? 'latest';
       const response = await fetch(`${API_BASE}/universe/${browserResult.universeId}/snapshot/${tick}`);
       if (!response.ok) throw new Error('Failed to fetch snapshot from server');
@@ -4118,7 +4135,7 @@ async function main() {
 
     // Show the PlanetJoinScreen and wait for user to confirm entry
     const joinResult = await new Promise<{ success: boolean; snapshot?: any }>((resolve) => {
-      const API_BASE = 'http://localhost:3001/api';
+      const API_BASE = `${API_BASE_URL}/api`;
 
       // Fetch universe and planet names for display
       let universeName = 'Unknown Universe';
@@ -4846,9 +4863,35 @@ async function main() {
 
   // Render loop with error handling to prevent silent failures
   let renderLoopStarted = false;
+  // PERF: Frame counter for throttling expensive render-loop operations
+  // Avoids redundant ECS queries at 60fps for data that changes at simulation rate (20 TPS)
+  let renderFrameCount = 0;
   function renderLoop() {
+    renderFrameCount++;
     try {
       inputHandler.update();
+
+      // MVEE Sprint 1: Camera follow for possessed player avatar
+      // PERF: Check every 3 frames (~20x/s at 60fps) to match simulation rate
+      if (renderFrameCount % 3 === 0) {
+        const pcEntities = gameLoop.world.query().with('player_control').executeEntities();
+        const pcEntity = pcEntities[0];
+        if (pcEntity) {
+          const pc = pcEntity.getComponent('player_control') as any;
+          if (pc?.isPossessed && pc.possessedAgentId) {
+            const possessedAgent = gameLoop.world.getEntity(pc.possessedAgentId);
+            if (possessedAgent) {
+              const pos = possessedAgent.getComponent('position') as any;
+              if (pos) {
+                const tileSize = renderer.tileSize;
+                const worldX = pos.x * tileSize + tileSize / 2;
+                const worldY = pos.y * tileSize + tileSize / 2;
+                renderer.camera.setPosition(worldX, worldY);
+              }
+            }
+          }
+        }
+      }
 
       const selectedEntity = panels.agentInfoPanel.getSelectedEntity() || panels.animalInfoPanel.getSelectedEntity();
       renderer.render(gameLoop.world, selectedEntity);
@@ -4872,11 +4915,14 @@ async function main() {
           }
         }
       } else {
-        const agents = gameLoop.world.query().with('agent').with('inventory').executeEntities();
-        if (agents.length > 0) {
-          const inventory = agents[0].getComponent('inventory');
-          if (inventory && inventory.type === 'inventory') {
-            panels.inventoryUI.setPlayerInventory(inventory);
+        // PERF: Throttle to every 30 frames (~0.5s at 60fps) - inventory changes at simulation rate (20 TPS)
+        if (renderFrameCount % 30 === 1) {
+          const agents = gameLoop.world.query().with('agent').with('inventory').executeEntities();
+          if (agents.length > 0) {
+            const inventory = agents[0]!.getComponent('inventory');
+            if (inventory && inventory.type === 'inventory') {
+              panels.inventoryUI.setPlayerInventory(inventory);
+            }
           }
         }
       }
@@ -4886,8 +4932,11 @@ async function main() {
       const ctx2 = renderer.getOverlayContext ? renderer.getOverlayContext() : null;
 
       // Update city manager panel and widget
-      panels.cityManagerPanel.update(gameLoop.world);
-      panels.cityStatsWidget.update(gameLoop.world);
+      // PERF: Throttle to every 20 frames (~3x/s at 60fps) - city data changes at simulation rate
+      if (renderFrameCount % 20 === 1) {
+        panels.cityManagerPanel.update(gameLoop.world);
+        panels.cityStatsWidget.update(gameLoop.world);
+      }
 
       if (ctx2) {
         // Get overlay canvas dimensions (may be different canvas for WebGL renderer)
@@ -5348,6 +5397,56 @@ async function main() {
     panels.animalRosterPanel.updateFromWorld(gameLoop.world);
 
     const playerDeityId = await createPlayerDeity(gameLoop.world);
+
+    // === MVEE Sprint 1: Player Avatar Setup ===
+    // Add player_control to deity entity so player can possess an agent with WASD
+    {
+      const deityEntity = gameLoop.world.getEntity(playerDeityId);
+      if (deityEntity) {
+        const playerControl = createPlayerControlComponent();
+        (deityEntity as EntityImpl).addComponent(playerControl);
+
+        // Auto-possess the first agent for immediate WASD movement
+        if (agentIds.length > 0) {
+          const firstAgentId = agentIds[0];
+          const firstAgent = gameLoop.world.getEntity(firstAgentId);
+          if (firstAgent) {
+            // Ensure agent has velocity component for movement
+            if (!firstAgent.hasComponent('velocity')) {
+              (firstAgent as EntityImpl).addComponent(createVelocityComponent(0, 0));
+            }
+
+            // Set possession state directly (bypass deity belief cost for MVEE)
+            (deityEntity as EntityImpl).updateComponent('player_control', (pc: any) => ({
+              ...pc,
+              isPossessed: true,
+              possessedAgentId: firstAgentId,
+              possessionStartTick: gameLoop.world.tick,
+              inputMode: 'possessed' as const,
+            }));
+
+            // Mark agent as player-controlled so AgentBrainSystem skips it
+            const agentComp = firstAgent.getComponent('agent') as any;
+            if (agentComp) {
+              agentComp.behavior = 'player_controlled';
+              agentComp.behaviorState = { possessedBy: deityEntity.id };
+            }
+
+            // Select the agent in the UI
+            panels.agentInfoPanel.setSelectedEntity(firstAgent);
+
+            console.log(`[PlayerAvatar] Player possessing agent ${firstAgentId} with WASD movement`);
+          }
+        }
+
+        // Wire up PlayerInputSystem keyboard listeners
+        const playerInputSystem = gameLoop.systemRegistry.get('player_input') as PlayerInputSystem | undefined;
+        if (playerInputSystem) {
+          playerInputSystem.registerKeyboardListeners(window);
+          console.log('[PlayerAvatar] WASD keyboard input registered');
+        }
+      }
+    }
 
     // Set the 2 most spiritual agents to believe in the player deity
     // Note: spirituality is on PersonalityComponent, not SpiritualComponent

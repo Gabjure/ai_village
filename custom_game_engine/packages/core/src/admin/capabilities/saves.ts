@@ -7,6 +7,8 @@
 
 import { capabilityRegistry, defineCapability, defineQuery, defineAction } from '../CapabilityRegistry.js';
 
+const API_SERVER = (typeof import.meta !== 'undefined' && import.meta.env?.VITE_API_URL as string) || 'http://localhost:3001';
+
 // Timeline entry from server
 interface TimelineEntry {
   tick: number;
@@ -60,7 +62,7 @@ const savesCapability = defineCapability({
 
         try {
           // Fetch timeline from multiverse server via orchestration API
-          const response = await fetch(`http://localhost:3001/api/multiverse/universe/${encodeURIComponent(universeId)}/timeline`);
+          const response = await fetch(`${API_SERVER}/api/multiverse/universe/${encodeURIComponent(universeId)}/timeline`);
 
           if (!response.ok) {
             if (response.status === 404) {
@@ -119,7 +121,7 @@ const savesCapability = defineCapability({
 
         try {
           const response = await fetch(
-            `http://localhost:3001/api/multiverse/universe/${encodeURIComponent(universeId)}/snapshot/${tick}`
+            `${API_SERVER}/api/multiverse/universe/${encodeURIComponent(universeId)}/snapshot/${tick}`
           );
 
           if (!response.ok) {
@@ -221,7 +223,7 @@ const savesCapability = defineCapability({
         };
 
         try {
-          const response = await fetch('http://localhost:3001/api/multiverse/universe/fork', {
+          const response = await fetch(`${API_SERVER}/api/multiverse/universe/fork`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({

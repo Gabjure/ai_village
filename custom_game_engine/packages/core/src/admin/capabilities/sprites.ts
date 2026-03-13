@@ -8,7 +8,7 @@
 
 import { capabilityRegistry, defineCapability, defineQuery, defineAction, defineLink } from '../CapabilityRegistry.js';
 
-const METRICS_SERVER = 'http://localhost:8766';
+const METRICS_SERVER = (typeof import.meta !== 'undefined' && import.meta.env?.VITE_LLM_PROXY_URL as string) || 'http://localhost:8766';
 
 // Helper to make API calls to metrics server
 async function metricsApiCall(endpoint: string, options: RequestInit = {}): Promise<any> {
@@ -291,7 +291,7 @@ const spritesCapability = defineCapability({
       id: 'sprite-manager',
       name: 'Sprite Manager',
       description: 'Browse, regenerate, and manage all generated sprites',
-      url: 'http://localhost:8766/sprites.html',  // Uses metrics server (always available)
+      url: `${METRICS_SERVER}/sprites.html`,  // Uses metrics server (always available)
       icon: '🖼️',
       embeddable: false,
     }),

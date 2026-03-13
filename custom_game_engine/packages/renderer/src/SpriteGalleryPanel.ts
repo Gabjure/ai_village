@@ -13,7 +13,9 @@ import type { IWindowPanel } from './types/WindowTypes.js';
 import type { PixelLabSpriteLoader } from './sprites/PixelLabSpriteLoader.js';
 
 const DIRECTIONS = ['south', 'southwest', 'west', 'northwest', 'north', 'northeast', 'east', 'southeast'];
-const METRICS_API = 'http://localhost:8766';
+import { LLM_PROXY_URL } from './urlConfig.js';
+
+const METRICS_API = LLM_PROXY_URL;
 
 interface SpriteInfo {
   id: string;

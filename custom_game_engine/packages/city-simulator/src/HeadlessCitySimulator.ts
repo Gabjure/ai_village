@@ -252,7 +252,7 @@ export class HeadlessCitySimulator {
       llmQueue: undefined,  // No LLM in headless mode
       promptBuilder: undefined,
       gameSessionId,
-      metricsServerUrl: 'ws://localhost:8765',
+      metricsServerUrl: (typeof import.meta !== 'undefined' && import.meta.env?.VITE_METRICS_WS_URL as string) || 'ws://localhost:8765',
       enableMetrics: false,  // Disable metrics for performance
       enableAutoSave: false, // Disable auto-save
       plantSystems,

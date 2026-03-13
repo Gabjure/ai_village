@@ -86,7 +86,7 @@ class UniverseWorker {
       sessionId: this.gameLoop.universeId,
       llmQueue: null, // Worker doesn't need LLM for now
       promptBuilder: null,
-      metricsServerUrl: 'ws://localhost:8765',
+      metricsServerUrl: (typeof import.meta !== 'undefined' && import.meta.env?.VITE_METRICS_WS_URL as string) || 'ws://localhost:8765',
       enableMetrics: true,
       enableAutoSave: false, // Worker manages its own persistence
     });

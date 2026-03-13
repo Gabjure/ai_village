@@ -7,6 +7,7 @@
  */
 
 import { saveLoadService } from '@ai-village/core';
+import { API_BASE_URL } from './urlConfig.js';
 
 export interface ServerUniverseInfo {
   id: string;
@@ -42,7 +43,7 @@ export class UniverseGalleryScreen {
   private syncProgress: { current: number; total: number; name: string } | null = null;
   private syncResult: { synced: number; failed: number; skipped: number } | null = null;
 
-  private readonly API_BASE = 'http://localhost:3001/api';
+  private readonly API_BASE = `${API_BASE_URL}/api`;
 
   constructor(containerId: string = 'universe-gallery-screen', callbacks: UniverseGalleryCallbacks) {
     this.callbacks = callbacks;

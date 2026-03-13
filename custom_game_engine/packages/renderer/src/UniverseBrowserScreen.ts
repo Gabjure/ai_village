@@ -12,6 +12,7 @@
 
 import { saveLoadService } from '@ai-village/core';
 import type { PersistenceSaveMetadata as SaveMetadata } from '@ai-village/core';
+import { API_BASE_URL } from './urlConfig.js';
 import { MultiverseTimelineView, type TimelineUniverse, type TimelineSnapshot } from './MultiverseTimelineView.js';
 import { getPlayerId } from './utils/GameStateHelpers.js';
 import { CosmicHubManager, createLocalStorageCallbacks, type GameStartConfig } from './CosmicHubManager.js';
@@ -72,7 +73,7 @@ export class UniverseBrowserScreen {
   private timelineContainer: HTMLElement | null = null;
   private universeSnapshotsCache: Map<string, ServerSnapshot[]> = new Map();
 
-  private readonly API_BASE = 'http://localhost:3001/api';
+  private readonly API_BASE = `${API_BASE_URL}/api`;
 
   constructor(containerId: string = 'universe-browser-screen') {
     const existing = document.getElementById(containerId);
@@ -426,7 +427,7 @@ export class UniverseBrowserScreen {
     // Fetch universe name for display
     let universeName = 'Unknown Universe';
     try {
-      const response = await fetch(`http://localhost:3001/api/multiverse/universe/${universeId}`);
+      const response = await fetch(`${API_BASE_URL}/api/multiverse/universe/${universeId}`);
       if (response.ok) {
         const data = await response.json();
         universeName = data.universe?.name || 'Unknown Universe';
