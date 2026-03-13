@@ -257,7 +257,8 @@ export const SPRINT_3_FLAGS: Readonly<FeatureFlags> = {
  *
  * Magic system with 25+ paradigms, divinity integration, LLM-driven spell generation,
  * introspection, sprite generation. Full playtest. Ship beta.
- * Extends Sprint 3 with: magic, fluidDynamics, uplift, plot, multiVillage, multiverse, advancedComms.
+ * Extends Sprint 3 with: magic, fluidDynamics, uplift, plot, multiVillage, multiverse, advancedComms,
+ * automation, television, collectiveConsciousness.
  */
 export const SPRINT_4_FLAGS: Readonly<FeatureFlags> = {
   ...SPRINT_3_FLAGS,
@@ -270,6 +271,9 @@ export const SPRINT_4_FLAGS: Readonly<FeatureFlags> = {
   multiVillage: true,
   multiverse: true,
   advancedComms: true,
+  automation: true,
+  television: true,
+  collectiveConsciousness: true,
 };
 
 /**
