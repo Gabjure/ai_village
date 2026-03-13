@@ -15,7 +15,7 @@ import type { LLMDecisionQueue } from '../types/LLMTypes.js';
 import type { PromptBuilder } from '../decision/LLMDecisionProcessor.js';
 import type { ScheduledDecisionProcessor } from '../decision/ScheduledDecisionProcessor.js';
 import type { ChunkManager, TerrainGenerator } from '@ai-village/world';
-import { type FeatureFlags, ALL_SYSTEMS_ON, setActiveFeatureFlags } from './FeatureFlags.js';
+import { type FeatureFlags, ALL_SYSTEMS_ON, setActiveFeatureFlags, setEntityBudget } from './FeatureFlags.js';
 
 /**
  * Simplified EventBus interface used by some combat systems.
@@ -448,6 +448,8 @@ export interface PlantSystemsConfig {
 export interface SystemRegistrationConfig extends LLMDependencies {
   /** Feature flags to control which system categories are registered. Defaults to ALL_SYSTEMS_ON. */
   featureFlags?: FeatureFlags;
+  /** Sprint number for entity budget caps. If set, enforces NPC limits per sprint. */
+  sprintNumber?: number;
   /** Session ID for metrics */
   gameSessionId?: string;
   /** Metrics server URL */
@@ -504,11 +506,16 @@ export function registerAllSystems(
   gameLoop: GameLoop,
   config: SystemRegistrationConfig = {}
 ): SystemRegistrationResult {
-  const { llmQueue, promptBuilder, scheduledProcessor, gameSessionId, metricsServerUrl, enableMetrics = true, enableAutoSave = true, plantSystems, chunkManager, terrainGenerator, featureFlags } = config;
+  const { llmQueue, promptBuilder, scheduledProcessor, gameSessionId, metricsServerUrl, enableMetrics = true, enableAutoSave = true, plantSystems, chunkManager, terrainGenerator, featureFlags, sprintNumber } = config;
 
   // Set active feature flags for runtime query
   const flags = featureFlags ?? ALL_SYSTEMS_ON;
   setActiveFeatureFlags(flags);
+
+  // Set entity budget caps for this sprint
+  if (sprintNumber !== undefined) {
+    setEntityBudget(sprintNumber);
+  }
 
   // Plant systems must be provided from @ai-village/botany
   if (!plantSystems) {
@@ -685,6 +692,7 @@ export function registerAllSystems(
   // ============================================================================
   if (flags.social) {
     gameLoop.systemRegistry.register(new CommunicationSystem());
+    gameLoop.systemRegistry.register(new ChatRoomSystem());
     gameLoop.systemRegistry.register(new SocialFatigueSystem());
     gameLoop.systemRegistry.register(new SocialGradientSystem());
     gameLoop.systemRegistry.register(new VerificationSystem());
@@ -895,8 +903,6 @@ export function registerAllSystems(
       gameLoop.systemRegistry.register(new MythGenerationSystem(llmQueue));
       gameLoop.systemRegistry.register(new MythRetellingSystem());
     }
-    const chatRoomSystem = new ChatRoomSystem();
-    gameLoop.systemRegistry.register(chatRoomSystem);
     gameLoop.systemRegistry.register(new CompanionSystem());
 
     // Institutions
@@ -1086,8 +1092,8 @@ export function registerAllSystems(
     gameLoop.systemRegistry.register(new CityDirectorSystem());
     gameLoop.systemRegistry.register(new VillageGovernanceSystem());
     gameLoop.systemRegistry.register(new CityGovernanceSystem());
-    registerDisabled(new ProvinceGovernanceSystem());
-    registerDisabled(new NationSystem());
+    gameLoop.systemRegistry.register(new ProvinceGovernanceSystem());
+    gameLoop.systemRegistry.register(new NationSystem());
     registerDisabled(new EmpireSystem());
     registerDisabled(new EmpireDiplomacySystem());
     registerDisabled(new EmpireWarSystem());
