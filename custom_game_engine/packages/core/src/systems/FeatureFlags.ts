@@ -253,6 +253,26 @@ export const SPRINT_3_FLAGS: Readonly<FeatureFlags> = {
 };
 
 /**
+ * Sprint 4: Magic, Polish + Beta Ship
+ *
+ * Magic system with 25+ paradigms, divinity integration, LLM-driven spell generation,
+ * introspection, sprite generation. Full playtest. Ship beta.
+ * Extends Sprint 3 with: magic, fluidDynamics, uplift, plot, multiVillage, multiverse, advancedComms.
+ */
+export const SPRINT_4_FLAGS: Readonly<FeatureFlags> = {
+  ...SPRINT_3_FLAGS,
+
+  // ON: Sprint 4 additions — magic + polish
+  magic: true,
+  fluidDynamics: true,
+  uplift: true,
+  plot: true,
+  multiVillage: true,
+  multiverse: true,
+  advancedComms: true,
+};
+
+/**
  * Look up the flags preset for a given sprint number.
  * Defaults to ALL_SYSTEMS_ON for unknown sprint values.
  */
@@ -261,6 +281,7 @@ export function getSprintFlags(sprint: number): Readonly<FeatureFlags> {
     case 1: return SPRINT_1_FLAGS;
     case 2: return SPRINT_2_FLAGS;
     case 3: return SPRINT_3_FLAGS;
+    case 4: return SPRINT_4_FLAGS;
     default: return ALL_SYSTEMS_ON;
   }
 }

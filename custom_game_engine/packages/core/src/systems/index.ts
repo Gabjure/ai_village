@@ -338,6 +338,7 @@ export {
   SPRINT_1_FLAGS,
   SPRINT_2_FLAGS,
   SPRINT_3_FLAGS,
+  SPRINT_4_FLAGS,
   getSprintFlags,
   getActiveFeatureFlags,
   getFeatureFlagSummary,
