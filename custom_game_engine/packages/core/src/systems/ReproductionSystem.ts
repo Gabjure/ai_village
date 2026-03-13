@@ -15,6 +15,7 @@ import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
 import { EntityImpl } from '../ecs/Entity.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
+import type { ComponentType } from '../types.js';
 import { SpeciesComponent, type Mutation, type MutationType } from '../components/SpeciesComponent.js';
 import { GeneticComponent } from '../components/GeneticComponent.js';
 import type { BodyComponent, BodyPart } from '../components/BodyComponent.js';
@@ -57,7 +58,7 @@ export class ReproductionSystem extends BaseSystem {
   public readonly id = 'ReproductionSystem';
   public readonly name = 'ReproductionSystem';
   public readonly priority = 50;
-  public readonly requiredComponents = [];
+  public readonly requiredComponents: ComponentType[] = [];
   // Lazy activation: Skip entire system when no genetic exists
   public readonly activationComponents = ['genetic'] as const;
   protected readonly throttleInterval = 100; // SLOW - 5 seconds
@@ -474,6 +475,12 @@ export class ReproductionSystem extends BaseSystem {
         return this.createSizeChangeMutation(body);
       case 'enhanced_organ':
         return this.createEnhancedOrganMutation();
+      case 'diminished_organ':
+        return this.createDiminishedOrganMutation();
+      case 'sensory_change':
+        return this.createSensoryChangeMutation();
+      case 'color_change':
+        return this.createColorChangeMutation();
       case 'metabolic':
         return this.createMetabolicMutation();
       default:
@@ -494,6 +501,8 @@ export class ReproductionSystem extends BaseSystem {
       this.addArmsToBody(body, 1);
     } else if (limbType === 'leg') {
       this.addLegsToBody(body, 1);
+    } else if (limbType === 'tentacle') {
+      this.addTentacleToBody(body);
     }
 
     return {
@@ -586,6 +595,62 @@ export class ReproductionSystem extends BaseSystem {
       statModifiers: { endurance: 0.2 },
       canInherit: true,
       inheritanceChance: 0.25,
+    };
+  }
+
+  /**
+   * Create diminished organ mutation
+   */
+  private createDiminishedOrganMutation(): Mutation {
+    const organs = ['lung', 'kidney', 'liver'] as const;
+    const organ = organs[Math.floor(Math.random() * organs.length)]!;
+
+    return {
+      id: `mutation_diminished_${organ}_${Date.now()}`,
+      type: 'diminished_organ',
+      bodyPartAffected: organ,
+      severity: 'moderate',
+      beneficial: false,
+      description: `Born with a weakened ${organ}`,
+      statModifiers: { endurance: -0.15 },
+      canInherit: true,
+      inheritanceChance: 0.2,
+    };
+  }
+
+  /**
+   * Create sensory change mutation
+   */
+  private createSensoryChangeMutation(): Mutation {
+    const enhanced = Math.random() < 0.5;
+    const senses = ['vision', 'hearing', 'smell'] as const;
+    const sense = senses[Math.floor(Math.random() * senses.length)]!;
+
+    return {
+      id: `mutation_sensory_${sense}_${Date.now()}`,
+      type: 'sensory_change',
+      bodyPartAffected: sense === 'vision' ? 'eye' : sense === 'hearing' ? 'ear' : 'nose',
+      severity: 'minor',
+      beneficial: enhanced,
+      description: `${enhanced ? 'Enhanced' : 'Diminished'} ${sense}`,
+      statModifiers: { perception: enhanced ? 0.15 : -0.1 },
+      canInherit: true,
+      inheritanceChance: 0.3,
+    };
+  }
+
+  /**
+   * Create color change mutation
+   */
+  private createColorChangeMutation(): Mutation {
+    return {
+      id: `mutation_color_${Date.now()}`,
+      type: 'color_change',
+      severity: 'minor',
+      beneficial: false,
+      description: 'Born with unusual coloring',
+      canInherit: true,
+      inheritanceChance: 0.5,
     };
   }
 
@@ -685,6 +750,28 @@ export class ReproductionSystem extends BaseSystem {
       };
       body.parts[legId] = leg;
     }
+  }
+
+  private addTentacleToBody(body: BodyComponent): void {
+    const currentTentacles = Object.values(body.parts).filter(p => p.type === 'tentacle').length;
+    const tentacleId = `tentacle_hereditary_${currentTentacles + 1}`;
+    const tentacle: BodyPart = {
+      id: tentacleId,
+      type: 'tentacle',
+      name: `Tentacle ${currentTentacles + 1}`,
+      vital: false,
+      health: 80,
+      maxHealth: 80,
+      functions: ['manipulation', 'locomotion'],
+      affectsSkills: ['crafting'],
+      affectsActions: ['grab', 'manipulate'],
+      injuries: [],
+      bandaged: false,
+      splinted: false,
+      infected: false,
+      modifications: [],
+    };
+    body.parts[tentacleId] = tentacle;
   }
 
   private addTailToBody(body: BodyComponent): void {
