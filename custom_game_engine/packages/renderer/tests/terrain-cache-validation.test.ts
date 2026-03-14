@@ -64,6 +64,12 @@ const mockCanvasContext = {
   arc: () => {},
   setLineDash: () => {},
   fillText: () => {},
+  createLinearGradient: (_x0: number, _y0: number, _x1: number, _y1: number) => ({
+    addColorStop: () => {},
+  }),
+  createRadialGradient: (_x0: number, _y0: number, _r0: number, _x1: number, _y1: number, _r1: number) => ({
+    addColorStop: () => {},
+  }),
   drawImage: (source: any, ...args: any[]) => {
     // Accept MockOffscreenCanvas as valid image source
     if (source && source._type === 'MockOffscreenCanvas') {
