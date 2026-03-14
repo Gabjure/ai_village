@@ -172,24 +172,24 @@ function getWebGLDiagnostics(): Record<string, string | number | boolean> {
 export function logWebGLDiagnostics(): void {
   // Context count
   const contextInfo = countActiveWebGLContexts();
-  console.log(`[WebGL Diagnostics] Active WebGL contexts: ${contextInfo.total}`);
-  console.log('[WebGL Diagnostics] Browser limit: typically 8-16 contexts');
+  console.warn(`[WebGL Diagnostics] Active WebGL contexts: ${contextInfo.total}`);
+  console.warn('[WebGL Diagnostics] Browser limit: typically 8-16 contexts');
   for (const detail of contextInfo.details) {
-    console.log(`[WebGL Diagnostics]   ${detail}`);
+    console.warn(`[WebGL Diagnostics]   ${detail}`);
   }
 
   // GPU info
-  console.log('[WebGL Diagnostics] GPU/WebGL capabilities:');
+  console.warn('[WebGL Diagnostics] GPU/WebGL capabilities:');
   const diagnostics = getWebGLDiagnostics();
   for (const [key, value] of Object.entries(diagnostics)) {
-    console.log(`[WebGL Diagnostics]   ${key}: ${value}`);
+    console.warn(`[WebGL Diagnostics]   ${key}: ${value}`);
   }
 
   // Memory info (Chrome only)
   if ((performance as Performance & { memory?: { usedJSHeapSize: number; jsHeapSizeLimit: number } }).memory) {
     const mem = (performance as Performance & { memory: { usedJSHeapSize: number; jsHeapSizeLimit: number } }).memory;
-    console.log('[WebGL Diagnostics] Memory:');
-    console.log(`[WebGL Diagnostics]   JS Heap: ${(mem.usedJSHeapSize / 1024 / 1024).toFixed(1)} MB / ${(mem.jsHeapSizeLimit / 1024 / 1024).toFixed(1)} MB`);
+    console.warn('[WebGL Diagnostics] Memory:');
+    console.warn(`[WebGL Diagnostics]   JS Heap: ${(mem.usedJSHeapSize / 1024 / 1024).toFixed(1)} MB / ${(mem.jsHeapSizeLimit / 1024 / 1024).toFixed(1)} MB`);
   }
 }
 
@@ -866,18 +866,105 @@ export class PixiJSRenderer implements IRenderer {
 
     // Create graphics for tiles
     const graphics = new Graphics();
+    const ts = this._tileSize;
+
+    // PASS 1: Draw base terrain tiles with deterministic noise for natural look
+    for (let y = 0; y < CHUNK_SIZE; y++) {
+      for (let x = 0; x < CHUNK_SIZE; x++) {
+        const tile = chunk.tiles[y * CHUNK_SIZE + x];
+        if (!tile) continue;
+
+        const baseColor = this.getTileColor(tile.terrain, tile);
+        // Deterministic noise based on world position (breaks up flat colors)
+        // Use a better hash that avoids checkerboard patterns
+        const wx = cx * CHUNK_SIZE + x;
+        const wy = cy * CHUNK_SIZE + y;
+        let h = (wx * 374761393 + wy * 668265263 + wx * wy * 1274126177) | 0;
+        h = ((h ^ (h >> 13)) * 1103515245 + 12345) | 0;
+        const noise = ((h & 0x3ff) / 1023.0 - 0.5) * 0.08; // ±4% brightness variation
+        const color = noise > 0
+          ? this.lightenColor(baseColor, noise)
+          : this.darkenColor(baseColor, -noise);
+
+        const px = x * ts;
+        const py = y * ts;
+
+        graphics.rect(px, py, ts, ts);
+        graphics.fill(color);
+      }
+    }
+
+    // PASS 2: Smooth terrain edges at biome boundaries
+    // Draw semi-transparent blended strips where terrain types differ
+    const blendSize = Math.max(3, Math.floor(ts * 0.4));
 
     for (let y = 0; y < CHUNK_SIZE; y++) {
       for (let x = 0; x < CHUNK_SIZE; x++) {
         const tile = chunk.tiles[y * CHUNK_SIZE + x];
         if (!tile) continue;
 
-        const color = this.getTileColor(tile.terrain, tile);
-        const px = x * this._tileSize;
-        const py = y * this._tileSize;
+        const px = x * ts;
+        const py = y * ts;
 
-        graphics.rect(px, py, this._tileSize, this._tileSize);
-        graphics.fill(color);
+        // Check right neighbor — vertical edge blend
+        if (x < CHUNK_SIZE - 1) {
+          const rightTile = chunk.tiles[y * CHUNK_SIZE + x + 1];
+          if (rightTile && rightTile.terrain !== tile.terrain) {
+            const rightColor = this.getTileColor(rightTile.terrain, rightTile);
+            const myColor = this.getTileColor(tile.terrain, tile);
+            const midColor = this.blendColors(myColor, rightColor, 0.5);
+
+            // Draw blended gradient strips at boundary
+            const edgeX = px + ts;
+            for (let i = 0; i < blendSize; i++) {
+              const t = i / blendSize;
+              const alpha = 0.35 * (1 - t);
+              // Right side: blend right color into left tile area
+              graphics.rect(edgeX - blendSize + i, py, 1, ts);
+              graphics.fill({ color: midColor, alpha });
+              // Left side: blend left color into right tile area
+              graphics.rect(edgeX + i, py, 1, ts);
+              graphics.fill({ color: midColor, alpha: 0.35 * (1 - (blendSize - 1 - i) / blendSize) });
+            }
+          }
+        }
+
+        // Check bottom neighbor — horizontal edge blend
+        if (y < CHUNK_SIZE - 1) {
+          const bottomTile = chunk.tiles[(y + 1) * CHUNK_SIZE + x];
+          if (bottomTile && bottomTile.terrain !== tile.terrain) {
+            const bottomColor = this.getTileColor(bottomTile.terrain, bottomTile);
+            const myColor = this.getTileColor(tile.terrain, tile);
+            const midColor = this.blendColors(myColor, bottomColor, 0.5);
+
+            const edgeY = py + ts;
+            for (let i = 0; i < blendSize; i++) {
+              const t = i / blendSize;
+              const alpha = 0.35 * (1 - t);
+              graphics.rect(px, edgeY - blendSize + i, ts, 1);
+              graphics.fill({ color: midColor, alpha });
+              graphics.rect(px, edgeY + i, ts, 1);
+              graphics.fill({ color: midColor, alpha: 0.35 * (1 - (blendSize - 1 - i) / blendSize) });
+            }
+          }
+        }
+
+        // Corner blend for diagonal transitions
+        if (x < CHUNK_SIZE - 1 && y < CHUNK_SIZE - 1) {
+          const diagTile = chunk.tiles[(y + 1) * CHUNK_SIZE + x + 1];
+          if (diagTile && diagTile.terrain !== tile.terrain) {
+            const diagColor = this.getTileColor(diagTile.terrain, diagTile);
+            const myColor = this.getTileColor(tile.terrain, tile);
+            const midColor = this.blendColors(myColor, diagColor, 0.5);
+            const cornerX = px + ts;
+            const cornerY = py + ts;
+            const r = blendSize;
+
+            // Draw small blended circle at corner
+            graphics.circle(cornerX, cornerY, r);
+            graphics.fill({ color: midColor, alpha: 0.25 });
+          }
+        }
       }
     }
 
@@ -920,6 +1007,20 @@ export class PixiJSRenderer implements IRenderer {
     const r = Math.max(0, ((color >> 16) & 0xff) * (1 - amount));
     const g = Math.max(0, ((color >> 8) & 0xff) * (1 - amount));
     const b = Math.max(0, (color & 0xff) * (1 - amount));
+    return (Math.floor(r) << 16) | (Math.floor(g) << 8) | Math.floor(b);
+  }
+
+  private lightenColor(color: number, amount: number): number {
+    const r = Math.min(255, ((color >> 16) & 0xff) * (1 + amount));
+    const g = Math.min(255, ((color >> 8) & 0xff) * (1 + amount));
+    const b = Math.min(255, (color & 0xff) * (1 + amount));
+    return (Math.floor(r) << 16) | (Math.floor(g) << 8) | Math.floor(b);
+  }
+
+  private blendColors(c1: number, c2: number, t: number): number {
+    const r = ((c1 >> 16) & 0xff) * (1 - t) + ((c2 >> 16) & 0xff) * t;
+    const g = ((c1 >> 8) & 0xff) * (1 - t) + ((c2 >> 8) & 0xff) * t;
+    const b = (c1 & 0xff) * (1 - t) + (c2 & 0xff) * t;
     return (Math.floor(r) << 16) | (Math.floor(g) << 8) | Math.floor(b);
   }
 
@@ -1049,7 +1150,7 @@ export class PixiJSRenderer implements IRenderer {
 
     // Tag sprite with entity info for texture updates
     sprite._entityId = entity.id;
-    sprite._spriteId = spriteId;
+    sprite._spriteId = spriteId ?? '';
 
     return sprite;
   }
@@ -1687,11 +1788,11 @@ export class PixiJSRenderer implements IRenderer {
    * - Steering (behavior + target)
    */
   debugAgentPositions(): void {
-    console.log('[PixiJSRenderer] Agent Debug Info');
-    console.log(`[PixiJSRenderer] Cached agents: ${this._cachedAgentEntities.length}`);
-    console.log(`[PixiJSRenderer] Entity sprites: ${this.entitySprites.size}`);
-    console.log(`[PixiJSRenderer] Visible entities: ${this._visibleEntities.length}`);
-    console.log(`[PixiJSRenderer] Cache refresh ticks - agents: ${this._agentCacheLastRefresh}, renderables: ${this._renderableCacheLastRefresh}`);
+    console.warn('[PixiJSRenderer] Agent Debug Info');
+    console.warn(`[PixiJSRenderer] Cached agents: ${this._cachedAgentEntities.length}`);
+    console.warn(`[PixiJSRenderer] Entity sprites: ${this.entitySprites.size}`);
+    console.warn(`[PixiJSRenderer] Visible entities: ${this._visibleEntities.length}`);
+    console.warn(`[PixiJSRenderer] Cache refresh ticks - agents: ${this._agentCacheLastRefresh}, renderables: ${this._renderableCacheLastRefresh}`);
 
     // Diagnostic counters
     let hasPosition = 0;
@@ -1724,21 +1825,21 @@ export class PixiJSRenderer implements IRenderer {
     }
 
     const total = this._cachedAgentEntities.length;
-    console.log('[PixiJSRenderer] === COMPONENT COVERAGE ===');
-    console.log(`[PixiJSRenderer] Position:  ${hasPosition}/${total} (${((hasPosition/total)*100).toFixed(0)}%)`);
-    console.log(`[PixiJSRenderer] Velocity:  ${hasVelocity}/${total} (${((hasVelocity/total)*100).toFixed(0)}%) - REQUIRED for SteeringSystem`);
-    console.log(`[PixiJSRenderer] Movement:  ${hasMovement}/${total} (${((hasMovement/total)*100).toFixed(0)}%) - REQUIRED for MovementSystem`);
-    console.log(`[PixiJSRenderer] Steering:  ${hasSteering}/${total} (${((hasSteering/total)*100).toFixed(0)}%) - REQUIRED for SteeringSystem`);
-    console.log(`[PixiJSRenderer]   - with target: ${hasSteeringTarget}/${hasSteering}`);
-    console.log(`[PixiJSRenderer] Non-zero velocity: ${hasNonZeroVelocity}/${total}`);
+    console.warn('[PixiJSRenderer] === COMPONENT COVERAGE ===');
+    console.warn(`[PixiJSRenderer] Position:  ${hasPosition}/${total} (${((hasPosition/total)*100).toFixed(0)}%)`);
+    console.warn(`[PixiJSRenderer] Velocity:  ${hasVelocity}/${total} (${((hasVelocity/total)*100).toFixed(0)}%) - REQUIRED for SteeringSystem`);
+    console.warn(`[PixiJSRenderer] Movement:  ${hasMovement}/${total} (${((hasMovement/total)*100).toFixed(0)}%) - REQUIRED for MovementSystem`);
+    console.warn(`[PixiJSRenderer] Steering:  ${hasSteering}/${total} (${((hasSteering/total)*100).toFixed(0)}%) - REQUIRED for SteeringSystem`);
+    console.warn(`[PixiJSRenderer]   - with target: ${hasSteeringTarget}/${hasSteering}`);
+    console.warn(`[PixiJSRenderer] Non-zero velocity: ${hasNonZeroVelocity}/${total}`);
 
-    console.log('[PixiJSRenderer] === STEERING BEHAVIORS ===');
+    console.warn('[PixiJSRenderer] === STEERING BEHAVIORS ===');
     for (const [behavior, count] of Object.entries(steeringBehaviors)) {
-      console.log(`[PixiJSRenderer]   ${behavior}: ${count}`);
+      console.warn(`[PixiJSRenderer]   ${behavior}: ${count}`);
     }
 
     // DIAGNOSIS
-    console.log('[PixiJSRenderer] === DIAGNOSIS ===');
+    console.warn('[PixiJSRenderer] === DIAGNOSIS ===');
     if (hasVelocity === 0) {
       console.error('[PixiJSRenderer] PROBLEM: No agents have Velocity component - SteeringSystem cannot run!');
     }
@@ -1759,7 +1860,7 @@ export class PixiJSRenderer implements IRenderer {
     }
 
     // Sample first 3 agents in detail
-    console.log('[PixiJSRenderer] === SAMPLE AGENTS (first 3) ===');
+    console.warn('[PixiJSRenderer] === SAMPLE AGENTS (first 3) ===');
     for (const entity of this._cachedAgentEntities.slice(0, 3)) {
       const pos = entity.getComponent('position') as { x: number; y: number } | undefined;
       const vel = entity.getComponent('velocity') as { vx: number; vy: number } | undefined;
@@ -1771,28 +1872,28 @@ export class PixiJSRenderer implements IRenderer {
       } | undefined;
       const sprite = this.entitySprites.get(entity.id);
 
-      console.log(`[PixiJSRenderer] Agent ${entity.id.slice(0, 8)}:`);
-      console.log(`[PixiJSRenderer]   Position: ${pos ? `(${pos.x.toFixed(2)}, ${pos.y.toFixed(2)})` : 'MISSING'}`);
-      console.log(`[PixiJSRenderer]   Velocity: ${vel ? `vx=${vel.vx.toFixed(3)}, vy=${vel.vy.toFixed(3)}` : 'MISSING'}`);
-      console.log(`[PixiJSRenderer]   Movement: ${movement ? `vX=${movement.velocityX.toFixed(3)}, vY=${movement.velocityY.toFixed(3)}` : 'MISSING'}`);
-      console.log(`[PixiJSRenderer]   Steering: ${steering ? `behavior="${steering.behavior}", target=${steering.target ? `(${steering.target.x.toFixed(1)}, ${steering.target.y.toFixed(1)})` : 'none'}, maxSpeed=${steering.maxSpeed}` : 'MISSING'}`);
-      console.log(`[PixiJSRenderer]   Sprite: ${sprite ? `visible=${sprite.visible}, pos=(${sprite.x.toFixed(1)}, ${sprite.y.toFixed(1)})` : 'no sprite'}`);
+      console.warn(`[PixiJSRenderer] Agent ${entity.id.slice(0, 8)}:`);
+      console.warn(`[PixiJSRenderer]   Position: ${pos ? `(${pos.x.toFixed(2)}, ${pos.y.toFixed(2)})` : 'MISSING'}`);
+      console.warn(`[PixiJSRenderer]   Velocity: ${vel ? `vx=${vel.vx.toFixed(3)}, vy=${vel.vy.toFixed(3)}` : 'MISSING'}`);
+      console.warn(`[PixiJSRenderer]   Movement: ${movement ? `vX=${movement.velocityX.toFixed(3)}, vY=${movement.velocityY.toFixed(3)}` : 'MISSING'}`);
+      console.warn(`[PixiJSRenderer]   Steering: ${steering ? `behavior="${steering.behavior}", target=${steering.target ? `(${steering.target.x.toFixed(1)}, ${steering.target.y.toFixed(1)})` : 'none'}, maxSpeed=${steering.maxSpeed}` : 'MISSING'}`);
+      console.warn(`[PixiJSRenderer]   Sprite: ${sprite ? `visible=${sprite.visible}, pos=(${sprite.x.toFixed(1)}, ${sprite.y.toFixed(1)})` : 'no sprite'}`);
     }
 
-    console.log('[PixiJSRenderer] === HOW TO FIX ===');
+    console.warn('[PixiJSRenderer] === HOW TO FIX ===');
     if (hasVelocity === 0 || hasMovement === 0 || hasSteering === 0) {
-      console.log('[PixiJSRenderer] Agents are missing required components. Check agent creation code.');
-      console.log('[PixiJSRenderer] Required components for movement: Position, Velocity, Movement, Steering');
+      console.warn('[PixiJSRenderer] Agents are missing required components. Check agent creation code.');
+      console.warn('[PixiJSRenderer] Required components for movement: Position, Velocity, Movement, Steering');
     } else if (steeringBehaviors['none'] === hasSteering || hasSteeringTarget === 0) {
-      console.log('[PixiJSRenderer] Agents have components but no active steering behavior/target.');
-      console.log('[PixiJSRenderer] Check AgentBrainSystem - it should set steering.behavior and steering.target.');
+      console.warn('[PixiJSRenderer] Agents have components but no active steering behavior/target.');
+      console.warn('[PixiJSRenderer] Check AgentBrainSystem - it should set steering.behavior and steering.target.');
     } else if (hasNonZeroVelocity === 0) {
-      console.log('[PixiJSRenderer] SteeringSystem may not be running or not computing velocity.');
-      console.log('[PixiJSRenderer] Check system registry: window.game.gameLoop.systemRegistry.systems');
+      console.warn('[PixiJSRenderer] SteeringSystem may not be running or not computing velocity.');
+      console.warn('[PixiJSRenderer] Check system registry: window.game.gameLoop.systemRegistry.systems');
     } else {
-      console.log('[PixiJSRenderer] Components look OK - check MovementSystem execution.');
+      console.warn('[PixiJSRenderer] Components look OK - check MovementSystem execution.');
     }
-    console.log('[PixiJSRenderer] To check if simulation is running, run: window.game.gameLoop.world.tick');
+    console.warn('[PixiJSRenderer] To check if simulation is running, run: window.game.gameLoop.world.tick');
   }
 
   getEntityAt(screenX: number, screenY: number, world: World): Entity | null {
