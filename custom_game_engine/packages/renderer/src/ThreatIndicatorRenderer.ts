@@ -31,16 +31,32 @@ export class ThreatIndicatorRenderer {
 
   // Visual configuration
   private readonly INDICATOR_SIZE = 16;
-  private readonly ARROW_SIZE = 12;
-  private readonly ARROW_MARGIN = 20; // Distance from screen edge
+  private readonly ARROW_SIZE = 14;
+  private readonly ARROW_MARGIN = 22; // Distance from screen edge
   private readonly PULSE_SPEED = 0.003; // Animation speed
 
-  // Severity colors
+  // Severity colors (main fill)
   private readonly SEVERITY_COLORS = {
-    low: '#FFFF00',     // Yellow
-    medium: '#FF9900',  // Orange
-    high: '#FF0000',    // Red
-    critical: '#CC0033', // Dark red
+    low: '#FFE033',     // Warm yellow
+    medium: '#FF8C00',  // Deep orange
+    high: '#FF2020',    // Vivid red
+    critical: '#CC0044', // Dark crimson
+  };
+
+  // Severity glow colors (outer bloom)
+  private readonly SEVERITY_GLOW = {
+    low: 'rgba(255, 220, 40, 0.35)',
+    medium: 'rgba(255, 130, 0, 0.4)',
+    high: 'rgba(255, 30, 30, 0.45)',
+    critical: 'rgba(200, 0, 60, 0.55)',
+  };
+
+  // Severity icons rendered inside indicator
+  private readonly SEVERITY_ICONS = {
+    low: '!',
+    medium: '!!',
+    high: '!!',
+    critical: '✕',
   };
 
   constructor(world: World, eventBus: EventBus, canvas: HTMLCanvasElement) {
@@ -164,28 +180,54 @@ export class ThreatIndicatorRenderer {
       throw new Error('Cannot render threat indicator: entity missing position component');
     }
 
-    // Get color for severity
     const color = this.SEVERITY_COLORS[severity as keyof typeof this.SEVERITY_COLORS] || this.SEVERITY_COLORS.medium;
+    const glowColor = this.SEVERITY_GLOW[severity as keyof typeof this.SEVERITY_GLOW] || this.SEVERITY_GLOW.medium;
 
-    // Pulsing animation for high severity
+    // Pulsing animation for high/critical severity
+    const t = Date.now();
     const pulseOffset = severity === 'high' || severity === 'critical'
-      ? Math.sin(Date.now() * this.PULSE_SPEED) * 3
+      ? Math.sin(t * this.PULSE_SPEED) * 3
       : 0;
 
     const size = this.INDICATOR_SIZE + pulseOffset;
 
-    // Draw exclamation mark indicator
     this.ctx.save();
-    this.ctx.translate(x, y - 20); // Above entity
+    this.ctx.translate(x, y - 20);
 
-    // Background circle
+    // Expanding ring pulse for high/critical (phase-offset for visual rhythm)
+    if (severity === 'high' || severity === 'critical') {
+      const ringPhase = (t * 0.002) % 1;
+      const ringRadius = size / 2 + ringPhase * 14;
+      this.ctx.globalAlpha = (1 - ringPhase) * 0.55;
+      this.ctx.strokeStyle = color;
+      this.ctx.lineWidth = severity === 'critical' ? 2.5 : 1.5;
+      (this.ctx as any).shadowColor = glowColor;
+      (this.ctx as any).shadowBlur = 10;
+      this.ctx.beginPath();
+      this.ctx.arc(0, 0, ringRadius, 0, Math.PI * 2);
+      this.ctx.stroke();
+    }
+
+    // Soft glow halo behind main circle
+    this.ctx.globalAlpha = 0.28;
     this.ctx.fillStyle = color;
-    this.ctx.globalAlpha = 0.8;
+    (this.ctx as any).shadowColor = glowColor;
+    (this.ctx as any).shadowBlur = 14;
+    this.ctx.beginPath();
+    this.ctx.arc(0, 0, size / 2 + 5, 0, Math.PI * 2);
+    this.ctx.fill();
+
+    // Main circle
+    this.ctx.globalAlpha = 0.88;
+    this.ctx.fillStyle = color;
+    (this.ctx as any).shadowColor = glowColor;
+    (this.ctx as any).shadowBlur = 5;
     this.ctx.beginPath();
     this.ctx.arc(0, 0, size / 2, 0, Math.PI * 2);
     this.ctx.fill();
 
-    // Exclamation mark
+    // Icon — critical gets '✕', all others get '!'
+    (this.ctx as any).shadowBlur = 0;
     this.ctx.globalAlpha = 1.0;
     this.ctx.fillStyle = '#FFFFFF';
     this.ctx.font = `bold ${size}px Arial`;
@@ -234,17 +276,18 @@ export class ThreatIndicatorRenderer {
     const dy = threatPos.y - playerPos.y;
     const distance = Math.sqrt(dx * dx + dy * dy); // Keep sqrt: actual distance displayed to user
 
-    // Render distance text
+    // Render distance text with contrasting outline for legibility
     this.ctx.save();
-    this.ctx.fillStyle = '#FFFFFF';
-    this.ctx.strokeStyle = '#000000';
-    this.ctx.font = '10px Arial';
+    this.ctx.font = 'bold 10px Arial';
     this.ctx.textAlign = 'center';
-    this.ctx.lineWidth = 2;
+    this.ctx.textBaseline = 'middle';
+    this.ctx.lineWidth = 3;
+    this.ctx.strokeStyle = 'rgba(0,0,0,0.75)';
+    this.ctx.fillStyle = '#F0E68C'; // Khaki — warmer than pure white, easier on the eye
 
-    const distanceText = `${Math.round(distance)}`;
-    this.ctx.strokeText(distanceText, x, y - 32);
-    this.ctx.fillText(distanceText, x, y - 32);
+    const distanceText = `${Math.round(distance)}m`;
+    this.ctx.strokeText(distanceText, x, y - 34);
+    this.ctx.fillText(distanceText, x, y - 34);
 
     this.ctx.restore();
   }
@@ -311,17 +354,33 @@ export class ThreatIndicatorRenderer {
     arrowX = Math.max(this.ARROW_MARGIN, Math.min(viewWidth - this.ARROW_MARGIN, arrowX));
     arrowY = Math.max(this.ARROW_MARGIN, Math.min(viewHeight - this.ARROW_MARGIN, arrowY));
 
-    // Get color for severity
     const color = this.SEVERITY_COLORS[severity as keyof typeof this.SEVERITY_COLORS] || this.SEVERITY_COLORS.medium;
+    const glowColor = this.SEVERITY_GLOW[severity as keyof typeof this.SEVERITY_GLOW] || this.SEVERITY_GLOW.medium;
 
-    // Draw arrow
+    // Pulse alpha for high/critical arrows
+    const pulseAlpha = severity === 'high' || severity === 'critical'
+      ? 0.75 + Math.sin(Date.now() * this.PULSE_SPEED) * 0.2
+      : 0.88;
+
     this.ctx.save();
     this.ctx.translate(arrowX, arrowY);
+
+    // Base disc — anchors the arrow to the edge
+    this.ctx.globalAlpha = pulseAlpha * 0.45;
+    this.ctx.fillStyle = color;
+    (this.ctx as any).shadowColor = glowColor;
+    (this.ctx as any).shadowBlur = 10;
+    this.ctx.beginPath();
+    this.ctx.arc(0, 0, this.ARROW_SIZE * 0.85, 0, Math.PI * 2);
+    this.ctx.fill();
+
     this.ctx.rotate(angle);
 
     // Arrow shape
+    this.ctx.globalAlpha = pulseAlpha;
     this.ctx.fillStyle = color;
-    this.ctx.globalAlpha = 0.9;
+    (this.ctx as any).shadowColor = glowColor;
+    (this.ctx as any).shadowBlur = 8;
     this.ctx.beginPath();
     this.ctx.moveTo(this.ARROW_SIZE, 0);
     this.ctx.lineTo(-this.ARROW_SIZE / 2, -this.ARROW_SIZE / 2);
@@ -329,9 +388,10 @@ export class ThreatIndicatorRenderer {
     this.ctx.closePath();
     this.ctx.fill();
 
-    // Border
-    this.ctx.strokeStyle = '#000000';
-    this.ctx.lineWidth = 2;
+    // Dark outline for contrast
+    (this.ctx as any).shadowBlur = 0;
+    this.ctx.strokeStyle = 'rgba(0,0,0,0.6)';
+    this.ctx.lineWidth = 1.5;
     this.ctx.stroke();
 
     this.ctx.restore();
