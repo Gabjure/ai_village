@@ -1,0 +1,30 @@
+{
+  "llm_baseline": {
+    "h_b_overall": 0.5292,
+    "h_b_talker": 0.5443,
+    "h_b_executor": 0.5252,
+    "d_cc_overall": 0.1497,
+    "d_cc_talker": 0.1382,
+    "d_cc_executor": 0.1612,
+    "total_episodes": 42245,
+    "talker_episodes": 8813,
+    "executor_episodes": 33432,
+    "agents_with_sufficient_data_talker": 24,
+    "agents_with_sufficient_data_executor": 40
+  },
+  "nn_phase4": {
+    "h_b_overall": 0.7658,
+    "h_b_talker": 0.9428,
+    "h_b_executor": 0.7192,
+    "d_cc_overall": 0.4449,
+    "d_cc_talker": 0.5719,
+    "d_cc_executor": 0.3178,
+    "talker_accuracy": 0.4171,
+    "executor_accuracy": 0.3177,
+    "talker_high_conf_count": 209,
+    "executor_high_conf_count": 4498,
+    "talker_fallback_rate": 0.9763,
+    "executor_fallback_rate": 0.8655,
+    "d_cc_target_met": true
+  }
+}
