@@ -35,7 +35,7 @@ export class AfterlifeNeedsSystem extends BaseSystem {
   public readonly activationComponents = ['afterlife'] as const;
   protected readonly throttleInterval = 20; // NORMAL - 1 second
 
-  private lastDeltaUpdateTick = 0;
+  private lastDeltaUpdateTick = 0; // First update at tick 1200 (DELTA_UPDATE_INTERVAL)
   private readonly DELTA_UPDATE_INTERVAL = 1200; // 1 game minute
 
   protected onUpdate(ctx: SystemContext): void {
