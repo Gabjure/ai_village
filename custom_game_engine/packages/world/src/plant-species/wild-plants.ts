@@ -2071,7 +2071,7 @@ export const OAK_TREE: PlantSpecies = {
   ],
 
   baseGenetics: {
-    growthRate: 0.2,
+    growthRate: 0.3, // Minimum valid rate; oak trees are slow-growing
     yieldAmount: 2.5,
     diseaseResistance: 85,
     droughtTolerance: 65,
