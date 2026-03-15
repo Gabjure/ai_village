@@ -71,7 +71,7 @@ export default defineConfig({
     target: ['chrome92', 'firefox79', 'safari15'],
     rollupOptions: {
       // Exclude Node.js-only modules from browser bundle
-      external: ['sharp'],
+      external: ['sharp', 'pixi.js'],
       input: {
         index: path.resolve(__dirname, 'game.html'),
       },
