@@ -70,8 +70,10 @@ export default defineConfig({
     emptyOutDir: true,
     target: ['chrome92', 'firefox79', 'safari15'],
     rollupOptions: {
-      // Exclude Node.js-only modules from browser bundle
-      external: ['sharp', 'pixi.js'],
+      // Exclude modules not in package.json — optional features (PixiJS renderer,
+      // d3 timeline, chart.js hierarchy viz, dexie IndexedDB) that aren't required
+      // for the core game. Also exclude Node.js builtins handled by browser stubs.
+      external: ['sharp', 'pixi.js', 'd3', 'chart.js', 'dexie'],
       input: {
         index: path.resolve(__dirname, 'game.html'),
       },

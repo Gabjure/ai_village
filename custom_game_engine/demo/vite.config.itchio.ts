@@ -93,7 +93,7 @@ export default defineConfig({
     target: ['chrome92', 'firefox79', 'safari15'],
     rollupOptions: {
       // Exclude Node.js-only modules from browser bundle
-      external: ['sharp', 'pixi.js'],
+      external: ['sharp', 'pixi.js', 'd3', 'chart.js', 'dexie'],
       input: {
         // Build game.html as index.html - Itch.io requires index.html as entry
         index: path.resolve(__dirname, 'game.html'),
