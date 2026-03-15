@@ -166,6 +166,20 @@ export class NeedsComponent extends ComponentBase {
   public energyDecayRate: number;
 
   /**
+   * Base hunger decay rate, unmodified by injuries or temporary effects.
+   * InjurySystem reads this to compute the effective hungerDecayRate (base * multiplier)
+   * without compounding it on every tick.
+   */
+  public baseHungerDecayRate: number;
+
+  /**
+   * Base energy decay rate, unmodified by injuries or temporary effects.
+   * InjurySystem reads this to compute the effective energyDecayRate (base * multiplier)
+   * without compounding it on every tick.
+   */
+  public baseEnergyDecayRate: number;
+
+  /**
    * Tracks how many ticks hunger has been at exactly 0.
    * Used for starvation mechanics:
    * - 1 game day (14,400 ticks) → "I haven't eaten in a day"
@@ -208,6 +222,8 @@ export class NeedsComponent extends ComponentBase {
     this.stimulation = 0.5;
     this.hungerDecayRate = 0.001;
     this.energyDecayRate = 0.0005;
+    this.baseHungerDecayRate = 0.001;
+    this.baseEnergyDecayRate = 0.0005;
     this.ticksAtZeroHunger = 0;
     this.starvationDayMemoriesIssued = new Set<number>();
     // bodyParts is intentionally undefined by default for backward compatibility
@@ -275,6 +291,9 @@ export class NeedsComponent extends ComponentBase {
 export function isHungry(needs: NeedsComponent): boolean {
   if (!needs) {
     throw new Error('isHungry: needs parameter is required');
+  }
+  if (typeof needs.hunger !== 'number') {
+    throw new Error(`isHungry: needs.hunger must be a number, got ${typeof needs.hunger}`);
   }
   return needs.hunger < 0.5; // Agents start seeking food at 50% hunger
 }

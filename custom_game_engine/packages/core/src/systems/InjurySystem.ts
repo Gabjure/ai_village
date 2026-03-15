@@ -199,14 +199,19 @@ export class InjurySystem extends BaseSystem {
     // All injuries increase energy consumption
     energyRateMultiplier = injury.severity === 'minor' ? 1.1 : injury.severity === 'major' ? 1.3 : 1.5;
 
-    // Update component with new rates
+    // Update component with new rates.
+    // IMPORTANT: Read from baseHungerDecayRate / baseEnergyDecayRate (the immutable base),
+    // not from hungerDecayRate (the effective rate), to avoid compounding the multiplier
+    // on every tick and causing exponential overflow.
     entityImpl.updateComponent<NeedsComponent>('needs', (currentNeeds) => {
       // Handle both class instances (with clone method) and plain deserialized objects
       const updated = typeof currentNeeds.clone === 'function'
         ? currentNeeds.clone()
         : new NeedsComponent(currentNeeds);
-      updated.hungerDecayRate = (currentNeeds.hungerDecayRate || 1.0) * hungerRateMultiplier;
-      updated.energyDecayRate = (currentNeeds.energyDecayRate || 1.0) * energyRateMultiplier;
+      const baseHunger = currentNeeds.baseHungerDecayRate ?? 0.001;
+      const baseEnergy = currentNeeds.baseEnergyDecayRate ?? 0.0005;
+      updated.hungerDecayRate = baseHunger * hungerRateMultiplier;
+      updated.energyDecayRate = baseEnergy * energyRateMultiplier;
       return updated;
     });
   }

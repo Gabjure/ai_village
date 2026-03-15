@@ -136,6 +136,8 @@ describe('InjurySystem Integration', () => {
         health: 0.9,
         hungerDecayRate: 0.42,
         energyDecayRate: 0.5,
+        baseHungerDecayRate: 0.42,
+        baseEnergyDecayRate: 0.5,
       })
     );
     agent.addComponent(
