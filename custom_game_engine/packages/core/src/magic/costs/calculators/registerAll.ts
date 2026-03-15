@@ -23,6 +23,18 @@ import { RuneCostCalculator } from './RuneCostCalculator.js';
 import { SympathyCostCalculator } from './SympathyCostCalculator.js';
 import { AllomancyCostCalculator } from './AllomancyCostCalculator.js';
 import { DaemonCostCalculator } from './DaemonCostCalculator.js';
+// Dimensional/Void paradigms
+import { VoidCostCalculator } from './VoidCostCalculator.js';
+// Creative paradigms
+import { BeliefCostCalculator } from './BeliefCostCalculator.js';
+import { CommerceCostCalculator } from './CommerceCostCalculator.js';
+import { DebtCostCalculator } from './DebtCostCalculator.js';
+import { BureaucraticCostCalculator } from './BureaucraticCostCalculator.js';
+import { GameCostCalculator } from './GameCostCalculator.js';
+import { LuckCostCalculator } from './LuckCostCalculator.js';
+import { EchoCostCalculator } from './EchoCostCalculator.js';
+import { ParadoxCostCalculator } from './ParadoxCostCalculator.js';
+import { ThresholdCostCalculator } from './ThresholdCostCalculator.js';
 
 /**
  * Register all built-in cost calculators with the global registry.
@@ -50,6 +62,20 @@ export function registerAllCostCalculators(): void {
   costCalculatorRegistry.registerOrReplace(new SympathyCostCalculator());
   costCalculatorRegistry.registerOrReplace(new AllomancyCostCalculator());
   costCalculatorRegistry.registerOrReplace(new DaemonCostCalculator());
+
+  // Dimensional/Void paradigms
+  costCalculatorRegistry.registerOrReplace(new VoidCostCalculator());
+
+  // Creative paradigms
+  costCalculatorRegistry.registerOrReplace(new BeliefCostCalculator());
+  costCalculatorRegistry.registerOrReplace(new CommerceCostCalculator());
+  costCalculatorRegistry.registerOrReplace(new DebtCostCalculator());
+  costCalculatorRegistry.registerOrReplace(new BureaucraticCostCalculator());
+  costCalculatorRegistry.registerOrReplace(new GameCostCalculator());
+  costCalculatorRegistry.registerOrReplace(new LuckCostCalculator());
+  costCalculatorRegistry.registerOrReplace(new EchoCostCalculator());
+  costCalculatorRegistry.registerOrReplace(new ParadoxCostCalculator());
+  costCalculatorRegistry.registerOrReplace(new ThresholdCostCalculator());
 }
 
 /**
@@ -95,8 +121,28 @@ export function verifyAnimistParadigmsRegistered(): boolean {
 }
 
 /**
+ * Check if all creative paradigms are registered.
+ */
+export function verifyCreativeParadigmsRegistered(): boolean {
+  const creativeParadigms = [
+    'void',
+    'belief_magic',
+    'commerce_magic',
+    'debt_magic',
+    'bureaucratic_magic',
+    'game_magic',
+    'luck_magic',
+    'echo_magic',
+    'paradox_magic',
+    'threshold_magic',
+  ];
+
+  return creativeParadigms.every(id => costCalculatorRegistry.has(id));
+}
+
+/**
  * Check if all paradigms are registered.
  */
 export function verifyAllParadigmsRegistered(): boolean {
-  return verifyCoreParadigmsRegistered() && verifyAnimistParadigmsRegistered();
+  return verifyCoreParadigmsRegistered() && verifyAnimistParadigmsRegistered() && verifyCreativeParadigmsRegistered();
 }
