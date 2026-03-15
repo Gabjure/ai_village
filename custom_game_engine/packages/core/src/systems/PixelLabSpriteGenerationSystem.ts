@@ -331,7 +331,8 @@ export class PixelLabSpriteGenerationSystem extends BaseSystem {
   private getDirectionImagePath(characterId: string, direction: string): string {
     // Browser compatibility: return placeholder path
     if (typeof window !== 'undefined') {
-      return `/assets/sprites/pixellab/${characterId}/rotations/${direction}.png`;
+      const base = import.meta.env?.BASE_URL ?? '/';
+      return `${base}assets/sprites/pixellab/${characterId}/rotations/${direction}.png`;
     }
 
     // Node.js path resolution

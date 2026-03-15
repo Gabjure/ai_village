@@ -147,7 +147,7 @@ export class RemoteUniverseView implements IWindowPanel {
   ): void {
     // Initialize PixelLabEntityRenderer lazily on first render
     if (!this.pixelLabEntityRenderer) {
-      this.pixelLabEntityRenderer = new PixelLabEntityRenderer(ctx, '/assets/sprites/pixellab');
+      this.pixelLabEntityRenderer = new PixelLabEntityRenderer(ctx);
     }
 
     // Update sprite animations

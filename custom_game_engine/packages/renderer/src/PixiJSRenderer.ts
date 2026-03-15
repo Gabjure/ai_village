@@ -37,6 +37,7 @@ import type {
 import { lookupSprite } from './sprites/SpriteService.js';
 import type { SpriteTraits, ClothingType } from './sprites/SpriteRegistry.js';
 import { getPixelLabSpriteLoader, type PixelLabSpriteLoader } from './sprites/PixelLabSpriteLoader.js';
+import { SPRITE_BASE_PATH, MAP_OBJECTS_BASE_PATH } from './sprites/spriteBasePath.js';
 
 /**
  * Extended Sprite type with entity metadata for texture updates.
@@ -409,7 +410,7 @@ export class PixiJSRenderer implements IRenderer {
     this.terrainGenerator = terrainGenerator;
     this._camera = new Camera(canvas.width, canvas.height);
     this._tileSize = options.tileSize ?? 16;
-    this._pixelLabLoader = getPixelLabSpriteLoader('/assets/sprites/pixellab');
+    this._pixelLabLoader = getPixelLabSpriteLoader();
   }
 
   /**
@@ -1226,10 +1227,10 @@ export class PixiJSRenderer implements IRenderer {
     const legacyFilename = PixiJSRenderer.MAP_OBJECT_SPRITES[spriteId];
 
     if (legacyFilename) {
-      pathsToTry.push(`/assets/sprites/map_objects/${legacyFilename}`);
+      pathsToTry.push(`${MAP_OBJECTS_BASE_PATH}/${legacyFilename}`);
     } else {
       // Try multiple PixelLab path formats
-      const basePath = `/assets/sprites/pixellab/${spriteId}`;
+      const basePath = `${SPRITE_BASE_PATH}/${spriteId}`;
       pathsToTry.push(
         `${basePath}/south.png`,           // Newer format (direction files directly)
         `${basePath}/rotations/south.png`, // Older format (rotations subfolder)

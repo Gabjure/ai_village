@@ -13,6 +13,7 @@ import { ComponentType as CT } from '@ai-village/core';
 import type { ChunkManager, TerrainGenerator, Chunk } from '@ai-village/world';
 import type { PixelLabEntityRenderer } from './sprites/PixelLabEntityRenderer.js';
 import { getPixelLabSpriteLoader, type PixelLabSpriteLoader, PixelLabDirection } from './sprites/PixelLabSpriteLoader.js';
+import { SPRITE_BASE_PATH } from './sprites/spriteBasePath.js';
 import { findSprite, type SpriteTraits } from './sprites/SpriteRegistry.js';
 import { lookupSprite } from './sprites/SpriteService.js';
 import { ChunkManager3D } from './3d/ChunkManager3D.js';
@@ -1599,7 +1600,7 @@ export class Renderer3D {
 
     // Start loading the sprite
     this.loadingAnimalTextures.add(speciesId);
-    const spritePath = `/assets/sprites/pixellab/${speciesId}/south.png`;
+    const spritePath = `${SPRITE_BASE_PATH}/${speciesId}/south.png`;
 
     this.textureLoader.load(
       spritePath,
@@ -1721,7 +1722,7 @@ export class Renderer3D {
     this.loadingAnimations.add(speciesId);
 
     // Try to load the first frame to check if animations exist
-    const testPath = `/assets/sprites/pixellab/${speciesId}/animations/${ANIMATION_CONFIG.animationType}/south/frame_000.png`;
+    const testPath = `${SPRITE_BASE_PATH}/${speciesId}/animations/${ANIMATION_CONFIG.animationType}/south/frame_000.png`;
 
     // Use a simple image load to test if animations exist
     const testImg = new Image();
@@ -1752,7 +1753,7 @@ export class Renderer3D {
 
       for (let i = 0; i < ANIMATION_CONFIG.frameCount; i++) {
         const frameNum = i.toString().padStart(3, '0');
-        const framePath = `/assets/sprites/pixellab/${speciesId}/animations/${ANIMATION_CONFIG.animationType}/${direction}/frame_${frameNum}.png`;
+        const framePath = `${SPRITE_BASE_PATH}/${speciesId}/animations/${ANIMATION_CONFIG.animationType}/${direction}/frame_${frameNum}.png`;
 
         this.textureLoader.load(
           framePath,

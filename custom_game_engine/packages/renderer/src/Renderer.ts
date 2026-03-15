@@ -101,6 +101,8 @@ export class Renderer {
   private _sortEntityToIndex: Map<Entity, number> = new Map();
   // Reusable screen position for worldToScreen calls (avoids object allocation per entity)
   private _screenPos: { x: number; y: number; parallax: import('./Camera.js').ParallaxTransform | null } = { x: 0, y: 0, parallax: null };
+  // Reusable array for speech bubble agent data (avoids per-frame Array allocation)
+  private _agentSpeechData: Array<{ id: string; x: number; y: number; name?: string }> = [];
 
   // Query result caching to avoid expensive ECS queries every frame
   // Buildings rarely change, so cache for 60 frames (~3 seconds at 20 TPS)
@@ -159,7 +161,7 @@ export class Renderer {
     this.debugOverlay = new DebugOverlay(this.ctx, this.chunkManager, this.terrainGenerator);
     this.interactionOverlay = new InteractionOverlay(this.ctx);
     this.entityPicker = new EntityPicker(this.tileSize);
-    this.pixelLabEntityRenderer = new PixelLabEntityRenderer(this.ctx, '/assets/sprites/pixellab');
+    this.pixelLabEntityRenderer = new PixelLabEntityRenderer(this.ctx);
     this.dimensionalControls = new DimensionalControls();
 
     // Lazy renderers: floatingTextRenderer, speechBubbleRenderer, particleRenderer,
@@ -847,8 +849,9 @@ export class Renderer {
     this.getBedOwnershipRenderer().render(this.ctx, this.camera, world);
 
     // Update and render speech bubbles
+    // PERF: Pass cached agent entities - avoids redundant world.query() every render frame
     this.getSpeechBubbleRenderer().update();
-    this.renderSpeechBubbles(world);
+    this.renderSpeechBubbles(this._cachedAgentEntities);
 
     // Render combat UI elements (after speech bubbles, before debug)
     if (this.healthBarRenderer) {
@@ -883,10 +886,11 @@ export class Renderer {
   /**
    * Render speech bubbles above agents.
    */
-  private renderSpeechBubbles(world: World): void {
+  private renderSpeechBubbles(agents: ReadonlyArray<Entity>): void {
     // Collect agents with positions for speech bubble rendering
-    const agents = world.query().with('agent', 'position').executeEntities();
-    const agentData: Array<{ id: string; x: number; y: number; name?: string }> = [];
+    // NOTE: Callers should pass _cachedAgentEntities to avoid per-frame queries
+    // PERF: Reuse _agentSpeechData array to avoid per-frame allocation
+    this._agentSpeechData.length = 0;
 
     for (const entity of agents) {
       const pos = entity.components.get('position') as PositionComponent | undefined;
@@ -899,7 +903,7 @@ export class Renderer {
       const worldY = pos.y * this.tileSize;
       this.camera.worldToScreenInto(worldX, worldY, 0, this._screenPos);
 
-      agentData.push({
+      this._agentSpeechData.push({
         id: entity.id,
         x: this._screenPos.x,
         y: this._screenPos.y,
@@ -907,7 +911,7 @@ export class Renderer {
       });
     }
 
-    this.getSpeechBubbleRenderer().render(this.ctx, agentData);
+    this.getSpeechBubbleRenderer().render(this.ctx, this._agentSpeechData);
   }
 
 

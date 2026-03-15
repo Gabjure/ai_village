@@ -5,6 +5,8 @@
  * Displays each ceremony one at a time with the Three Fates' conversation.
  */
 
+import { SPRITE_BASE_PATH } from './sprites/spriteBasePath.js';
+
 export interface CeremonyExchange {
   speaker: 'weaver' | 'spinner' | 'cutter';
   text: string;
@@ -266,7 +268,7 @@ export class SoulCeremonyModal {
     // Build sprite display HTML
     let spriteHtml = '';
     if (spriteFolderId) {
-      const spritePath = `/assets/sprites/pixellab/${spriteFolderId}/rotations/south.png`;
+      const spritePath = `${SPRITE_BASE_PATH}/${spriteFolderId}/rotations/south.png`;
       spriteHtml = `
         <div style="text-align: center; margin-bottom: 20px;">
           <img src="${spritePath}"

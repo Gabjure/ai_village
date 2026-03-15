@@ -9,6 +9,7 @@
  */
 
 import { findSpriteWithFallback, type SpriteTraits } from './SpriteRegistry.js';
+import { SPRITE_BASE_PATH } from './spriteBasePath.js';
 
 export type SpriteStatus = 'available' | 'missing' | 'generating' | 'unknown';
 
@@ -38,7 +39,7 @@ const spriteStatusCache = new Map<string, SpriteStatus>();
 const generatingSprites = new Set<string>();
 
 // Base path for sprite assets (will be set during initialization)
-let assetsBasePath = '/assets/sprites/pixellab';
+let assetsBasePath = SPRITE_BASE_PATH;
 
 // Whether PixelLab API is available
 let pixelLabAvailable = false;

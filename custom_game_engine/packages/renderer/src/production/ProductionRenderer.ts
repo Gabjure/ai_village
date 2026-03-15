@@ -7,6 +7,7 @@
 
 import type { Entity, World } from '@ai-village/core';
 import { LLM_PROXY_URL } from '../urlConfig.js';
+import { SPRITE_BASE_PATH } from '../sprites/spriteBasePath.js';
 
 /** Production quality levels */
 export enum QualityLevel {
@@ -515,7 +516,7 @@ export class ProductionRenderer {
       // Return the expected path where the sprite will be generated
       // The daemon will save sprites to /assets/sprites/pixellab/{folderId}/
       return {
-        imageUrl: `/assets/sprites/pixellab/${folderId}/south.png`,
+        imageUrl: `${SPRITE_BASE_PATH}/${folderId}/south.png`,
         imageData: undefined,
       };
     } catch (error) {

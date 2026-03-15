@@ -3,6 +3,7 @@
  */
 
 import { getPixelLabSpriteLoader } from './sprites/PixelLabSpriteLoader.js';
+import { SPRITE_BASE_PATH, MAP_OBJECTS_BASE_PATH } from './sprites/spriteBasePath.js';
 
 // Image cache for map objects
 const mapObjectCache = new Map<string, HTMLImageElement>();
@@ -100,10 +101,10 @@ function loadMapObjectSprite(spriteId: string): HTMLImageElement | null {
 
   if (legacyFilename) {
     // Use legacy map_objects path
-    spritePath = `/assets/sprites/map_objects/${legacyFilename}`;
+    spritePath = `${MAP_OBJECTS_BASE_PATH}/${legacyFilename}`;
   } else {
     // Try PixelLab path (folder-based with sprite.png)
-    spritePath = `/assets/sprites/pixellab/${spriteId}/sprite.png`;
+    spritePath = `${SPRITE_BASE_PATH}/${spriteId}/sprite.png`;
   }
 
   // Start loading
@@ -191,7 +192,7 @@ function tryRenderAnimatedCampfire(
   size: number
 ): boolean {
   const animationId = 'campfire_flames';
-  const folderPath = '/assets/sprites/pixellab/campfire_flames';
+  const folderPath = `${SPRITE_BASE_PATH}/campfire_flames`;
 
   // Load animation if not already loaded
   if (!frameAnimations.has(animationId) && !loadingFrameAnimations.has(animationId)) {

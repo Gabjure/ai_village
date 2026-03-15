@@ -3,6 +3,7 @@ import { getPixelLabSpriteLoader, type PixelLabSpriteLoader } from './PixelLabSp
 import { PixelLabDirection, angleToPixelLabDirection } from './PixelLabSpriteDefs.js';
 import { findSprite, type SpriteTraits } from './SpriteRegistry.js';
 import { lookupSprite } from './SpriteService.js';
+import { SPRITE_BASE_PATH } from './spriteBasePath.js';
 
 /**
  * Handles rendering of entities using PixelLab sprites.
@@ -23,7 +24,7 @@ export class PixelLabEntityRenderer {
   private entityLastDirections = new Map<string, PixelLabDirection>(); // entityId -> last direction
   private lastFrameTime: number = performance.now();
 
-  constructor(ctx: CanvasRenderingContext2D, assetsPath: string = '/assets/sprites/pixellab') {
+  constructor(ctx: CanvasRenderingContext2D, assetsPath: string = SPRITE_BASE_PATH) {
     this.ctx = ctx;
     this.pixelLabLoader = getPixelLabSpriteLoader(assetsPath);
   }
@@ -105,7 +106,12 @@ export class PixelLabEntityRenderer {
 
     // Find the best matching sprite folder and queue generation if missing
     const spriteResult = lookupSprite(traits);
-    const spriteFolderId = spriteResult.folderId;
+    // For animals: if the registry returned a fallback (no species match), use speciesId
+    // directly as the PixelLab folder ID. This handles alien species whose sprites are
+    // queued for generation — the loader will show a placeholder until the daemon produces them.
+    const spriteFolderId = (animal && spriteResult.isFallback)
+      ? animal.speciesId
+      : spriteResult.folderId;
 
     // Check if sprite is loaded
     if (!this.pixelLabLoader.isLoaded(spriteFolderId)) {

@@ -15,6 +15,7 @@ import {
 // Re-export for external use
 export { PixelLabDirection } from './PixelLabSpriteDefs';
 import { getSpriteCache } from './SpriteCache';
+import { SPRITE_BASE_PATH } from './spriteBasePath.js';
 
 /** Metadata format from PixelLab (nested format) */
 interface PixelLabMetadataNested {
@@ -90,7 +91,7 @@ export class PixelLabSpriteLoader {
   private instances: Map<string, PixelLabCharacterInstance> = new Map();
   private loadingPromises: Map<string, Promise<LoadedPixelLabCharacter>> = new Map();
 
-  constructor(basePath: string = '/assets/sprites/pixellab') {
+  constructor(basePath: string = SPRITE_BASE_PATH) {
     this.basePath = basePath;
   }
 
