@@ -15,14 +15,14 @@ import { DeityEmergenceSystem } from '../DeityEmergenceSystem.js';
 import { AIGodBehaviorSystem } from '../AIGodBehaviorSystem.js';
 import { DeityComponent } from '../../components/DeityComponent.js';
 import { createSpiritualComponent } from '../../components/SpiritualComponent.js';
-import { AgentComponent } from '../../components/AgentComponent.js';
-import { PositionComponent } from '../../components/PositionComponent.js';
+import { createAgentComponent } from '../../components/AgentComponent.js';
+import { createPositionComponent } from '../../components/PositionComponent.js';
 import {
   calculateInitialRelationship,
   calculateDomainSynergy,
 } from '../../divinity/DeityRelations.js';
 import type { DivineDomain } from '../../divinity/DeityTypes.js';
-import { EventBusImpl } from '../events/EventBus.js';
+import { EventBusImpl } from '../../events/EventBus.js';
 
 describe('Phase 4: Deity Emergence Integration', () => {
   let world: World;
@@ -46,18 +46,7 @@ describe('Phase 4: Deity Emergence Integration', () => {
       for (let i = 0; i < 5; i++) {
         const entity = world.createEntity();
 
-        const agent = new AgentComponent(
-          `Agent ${i}`,
-          'human',
-          { x: 0, y: 0 },
-          {
-            openness: 0.7,
-            conscientiousness: 0.5,
-            extraversion: 0.5,
-            agreeableness: 0.7,
-            neuroticism: 0.4,
-          }
-        );
+        const agent = createAgentComponent();
 
         const spiritual = createSpiritualComponent(0.8); // High faith
         spiritual.prayers.push({
@@ -71,7 +60,7 @@ describe('Phase 4: Deity Emergence Integration', () => {
 
         entity.addComponent(agent);
         entity.addComponent(spiritual);
-        entity.addComponent(new PositionComponent(0, 0));
+        entity.addComponent(createPositionComponent(0, 0));
       }
 
       // Run emergence detection
@@ -81,7 +70,7 @@ describe('Phase 4: Deity Emergence Integration', () => {
 
       // Advance time past check interval
       world.currentTick = 150;
-      emergenceSystem.update(world);
+      emergenceSystem.update(world, [], 0.05);
 
       const deityCountAfter = Array.from(world.entities.values()).filter(e =>
         e.hasComponent('deity')
@@ -96,7 +85,7 @@ describe('Phase 4: Deity Emergence Integration', () => {
       for (let i = 0; i < 2; i++) {
         const entity = world.createEntity();
 
-        const agent = new AgentComponent(`Agent ${i}`, 'human', { x: 0, y: 0 });
+        const agent = createAgentComponent();
         const spiritual = createSpiritualComponent(0.9);
         spiritual.prayers.push({
           id: `prayer_${i}`,
@@ -109,11 +98,11 @@ describe('Phase 4: Deity Emergence Integration', () => {
 
         entity.addComponent(agent);
         entity.addComponent(spiritual);
-        entity.addComponent(new PositionComponent(0, 0));
+        entity.addComponent(createPositionComponent(0, 0));
       }
 
       world.currentTick = 150;
-      emergenceSystem.update(world);
+      emergenceSystem.update(world, [], 0.05);
 
       const deityCount = Array.from(world.entities.values()).filter(e =>
         e.hasComponent('deity')
@@ -129,7 +118,7 @@ describe('Phase 4: Deity Emergence Integration', () => {
         const entity = world.createEntity();
         agentIds.push(entity.id);
 
-        const agent = new AgentComponent(`Agent ${i}`, 'human', { x: 0, y: 0 });
+        const agent = createAgentComponent();
         const spiritual = createSpiritualComponent(0.7);
         spiritual.prayers.push({
           id: `prayer_${i}`,
@@ -142,11 +131,11 @@ describe('Phase 4: Deity Emergence Integration', () => {
 
         entity.addComponent(agent);
         entity.addComponent(spiritual);
-        entity.addComponent(new PositionComponent(0, 0));
+        entity.addComponent(createPositionComponent(0, 0));
       }
 
       world.currentTick = 150;
-      emergenceSystem.update(world);
+      emergenceSystem.update(world, [], 0.05);
 
       // Find the deity
       const deityEntity = Array.from(world.entities.values()).find(e =>
@@ -183,12 +172,12 @@ describe('Phase 4: Deity Emergence Integration', () => {
 
       // Create believer with prayer
       const believerEntity = world.createEntity();
-      const agent = new AgentComponent('Believer', 'human', { x: 0, y: 0 });
+      const agent = createAgentComponent();
       const spiritual = createSpiritualComponent(0.8, deityEntity.id);
 
       believerEntity.addComponent(agent);
       believerEntity.addComponent(spiritual);
-      believerEntity.addComponent(new PositionComponent(0, 0));
+      believerEntity.addComponent(createPositionComponent(0, 0));
 
       deity.addBeliever(believerEntity.id);
       deity.addPrayer(believerEntity.id, 'prayer_1', world.currentTick);
@@ -196,7 +185,7 @@ describe('Phase 4: Deity Emergence Integration', () => {
       // Run AI behavior system
       const behaviorSystem = new AIGodBehaviorSystem();
       world.currentTick = 2500; // Past decision interval
-      behaviorSystem.update(world);
+      behaviorSystem.update(world, [], 0.05);
 
       // Prayer should be answered
       expect(deity.prayerQueue.length).toBe(0);
@@ -213,7 +202,7 @@ describe('Phase 4: Deity Emergence Integration', () => {
 
       const behaviorSystem = new AIGodBehaviorSystem();
       world.currentTick = 2500;
-      behaviorSystem.update(world);
+      behaviorSystem.update(world, [], 0.05);
 
       // Should not have spent any belief
       expect(deity.belief.currentBelief).toBe(initialBelief);
@@ -299,7 +288,7 @@ describe('Phase 4: Deity Emergence Integration', () => {
       // Step 1: Create agents with shared beliefs
       for (let i = 0; i < 4; i++) {
         const entity = world.createEntity();
-        const agent = new AgentComponent(`Agent ${i}`, 'human', { x: 0, y: 0 });
+        const agent = createAgentComponent();
         const spiritual = createSpiritualComponent(0.75);
 
         spiritual.prayers.push({
@@ -313,12 +302,12 @@ describe('Phase 4: Deity Emergence Integration', () => {
 
         entity.addComponent(agent);
         entity.addComponent(spiritual);
-        entity.addComponent(new PositionComponent(0, 0));
+        entity.addComponent(createPositionComponent(0, 0));
       }
 
       // Step 2: Trigger emergence
       world.currentTick = 150;
-      emergenceSystem.update(world);
+      emergenceSystem.update(world, [], 0.05);
 
       const deities = Array.from(world.entities.values()).filter(e =>
         e.hasComponent('deity')
@@ -358,7 +347,7 @@ describe('Phase 4: Deity Emergence Integration', () => {
       const behaviorSystem = new AIGodBehaviorSystem();
       deity1.belief.currentBelief = 200;
       world.currentTick = 2500;
-      behaviorSystem.update(world);
+      behaviorSystem.update(world, [], 0.05);
 
       // Deity should have acted (answered prayers or expanded worship)
       expect(deity1.belief.totalBeliefSpent).toBeGreaterThan(0);

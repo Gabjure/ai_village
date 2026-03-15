@@ -72,6 +72,7 @@ import { SpatialMemoryComponent } from '../components/SpatialMemoryComponent.js'
 import { BeliefComponent } from '../components/BeliefComponent.js';
 import { EpisodicMemoryComponent } from '../components/EpisodicMemoryComponent.js';
 import { NeedsComponent } from '../components/NeedsComponent.js';
+import { PersonalityComponent } from '../components/PersonalityComponent.js';
 
 // Re-export TerrainType/BiomeType for backwards compatibility
 export type { TerrainType, BiomeType };
@@ -171,6 +172,23 @@ const ENTITY_ARCHETYPES: Record<string, ArchetypeDefinition> = {
       entity.addComponent(createRenderableComponent('spaceship', 'entity'));
       entity.addComponent(createTagsComponent('spaceship', 'vehicle'));
       entity.addComponent(createPhysicsComponent(true, 3, 3)); // Solid, 3x3 footprint
+    },
+  },
+
+  weather: {
+    description: 'Weather entity representing a weather phenomenon or system',
+    apply: (entity: EntityImpl) => {
+      entity.addComponent(createTagsComponent('weather'));
+    },
+  },
+
+  resource: {
+    description: 'Resource entity representing a world resource (ore, wood, etc.)',
+    apply: (entity: EntityImpl) => {
+      entity.addComponent(createPositionComponent(0, 0));
+      entity.addComponent(createRenderableComponent('resource', 'entity'));
+      entity.addComponent(createTagsComponent('resource'));
+      entity.addComponent(createPhysicsComponent(false, 1, 1)); // Non-solid, can be harvested
     },
   },
 };
@@ -697,6 +715,20 @@ const componentRegistry: Record<string, ComponentFactory> = {
     ...data,
   }),
 
+  'personality': (data = {}) => new PersonalityComponent({
+    openness: (data.openness as number) ?? 0.5,
+    conscientiousness: (data.conscientiousness as number) ?? 0.5,
+    extraversion: (data.extraversion as number) ?? 0.5,
+    agreeableness: (data.agreeableness as number) ?? 0.5,
+    neuroticism: (data.neuroticism as number) ?? 0.5,
+    workEthic: data.workEthic as number | undefined,
+    creativity: data.creativity as number | undefined,
+    generosity: data.generosity as number | undefined,
+    leadership: data.leadership as number | undefined,
+    spirituality: data.spirituality as number | undefined,
+    humor: data.humor as number | undefined,
+  }),
+
   // Backwards compatibility aliases (PascalCase → lowercase_with_underscores)
   'Velocity': (data) => componentRegistry['velocity']!(data),
   'Steering': (data) => componentRegistry['steering']!(data),
@@ -714,7 +746,7 @@ const componentRegistry: Record<string, ComponentFactory> = {
 };
 
 // Type for component class or string identifier
-type ComponentClassOrString = string | { new(data?: unknown): Component } | { prototype: Component };
+type ComponentClassOrString = string | Component | { new(data?: unknown): Component } | { prototype: Component };
 
 // Extended Entity interface with test convenience methods
 interface TestEntity extends Entity {
@@ -990,10 +1022,12 @@ export class WorldImpl implements WorldMutator {
 
     // Create the enhanced addComponent function
     const enhancedAddComponent = (ComponentClassOrInstance: ComponentClassOrString, data?: Record<string, unknown>): Component => {
-      // If it's already a component instance, use it directly
-      if (typeof ComponentClassOrInstance === 'object' && ComponentClassOrInstance !== null && 'type' in ComponentClassOrInstance && 'version' in ComponentClassOrInstance) {
-        // Type guard: checked that it has 'type' and 'version' properties, so it's a Component
+      // If it's already a component instance (object with 'type'), use it directly
+      if (typeof ComponentClassOrInstance === 'object' && ComponentClassOrInstance !== null && 'type' in ComponentClassOrInstance) {
         const component = ComponentClassOrInstance as Component;
+        if (!('version' in component)) {
+          (component as Record<string, unknown>).version = 1;
+        }
         originalAddComponent(component);
         return component;
       }
@@ -1133,6 +1167,18 @@ export class WorldImpl implements WorldMutator {
         finalState: Object.fromEntries(entity.components),
       },
     });
+  }
+
+  /**
+   * Remove an entity by id. Returns true if removed, false if not found.
+   * Implements IWorldMutator interface - delegates to destroyEntity.
+   */
+  removeEntity(id: EntityId): boolean {
+    if (!this._entities.has(id)) {
+      return false;
+    }
+    this.destroyEntity(id, 'removeEntity');
+    return true;
   }
 
   addComponent(entityId: EntityId, component: Component): void {

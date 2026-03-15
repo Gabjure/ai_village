@@ -21,13 +21,14 @@ describe('MetricsCollectionSystem Integration', () => {
   let harness: IntegrationTestHarness;
   let metricsSystem: MetricsCollectionSystem;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     harness = createMinimalWorld();
-    metricsSystem = new MetricsCollectionSystem(harness.world, {
+    metricsSystem = new MetricsCollectionSystem({
       enabled: true,
       samplingRate: 1.0,
       snapshotInterval: 10, // Snapshot every 10 ticks
     });
+    await metricsSystem.initialize(harness.world, harness.eventBus);
   });
 
   describe('Initialization', () => {

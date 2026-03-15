@@ -17,6 +17,7 @@ import { EntityImpl } from '../ecs/Entity.js';
 import { AgentCombatSystem } from '../systems/AgentCombatSystem.js';
 import { createSoulIdentityComponent } from '../components/SoulIdentityComponent.js';
 import { createSoulLinkComponent } from '../components/SoulLinkComponent.js';
+import { createAgentComponent } from '../components/AgentComponent.js';
 import type { ConflictComponent } from '../components/ConflictComponent.js';
 import type { CombatStatsComponent } from '../components/CombatStatsComponent.js';
 import type { NeedsComponent } from '../components/NeedsComponent.js';
@@ -66,6 +67,9 @@ describe('HeroProtection', () => {
     const soulLink = createSoulLinkComponent(soul.id, 0);
     agent.addComponent(soulLink);
 
+    // Add agent component (required by AgentCombatSystem validation)
+    agent.addComponent(createAgentComponent('wander', false, 20));
+
     // Add combat stats
     const combatStats: CombatStatsComponent = {
       type: 'combat_stats',
@@ -96,6 +100,9 @@ describe('HeroProtection', () => {
    */
   function createNormalAgent(id: string, combatSkill: number) {
     const agent = new EntityImpl(id);
+
+    // Add agent component (required by AgentCombatSystem validation)
+    agent.addComponent(createAgentComponent('wander', false, 20));
 
     const combatStats: CombatStatsComponent = {
       type: 'combat_stats',
@@ -206,9 +213,11 @@ describe('HeroProtection', () => {
     const trials = 1000;
 
     for (let i = 0; i < trials; i++) {
-      // Fresh world for each trial
-      const testWorld = new World();
+      // Fresh world for each trial - reassign outer world so createHero/createNormalAgent use it
+      const testEventBus = new EventBusImpl();
+      world = new World(testEventBus);
       const testSystem = new AgentCombatSystem();
+      void testSystem.initialize(world, testEventBus);
 
       const hero = createHero({
         id: 'blessed-hero',
@@ -219,9 +228,6 @@ describe('HeroProtection', () => {
 
       const normal = createNormalAgent('normal', 10);
 
-      testWorld.addEntity(hero);
-      testWorld.addEntity(normal);
-
       // Create conflict
       const conflict: ConflictComponent = {
         type: 'conflict',
@@ -229,7 +235,7 @@ describe('HeroProtection', () => {
         conflictType: 'agent_combat',
         initiator: hero.id,
         target: normal.id,
-        state: 'active',
+        state: 'initiated',
         startTick: 0,
         cause: 'test',
         lethal: false,
@@ -238,19 +244,19 @@ describe('HeroProtection', () => {
 
       hero.addComponent(conflict);
 
-      // Run combat
-      testSystem.update(testWorld, 0);
+      // Run combat: first tick starts combat (initiated → fighting), subsequent ticks resolve it
+      // deltaTime=1.0 = 20 ticks elapsed; run 60 ticks total (1200 ticks) to exceed COMBAT_DURATION_EXTENDED (700)
+      const entities = Array.from(world.entities.values());
+      for (let t = 0; t < 60; t++) {
+        testSystem.update(world, entities, 1.0);
+      }
 
-      // Check who won (who has lower health)
-      const heroNeeds = testWorld.getComponent<NeedsComponent>(hero.id, 'needs');
-      const normalNeeds = testWorld.getComponent<NeedsComponent>(normal.id, 'needs');
-
-      if (heroNeeds && normalNeeds) {
-        if (heroNeeds.health > normalNeeds.health) {
-          winCounts.hero++;
-        } else if (normalNeeds.health > heroNeeds.health) {
-          winCounts.normal++;
-        }
+      // Check who won via the conflict outcome (hero is the initiator/attacker)
+      const resolvedConflict = world.getComponent<ConflictComponent>(hero.id, 'conflict');
+      if (resolvedConflict?.outcome === 'attacker_victory') {
+        winCounts.hero++;
+      } else if (resolvedConflict?.outcome === 'defender_victory') {
+        winCounts.normal++;
       }
     }
 
@@ -268,8 +274,11 @@ describe('HeroProtection', () => {
     const trials = 1000;
 
     for (let i = 0; i < trials; i++) {
-      const testWorld = new World();
+      // Fresh world for each trial - reassign outer world so createHero/createNormalAgent use it
+      const testEventBus = new EventBusImpl();
+      world = new World(testEventBus);
       const testSystem = new AgentCombatSystem();
+      void testSystem.initialize(world, testEventBus);
 
       const hero = createHero({
         id: 'cursed-hero',
@@ -280,16 +289,13 @@ describe('HeroProtection', () => {
 
       const normal = createNormalAgent('normal', 10);
 
-      testWorld.addEntity(hero);
-      testWorld.addEntity(normal);
-
       const conflict: ConflictComponent = {
         type: 'conflict',
         version: 1,
         conflictType: 'agent_combat',
         initiator: hero.id,
         target: normal.id,
-        state: 'active',
+        state: 'initiated',
         startTick: 0,
         cause: 'test',
         lethal: false,
@@ -297,17 +303,20 @@ describe('HeroProtection', () => {
       };
 
       hero.addComponent(conflict);
-      testSystem.update(testWorld, 0);
 
-      const heroNeeds = testWorld.getComponent<NeedsComponent>(hero.id, 'needs');
-      const normalNeeds = testWorld.getComponent<NeedsComponent>(normal.id, 'needs');
+      // Run combat: first tick starts combat (initiated → fighting), subsequent ticks resolve it
+      // deltaTime=1.0 = 20 ticks elapsed; run 60 ticks total (1200 ticks) to exceed COMBAT_DURATION_EXTENDED (700)
+      const entities = Array.from(world.entities.values());
+      for (let t = 0; t < 60; t++) {
+        testSystem.update(world, entities, 1.0);
+      }
 
-      if (heroNeeds && normalNeeds) {
-        if (heroNeeds.health > normalNeeds.health) {
-          winCounts.hero++;
-        } else if (normalNeeds.health > heroNeeds.health) {
-          winCounts.normal++;
-        }
+      // Check who won via the conflict outcome (hero is the initiator/attacker)
+      const resolvedConflict = world.getComponent<ConflictComponent>(hero.id, 'conflict');
+      if (resolvedConflict?.outcome === 'attacker_victory') {
+        winCounts.hero++;
+      } else if (resolvedConflict?.outcome === 'defender_victory') {
+        winCounts.normal++;
       }
     }
 

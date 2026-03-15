@@ -12,7 +12,7 @@ import { MegastructureConstructionSystem } from '../MegastructureConstructionSys
 import { ComponentType as CT } from '../../types/ComponentType.js';
 import type { MegastructureComponent } from '../../components/MegastructureComponent.js';
 import type { WarehouseComponent } from '../../components/WarehouseComponent.js';
-import { EventBusImpl } from '../events/EventBus.js';
+import { EventBusImpl } from '../../events/EventBus.js';
 
 describe('MegastructureMaintenanceSystem Integration', () => {
   let world: World;
@@ -152,7 +152,7 @@ describe('MegastructureMaintenanceSystem Integration', () => {
       warehouseEntity.addComponent(warehouse);
 
       // Run maintenance system (should find warehouse and deduct resources)
-      maintenanceSystem.update(world);
+      maintenanceSystem.update(world, [], 0.05);
 
       // Verify maintenance tracking
       const updated = megaEntity.getComponent<MegastructureComponent>(CT.Megastructure);
@@ -206,8 +206,8 @@ describe('MegastructureMaintenanceSystem Integration', () => {
 
       // Simulate many ticks without maintenance
       for (let i = 0; i < 1000; i++) {
-        world.tick++;
-        maintenanceSystem.update(world);
+        world.setTick(world.tick + 1);
+        maintenanceSystem.update(world, [], 0.05);
       }
 
       // Check that efficiency has degraded
@@ -264,8 +264,8 @@ describe('MegastructureMaintenanceSystem Integration', () => {
 
       // Run system multiple times to trigger failure
       for (let i = 0; i < 2000; i++) {
-        world.tick++;
-        maintenanceSystem.update(world);
+        world.setTick(world.tick + 1);
+        maintenanceSystem.update(world, [], 0.05);
       }
 
       const updated = megaEntity.getComponent<MegastructureComponent>(CT.Megastructure);
@@ -342,7 +342,7 @@ describe('MegastructureMaintenanceSystem Integration', () => {
       };
       warehouseEntity.addComponent(warehouse);
 
-      maintenanceSystem.update(world);
+      maintenanceSystem.update(world, [], 0.05);
 
       // Event may or may not be emitted depending on timing, but test passes if no errors
       expect(true).toBe(true);

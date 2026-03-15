@@ -34,7 +34,7 @@ describe('BodySystem - Infection Spreading', () => {
     bodySystem = new BodySystem();
   });
 
-  it('should initialize infection severity when infection starts', () => {
+  it('should initialize infection severity when infection starts', async () => {
     const entity = world.createEntity();
     const body = createBodyComponentFromPlan('humanoid_standard');
 
@@ -43,18 +43,18 @@ describe('BodySystem - Infection Spreading', () => {
     leftArm.infected = true;
 
     entity.addComponent(body);
-    world.registerSystem(bodySystem);
+    await bodySystem.initialize(world, eventBus);
 
     // Run one update
-    world.tick = 0;
-    bodySystem.update(world);
+    world.setTick(0);
+    bodySystem.update(world, [], 0.05);
 
     // Infection severity should be initialized
     expect(leftArm.infectionSeverity).toBeDefined();
     expect(leftArm.infectionSeverity).toBeGreaterThan(0);
   });
 
-  it('should increase infection severity over time when untreated', () => {
+  it('should increase infection severity over time when untreated', async () => {
     const entity = world.createEntity();
     const body = createBodyComponentFromPlan('humanoid_standard');
 
@@ -64,15 +64,15 @@ describe('BodySystem - Infection Spreading', () => {
     leftArm.infectionSeverity = 0.1;
 
     entity.addComponent(body);
-    world.registerSystem(bodySystem);
+    await bodySystem.initialize(world, eventBus);
 
     // Run multiple updates with large deltaTime
-    world.tick = 0;
+    world.setTick(0);
     const initialSeverity = leftArm.infectionSeverity;
 
     for (let i = 0; i < 10; i++) {
-      world.tick += 100;
-      bodySystem.update(world);
+      world.setTick(world.tick + 100);
+      bodySystem.update(world, [], 0.05);
     }
 
     // Infection severity should have increased
@@ -80,7 +80,7 @@ describe('BodySystem - Infection Spreading', () => {
     expect(leftArm.infectionSeverity).toBeLessThanOrEqual(1.0);
   });
 
-  it('should slow infection progression when bandaged', () => {
+  it('should slow infection progression when bandaged', async () => {
     const entity = world.createEntity();
     const body = createBodyComponentFromPlan('humanoid_standard');
 
@@ -97,24 +97,24 @@ describe('BodySystem - Infection Spreading', () => {
     rightArm.bandaged = true;
 
     entity.addComponent(body);
-    world.registerSystem(bodySystem);
+    await bodySystem.initialize(world, eventBus);
 
     // Run multiple updates
-    world.tick = 0;
+    world.setTick(0);
     for (let i = 0; i < 20; i++) {
-      world.tick += 100;
-      bodySystem.update(world);
+      world.setTick(world.tick + 100);
+      bodySystem.update(world, [], 0.05);
     }
 
     // Unbandaged arm should have worse infection
     expect(leftArm.infectionSeverity).toBeGreaterThan(rightArm.infectionSeverity!);
   });
 
-  it('should identify adjacent body parts correctly', () => {
+  it('should identify adjacent body parts correctly', async () => {
     const entity = world.createEntity();
     const body = createBodyComponentFromPlan('humanoid_standard');
     entity.addComponent(body);
-    world.registerSystem(bodySystem);
+    await bodySystem.initialize(world, eventBus);
 
     // Use reflection to access private method for testing
     const getAdjacentBodyParts = (bodySystem as Record<string, unknown>).getAdjacentBodyParts.bind(bodySystem);
@@ -131,7 +131,7 @@ describe('BodySystem - Infection Spreading', () => {
     expect(leftArmAdjacent).toContain('torso'); // Parent (via type-based adjacency)
   });
 
-  it('should spread infection to adjacent parts with probability', () => {
+  it('should spread infection to adjacent parts with probability', async () => {
     const entity = world.createEntity();
     const body = createBodyComponentFromPlan('humanoid_standard');
 
@@ -141,15 +141,15 @@ describe('BodySystem - Infection Spreading', () => {
     leftArm.infectionSeverity = 0.9; // High severity = higher spread chance
 
     entity.addComponent(body);
-    world.registerSystem(bodySystem);
+    await bodySystem.initialize(world, eventBus);
 
     // Run many updates to eventually trigger spreading
-    world.tick = 0;
+    world.setTick(0);
     let spreadOccurred = false;
 
     for (let i = 0; i < 1000; i++) {
-      world.tick += 100;
-      bodySystem.update(world);
+      world.setTick(world.tick + 100);
+      bodySystem.update(world, [], 0.05);
 
       // Check if infection spread to adjacent parts
       const hand = body.parts['left_arm_hand'];
@@ -167,19 +167,19 @@ describe('BodySystem - Infection Spreading', () => {
     expect(spreadOccurred).toBe(true);
   });
 
-  it('should not spread infection from non-infected parts', () => {
+  it('should not spread infection from non-infected parts', async () => {
     const entity = world.createEntity();
     const body = createBodyComponentFromPlan('humanoid_standard');
 
     // No infections
     entity.addComponent(body);
-    world.registerSystem(bodySystem);
+    await bodySystem.initialize(world, eventBus);
 
     // Run multiple updates
-    world.tick = 0;
+    world.setTick(0);
     for (let i = 0; i < 100; i++) {
-      world.tick += 100;
-      bodySystem.update(world);
+      world.setTick(world.tick + 100);
+      bodySystem.update(world, [], 0.05);
     }
 
     // No part should be infected
@@ -188,7 +188,7 @@ describe('BodySystem - Infection Spreading', () => {
     }
   });
 
-  it('should handle insectoid body plan with different part types', () => {
+  it('should handle insectoid body plan with different part types', async () => {
     const entity = world.createEntity();
     const body = createBodyComponentFromPlan('insectoid_4arm');
 
@@ -198,7 +198,7 @@ describe('BodySystem - Infection Spreading', () => {
     thorax.infectionSeverity = 0.1;
 
     entity.addComponent(body);
-    world.registerSystem(bodySystem);
+    await bodySystem.initialize(world, eventBus);
 
     // Use reflection to access private method
     const getAdjacentBodyParts = (bodySystem as Record<string, unknown>).getAdjacentBodyParts.bind(bodySystem);

@@ -24,8 +24,8 @@ type QueryMock = ReturnType<typeof vi.fn> & {
   executeEntities: ReturnType<typeof vi.fn>;
 };
 import type { Component } from '../types/index.js';
-import type {
 import { EventBusImpl } from '@ai-village/core';
+import type {
   PlaceBuildingRequest,
   PlaceBuildingResult,
   BuildingInfo,
@@ -819,7 +819,7 @@ describe('GameIntrospectionAPI Phase 2 - Building Management', () => {
     });
 
     it('should emit building placement event', async () => {
-      const emitSpy = vi.spyOn(eventBus!, 'emit');
+      const emitSpy = vi.spyOn(world.eventBus, 'emit');
 
       const result = await api.placeBuilding({
         blueprintId: 'workbench',

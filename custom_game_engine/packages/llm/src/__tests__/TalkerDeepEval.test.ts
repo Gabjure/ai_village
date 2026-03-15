@@ -25,6 +25,7 @@ describe('TalkerDeepEval - Speech Generation', () => {
         })
       }),
       getEntity: () => null,
+      getPlanet: () => undefined,
     };
 
     // Base mock agent

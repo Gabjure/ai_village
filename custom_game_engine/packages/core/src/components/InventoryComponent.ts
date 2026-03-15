@@ -2,6 +2,7 @@ import type { Component } from '../ecs/Component.js';
 import type { ResourceType } from './ResourceComponent.js';
 import {
   itemRegistry,
+  itemInstanceRegistry,
   isSeedItemId,
   getSeedSpeciesId as getSeedSpeciesIdFromItems,
   createSeedItemId as createSeedItemIdFromItems,
@@ -465,9 +466,6 @@ export function getWorkingTools(
   inventory: InventoryComponent,
   toolType: string
 ): Array<{ slotIndex: number; instanceId: string; itemId: string; condition: number }> {
-  const { itemInstanceRegistry } = require('../items/ItemInstanceRegistry.js');
-  const { itemRegistry } = require('../items/ItemRegistry.js');
-
   const workingTools: Array<{ slotIndex: number; instanceId: string; itemId: string; condition: number }> = [];
 
   for (let i = 0; i < inventory.slots.length; i++) {

@@ -11,9 +11,23 @@ import { ComponentType } from '../types/ComponentType.js';
  */
 
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { World } from '../World.js';
+import { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
-import type { SkillId, SkillLevel } from '../components/SkillsComponent.js';
+import {
+  type SkillId,
+  type SkillLevel,
+  generateRandomStartingSkills,
+  filterVisibleEntities,
+  getFoodStorageInfo,
+  getAvailableBuildings,
+} from '../components/SkillsComponent.js';
+import { PersonalityComponent } from '../components/PersonalityComponent.js';
+import { BuildingBlueprintRegistry } from '../buildings/BuildingBlueprintRegistry.js';
+import {
+  generateStrategicInstruction,
+  getPerceivedAgentSkills,
+  getAffordancesThroughRelationships,
+} from '../../../llm/src/StructuredPromptBuilder.js';
 import { EventBusImpl } from '../events/EventBus.js';
 
 describe('Role Specialization Integration', () => {
@@ -30,8 +44,6 @@ describe('Role Specialization Integration', () => {
 
   describe('Skill Diversity at Spawn (80%+ have skill > 0)', () => {
     it('should spawn agents with diverse starting skills', () => {
-      const { generateRandomStartingSkills } = require('../components/SkillsComponent.js');
-      const { createPersonalityComponent } = require('../components/PersonalityComponent.js');
 
       const agentsWithSkills: number[] = [];
 
@@ -61,8 +73,6 @@ describe('Role Specialization Integration', () => {
     });
 
     it('should distribute skills across multiple domains', () => {
-      const { generateRandomStartingSkills } = require('../components/SkillsComponent.js');
-      const { createPersonalityComponent } = require('../components/PersonalityComponent.js');
 
       const skillCounts: Record<SkillId, number> = {
         building: 0,
@@ -154,8 +164,6 @@ describe('Role Specialization Integration', () => {
       // Simulate: village needs a building
       // Check which agents receive "build" suggestions in their prompts
 
-      const { generateStrategicInstruction } = require('../llm/StructuredPromptBuilder.js');
-
       const villageState = {
         needsStorage: true,
         foodLow: false,
@@ -227,8 +235,6 @@ describe('Role Specialization Integration', () => {
         agents.push(entity);
       }
 
-      const { generateStrategicInstruction } = require('../llm/StructuredPromptBuilder.js');
-
       const villageState = {
         needsStorage: false,
         foodLow: true,
@@ -266,9 +272,6 @@ describe('Role Specialization Integration', () => {
 
   describe('Reduced building duplicates (<10% overlapping starts)', () => {
     it('should prevent unskilled agents from seeing complex buildings', () => {
-      const { getAvailableBuildings } = require('../components/SkillsComponent.js');
-      const { BuildingBlueprintRegistry } = require('../buildings/BuildingBlueprintRegistry.js');
-
       const registry = new BuildingBlueprintRegistry();
       registry.registerDefaults();
 
@@ -338,8 +341,6 @@ describe('Role Specialization Integration', () => {
         agents.push(entity);
       }
 
-      const { generateStrategicInstruction } = require('../llm/StructuredPromptBuilder.js');
-
       const villageState = {
         needsStorage: true,
         foodLow: false,
@@ -382,8 +383,6 @@ describe('Role Specialization Integration', () => {
 
   describe('Entity visibility based on skill and distance', () => {
     it('should only show entities within perception radius', () => {
-      const { filterVisibleEntities } = require('../components/SkillsComponent.js');
-
       const entities = [
         { id: '1', type: 'berry_bush', position: { x: 3, y: 0 } },   // 3 tiles away
         { id: '2', type: 'berry_bush', position: { x: 10, y: 0 } },  // 10 tiles away
@@ -419,8 +418,6 @@ describe('Role Specialization Integration', () => {
     });
 
     it('should filter rare entities by skill level', () => {
-      const { filterVisibleEntities } = require('../components/SkillsComponent.js');
-
       const entities = [
         { id: '1', type: 'berry_bush', position: { x: 5, y: 0 } },
         { id: '2', type: 'truffle', position: { x: 5, y: 5 } },
@@ -449,8 +446,6 @@ describe('Role Specialization Integration', () => {
 
   describe('Information depth scales with skill', () => {
     it('should provide increasingly detailed food information', () => {
-      const { getFoodStorageInfo } = require('../components/SkillsComponent.js');
-
       const storage = {
         items: { berries: 23, meat: 12 },
         villageSize: 5,
@@ -482,8 +477,6 @@ describe('Role Specialization Integration', () => {
 
   describe('Social skill gates perception of other agents', () => {
     it('should reveal more about others as social skill increases', () => {
-      const { getPerceivedAgentSkills } = require('../llm/StructuredPromptBuilder.js');
-
       const target = {
         name: 'Oak',
         skills: {
@@ -518,8 +511,6 @@ describe('Role Specialization Integration', () => {
 
   describe('Relationships unlock affordances', () => {
     it('should show different affordances based on relationship level', () => {
-      const { getAffordancesThroughRelationships } = require('../llm/StructuredPromptBuilder.js');
-
       const otherAgents = [
         {
           id: 'oak',

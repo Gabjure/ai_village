@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
-import { ItemInstance, getQualityTier } from './ItemInstance';
-import { ItemTraits } from './ItemTraits';
+import { ItemInstance, getQualityTier } from './ItemInstance.js';
+import { ItemTraits } from './ItemTraits.js';
 
 /**
  * Registry for active item instances in the world.

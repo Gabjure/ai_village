@@ -40,7 +40,8 @@ describe('MetricsWebSocketClient Integration', () => {
     };
 
     // Mock WebSocket constructor to return our mock instance
-    global.WebSocket = vi.fn(() => mockWebSocket as WebSocket) as typeof WebSocket;
+    // Use regular function (not arrow) so new WebSocket() returns mockWebSocket
+    global.WebSocket = vi.fn().mockImplementation(function() { return mockWebSocket; }) as unknown as typeof WebSocket;
   });
 
   afterEach(() => {

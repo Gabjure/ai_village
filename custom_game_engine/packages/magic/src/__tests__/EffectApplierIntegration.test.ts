@@ -36,8 +36,8 @@ import { EventBusImpl } from '@ai-village/core';
 // Test Setup Helpers
 // ============================================================================
 
-function createTestWorld(): { world: World; magicSystem: MagicSystem } {
-  const eventBus = new EventBusImpl(); world = new World(eventBus);
+function createTestWorld(): { world: World; magicSystem: MagicSystem; eventBus: EventBusImpl } {
+  const eventBus = new EventBusImpl(); const world = new World(eventBus);
   const magicSystem = new MagicSystem();
 
   // Reset singletons before each test to ensure clean state
@@ -49,7 +49,7 @@ function createTestWorld(): { world: World; magicSystem: MagicSystem } {
   // This will call initMagicInfrastructure() which registers appliers and example spells
   magicSystem.initialize(world, eventBus);
 
-  return { world, magicSystem };
+  return { world, magicSystem, eventBus };
 }
 
 function createMageEntity(world: World, options: {
@@ -259,6 +259,7 @@ describe('Complete Spell Casting Pipeline', () => {
     const setup = createTestWorld();
     world = setup.world;
     magicSystem = setup.magicSystem;
+    eventBus = setup.eventBus;
   });
 
   it('should cast spell and apply damage effect to target', () => {
@@ -856,12 +857,14 @@ describe('Resource Management', () => {
 
 describe('Event System', () => {
   let world: World;
+  let eventBus: EventBusImpl;
   let magicSystem: MagicSystem;
 
   beforeEach(() => {
     const setup = createTestWorld();
     world = setup.world;
     magicSystem = setup.magicSystem;
+    eventBus = setup.eventBus;
   });
 
   it('should emit spell_cast event', () => {

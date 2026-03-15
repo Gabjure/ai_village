@@ -1,4 +1,4 @@
-import { ItemTraits } from './ItemTraits';
+import { ItemTraits } from './ItemTraits.js';
 import type { ItemQuality } from '../types/ItemTypes.js';
 
 // Re-export for backwards compatibility

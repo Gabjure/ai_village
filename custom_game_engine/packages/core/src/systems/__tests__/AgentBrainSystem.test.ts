@@ -243,7 +243,7 @@ describe('AgentBrainSystem', () => {
 
       system.update(world, [entity], 0.05);
 
-      expect(eventBus.emit).toHaveBeenCalledWith(
+      expect(world.eventBus.emit).toHaveBeenCalledWith(
         expect.objectContaining({
           type: 'agent:queue:interrupted',
           data: expect.objectContaining({

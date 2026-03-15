@@ -26,6 +26,10 @@ describe('Voxel Building System - End-to-End Integration', () => {
     const eventBus = new EventBusImpl();
     world = new World(eventBus);
 
+    // Initialize the TileConstructionSystem singleton so this.events is available
+    const constructionSystem = getTileConstructionSystem();
+    void constructionSystem.initialize(world, eventBus);
+
     // Register test blueprints for integration testing
     const registry = getTileBasedBlueprintRegistry();
 

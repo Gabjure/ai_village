@@ -81,7 +81,7 @@ describe('Reality Anchor Power Integration', () => {
       // Simulate 20 ticks (1 second at 20 TPS)
       for (let i = 0; i < 20; i++) {
         world.advanceTick();
-        realityAnchorSystem.update(world);
+        realityAnchorSystem.update(world, [], 0.05);
       eventBus.flush(); // Flush event queue
       }
 
@@ -118,7 +118,7 @@ describe('Reality Anchor Power Integration', () => {
       // Simulate 20 ticks (1 second at 20 TPS)
       for (let i = 0; i < 20; i++) {
         world.advanceTick();
-        realityAnchorSystem.update(world);
+        realityAnchorSystem.update(world, [], 0.05);
       eventBus.flush(); // Flush event queue
       }
 
@@ -147,7 +147,7 @@ describe('Reality Anchor Power Integration', () => {
       for (let i = 0; i < 20; i++) {
         world.advanceTick();
       }
-      realityAnchorSystem.update(world);
+      realityAnchorSystem.update(world, [], 0.05);
       eventBus.flush(); // Flush event queue
 
       // Assert: Event should be emitted
@@ -211,7 +211,7 @@ describe('Reality Anchor Power Integration', () => {
       for (let i = 0; i < 20; i++) {
         world.advanceTick();
       }
-      realityAnchorSystem.update(world);
+      realityAnchorSystem.update(world, [], 0.05);
       eventBus.flush(); // Flush event queue
 
       // Assert: Field should collapse
@@ -241,7 +241,7 @@ describe('Reality Anchor Power Integration', () => {
       for (let i = 0; i < 20; i++) {
         world.advanceTick();
       }
-      realityAnchorSystem.update(world);
+      realityAnchorSystem.update(world, [], 0.05);
       eventBus.flush(); // Flush event queue
       eventBus.flush(); // Flush event queue
 
@@ -277,7 +277,7 @@ describe('Reality Anchor Power Integration', () => {
       for (let i = 0; i < 20; i++) {
         world.advanceTick();
       }
-      realityAnchorSystem.update(world);
+      realityAnchorSystem.update(world, [], 0.05);
       eventBus.flush(); // Flush event queue
       eventBus.flush(); // Flush event queue
 
@@ -316,7 +316,7 @@ describe('Reality Anchor Power Integration', () => {
       for (let i = 0; i < 20; i++) {
         world.advanceTick();
       }
-      realityAnchorSystem.update(world);
+      realityAnchorSystem.update(world, [], 0.05);
       eventBus.flush(); // Flush event queue
 
       // Assert: Field should remain active
@@ -383,7 +383,7 @@ describe('Reality Anchor Power Integration', () => {
       for (let i = 0; i < 20; i++) {
         world.advanceTick();
       }
-      realityAnchorSystem.update(world);
+      realityAnchorSystem.update(world, [], 0.05);
       eventBus.flush(); // Flush event queue
 
       // Assert: Should have 2 separate networks, anchor not powered, not charging
@@ -449,7 +449,7 @@ describe('Reality Anchor Power Integration', () => {
       for (let i = 0; i < 20; i++) {
         world.advanceTick();
       }
-      realityAnchorSystem.update(world);
+      realityAnchorSystem.update(world, [], 0.05);
       eventBus.flush(); // Flush event queue
 
       // Assert: Partial power warning emitted
@@ -504,7 +504,7 @@ describe('Reality Anchor Power Integration', () => {
       for (let i = 0; i < 20; i++) {
         world.advanceTick();
       }
-      realityAnchorSystem.update(world);
+      realityAnchorSystem.update(world, [], 0.05);
       eventBus.flush(); // Flush event queue
 
       // Assert: Field collapsed, god restored to divinity
@@ -529,7 +529,7 @@ describe('Reality Anchor Power Integration', () => {
       for (let i = 0; i < 20; i++) {
         world.advanceTick();
       }
-      expect(() => realityAnchorSystem.update(world)).not.toThrow();
+      expect(() => realityAnchorSystem.update(world, [], 0.05)).not.toThrow();
 
       // Assert: Should either:
       // 1. Not charge (safest)
@@ -554,7 +554,7 @@ describe('Reality Anchor Power Integration', () => {
       for (let i = 0; i < 20; i++) {
         world.advanceTick();
       }
-      realityAnchorSystem.update(world);
+      realityAnchorSystem.update(world, [], 0.05);
       eventBus.flush(); // Flush event queue
 
       // Assert: No changes to power level, no power consumption

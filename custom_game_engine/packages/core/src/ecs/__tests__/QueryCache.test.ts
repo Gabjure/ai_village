@@ -1,11 +1,11 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { QueryCache } from '../QueryCache.js';
 import { World } from '../World.js';
-import { EventBus } from '../../events/EventBus.js';
+import { EventBusImpl } from '../../events/EventBus.js';
 import type { Entity } from '../Entity.js';
 
 function createTestWorld() {
-  const eventBus = new EventBus();
+  const eventBus = new EventBusImpl();
   return new World(eventBus);
 }
 

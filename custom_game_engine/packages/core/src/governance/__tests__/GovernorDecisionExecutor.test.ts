@@ -6,7 +6,7 @@
 
 import { describe, it, expect, beforeEach } from 'vitest';
 import { World } from '../../ecs/World.js';
-import { EventBus } from '../../events/EventBus.js';
+import { EventBus, EventBusImpl } from '../../events/EventBus.js';
 import { EntityImpl } from '../../ecs/Entity.js';
 import { executeGovernorDecision, type ParsedGovernorDecision } from '../GovernorDecisionExecutor.js';
 import { createGovernorComponent } from '../../components/GovernorComponent.js';
@@ -20,7 +20,7 @@ describe('GovernorDecisionExecutor', () => {
   let eventBus: EventBus;
 
   beforeEach(() => {
-    eventBus = new EventBus();
+    eventBus = new EventBusImpl();
     world = new World(eventBus);
   });
 

@@ -109,6 +109,10 @@ describe('Divinity System - Complete Integration', () => {
     speciesSystem = new SpeciesCreationSystem();
     weatherSystem = new DivineWeatherControl();
     massEventSystem = new MassEventSystem();
+
+    // Initialize systems that use this.events (BaseSystem) with the eventBus
+    void avatarSystem.initialize(world, eventBus);
+    void massEventSystem.initialize(world, eventBus);
   });
 
   describe('Phase 1-3: Foundation', () => {
@@ -186,7 +190,7 @@ describe('Divinity System - Complete Integration', () => {
       // Run emergence detection
       for (let i = 0; i < 100; i++) {
         world.advanceTick();
-        deityEmergenceSystem.update(world);
+        deityEmergenceSystem.update(world, [], 0.05);
       }
 
       const finalDeityCount = Array.from(world.entities.values())
@@ -209,7 +213,7 @@ describe('Divinity System - Complete Integration', () => {
       }
 
       // Run AI behavior
-      aiGodBehaviorSystem.update(world);
+      aiGodBehaviorSystem.update(world, [], 0.05);
 
       // AI should manage its belief and believers
       expect(deityComp).toBeDefined();
@@ -236,7 +240,7 @@ describe('Divinity System - Complete Integration', () => {
         for (let j = 0; j < interval; j++) {
           world.advanceTick();
         }
-        priesthoodSystem.update(world);
+        priesthoodSystem.update(world, [], 0.05);
       }
 
       // Should have ordained a priest
@@ -259,7 +263,7 @@ describe('Divinity System - Complete Integration', () => {
       for (let i = 0; i < holyTextInterval; i++) {
         world.advanceTick();
       }
-      holyTextSystem.update(world);
+      holyTextSystem.update(world, [], 0.05);
 
       // Should have created a holy text
       const texts = holyTextSystem.getTextsForDeity(deity.id);
@@ -325,7 +329,7 @@ describe('Divinity System - Complete Integration', () => {
         for (let j = 0; j < interval; j++) {
           world.advanceTick();
         }
-        schismSystem.update(world);
+        schismSystem.update(world, [], 0.05);
       }
 
       // May have created schism (probabilistic)
@@ -362,7 +366,7 @@ describe('Divinity System - Complete Integration', () => {
         for (let j = 0; j < interval; j++) {
           world.advanceTick();
         }
-        competitionSystem.update(world);
+        competitionSystem.update(world, [], 0.05);
       }
 
       // May have started competition
@@ -507,20 +511,20 @@ describe('Divinity System - Complete Integration', () => {
         beliefGenSystem.update(world, Array.from(world.entities.values()), world.tick);
         prayerSystem.update(world, Array.from(world.entities.values()), world.tick);
         prayerAnswerSystem.update(world, Array.from(world.entities.values()), world.tick);
-        deityEmergenceSystem.update(world);
-        aiGodBehaviorSystem.update(world);
-        priesthoodSystem.update(world);
-        ritualSystem.update(world);
-        holyTextSystem.update(world);
-        avatarSystem.update(world);
-        angelSystem.update(world);
-        schismSystem.update(world);
-        syncretismSystem.update(world);
-        competitionSystem.update(world);
-        terrainSystem.update(world);
-        speciesSystem.update(world);
-        weatherSystem.update(world);
-        massEventSystem.update(world);
+        deityEmergenceSystem.update(world, [], 0.05);
+        aiGodBehaviorSystem.update(world, [], 0.05);
+        priesthoodSystem.update(world, [], 0.05);
+        ritualSystem.update(world, [], 0.05);
+        holyTextSystem.update(world, [], 0.05);
+        avatarSystem.update(world, [], 0.05);
+        angelSystem.update(world, [], 0.05);
+        schismSystem.update(world, [], 0.05);
+        syncretismSystem.update(world, [], 0.05);
+        competitionSystem.update(world, [], 0.05);
+        terrainSystem.update(world, [], 0.05);
+        speciesSystem.update(world, [], 0.05);
+        weatherSystem.update(world, [], 0.05);
+        massEventSystem.update(world, [], 0.05);
       }
 
       // Verify the system is working

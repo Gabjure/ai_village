@@ -24,14 +24,15 @@ describe('University Research Integration', () => {
   let buildingSystem: BuildingSystem;
   let techSystem: TechnologyUnlockSystem;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     eventBus = new EventBusImpl();
     world = new World(eventBus);
     universitySystem = new UniversitySystem(eventBus);
     buildingSystem = new BuildingSystem();
     techSystem = new TechnologyUnlockSystem(eventBus);
 
-    // Only BuildingSystem has initialize method
+    // Initialize systems that use this.events (BaseSystem)
+    await universitySystem.initialize(world, eventBus);
     buildingSystem.initialize(world, eventBus);
   });
 

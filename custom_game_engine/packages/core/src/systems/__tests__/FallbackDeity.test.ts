@@ -77,7 +77,7 @@ describe('Fallback Deity', () => {
     });
 
     // Run prayer system
-    prayerSystem.update(world);
+    prayerSystem.update(world, [], 0.05);
 
     // Verify prayer was routed to fallback deity
     expect(prayerOffered).toBe(true);
@@ -115,7 +115,7 @@ describe('Fallback Deity', () => {
     });
 
     // Run prayer system (no fallback deity exists)
-    prayerSystem.update(world);
+    prayerSystem.update(world, [], 0.05);
 
     // Verify proto_deity event was emitted
     expect(protoDeityEvent).toBe(true);

@@ -20,7 +20,7 @@ import type { ShippingLaneComponent } from '../../components/ShippingLaneCompone
 import type { TradeNetworkComponent } from '../../components/TradeNetworkComponent.js';
 import type { BlockadeComponent } from '../../components/BlockadeComponent.js';
 import { createTradeNetworkComponent } from '../../components/TradeNetworkComponent.js';
-import { EventBusImpl } from '../events/EventBus.js';
+import { EventBusImpl } from '../../events/EventBus.js';
 
 describe('TradeNetworkSystem', () => {
   let world: World;
@@ -86,7 +86,7 @@ describe('TradeNetworkSystem', () => {
       (networkEntity as EntityImpl).addComponent(network);
 
       // Update system to build graph
-      system.update(world);
+      system.update(world, [], 0.05);
 
       // Verify network was built
       const updatedNetwork = networkEntity.getComponent<TradeNetworkComponent>('trade_network');
@@ -146,7 +146,7 @@ describe('TradeNetworkSystem', () => {
       );
       (networkEntity as EntityImpl).addComponent(network);
 
-      system.update(world);
+      system.update(world, [], 0.05);
 
       const updatedNetwork = networkEntity.getComponent<TradeNetworkComponent>('trade_network');
       expect(updatedNetwork!.nodes.size).toBe(3);
@@ -200,7 +200,7 @@ describe('TradeNetworkSystem', () => {
       );
       (networkEntity as EntityImpl).addComponent(network);
 
-      system.update(world);
+      system.update(world, [], 0.05);
 
       const updatedNetwork = networkEntity.getComponent<TradeNetworkComponent>('trade_network');
 
@@ -263,7 +263,7 @@ describe('TradeNetworkSystem', () => {
       );
       (networkEntity as EntityImpl).addComponent(network);
 
-      system.update(world);
+      system.update(world, [], 0.05);
 
       const updatedNetwork = networkEntity.getComponent<TradeNetworkComponent>('trade_network');
 
@@ -345,7 +345,7 @@ describe('TradeNetworkSystem', () => {
       );
       (networkEntity as EntityImpl).addComponent(network);
 
-      system.update(world);
+      system.update(world, [], 0.05);
 
       const updatedNetwork = networkEntity.getComponent<TradeNetworkComponent>('trade_network');
 
@@ -426,7 +426,7 @@ describe('TradeNetworkSystem', () => {
       );
       (networkEntity as EntityImpl).addComponent(network);
 
-      system.update(world);
+      system.update(world, [], 0.05);
 
       // Create blockade at hub
       const result = system.createBlockade(
@@ -442,7 +442,7 @@ describe('TradeNetworkSystem', () => {
       expect(result.blockadeId).toBeDefined();
 
       // Update system to process blockade
-      system.update(world);
+      system.update(world, [], 0.05);
 
       // Check flow rates reduced
       const updatedLaneA = laneEntityA.getComponent<ShippingLaneComponent>('shipping_lane');
@@ -520,7 +520,7 @@ describe('TradeNetworkSystem', () => {
       );
       (networkEntity as EntityImpl).addComponent(network);
 
-      system.update(world);
+      system.update(world, [], 0.05);
 
       // Track shortage events
       let shortageDetected = false;
@@ -538,7 +538,7 @@ describe('TradeNetworkSystem', () => {
         1000
       );
 
-      system.update(world);
+      system.update(world, [], 0.05);
 
       // Shortage event should be emitted for nodeB
       expect(shortageDetected).toBe(true);
@@ -613,7 +613,7 @@ describe('TradeNetworkSystem', () => {
       );
       (networkEntity as EntityImpl).addComponent(network);
 
-      system.update(world);
+      system.update(world, [], 0.05);
 
       const updatedNetwork = networkEntity.getComponent<TradeNetworkComponent>('trade_network');
 
@@ -670,7 +670,7 @@ describe('TradeNetworkSystem', () => {
       );
       (networkEntity as EntityImpl).addComponent(network);
 
-      system.update(world);
+      system.update(world, [], 0.05);
 
       const updatedNetwork = networkEntity.getComponent<TradeNetworkComponent>('trade_network');
 
@@ -731,7 +731,7 @@ describe('TradeNetworkSystem', () => {
       );
       (networkEntity as EntityImpl).addComponent(network);
 
-      system.update(world);
+      system.update(world, [], 0.05);
 
       const updatedNetwork = networkEntity.getComponent<TradeNetworkComponent>('trade_network');
 
@@ -790,7 +790,7 @@ describe('TradeNetworkSystem', () => {
         resilienceWarningEmitted = true;
       });
 
-      system.update(world);
+      system.update(world, [], 0.05);
 
       const updatedNetwork = networkEntity.getComponent<TradeNetworkComponent>('trade_network');
 

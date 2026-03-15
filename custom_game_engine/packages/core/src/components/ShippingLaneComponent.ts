@@ -110,6 +110,38 @@ export interface ShippingLaneComponent {
 }
 
 /**
+ * Create a new ShippingLaneComponent with defaults
+ */
+export function createShippingLaneComponent(
+  originId: EntityId,
+  destinationId: EntityId,
+  capacity: number
+): ShippingLaneComponent {
+  return {
+    type: 'shipping_lane',
+    version: 1,
+    laneId: `${originId}_to_${destinationId}`,
+    name: `Lane ${originId} → ${destinationId}`,
+    originId,
+    originPosition: { x: 0, y: 0 },
+    destinationId,
+    destinationPosition: { x: 0, y: 0 },
+    distance: 0,
+    travelTimeTicks: 0,
+    passageIds: [],
+    activeCaravans: [],
+    flowRate: 0,
+    capacity,
+    hazards: [],
+    safetyRating: 1.0,
+    tollRate: 0,
+    controlledBy: undefined,
+    status: 'active',
+    lastUsedTick: 0,
+  };
+}
+
+/**
  * Lane Hazard - Dangers affecting the shipping lane
  */
 export interface LaneHazard {

@@ -16,7 +16,7 @@ import { ComponentType as CT } from '../../types/ComponentType.js';
 import { createEmpireComponent, type EmpireRelation } from '../../components/EmpireComponent.js';
 import { EmpireDiplomacySystem } from '../EmpireDiplomacySystem.js';
 import { EmpireWarSystem } from '../EmpireWarSystem.js';
-import { EventBusImpl } from '../events/EventBus.js';
+import { EventBusImpl } from '../../events/EventBus.js';
 
 describe('Empire Diplomacy System', () => {
   let world: World;
@@ -144,6 +144,7 @@ describe('Empire Diplomacy System', () => {
 
 describe('Empire War System', () => {
   let world: World;
+  let eventBus: EventBusImpl;
   let warSystem: EmpireWarSystem;
 
   beforeEach(() => {
@@ -278,6 +279,7 @@ describe('Empire War System', () => {
 
 describe('Treaty Execution', () => {
   let world: World;
+  let eventBus: EventBusImpl;
 
   beforeEach(() => {
     eventBus = new EventBusImpl(); world = new World(eventBus);

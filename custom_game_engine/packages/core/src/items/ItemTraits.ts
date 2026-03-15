@@ -1,12 +1,12 @@
-import { EdibleTrait } from './traits/EdibleTrait';
-import { WeaponTrait } from './traits/WeaponTrait';
-import { MagicalTrait } from './traits/MagicalTrait';
-import { ContainerTrait } from './traits/ContainerTrait';
-import { ToolTrait } from './traits/ToolTrait';
-import { ArmorTrait } from './traits/ArmorTrait';
-import { StatBonusTrait } from './traits/StatBonusTrait';
-import { AmmoTrait } from './traits/AmmoTrait';
-import { MaterialTrait } from './traits/MaterialTrait';
+import { EdibleTrait } from './traits/EdibleTrait.js';
+import { WeaponTrait } from './traits/WeaponTrait.js';
+import { MagicalTrait } from './traits/MagicalTrait.js';
+import { ContainerTrait } from './traits/ContainerTrait.js';
+import { ToolTrait } from './traits/ToolTrait.js';
+import { ArmorTrait } from './traits/ArmorTrait.js';
+import { StatBonusTrait } from './traits/StatBonusTrait.js';
+import { AmmoTrait } from './traits/AmmoTrait.js';
+import { MaterialTrait } from './traits/MaterialTrait.js';
 
 /**
  * Compositional trait bag for items.

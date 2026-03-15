@@ -139,16 +139,21 @@ export class FleeBehavior extends BaseAnimalBehavior {
   /**
    * Check if fleeing behavior can start.
    * Only triggers at panic-level stress (>70) or for wild animals near humans.
+   * Personality fearfulness lowers the effective stress threshold: a fearful animal
+   * (fearfulness=1.0) flees at stress > 40; a brave animal (fearfulness=0.0) needs stress > 70.
    * Combined with stress reduction when no threat found (-10/tick), this prevents
    * the flee→idle→flee loop that occurred with the old threshold of 50.
    */
   canStart(_entity: EntityImpl, animal: AnimalComponent): boolean {
-    // Panic threshold - animal must be highly stressed to START fleeing
+    // Panic threshold - always flee at very high stress regardless of personality
     if (animal.stress > 70) {
       return true;
     }
-    // Wild animals flee from humans if untrusting and moderately stressed
-    if (animal.wild && animal.trustLevel < 30 && animal.stress > 40) {
+    // Personality-adjusted threshold for wild, untrusting animals.
+    // fearfulness ∈ [0,1]: threshold ranges from 70 (fearfulness=0) to 40 (fearfulness=1).
+    const fearfulness = animal.personality?.fearfulness ?? 0.5;
+    const threshold = 70 - fearfulness * 30;
+    if (animal.wild && animal.trustLevel < 30 && animal.stress > threshold) {
       return true;
     }
     return false;
@@ -156,15 +161,24 @@ export class FleeBehavior extends BaseAnimalBehavior {
 
   /**
    * Get priority - fleeing is highest priority for prey.
+   * Personality fearfulness scales priority upward for more fearful animals.
    */
   getPriority(animal: AnimalComponent): number {
-    // Fleeing is critical when stressed
+    // Base priority curve:
     // 0-50 stress: 0-25 priority
     // 50-80 stress: 25-75 priority (moderate threat)
     // 80-100 stress: 75-100 priority (critical)
-    if (animal.stress <= 50) return animal.stress * 0.5;
-    if (animal.stress <= 80) return 25 + ((animal.stress - 50) / 30) * 50;
-    return 75 + ((animal.stress - 80) / 20) * 25;
+    let base: number;
+    if (animal.stress <= 50) {
+      base = animal.stress * 0.5;
+    } else if (animal.stress <= 80) {
+      base = 25 + ((animal.stress - 50) / 30) * 50;
+    } else {
+      base = 75 + ((animal.stress - 80) / 20) * 25;
+    }
+    // Scale by fearfulness: fearful animals have up to 50% higher priority
+    const fearfulness = animal.personality?.fearfulness ?? 0.5;
+    return base * (1 + fearfulness * 0.5);
   }
 
   /**
@@ -180,8 +194,8 @@ export class FleeBehavior extends BaseAnimalBehavior {
   ): Entity | null {
     // Cache query results per tick (avoids O(N*M) when N animals search for threats)
     if (this.queryCacheTick !== world.tick) {
-      this.agentQueryCache = world.query().with('agent').with('position').executeEntities();
-      this.animalQueryCache = world.query().with('animal').with('position').executeEntities();
+      this.agentQueryCache = [...world.query().with('agent').with('position').executeEntities()];
+      this.animalQueryCache = [...world.query().with('animal').with('position').executeEntities()];
       this.queryCacheTick = world.tick;
     }
 

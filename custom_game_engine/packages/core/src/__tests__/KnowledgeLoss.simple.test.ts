@@ -14,8 +14,8 @@ describe('KnowledgeLoss', () => {
   let eventBus: EventBus;
 
   beforeEach(() => {
-    eventBus = new EventBusImpl(); world = new World(eventBus);
-    eventBus = new EventBus();
+    eventBus = new EventBusImpl();
+    world = new World(eventBus);
     system = new DeathTransitionSystem(eventBus);
   });
 

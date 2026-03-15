@@ -55,7 +55,7 @@ describe('RealityAnchorSystem Integration', () => {
     // Simulate 20 ticks (1 second at 20 TPS)
     for (let i = 0; i < 20; i++) {
       world.advanceTick();
-      realityAnchorSystem.update(world);
+      realityAnchorSystem.update(world, [], 0.05);
     }
 
     // Verify power level increased (charging happened)
@@ -100,7 +100,7 @@ describe('RealityAnchorSystem Integration', () => {
     // Simulate 20 ticks
     for (let i = 0; i < 20; i++) {
       world.advanceTick();
-      realityAnchorSystem.update(world);
+      realityAnchorSystem.update(world, [], 0.05);
     }
 
     // Verify power level did NOT increase (no charging)
@@ -142,7 +142,7 @@ describe('RealityAnchorSystem Integration', () => {
 
     // Simulate 20 ticks
     world.setTick(20);
-    realityAnchorSystem.update(world);
+    realityAnchorSystem.update(world, [], 0.05);
 
     // Verify field remains active
     expect(anchorComp.status).toBe('active');
@@ -171,7 +171,7 @@ describe('RealityAnchorSystem Integration', () => {
 
     // Run system
     world.setTick(20);
-    realityAnchorSystem.update(world);
+    realityAnchorSystem.update(world, [], 0.05);
 
     // Verify field collapsed
     expect(anchorComp.status).toBe('failed');
@@ -201,7 +201,7 @@ describe('RealityAnchorSystem Integration', () => {
     realityAnchorSystem.initialize(world, eventBus);
 
     world.setTick(20);
-    realityAnchorSystem.update(world);
+    realityAnchorSystem.update(world, [], 0.05);
     eventBus.flush();
 
     // Verify event emitted
@@ -237,7 +237,7 @@ describe('RealityAnchorSystem Integration', () => {
     realityAnchorSystem.initialize(world, eventBus);
 
     world.setTick(20);
-    realityAnchorSystem.update(world);
+    realityAnchorSystem.update(world, [], 0.05);
 
     // Verify field collapse event and gods released
     expect(eventSpy).toHaveBeenCalledWith(
@@ -292,7 +292,7 @@ describe('RealityAnchorSystem Integration', () => {
 
     // Run Reality Anchor system
     world.setTick(20);
-    realityAnchorSystem.update(world);
+    realityAnchorSystem.update(world, [], 0.05);
 
     // Verify field collapsed, god restored
     expect(anchorPower.isPowered).toBe(false);
@@ -334,7 +334,7 @@ describe('RealityAnchorSystem Integration', () => {
     expect(anchorPower.isPowered).toBe(false);
 
     world.setTick(20);
-    realityAnchorSystem.update(world);
+    realityAnchorSystem.update(world, [], 0.05);
 
     // Should not charge
     expect(anchorComp.powerLevel).toBe(0);
@@ -358,7 +358,7 @@ describe('RealityAnchorSystem Integration', () => {
 
     // Should not crash
     world.setTick(20);
-    expect(() => realityAnchorSystem.update(world)).not.toThrow();
+    expect(() => realityAnchorSystem.update(world, [], 0.05)).not.toThrow();
 
     // Should not charge
     expect(anchorComp.powerLevel).toBe(0);
@@ -387,7 +387,7 @@ describe('RealityAnchorSystem Integration', () => {
     realityAnchorSystem.initialize(world, eventBus);
 
     world.setTick(20);
-    realityAnchorSystem.update(world);
+    realityAnchorSystem.update(world, [], 0.05);
 
     // Verify event emitted
     expect(eventSpy).toHaveBeenCalledWith(
@@ -434,7 +434,7 @@ describe('RealityAnchorSystem Integration', () => {
     expect(anchorPower.efficiency).toBe(0.5);
 
     world.setTick(20);
-    realityAnchorSystem.update(world);
+    realityAnchorSystem.update(world, [], 0.05);
 
     // Verify partial power warning emitted
     expect(eventSpy).toHaveBeenCalledWith(

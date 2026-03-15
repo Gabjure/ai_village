@@ -27,9 +27,9 @@ import { BuildingType } from '../types/BuildingType.js';
 describe('Fake Implementations Cleanup', () => {
 
   // ========================================
-  // Criterion 1: PlantSystem.isTileSuitable() Uses Real Logic
+  // Criterion 1: PlantSystem.isTileSuitableCached() Uses Real Logic
   // ========================================
-  describe('Criterion 1: PlantSystem.isTileSuitable() uses real terrain/occupancy checks', () => {
+  describe('Criterion 1: PlantSystem.isTileSuitableCached() uses real terrain/occupancy checks', () => {
     let world: World;
     let plantSystem: PlantSystem;
     let eventBus: EventBusImpl;
@@ -42,7 +42,7 @@ describe('Fake Implementations Cleanup', () => {
 
     it('should reject tiles with invalid terrain type', () => {
       // Create a tile with invalid terrain (e.g., water, stone)
-      // This test will fail until isTileSuitable checks actual terrain
+      // This test will fail until isTileSuitableCached checks actual terrain
       const waterPosition = { x: 10, y: 10 };
 
       // Mock world.getTileAt to return water terrain
@@ -51,7 +51,7 @@ describe('Fake Implementations Cleanup', () => {
         getComponent: vi.fn()
       } as Record<string, unknown>);
 
-      const suitable = (plantSystem as Record<string, unknown>).isTileSuitable(waterPosition, world);
+      const suitable = (plantSystem as Record<string, unknown>).isTileSuitableCached(waterPosition, world, []);
 
       expect(suitable).toBe(false);
       expect(world.getTileAt).toHaveBeenCalledWith(waterPosition.x, waterPosition.y);
@@ -65,17 +65,12 @@ describe('Fake Implementations Cleanup', () => {
 
         vi.spyOn(world, 'getTileAt').mockReturnValue({
           terrain,
+          fertility: terrain === 'tilled_soil' ? 0.9 : undefined,
           getComponent: vi.fn()
         } as Record<string, unknown>);
 
-        // Mock world.query() to return no existing plants at this position
-        const mockQuery = {
-          with: vi.fn().mockReturnThis(),
-          executeEntities: vi.fn().mockReturnValue([])
-        };
-        vi.spyOn(world, 'query').mockReturnValue(mockQuery as unknown);
-
-        const suitable = (plantSystem as Record<string, unknown>).isTileSuitable(position, world);
+        // Pass empty plantPositions to indicate no plants at this position
+        const suitable = (plantSystem as Record<string, unknown>).isTileSuitableCached(position, world, []);
 
         expect(suitable).toBe(true);
       }
@@ -89,25 +84,10 @@ describe('Fake Implementations Cleanup', () => {
         getComponent: vi.fn()
       } as Record<string, unknown>);
 
-      // Mock an entity with plant component at this position
-      const plantEntity = {
-        id: 'plant1',
-        getComponent: (type: string) => {
-          if (type === 'plant') {
-            return { position: { x: 8, y: 8 } };
-          }
-          return undefined;
-        }
-      };
+      // Pass plantPositions with an existing plant at this position
+      const existingPlantPositions = [{ x: 8, y: 8 }];
 
-      // Mock world.query() to return the existing plant
-      const mockQuery = {
-        with: vi.fn().mockReturnThis(),
-        executeEntities: vi.fn().mockReturnValue([plantEntity])
-      };
-      vi.spyOn(world, 'query').mockReturnValue(mockQuery as unknown);
-
-      const suitable = (plantSystem as Record<string, unknown>).isTileSuitable(position, world);
+      const suitable = (plantSystem as Record<string, unknown>).isTileSuitableCached(position, world, existingPlantPositions);
 
       expect(suitable).toBe(false);
     });
@@ -121,14 +101,8 @@ describe('Fake Implementations Cleanup', () => {
         getComponent: vi.fn()
       } as Record<string, unknown>);
 
-      // Mock world.query() to return no existing plants
-      const mockQuery = {
-        with: vi.fn().mockReturnThis(),
-        executeEntities: vi.fn().mockReturnValue([])
-      };
-      vi.spyOn(world, 'query').mockReturnValue(mockQuery as unknown);
-
-      const suitable = (plantSystem as Record<string, unknown>).isTileSuitable(position, world);
+      // Pass empty plantPositions - no existing plants
+      const suitable = (plantSystem as Record<string, unknown>).isTileSuitableCached(position, world, []);
 
       expect(suitable).toBe(false);
     });
@@ -144,15 +118,9 @@ describe('Fake Implementations Cleanup', () => {
         getComponent: vi.fn()
       } as Record<string, unknown>);
 
-      // Mock world.query() to return no existing plants
-      const mockQuery = {
-        with: vi.fn().mockReturnThis(),
-        executeEntities: vi.fn().mockReturnValue([])
-      };
-      vi.spyOn(world, 'query').mockReturnValue(mockQuery as unknown);
-
-      const evenSuitable = (plantSystem as Record<string, unknown>).isTileSuitable(evenPosition, world);
-      const oddSuitable = (plantSystem as Record<string, unknown>).isTileSuitable(oddPosition, world);
+      // Pass empty plantPositions - no existing plants
+      const evenSuitable = (plantSystem as Record<string, unknown>).isTileSuitableCached(evenPosition, world, []);
+      const oddSuitable = (plantSystem as Record<string, unknown>).isTileSuitableCached(oddPosition, world, []);
 
       // Both should be true (both have valid terrain and no plants)
       expect(evenSuitable).toBe(true);
@@ -167,7 +135,7 @@ describe('Fake Implementations Cleanup', () => {
 
       vi.spyOn(world, 'getTileAt').mockReturnValue(null);
 
-      const suitable = (plantSystem as Record<string, unknown>).isTileSuitable(position, world);
+      const suitable = (plantSystem as Record<string, unknown>).isTileSuitableCached(position, world, []);
 
       expect(suitable).toBe(false);
     });

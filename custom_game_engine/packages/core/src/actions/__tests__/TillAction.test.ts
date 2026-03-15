@@ -5,7 +5,6 @@ import { SoilSystem } from '../../systems/SoilSystem.js';
 import type { Tile, BiomeType } from '../../systems/SoilSystem.js';
 import { World } from '../../ecs/World.js';
 import { EventBusImpl } from '../../events/EventBus.js';
-import type { World } from '../../ecs/World.js';
 
 /**
  * Phase 9: Tilling Action Tests (TDD Red Phase)

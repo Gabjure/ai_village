@@ -12,7 +12,7 @@ import { EventBusImpl } from '../../events/EventBus.js';
 import { UniversitySystem } from '../UniversitySystem.js';
 import { UniversityResearchManagementSystem } from '../UniversityResearchManagementSystem.js';
 import { BuildingSystem } from '../BuildingSystem.js';
-import { AcademicPaperSystem, getAcademicPaperSystem } from '../../research/AcademicPaperSystem.js';
+import { AcademicPaperSystem, getAcademicPaperSystem, resetAcademicPaperSystem } from '../../research/AcademicPaperSystem.js';
 import { ResearchRegistry } from '../../research/ResearchRegistry.js';
 import { createUniversityComponent } from '../../components/UniversityComponent.js';
 import { createBuildingComponent } from '../../components/BuildingComponent.js';
@@ -48,16 +48,23 @@ describe('University Paper Publishing Integration', () => {
   let buildingSystem: BuildingSystem;
   let academicPaperSystem: AcademicPaperSystem;
 
-  beforeEach(() => {
+  beforeEach(async () => {
+    // Reset singleton between tests to ensure clean state
+    resetAcademicPaperSystem();
+
     eventBus = new EventBusImpl();
     world = new World(eventBus);
     universitySystem = new UniversitySystem(eventBus);
     researchManagementSystem = new UniversityResearchManagementSystem();
     buildingSystem = new BuildingSystem();
-    academicPaperSystem = new AcademicPaperSystem();
+    // Use the singleton so UniversitySystem's getAcademicPaperSystem() call gets the initialized instance
+    academicPaperSystem = getAcademicPaperSystem();
 
     // Connect the systems
     researchManagementSystem.setUniversitySystem(universitySystem);
+    // Initialize systems that use this.events (BaseSystem)
+    await universitySystem.initialize(world, eventBus);
+    researchManagementSystem.initialize(world, eventBus);
     buildingSystem.initialize(world, eventBus);
     academicPaperSystem.initialize(world, eventBus);
   });
@@ -141,11 +148,13 @@ describe('University Paper Publishing Integration', () => {
     // ========================================================================
 
     // Run university system until research completes
+    // UniversitySystem has throttleInterval=200, so advance by 200 ticks each iteration
+    // to ensure the system actually runs each iteration.
     let ticksToComplete = 0;
-    const maxTicks = 2000; // Safety limit
+    const maxTicks = 2000; // Safety limit (2000 * 200 = 400,000 world ticks)
 
     while (project.progress < 99.99 && ticksToComplete < maxTicks) {
-      (world as { _tick: number })._tick++;
+      (world as { _tick: number })._tick += 200;
       universitySystem.update(world, [university], 0);
       ticksToComplete++;
     }

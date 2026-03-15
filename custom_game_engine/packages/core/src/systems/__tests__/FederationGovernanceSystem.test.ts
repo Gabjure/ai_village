@@ -16,7 +16,7 @@ import { ComponentType as CT } from '../../types/ComponentType.js';
 import { FederationGovernanceSystem } from '../FederationGovernanceSystem.js';
 import type { FederationGovernanceComponent } from '../../components/FederationGovernanceComponent.js';
 import type { EmpireComponent } from '../../components/EmpireComponent.js';
-import { EventBusImpl } from '../events/EventBus.js';
+import { EventBusImpl } from '../../events/EventBus.js';
 
 describe('FederationGovernanceSystem', () => {
   let world: World;
@@ -25,7 +25,7 @@ describe('FederationGovernanceSystem', () => {
 
   beforeEach(() => {
     eventBus = new EventBusImpl(); world = new World(eventBus);
-    world.tick = 0;
+    world.setTick(0);
     system = new FederationGovernanceSystem();
   });
 

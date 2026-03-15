@@ -130,6 +130,52 @@ export function inheritAnimalGenetics(
   return { genetics: offspringGenetics, mutations: inheritedMutations };
 }
 
+// ============================================================================
+// Animal Personality
+// ============================================================================
+
+export type AnimalPersonalityType = 'neutral' | 'skittish' | 'aggressive' | 'friendly';
+
+export interface AnimalPersonality {
+  fearfulness: number;    // 0–1, how easily frightened
+  aggressiveness: number; // 0–1, tendency to attack
+  curiosity: number;      // 0–1, interest in novelty
+  sociability: number;    // 0–1, desire for company
+}
+
+/** Base trait values per personality type (all in [0, 1]) */
+const PERSONALITY_BASES: Record<AnimalPersonalityType, AnimalPersonality> = {
+  neutral:    { fearfulness: 0.5, aggressiveness: 0.3, curiosity: 0.5, sociability: 0.5 },
+  skittish:   { fearfulness: 0.8, aggressiveness: 0.1, curiosity: 0.3, sociability: 0.4 },
+  aggressive: { fearfulness: 0.3, aggressiveness: 0.8, curiosity: 0.4, sociability: 0.2 },
+  friendly:   { fearfulness: 0.2, aggressiveness: 0.1, curiosity: 0.6, sociability: 0.85 },
+};
+
+/** Max random variance applied to each trait (±PERSONALITY_VARIANCE / 2) */
+const PERSONALITY_VARIANCE = 0.2;
+
+/**
+ * Generate an AnimalPersonality for the given type, with optional random variance.
+ * All trait values are clamped to [0, 1].
+ *
+ * @param type - Personality archetype to base traits on.
+ * @param rng  - Optional RNG (defaults to Math.random). Accepts any () => number.
+ */
+export function generateAnimalPersonality(
+  type: AnimalPersonalityType,
+  rng: () => number = Math.random,
+): AnimalPersonality {
+  const base = PERSONALITY_BASES[type];
+  const clamp = (v: number) => Math.min(1, Math.max(0, v));
+  const vary = (base: number) => clamp(base + (rng() - 0.5) * PERSONALITY_VARIANCE);
+  return {
+    fearfulness:    vary(base.fearfulness),
+    aggressiveness: vary(base.aggressiveness),
+    curiosity:      vary(base.curiosity),
+    sociability:    vary(base.sociability),
+  };
+}
+
 // Re-export for backwards compatibility
 export type { AnimalLifeStage, AnimalState };
 
@@ -153,6 +199,8 @@ export interface AnimalComponentData {
   bondLevel: number; // 0-100, bond with owner
   trustLevel: number; // 0-100, trust in humans
   housingBuildingId?: string; // Entity ID of housing building (if housed)
+  personality?: AnimalPersonality; // Optional personality traits
+  groupId?: string; // Entity ID of herd/flock group (if grouped)
 }
 
 export interface AnimalComponent extends Component {
@@ -176,6 +224,8 @@ export interface AnimalComponent extends Component {
   bondLevel: number;
   trustLevel: number;
   housingBuildingId?: string;
+  personality?: AnimalPersonality;
+  groupId?: string;
 }
 
 /**
@@ -205,6 +255,8 @@ export class AnimalComponent implements Component {
   public bondLevel: number;
   public trustLevel: number;
   public housingBuildingId?: string;
+  public personality?: AnimalPersonality;
+  public groupId?: string;
 
   constructor(data: AnimalComponentData) {
     // Validate all required fields - NO FALLBACKS
@@ -280,6 +332,8 @@ export class AnimalComponent implements Component {
     this.bondLevel = data.bondLevel;
     this.trustLevel = data.trustLevel;
     this.housingBuildingId = data.housingBuildingId; // Optional field
+    this.personality = data.personality; // Optional field
+    this.groupId = data.groupId; // Optional field
   }
 }
 
