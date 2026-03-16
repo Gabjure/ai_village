@@ -18,6 +18,22 @@ const BASE_PATH = process.env.BASE_PATH || '/mvee';
 const app = express();
 app.use(express.json());
 
+// Allowlisted LLM provider hostnames — prevents SSRF via the proxy endpoints
+const ALLOWED_LLM_HOSTS = new Set([
+  'api.groq.com',
+  'api.cerebras.ai',
+  'api.openai.com',
+]);
+
+function isAllowedLLMUrl(urlStr: string): boolean {
+  try {
+    const url = new URL(urlStr);
+    return url.protocol === 'https:' && ALLOWED_LLM_HOSTS.has(url.hostname);
+  } catch {
+    return false;
+  }
+}
+
 // Resolve LLM API key for a given provider base URL
 function getLLMApiKey(baseUrl: string): string {
   if (baseUrl.includes('groq.com')) {
@@ -35,6 +51,10 @@ app.get('/api/llm/check-availability', async (req, res) => {
   const baseUrl = req.query.baseUrl as string;
   if (!baseUrl) {
     res.status(400).json({ available: false, error: 'Missing baseUrl parameter' });
+    return;
+  }
+  if (!isAllowedLLMUrl(baseUrl)) {
+    res.status(403).json({ available: false, error: 'Provider not allowed' });
     return;
   }
 
@@ -59,6 +79,11 @@ app.post('/api/llm/chat', async (req, res) => {
   try {
     const requestData = req.body;
     const baseUrl: string = requestData.baseUrl || 'https://api.groq.com/openai/v1';
+
+    if (!isAllowedLLMUrl(baseUrl)) {
+      res.status(403).json({ error: 'Provider not allowed' });
+      return;
+    }
 
     let apiKey: string = requestData.apiKey || '';
     if (!apiKey) apiKey = getLLMApiKey(baseUrl);
