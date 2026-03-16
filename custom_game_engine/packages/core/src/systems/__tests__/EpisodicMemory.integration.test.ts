@@ -61,7 +61,7 @@ describe('Episodic Memory Integration', () => {
       });
 
       // Run memory formation system
-      memoryFormationSystem.update(world, 0);
+      memoryFormationSystem.update(world, [], 0);
 
       // Memory should be created
       const updatedMemory = agent.getComponent(ComponentType.EpisodicMemory) as EpisodicMemoryComponent;
@@ -92,7 +92,7 @@ describe('Episodic Memory Integration', () => {
       });
 
       // Run memory formation system
-      memoryFormationSystem.update(world, 0);
+      memoryFormationSystem.update(world, [], 0);
 
       // Both agents should have memories
       const speakerMemory = agent.getComponent(ComponentType.EpisodicMemory) as EpisodicMemoryComponent;
@@ -121,7 +121,7 @@ describe('Episodic Memory Integration', () => {
       });
 
       // Run memory formation system
-      memoryFormationSystem.update(world, 0);
+      memoryFormationSystem.update(world, [], 0);
 
       // Memory should be high importance
       const memory = agent.getComponent(ComponentType.EpisodicMemory) as EpisodicMemoryComponent;
@@ -149,7 +149,7 @@ describe('Episodic Memory Integration', () => {
       }
 
       // Run memory formation system
-      memoryFormationSystem.update(world, 0);
+      memoryFormationSystem.update(world, [], 0);
 
       // Should have 3 memories
       const memory = agent.getComponent(ComponentType.EpisodicMemory) as EpisodicMemoryComponent;
@@ -235,7 +235,7 @@ describe('Episodic Memory Integration', () => {
       const originalSummary = memory.episodicMemories[0]?.summary;
 
       // Consolidate the memory to protect it from forgetting
-      memoryConsolidationSystem.update(world, 0);
+      memoryConsolidationSystem.update(world, [], 0);
 
       // Verify it's consolidated
       let updatedMemory = agent.getComponent(ComponentType.EpisodicMemory) as EpisodicMemoryComponent;
@@ -276,7 +276,7 @@ describe('Episodic Memory Integration', () => {
       });
 
       // Run consolidation system
-      memoryConsolidationSystem.update(world, 0);
+      memoryConsolidationSystem.update(world, [], 0);
 
       // Memory should be consolidated
       const updatedMemory = agent.getComponent(ComponentType.EpisodicMemory) as EpisodicMemoryComponent;
@@ -313,7 +313,7 @@ describe('Episodic Memory Integration', () => {
       });
 
       // Run consolidation system
-      memoryConsolidationSystem.update(world, 0);
+      memoryConsolidationSystem.update(world, [], 0);
 
       const updatedMemory = agent.getComponent(ComponentType.EpisodicMemory) as EpisodicMemoryComponent;
       expect(updatedMemory.episodicMemories[0]?.consolidated).toBe(true);
@@ -452,7 +452,7 @@ describe('Episodic Memory Integration', () => {
         }
       });
 
-      memoryFormationSystem.update(world, 0);
+      memoryFormationSystem.update(world, [], 0);
 
       let memory = agent.getComponent(ComponentType.EpisodicMemory) as EpisodicMemoryComponent;
       expect(memory.episodicMemories.length).toBe(1);
@@ -472,7 +472,7 @@ describe('Episodic Memory Integration', () => {
         data: { agentId: agent.id }
       });
 
-      memoryConsolidationSystem.update(world, 0);
+      memoryConsolidationSystem.update(world, [], 0);
 
       memory = agent.getComponent(ComponentType.EpisodicMemory) as EpisodicMemoryComponent;
       expect(memory.episodicMemories[0]?.consolidated).toBe(true);
@@ -514,7 +514,7 @@ describe('Episodic Memory Integration', () => {
         }
       });
 
-      memoryFormationSystem.update(world, 0);
+      memoryFormationSystem.update(world, [], 0);
 
       // Each agent should have their own memory
       const memory1 = agent.getComponent(ComponentType.EpisodicMemory) as EpisodicMemoryComponent;
@@ -544,7 +544,7 @@ describe('Episodic Memory Integration', () => {
 
       // Should throw - missing agentId is a programming error (CLAUDE.md: no silent fallbacks)
       expect(() => {
-        memoryFormationSystem.update(world, 0);
+        memoryFormationSystem.update(world, [], 0);
       }).toThrow(/missing required agentId/);
     });
 

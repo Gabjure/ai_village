@@ -561,17 +561,17 @@ describe('GalacticCouncilSystem', () => {
       system.addSpeciesToCouncil(world, councilComp, species.id, speciesComp);
 
       // First update at tick 0
-      system.update(world);
+      system.update(world, [], 0.05);
       expect(councilComp.lastCosmicUpdateTick).toBe(0);
 
       // Update at tick 1000 (too soon)
       world.tick = 1000;
-      system.update(world);
+      system.update(world, [], 0.05);
       expect(councilComp.lastCosmicUpdateTick).toBe(0); // Should not update
 
       // Update at tick 72000 (exactly 1 hour)
       world.tick = 72000;
-      system.update(world);
+      system.update(world, [], 0.05);
       expect(councilComp.lastCosmicUpdateTick).toBe(72000); // Should update
     });
   });

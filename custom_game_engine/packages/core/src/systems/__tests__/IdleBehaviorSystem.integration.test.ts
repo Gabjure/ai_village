@@ -62,7 +62,7 @@ describe('IdleBehaviorSystem Integration', () => {
       const actionQueue = agent.getComponent(ComponentType.ActionQueue);
       actionQueue.clear();
 
-      idleBehaviorSystem.update(world, 1);
+      idleBehaviorSystem.update(world, [], 1);
 
       const action = actionQueue.peek();
       if (action) {
@@ -111,7 +111,7 @@ describe('IdleBehaviorSystem Integration', () => {
       const actionQueue = agent.getComponent(ComponentType.ActionQueue);
       actionQueue.clear();
 
-      idleBehaviorSystem.update(world, 1);
+      idleBehaviorSystem.update(world, [], 1);
 
       const action = actionQueue.peek();
       if (action) {
@@ -155,7 +155,7 @@ describe('IdleBehaviorSystem Integration', () => {
       const actionQueue = agent.getComponent(ComponentType.ActionQueue);
       actionQueue.clear();
 
-      idleBehaviorSystem.update(world, 1);
+      idleBehaviorSystem.update(world, [], 1);
 
       const action = actionQueue.peek();
       if (action) {
@@ -200,7 +200,7 @@ describe('IdleBehaviorSystem Integration', () => {
       const actionQueue = agent.getComponent(ComponentType.ActionQueue);
       actionQueue.clear();
 
-      idleBehaviorSystem.update(world, 1);
+      idleBehaviorSystem.update(world, [], 1);
 
       const action = actionQueue.peek();
       if (action) {
@@ -243,7 +243,7 @@ describe('IdleBehaviorSystem Integration', () => {
     const initialQueueSize = queue.size();
 
     // System should not add idle behaviors to a non-empty queue
-    idleBehaviorSystem.update(world, 1);
+    idleBehaviorSystem.update(world, [], 1);
 
     expect(queue.size()).toBe(initialQueueSize); // Queue unchanged
   });
@@ -290,7 +290,7 @@ describe('IdleBehaviorSystem Integration', () => {
       const actionQueue = agent.getComponent(ComponentType.ActionQueue);
       actionQueue.clear();
 
-      idleBehaviorSystem.update(world, 1);
+      idleBehaviorSystem.update(world, [], 1);
 
       const action = actionQueue.peek();
       if (action) {
@@ -332,7 +332,7 @@ describe('IdleBehaviorSystem Integration', () => {
       const actionQueue = agent.getComponent(ComponentType.ActionQueue);
       actionQueue.clear();
 
-      idleBehaviorSystem.update(world, 1);
+      idleBehaviorSystem.update(world, [], 1);
 
       const action = actionQueue.peek();
       if (action) {

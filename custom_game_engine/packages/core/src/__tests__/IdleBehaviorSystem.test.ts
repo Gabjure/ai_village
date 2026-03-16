@@ -132,7 +132,7 @@ describe('IdleBehaviorSystem', () => {
         const queue = entity.getComponent(ComponentType.ActionQueue);
         expect(queue).toBeDefined();
         queue!.clear();
-        system.update(world, 1);
+        system.update(world, [], 1);
         const action = queue!.peek();
         if (action) {
           behaviors.push(action.type as IdleBehaviorType);
@@ -160,7 +160,7 @@ describe('IdleBehaviorSystem', () => {
         const queue = entity.getComponent(ComponentType.ActionQueue);
         expect(queue).toBeDefined();
         queue!.clear();
-        system.update(world, 1);
+        system.update(world, [], 1);
         const action = queue!.peek();
         if (action) {
           behaviors.push(action.type as IdleBehaviorType);
@@ -192,7 +192,7 @@ describe('IdleBehaviorSystem', () => {
         const queue = entity.getComponent(ComponentType.ActionQueue);
         expect(queue).toBeDefined();
         queue!.clear();
-        system.update(world, 1);
+        system.update(world, [], 1);
         const action = queue!.peek();
         if (action) {
           behaviors.push(action.type as IdleBehaviorType);
@@ -224,7 +224,7 @@ describe('IdleBehaviorSystem', () => {
         const queue = entity.getComponent(ComponentType.ActionQueue);
         expect(queue).toBeDefined();
         queue!.clear();
-        system.update(world, 1);
+        system.update(world, [], 1);
         const action = queue!.peek();
         if (action) {
           behaviors.push(action.type as IdleBehaviorType);
@@ -254,7 +254,7 @@ describe('IdleBehaviorSystem', () => {
         const queue = entity.getComponent(ComponentType.ActionQueue);
         expect(queue).toBeDefined();
         queue!.clear();
-        system.update(world, 1);
+        system.update(world, [], 1);
         const action = queue!.peek();
         if (action) {
           behaviors.push(action.type as IdleBehaviorType);

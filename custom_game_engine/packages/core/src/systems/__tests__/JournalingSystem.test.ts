@@ -57,7 +57,7 @@ describe('JournalingSystem', () => {
         timestamp: Date.now()
       });
 
-      system.update(world, 1);
+      system.update(world, [], 1);
 
       const journalComp = agent.getComponent(JournalComponent);
       expect(journalComp.entries.length).toBeGreaterThan(0);
@@ -103,7 +103,7 @@ describe('JournalingSystem', () => {
           timestamp: Date.now()
         });
 
-        system.update(world, 1);
+        system.update(world, [], 1);
 
         introvertJournals = introvert.getComponent(JournalComponent).entries.length;
         extrovertJournals = extrovert.getComponent(JournalComponent).entries.length;
@@ -142,7 +142,7 @@ describe('JournalingSystem', () => {
       for (let i = 0; i < 50; i++) {
         eventBus.emit('agent:idle', { agentId: openAgent.id });
         eventBus.emit('agent:idle', { agentId: closedAgent.id });
-        system.update(world, 1);
+        system.update(world, [], 1);
       }
 
       const openJournals = openAgent.getComponent(JournalComponent).entries.length;
@@ -179,7 +179,7 @@ describe('JournalingSystem', () => {
       for (let i = 0; i < 50; i++) {
         eventBus.emit('agent:idle', { agentId: conscientious.id });
         eventBus.emit('agent:idle', { agentId: unconscientious.id });
-        system.update(world, 1);
+        system.update(world, [], 1);
       }
 
       const conscientiousJournals = conscientious.getComponent(JournalComponent).entries.length;
@@ -200,7 +200,7 @@ describe('JournalingSystem', () => {
 
       eventBus.emit('agent:idle', { agentId: agent.id });
 
-      system.update(world, 1);
+      system.update(world, [], 1);
 
       const journalComp = agent.getComponent(JournalComponent);
       const entry = journalComp.entries[0];
@@ -229,7 +229,7 @@ describe('JournalingSystem', () => {
 
       eventBus.emit('agent:idle', { agentId: agent.id });
 
-      system.update(world, 1);
+      system.update(world, [], 1);
 
       const journalComp = agent.getComponent(JournalComponent);
       const entry = journalComp.entries[0];
@@ -241,7 +241,7 @@ describe('JournalingSystem', () => {
     it('should include timestamp with journal entry', () => {
       eventBus.emit('agent:idle', { agentId: agent.id });
 
-      system.update(world, 1);
+      system.update(world, [], 1);
 
       const journalComp = agent.getComponent(JournalComponent);
       const entry = journalComp.entries[0];
@@ -256,7 +256,7 @@ describe('JournalingSystem', () => {
 
       eventBus.emit('agent:idle', { agentId: agent.id });
 
-      system.update(world, 1);
+      system.update(world, [], 1);
 
       expect(handler).toHaveBeenCalledWith(
         expect.objectContaining({ agentId: agent.id })
@@ -290,7 +290,7 @@ describe('JournalingSystem', () => {
         journalEntryId: writerJournal.entries[0].id
       });
 
-      system.update(world, 1);
+      system.update(world, [], 1);
 
       const readerMem = reader.getComponent(EpisodicMemoryComponent);
       expect(readerMem.episodicMemories.length).toBeGreaterThan(0);
@@ -319,7 +319,7 @@ describe('JournalingSystem', () => {
       });
 
       expect(() => {
-        system.update(world, 1);
+        system.update(world, [], 1);
       }).toThrow(); // Should fail - not discoverable
     });
 
@@ -344,7 +344,7 @@ describe('JournalingSystem', () => {
         journalEntryId: writerJournal.entries[0].id
       });
 
-      system.update(world, 1);
+      system.update(world, [], 1);
 
       const readerMem = reader.getComponent(EpisodicMemoryComponent);
       const memory = readerMem.episodicMemories[0];
@@ -376,7 +376,7 @@ describe('JournalingSystem', () => {
         journalEntryId: writerJournal.entries[0].id
       });
 
-      system.update(world, 1);
+      system.update(world, [], 1);
 
       const readerSemantic = reader.getComponent(SemanticMemoryComponent);
       // Should learn topics from journal
@@ -405,7 +405,7 @@ describe('JournalingSystem', () => {
         journalEntryId: writerJournal.entries[0].id
       });
 
-      system.update(world, 1);
+      system.update(world, [], 1);
 
       const readerSocial = reader.getComponent(SocialMemoryComponent);
       // Should update knowledge about writer
@@ -434,7 +434,7 @@ describe('JournalingSystem', () => {
         journalEntryId: writerJournal.entries[0].id
       });
 
-      system.update(world, 1);
+      system.update(world, [], 1);
 
       const readerMem = reader.getComponent(EpisodicMemoryComponent);
       const memory = readerMem.episodicMemories[0];
@@ -467,7 +467,7 @@ describe('JournalingSystem', () => {
         journalEntryId: writerJournal.entries[0].id
       });
 
-      system.update(world, 1);
+      system.update(world, [], 1);
 
       expect(handler).toHaveBeenCalled();
     });
@@ -488,7 +488,7 @@ describe('JournalingSystem', () => {
 
       eventBus.emit('agent:idle', { agentId: agent.id });
 
-      system.update(world, 1);
+      system.update(world, [], 1);
 
       expect(llmSpy).toHaveBeenCalled();
     });
@@ -502,7 +502,7 @@ describe('JournalingSystem', () => {
 
       // Should not throw, just skip journaling
       expect(() => {
-        system.update(world, 1);
+        system.update(world, [], 1);
       }).not.toThrow();
     });
   });
@@ -517,7 +517,7 @@ describe('JournalingSystem', () => {
       eventBus.emit('agent:idle', { agentId: agentWithoutJournal.id });
 
       expect(() => {
-        system.update(world, 1);
+        system.update(world, [], 1);
       }).toThrow();
     });
 
@@ -529,7 +529,7 @@ describe('JournalingSystem', () => {
       eventBus.emit('agent:idle', { agentId: agentWithoutAgent.id });
 
       expect(() => {
-        system.update(world, 1);
+        system.update(world, [], 1);
       }).toThrow();
     });
 

@@ -137,7 +137,7 @@ describe('MagicalSkillBonuses', () => {
     world.addEntity(entity);
 
     // Run equipment system
-    equipmentSystem.update(world, 0);
+    equipmentSystem.update(world, [], 0);
 
     // Check cached skill modifiers
     const updatedEquipment = world.getComponent<EquipmentComponent>(entity.id, 'equipment');
@@ -202,7 +202,7 @@ describe('MagicalSkillBonuses', () => {
     world.addEntity(entity);
 
     // Run equipment system
-    equipmentSystem.update(world, 0);
+    equipmentSystem.update(world, [], 0);
 
     // Check stacked skill modifiers
     const updatedEquipment = world.getComponent<EquipmentComponent>(entity.id, 'equipment');
@@ -255,7 +255,7 @@ describe('MagicalSkillBonuses', () => {
     world.addEntity(entity);
 
     // Run equipment system
-    equipmentSystem.update(world, 0);
+    equipmentSystem.update(world, [], 0);
 
     // Check cursed item modifiers
     const updatedEquipment = world.getComponent<EquipmentComponent>(entity.id, 'equipment');
@@ -308,7 +308,7 @@ describe('MagicalSkillBonuses', () => {
     world.addEntity(entity);
 
     // Run equipment system
-    equipmentSystem.update(world, 0);
+    equipmentSystem.update(world, [], 0);
 
     // Verify bonus is present
     let updatedEquipment = world.getComponent<EquipmentComponent>(entity.id, 'equipment');
@@ -321,7 +321,7 @@ describe('MagicalSkillBonuses', () => {
     });
 
     // Run equipment system again
-    equipmentSystem.update(world, 1);
+    equipmentSystem.update(world, [], 1);
 
     // Verify bonus is cleared
     updatedEquipment = world.getComponent<EquipmentComponent>(entity.id, 'equipment');
@@ -399,7 +399,7 @@ describe('MagicalSkillBonuses', () => {
     world.addEntity(entity);
 
     // Run equipment system
-    equipmentSystem.update(world, 0);
+    equipmentSystem.update(world, [], 0);
 
     // Check complex stacking
     const updatedEquipment = world.getComponent<EquipmentComponent>(entity.id, 'equipment');

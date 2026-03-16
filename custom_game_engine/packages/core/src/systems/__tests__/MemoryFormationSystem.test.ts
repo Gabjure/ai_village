@@ -31,7 +31,7 @@ describe('MemoryFormationSystem', () => {
         novelty: 1.0
       });
 
-      system.update(world, 1);
+      system.update(world, [], 1);
 
       expect(memComp.episodicMemories.length).toBe(1);
       expect(memComp.episodicMemories[0].eventType).toBe('harvest:first');
@@ -47,7 +47,7 @@ describe('MemoryFormationSystem', () => {
         emotionalValence: -0.8
       });
 
-      system.update(world, 1);
+      system.update(world, [], 1);
 
       expect(memComp.episodicMemories.length).toBe(1);
     });
@@ -62,7 +62,7 @@ describe('MemoryFormationSystem', () => {
         surprise: 0.9
       });
 
-      system.update(world, 1);
+      system.update(world, [], 1);
 
       expect(memComp.episodicMemories.length).toBe(1);
     });
@@ -77,7 +77,7 @@ describe('MemoryFormationSystem', () => {
         survivalRelevance: 1.0
       });
 
-      system.update(world, 1);
+      system.update(world, [], 1);
 
       expect(memComp.episodicMemories.length).toBe(1);
     });
@@ -94,7 +94,7 @@ describe('MemoryFormationSystem', () => {
         importance: 0.1
       });
 
-      system.update(world, 1);
+      system.update(world, [], 1);
 
       expect(memComp.episodicMemories.length).toBe(0);
     });
@@ -111,7 +111,7 @@ describe('MemoryFormationSystem', () => {
         intensity: 0.7
       });
 
-      system.update(world, 1);
+      system.update(world, [], 1);
 
       expect(memComp.episodicMemories.length).toBe(1);
     });
@@ -125,7 +125,7 @@ describe('MemoryFormationSystem', () => {
         eventType: 'first_time_fishing'
       });
 
-      system.update(world, 1);
+      system.update(world, [], 1);
 
       expect(memComp.episodicMemories.length).toBe(1);
     });
@@ -140,7 +140,7 @@ describe('MemoryFormationSystem', () => {
         interactionType: 'first_meeting'
       });
 
-      system.update(world, 1);
+      system.update(world, [], 1);
 
       expect(memComp.episodicMemories.length).toBe(1);
     });
@@ -154,7 +154,7 @@ describe('MemoryFormationSystem', () => {
         survivalRelevance: 0.9
       });
 
-      system.update(world, 1);
+      system.update(world, [], 1);
 
       expect(memComp.episodicMemories.length).toBe(1);
     });
@@ -169,7 +169,7 @@ describe('MemoryFormationSystem', () => {
         goalRelevance: 0.9
       });
 
-      system.update(world, 1);
+      system.update(world, [], 1);
 
       expect(memComp.episodicMemories.length).toBe(1);
     });
@@ -189,7 +189,7 @@ describe('MemoryFormationSystem', () => {
         survivalRelevance: 0.0
       });
 
-      system.update(world, 1);
+      system.update(world, [], 1);
 
       const importance = memComp.episodicMemories[0].importance;
       expect(importance).toBeCloseTo(0.3, 1);
@@ -207,7 +207,7 @@ describe('MemoryFormationSystem', () => {
         survivalRelevance: 0.0
       });
 
-      system.update(world, 1);
+      system.update(world, [], 1);
 
       const importance = memComp.episodicMemories[0].importance;
       // 0.8 * 0.3 = 0.24
@@ -226,7 +226,7 @@ describe('MemoryFormationSystem', () => {
         survivalRelevance: 0.0
       });
 
-      system.update(world, 1);
+      system.update(world, [], 1);
 
       const importance = memComp.episodicMemories[0].importance;
       // 0.8 * 0.2 = 0.16
@@ -245,7 +245,7 @@ describe('MemoryFormationSystem', () => {
         survivalRelevance: 0.0
       });
 
-      system.update(world, 1);
+      system.update(world, [], 1);
 
       const importance = memComp.episodicMemories[0].importance;
       expect(importance).toBeCloseTo(0.15, 1);
@@ -263,7 +263,7 @@ describe('MemoryFormationSystem', () => {
         survivalRelevance: 0.8 // Below boost threshold (0.9) to test base weighting
       });
 
-      system.update(world, 1);
+      system.update(world, [], 1);
 
       const importance = memComp.episodicMemories[0].importance;
       // 0.8 * 0.25 = 0.20
@@ -282,7 +282,7 @@ describe('MemoryFormationSystem', () => {
         survivalRelevance: 0.3
       });
 
-      system.update(world, 1);
+      system.update(world, [], 1);
 
       // With normalized weights (sum to 1.0):
       // 0.8*0.25 + 0.85*0.25 + 0.85*0.167 + 0.5*0.125 + 0.3*0.208
@@ -304,7 +304,7 @@ describe('MemoryFormationSystem', () => {
         timestamp: Date.now()
       });
 
-      system.update(world, 1);
+      system.update(world, [], 1);
 
       expect(memComp.episodicMemories.length).toBe(1);
       expect(memComp.episodicMemories[0].eventType).toContain('conversation');
@@ -321,7 +321,7 @@ describe('MemoryFormationSystem', () => {
         timestamp: Date.now()
       });
 
-      system.update(world, 1);
+      system.update(world, [], 1);
 
       expect(memComp.episodicMemories.length).toBe(1);
       expect(memComp.episodicMemories[0].eventType).toContain('conversation');
@@ -337,7 +337,7 @@ describe('MemoryFormationSystem', () => {
         timestamp: Date.now()
       });
 
-      system.update(world, 1);
+      system.update(world, [], 1);
 
       const memory = memComp.episodicMemories[0];
       expect(memory.dialogueText).toBe('I really love gardening');
@@ -358,7 +358,7 @@ describe('MemoryFormationSystem', () => {
         timestamp: Date.now()
       });
 
-      system.update(world, 1);
+      system.update(world, [], 1);
 
       const speakerMem = speaker.getComponent(EpisodicMemoryComponent);
       const listenerMem = listener.getComponent(EpisodicMemoryComponent);
@@ -380,7 +380,7 @@ describe('MemoryFormationSystem', () => {
         novelty: 1.0
       });
 
-      system.update(world, 1);
+      system.update(world, [], 1);
 
       expect(handler).toHaveBeenCalledWith(
         expect.objectContaining({ type: 'memory:formed' })
@@ -396,7 +396,7 @@ describe('MemoryFormationSystem', () => {
         emotionalIntensity: 0.7
       });
 
-      system.update(world, 1);
+      system.update(world, [], 1);
 
       // Production EventBus format: { type, source, data }
       expect(handler).toHaveBeenCalledWith(
@@ -419,7 +419,7 @@ describe('MemoryFormationSystem', () => {
 
       // Per CLAUDE.md: "NEVER use fallback values to mask errors. If data is missing or invalid, crash immediately."
       expect(() => {
-        system.update(world, 1);
+        system.update(world, [], 1);
       }).toThrow(/Event test:event missing required agentId/);
     });
 
@@ -431,7 +431,7 @@ describe('MemoryFormationSystem', () => {
           agentId: agentWithoutMemory.id,
           emotionalIntensity: 0.8
         });
-        system.update(world, 1);
+        system.update(world, [], 1);
       }).toThrow();
     });
 
@@ -445,7 +445,7 @@ describe('MemoryFormationSystem', () => {
       });
 
       expect(() => {
-        system.update(world, 1);
+        system.update(world, [], 1);
       }).toThrow();
     });
   });

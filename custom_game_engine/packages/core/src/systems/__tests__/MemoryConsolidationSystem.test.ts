@@ -49,7 +49,7 @@ describe('MemoryConsolidationSystem', () => {
 
       const initialClarity = memComp.episodicMemories[0].clarity;
 
-      system.update(world, 86400); // 1 day passed
+      system.update(world, [], 86400); // 1 day passed
 
       const finalClarity = memComp.episodicMemories[0].clarity;
       expect(finalClarity).toBeCloseTo(initialClarity * 0.95, 2);
@@ -69,7 +69,7 @@ describe('MemoryConsolidationSystem', () => {
 
       const initialClarity = memComp.episodicMemories[0].clarity;
 
-      system.update(world, 86400); // 1 day passed
+      system.update(world, [], 86400); // 1 day passed
 
       const finalClarity = memComp.episodicMemories[0].clarity;
       expect(finalClarity).toBeCloseTo(initialClarity * 0.995, 3);
@@ -96,7 +96,7 @@ describe('MemoryConsolidationSystem', () => {
         clarity: 1.0
       });
 
-      system.update(world, 86400); // 1 day passed
+      system.update(world, [], 86400); // 1 day passed
 
       const lowClarity = memComp.episodicMemories[0].clarity;
       const highClarity = memComp.episodicMemories[1].clarity;
@@ -118,7 +118,7 @@ describe('MemoryConsolidationSystem', () => {
 
       expect(memComp.episodicMemories.length).toBe(1);
 
-      system.update(world, 86400 * 2); // 2 days
+      system.update(world, [], 86400 * 2); // 2 days
 
       // Clarity should drop below 0.1 and memory forgotten
       expect(memComp.episodicMemories.length).toBe(0);
@@ -139,7 +139,7 @@ describe('MemoryConsolidationSystem', () => {
         clarity: 0.11
       });
 
-      system.update(world, 86400 * 2);
+      system.update(world, [], 86400 * 2);
 
       expect(handler).toHaveBeenCalled();
     });
@@ -159,7 +159,7 @@ describe('MemoryConsolidationSystem', () => {
         consolidated: false
       });
 
-      system.update(world, 1);
+      system.update(world, [], 1);
 
       const memory = memComp.episodicMemories[0];
       expect(memory.consolidated).toBe(true);
@@ -177,7 +177,7 @@ describe('MemoryConsolidationSystem', () => {
         consolidated: false
       });
 
-      system.update(world, 1);
+      system.update(world, [], 1);
 
       const memory = memComp.episodicMemories[0];
       expect(memory.consolidated).toBe(true);
@@ -195,7 +195,7 @@ describe('MemoryConsolidationSystem', () => {
         consolidated: false
       });
 
-      system.update(world, 1);
+      system.update(world, [], 1);
 
       const memory = memComp.episodicMemories[0];
       expect(memory.consolidated).toBe(true);
@@ -217,7 +217,7 @@ describe('MemoryConsolidationSystem', () => {
         timestamp: Date.now()
       });
 
-      system.update(world, 1);
+      system.update(world, [], 1);
 
       const memory = memComp.episodicMemories[0];
       expect(memory.consolidated).toBe(true);
@@ -240,7 +240,7 @@ describe('MemoryConsolidationSystem', () => {
         timestamp: Date.now()
       });
 
-      system.update(world, 1);
+      system.update(world, [], 1);
 
       const memory = memComp.episodicMemories[0];
       expect(memory.consolidated).toBe(true);
@@ -259,7 +259,7 @@ describe('MemoryConsolidationSystem', () => {
         consolidated: false
       });
 
-      system.update(world, 86400 * 10); // Many days pass
+      system.update(world, [], 86400 * 10); // Many days pass
 
       const memory = memComp.episodicMemories[0];
       expect(memory.consolidated).toBe(false);
@@ -280,7 +280,7 @@ describe('MemoryConsolidationSystem', () => {
 
       // Simulate many days passing
       for (let i = 0; i < 50; i++) {
-        system.update(world, 86400); // 1 day
+        system.update(world, [], 86400); // 1 day
       }
 
       // Memory should be forgotten
@@ -302,7 +302,7 @@ describe('MemoryConsolidationSystem', () => {
 
       eventBus.emit('agent:sleep_start', { agentId: agent.id });
 
-      system.update(world, 1);
+      system.update(world, [], 1);
 
       expect(memComp.episodicMemories[0].consolidated).toBe(true);
     });
@@ -323,7 +323,7 @@ describe('MemoryConsolidationSystem', () => {
         type: 'deep'
       });
 
-      system.update(world, 1);
+      system.update(world, [], 1);
 
       expect(memComp.episodicMemories[0].consolidated).toBe(true);
     });
@@ -347,7 +347,7 @@ describe('MemoryConsolidationSystem', () => {
         memoryId: memComp.episodicMemories[0].id
       });
 
-      system.update(world, 1);
+      system.update(world, [], 1);
 
       const memory = memComp.episodicMemories[0];
       expect(memory.clarity).toBeGreaterThan(0.8);
@@ -372,7 +372,7 @@ describe('MemoryConsolidationSystem', () => {
           agentId: agent.id,
           memoryId: memComp.episodicMemories[0].id
         });
-        system.update(world, 1);
+        system.update(world, [], 1);
       }
 
       const finalImportance = memComp.episodicMemories[0].importance;
@@ -393,12 +393,12 @@ describe('MemoryConsolidationSystem', () => {
       });
 
       // 0.5 day
-      system.update(world, 43200);
+      system.update(world, [], 43200);
 
       const clarity1 = memComp.episodicMemories[0].clarity;
 
       // Another 0.5 day
-      system.update(world, 43200);
+      system.update(world, [], 43200);
 
       const clarity2 = memComp.episodicMemories[0].clarity;
 
@@ -418,7 +418,7 @@ describe('MemoryConsolidationSystem', () => {
       });
 
       // Large time jump
-      system.update(world, 86400 * 10); // 10 days
+      system.update(world, [], 86400 * 10); // 10 days
 
       const clarity = memComp.episodicMemories[0].clarity;
       expect(clarity).toBeLessThan(0.6); // Should have decayed significantly
@@ -435,7 +435,7 @@ describe('MemoryConsolidationSystem', () => {
       });
 
       expect(() => {
-        system.update(world, 1);
+        system.update(world, [], 1);
       }).toThrow();
     });
 
@@ -457,7 +457,7 @@ describe('MemoryConsolidationSystem', () => {
       eventBus.emit('agent:sleep_start', { agentId: agent.id });
 
       expect(() => {
-        system.update(world, 1);
+        system.update(world, [], 1);
       }).toThrow();
     });
 
@@ -473,7 +473,7 @@ describe('MemoryConsolidationSystem', () => {
       });
 
       expect(() => {
-        system.update(world, 86400);
+        system.update(world, [], 86400);
       }).toThrow();
     });
   });

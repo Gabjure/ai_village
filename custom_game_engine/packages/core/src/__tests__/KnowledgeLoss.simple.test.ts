@@ -59,7 +59,7 @@ describe('KnowledgeLoss', () => {
     });
 
     // Trigger death
-    system.update(world, 1);
+    system.update(world, [], 1);
 
     // Check knowledge loss was tracked
     const knowledgeLoss = world.getComponent<KnowledgeLossComponent>('knowledge_loss');
@@ -110,7 +110,7 @@ describe('KnowledgeLoss', () => {
       temperature: 37,
     });
 
-    system.update(world, 1);
+    system.update(world, [], 1);
 
     const knowledgeLoss = world.getComponent<KnowledgeLossComponent>('knowledge_loss');
 

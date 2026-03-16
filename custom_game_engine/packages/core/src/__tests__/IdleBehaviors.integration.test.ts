@@ -42,7 +42,7 @@ describe('Idle Behaviors Integration', () => {
       for (let i = 0; i < 100; i++) {
         const queue = entity.getComponent(ComponentType.ActionQueue) as ActionQueue;
         queue.clear();
-        idleBehaviorSystem.update(world, 1);
+        idleBehaviorSystem.update(world, [], 1);
         const action = queue.peek();
         if (action) {
           behaviors.push(action.type);
@@ -73,7 +73,7 @@ describe('Idle Behaviors Integration', () => {
       for (let i = 0; i < 100; i++) {
         const queue = entity.getComponent(ComponentType.ActionQueue) as ActionQueue;
         queue.clear();
-        idleBehaviorSystem.update(world, 1);
+        idleBehaviorSystem.update(world, [], 1);
         const action = queue.peek();
         if (action) {
           behaviors.add(action.type);
@@ -105,14 +105,14 @@ describe('Idle Behaviors Integration', () => {
 
       // Simulate 1 game day (assuming 1000 ticks = 1 day)
       for (let i = 0; i < 1000; i++) {
-        idleBehaviorSystem.update(world, 1);
+        idleBehaviorSystem.update(world, [], 1);
 
         const queue = entity.getComponent(ComponentType.ActionQueue) as ActionQueue;
         const action = queue.peek();
         if (action?.type === 'reflect') {
           // Execute reflection
           queue.dequeue();
-          reflectionSystem.update(world, 1);
+          reflectionSystem.update(world, [], 1);
         }
       }
 
@@ -136,11 +136,11 @@ describe('Idle Behaviors Integration', () => {
       entity.addComponent(new ActionQueue(entity.id));
 
       // Trigger reflection
-      reflectionSystem.update(world, 1);
+      reflectionSystem.update(world, [], 1);
       const firstTime = memory.lastReflectionTime || 0;
 
       // Try to trigger again immediately
-      reflectionSystem.update(world, 1);
+      reflectionSystem.update(world, [], 1);
       const secondTime = memory.lastReflectionTime || 0;
 
       // Should not reflect again immediately
@@ -171,13 +171,13 @@ describe('Idle Behaviors Integration', () => {
       for (let day = 0; day < 3; day++) {
         for (let tick = 0; tick < 1000; tick++) {
           agents.forEach(agent => {
-            idleBehaviorSystem.update(world, 1);
+            idleBehaviorSystem.update(world, [], 1);
 
             const queue = agent.getComponent(ComponentType.ActionQueue) as ActionQueue;
             const action = queue.peek();
             if (action?.type === 'reflect') {
               queue.dequeue();
-              reflectionSystem.update(world, 1);
+              reflectionSystem.update(world, [], 1);
             }
           });
         }
@@ -211,7 +211,7 @@ describe('Idle Behaviors Integration', () => {
       for (let i = 0; i < 50; i++) {
         const memory = entity.getComponent(ComponentType.Memory) as MemoryComponent;
         memory.lastReflectionTime = 0; // Reset cooldown
-        reflectionSystem.update(world, 1);
+        reflectionSystem.update(world, [], 1);
       }
 
       const goals = entity.getComponent(ComponentType.Goals) as GoalsComponent;
@@ -270,7 +270,7 @@ describe('Idle Behaviors Integration', () => {
         // Lonely agent
         const lonelyQueue = lonelyEntity.getComponent(ComponentType.ActionQueue) as ActionQueue;
         lonelyQueue.clear();
-        idleBehaviorSystem.update(world, 1);
+        idleBehaviorSystem.update(world, [], 1);
         const lonelyAction = lonelyQueue.peek();
         if (lonelyAction) {
           lonelyBehaviors.push(lonelyAction.type);
@@ -279,7 +279,7 @@ describe('Idle Behaviors Integration', () => {
         // Content agent
         const contentQueue = contentEntity.getComponent(ComponentType.ActionQueue) as ActionQueue;
         contentQueue.clear();
-        idleBehaviorSystem.update(world, 1);
+        idleBehaviorSystem.update(world, [], 1);
         const contentAction = contentQueue.peek();
         if (contentAction) {
           contentBehaviors.push(contentAction.type);
@@ -426,7 +426,7 @@ describe('Idle Behaviors Integration', () => {
       });
 
       // Trigger reflection
-      reflectionSystem.update(world, 1);
+      reflectionSystem.update(world, [], 1);
 
       expect(monologue.length).toBeGreaterThan(0);
     });
@@ -478,7 +478,7 @@ describe('Idle Behaviors Integration', () => {
       for (let i = 0; i < 50; i++) {
         const queue = entity.getComponent(ComponentType.ActionQueue) as ActionQueue;
         queue.clear();
-        idleBehaviorSystem.update(world, 1);
+        idleBehaviorSystem.update(world, [], 1);
         const action = queue.peek();
         if (action) {
           behaviors.push(action.type);

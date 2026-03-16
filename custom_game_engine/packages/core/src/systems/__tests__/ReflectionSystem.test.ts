@@ -40,7 +40,7 @@ describe('ReflectionSystem', () => {
         timestamp: Date.now()
       });
 
-      system.update(world, 1);
+      system.update(world, [], 1);
 
       const reflectionComp = agent.getComponent(ReflectionComponent);
       expect(reflectionComp.reflections.length).toBeGreaterThan(0);
@@ -69,7 +69,7 @@ describe('ReflectionSystem', () => {
         timestamp: Date.now()
       });
 
-      system.update(world, 1);
+      system.update(world, [], 1);
 
       const reflectionComp = agent.getComponent(ReflectionComponent);
       const reflection = reflectionComp.reflections[0];
@@ -94,7 +94,7 @@ describe('ReflectionSystem', () => {
         timestamp: Date.now()
       });
 
-      system.update(world, 1);
+      system.update(world, [], 1);
 
       // Should form belief: "Spring is good for wheat"
       expect(semanticMem.beliefs.length).toBeGreaterThan(0);
@@ -116,7 +116,7 @@ describe('ReflectionSystem', () => {
         timestamp: Date.now()
       });
 
-      system.update(world, 1);
+      system.update(world, [], 1);
 
       const memory = episodicMem.episodicMemories[0];
       expect(memory.markedForConsolidation).toBe(true);
@@ -137,7 +137,7 @@ describe('ReflectionSystem', () => {
         timestamp: Date.now()
       });
 
-      system.update(world, 1);
+      system.update(world, [], 1);
 
       const reflectionComp = agent.getComponent(ReflectionComponent);
       const reflection = reflectionComp.reflections[0];
@@ -161,7 +161,7 @@ describe('ReflectionSystem', () => {
         timestamp: Date.now()
       });
 
-      system.update(world, 1);
+      system.update(world, [], 1);
 
       const reflectionComp = agent.getComponent(ReflectionComponent);
       const reflection = reflectionComp.reflections[0];
@@ -189,7 +189,7 @@ describe('ReflectionSystem', () => {
         timestamp: Date.now()
       });
 
-      system.update(world, 1);
+      system.update(world, [], 1);
 
       const reflectionComp = agent.getComponent(ReflectionComponent);
       const reflection = reflectionComp.reflections[0];
@@ -213,7 +213,7 @@ describe('ReflectionSystem', () => {
         timestamp: Date.now()
       });
 
-      system.update(world, 1);
+      system.update(world, [], 1);
 
       const reflectionComp = agent.getComponent(ReflectionComponent);
       const reflection = reflectionComp.reflections[0];
@@ -240,7 +240,7 @@ describe('ReflectionSystem', () => {
         timestamp: Date.now()
       });
 
-      system.update(world, 1);
+      system.update(world, [], 1);
 
       const reflectionComp = agent.getComponent(ReflectionComponent);
       const reflection = reflectionComp.reflections[0];
@@ -278,7 +278,7 @@ describe('ReflectionSystem', () => {
         timestamp: Date.now()
       });
 
-      system.update(world, 1);
+      system.update(world, [], 1);
 
       const reflectionComp = agent.getComponent(ReflectionComponent);
       const reflection = reflectionComp.reflections[0];
@@ -304,7 +304,7 @@ describe('ReflectionSystem', () => {
         timestamp: Date.now()
       });
 
-      system.update(world, 1);
+      system.update(world, [], 1);
 
       // Should update semantic memory with identity insight
       const semanticMem = agent.getComponent(SemanticMemoryComponent);
@@ -328,7 +328,7 @@ describe('ReflectionSystem', () => {
         timestamp: Date.now()
       });
 
-      system.update(world, 1);
+      system.update(world, [], 1);
 
       const reflectionComp = agent.getComponent(ReflectionComponent);
       const reflection = reflectionComp.reflections[0];
@@ -356,7 +356,7 @@ describe('ReflectionSystem', () => {
         importance: 0.95
       });
 
-      system.update(world, 1);
+      system.update(world, [], 1);
 
       const reflectionComp = agent.getComponent(ReflectionComponent);
       expect(reflectionComp.reflections.length).toBeGreaterThan(0);
@@ -374,7 +374,7 @@ describe('ReflectionSystem', () => {
           timestamp: Date.now()
         });
 
-        system.update(world, 1);
+        system.update(world, [], 1);
 
         if (reflectionComp.reflections.length > reflectionCount) {
           reflectionCount++;
@@ -397,7 +397,7 @@ describe('ReflectionSystem', () => {
         timestamp: Date.now()
       });
 
-      system.update(world, 1);
+      system.update(world, [], 1);
 
       const reflectionComp = agent.getComponent(ReflectionComponent);
       expect(reflectionComp.reflections.length).toBe(0);
@@ -424,7 +424,7 @@ describe('ReflectionSystem', () => {
         timestamp: Date.now()
       });
 
-      system.update(world, 1);
+      system.update(world, [], 1);
 
       expect(handler).toHaveBeenCalled();
     });
@@ -447,7 +447,7 @@ describe('ReflectionSystem', () => {
         timestamp: Date.now()
       });
 
-      system.update(world, 1);
+      system.update(world, [], 1);
 
       expect(handler).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -476,7 +476,7 @@ describe('ReflectionSystem', () => {
         timestamp: Date.now()
       });
 
-      system.update(world, 1);
+      system.update(world, [], 1);
 
       expect(llmSpy).toHaveBeenCalled();
     });
@@ -503,7 +503,7 @@ describe('ReflectionSystem', () => {
 
       // Should not throw, but log error
       expect(() => {
-        system.update(world, 1);
+        system.update(world, [], 1);
       }).not.toThrow();
     });
   });
@@ -519,7 +519,7 @@ describe('ReflectionSystem', () => {
           agentId: agentWithoutReflection.id,
           timestamp: Date.now()
         });
-        system.update(world, 1);
+        system.update(world, [], 1);
       }).toThrow();
     });
 
@@ -532,7 +532,7 @@ describe('ReflectionSystem', () => {
           agentId: agentWithoutMemory.id,
           timestamp: Date.now()
         });
-        system.update(world, 1);
+        system.update(world, [], 1);
       }).toThrow();
     });
 
@@ -556,7 +556,7 @@ describe('ReflectionSystem', () => {
       });
 
       expect(() => {
-        system.update(world, 1);
+        system.update(world, [], 1);
       }).toThrow();
     });
   });
