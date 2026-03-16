@@ -12,10 +12,11 @@ describe('Power Consumption System', () => {
   let world: World;
   let powerGridSystem: PowerGridSystem;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     const eventBus = new EventBusImpl();
     world = new World(eventBus);
     powerGridSystem = new PowerGridSystem();
+    await powerGridSystem.initialize(world, eventBus);
   });
 
   describe('Criterion 1: Power Consumers Drain Power', () => {

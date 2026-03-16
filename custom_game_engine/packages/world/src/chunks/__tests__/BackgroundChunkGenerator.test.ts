@@ -12,6 +12,7 @@ type MockWorldMutator = {
   query: () => any;
   addEntity: (...args: any[]) => void;
   createEntity: () => any;
+  performanceStats: { tps: number; avgTickTimeMs: number; maxTickTimeMs: number; tickCount: number };
 };
 
 describe('BackgroundChunkGenerator', () => {
@@ -45,6 +46,7 @@ describe('BackgroundChunkGenerator', () => {
         hasComponent: vi.fn(() => false),
         getComponent: vi.fn(),
       })),
+      performanceStats: { tps: 20, avgTickTimeMs: 50, maxTickTimeMs: 100, tickCount: 0 },
     };
   });
 

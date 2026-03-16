@@ -45,7 +45,8 @@ describe('GalacticCouncilSystem', () => {
   let councilComp: GalacticCouncilComponent;
 
   beforeEach(() => {
-    world = new World({ enableSpatialGrid: false });
+    eventBus = new EventBusImpl();
+    world = new World(eventBus);
     system = new GalacticCouncilSystem();
 
     // Create galactic council entity

@@ -16,6 +16,7 @@ import { ComponentType } from '../types/ComponentType.js';
 import { describe, it, expect, beforeEach } from 'vitest';
 import { World } from '../ecs/World.js';
 import { EntityImpl } from '../ecs/Entity.js';
+import { EventBusImpl } from '../events/EventBus.js';
 import { NeedsComponent, isHungry, isTired } from '../components/NeedsComponent.js';
 import { PersonalityComponent } from '../components/PersonalityComponent.js';
 
@@ -25,14 +26,8 @@ describe('Component Format Unification - Integration Tests', () => {
 
   beforeEach(() => {
     // Create a minimal world for testing
-    world = new World({
-      gameTime: { tick: 0, hour: 6, dayOfYear: 1, season: 'spring' as const, year: 1 },
-      eventBus: {
-        on: () => () => {},
-        off: () => {},
-        emit: () => {},
-      } as unknown,
-    });
+    const eb = new EventBusImpl();
+    world = new World(eb);
     entity = world.createEntity();
   });
 

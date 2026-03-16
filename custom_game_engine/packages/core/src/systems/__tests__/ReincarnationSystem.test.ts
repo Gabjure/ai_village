@@ -30,11 +30,12 @@ describe('ReincarnationSystem', () => {
   let eventBus: EventBusImpl;
   let system: ReincarnationSystem;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     harness = createMinimalWorld();
     world = harness.world;
+    eventBus = harness.eventBus;
     system = new ReincarnationSystem();
-    system.init(world);
+    await system.initialize(world, eventBus);
   });
 
   describe('initialization', () => {

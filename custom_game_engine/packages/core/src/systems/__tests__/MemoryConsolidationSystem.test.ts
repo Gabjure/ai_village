@@ -1,9 +1,9 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { World } from '../../World';
+import { World } from '../../ecs/World.js';
 import { MemoryConsolidationSystem } from '../MemoryConsolidationSystem';
 import { EpisodicMemoryComponent } from '../../components/EpisodicMemoryComponent';
 import { EventBus } from '../../EventBus';
-import { EventBusImpl } from '../events/EventBus.js';
+import { EventBusImpl } from '../../events/EventBus.js';
 
 // Type helpers for testing
 type EntityWithMethods = {

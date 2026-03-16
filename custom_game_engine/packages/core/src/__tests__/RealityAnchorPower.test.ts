@@ -16,12 +16,13 @@ describe('Reality Anchor Power Integration', () => {
   let powerGridSystem: PowerGridSystem;
   let eventBus: EventBusImpl;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     eventBus = new EventBusImpl();
     world = new World(eventBus);
     realityAnchorSystem = new RealityAnchorSystem();
     powerGridSystem = new PowerGridSystem();
-    realityAnchorSystem.initialize(world, eventBus);
+    await realityAnchorSystem.initialize(world, eventBus);
+    await powerGridSystem.initialize(world, eventBus);
   });
 
   describe('Criterion 4: Reality Anchor Charging Consumes Power', () => {

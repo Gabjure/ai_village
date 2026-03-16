@@ -32,7 +32,7 @@ describe('InterestEvolutionSystem - Phase 7.1', () => {
   let agent: EntityImpl;
 
   beforeEach(async () => {
-    const eventBus = new EventBusImpl();
+    eventBus = new EventBusImpl();
     world = new World(eventBus);
     system = new InterestEvolutionSystem();
     await system.initialize(world, eventBus);

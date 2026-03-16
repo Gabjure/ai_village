@@ -24,7 +24,7 @@ describe('Phase 6: Emergent Social Dynamics', () => {
   let agent2: EntityImpl;
 
   beforeEach(async () => {
-    const eventBus = new EventBusImpl();
+    eventBus = new EventBusImpl();
     world = new World(eventBus);
 
     // Create two test agents

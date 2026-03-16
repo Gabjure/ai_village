@@ -30,7 +30,7 @@ describe('Behavior Queue System Integration', () => {
 
   beforeEach(() => {
     // Create real world with EventBus
-    const eventBus = new EventBusImpl();
+    eventBus = new EventBusImpl();
     world = new World(eventBus);
 
     // Create AI system

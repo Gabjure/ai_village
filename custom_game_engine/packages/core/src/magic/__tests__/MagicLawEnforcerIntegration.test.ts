@@ -32,6 +32,7 @@ describe('MagicLawEnforcer - Cost Calculator Integration', () => {
         mana: { type: 'mana', current: 100, maximum: 100, regenRate: 0.01, locked: 0 },
         stamina: { type: 'stamina', current: 100, maximum: 100, regenRate: 0.02, locked: 0 },
       },
+      manaPools: [],
       knownSpells: [],
       paradigmState: {},
     } as Record<string, unknown>;
@@ -169,6 +170,7 @@ describe('MagicLawEnforcer - Cross-Paradigm Validation', () => {
         mana: { type: 'mana', current: 100, maximum: 100, regenRate: 0.01, locked: 0 },
         sanity: { type: 'sanity', current: 100, maximum: 100, regenRate: 0.005, locked: 0 },
       },
+      manaPools: [],
       knownSpells: [],
       paradigmState: {
         names: { knownNames: ['fire', 'wind'] },
@@ -207,6 +209,7 @@ describe('MagicLawEnforcer - Cross-Paradigm Validation', () => {
       knownParadigmIds: ['divine', 'pact'], // Forbidden combo
       activeParadigms: ['divine', 'pact'],
       resourcePools: {},
+      manaPools: [],
       knownSpells: [],
       paradigmState: {},
     } as Record<string, unknown>;
@@ -226,6 +229,7 @@ describe('MagicLawEnforcer - Risk Assessment', () => {
       resourcePools: {
         mana: { type: 'mana', current: 100, maximum: 100, regenRate: 0.01, locked: 0 },
       },
+      manaPools: [],
       knownSpells: [
         {
           spellId: 'fireball',
@@ -274,6 +278,7 @@ describe('MagicLawEnforcer - Risk Assessment', () => {
         favor: { type: 'favor', current: 100, maximum: 100, regenRate: 0, locked: 0 },
         corruption: { type: 'corruption', current: 80, maximum: 100, regenRate: 0, locked: 0 },
       },
+      manaPools: [],
       knownSpells: [],
       paradigmState: { pact: { patronId: 'demon', pactTerms: [], serviceOwed: 0 } },
     } as Record<string, unknown>;
@@ -313,6 +318,7 @@ describe('MagicLawEnforcer - Spell Modification', () => {
       resourcePools: {
         mana: { type: 'mana', current: 100, maximum: 100, regenRate: 0.01, locked: 0 },
       },
+      manaPools: [],
       knownSpells: [],
       paradigmState: {},
     } as Record<string, unknown>;
@@ -349,6 +355,7 @@ describe('MagicLawEnforcer - Spell Modification', () => {
       resourcePools: {
         favor: { type: 'favor', current: 10, maximum: 100, regenRate: 0, locked: 0 }, // Low favor
       },
+      manaPools: [],
       knownSpells: [],
       paradigmState: { divine: { deityId: 'healing_god', deityStanding: 'disfavored' } },
     } as Record<string, unknown>;

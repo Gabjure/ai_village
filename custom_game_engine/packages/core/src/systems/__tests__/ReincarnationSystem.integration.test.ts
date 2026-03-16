@@ -37,14 +37,15 @@ describe('ReincarnationSystem Integration', () => {
   let reincarnationSystem: ReincarnationSystem;
   let deathSystem: DeathTransitionSystem;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     harness = createMinimalWorld();
     world = harness.world;
+    eventBus = harness.eventBus;
     reincarnationSystem = new ReincarnationSystem();
     deathSystem = new DeathTransitionSystem();
 
     // Initialize systems
-    reincarnationSystem.init(world);
+    await reincarnationSystem.initialize(world, eventBus);
   });
 
   describe('full reincarnation lifecycle', () => {

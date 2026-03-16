@@ -19,7 +19,7 @@ describe('Resource Gathering System', () => {
   let rock: EntityImpl;
 
   beforeEach(() => {
-    const eventBus = new EventBusImpl();
+    eventBus = new EventBusImpl();
     world = new World(eventBus);
 
     // Create agent with inventory

@@ -7,7 +7,6 @@ import { ComponentType } from '../../types/ComponentType';
 import { MYTHIC_RIDDLES } from '../../components/DeathBargainComponent';
 import type { DeathBargainComponent } from '../../components/DeathBargainComponent';
 import type { LLMProvider } from '@ai-village/llm';
-import type { World } from '../../ecs/World';
 
 // Type helpers for testing
 type EntityWithMethods = {
@@ -31,7 +30,8 @@ describe('DeathBargainSystem', () => {
 
   beforeEach(() => {
     system = new DeathBargainSystem();
-    world = new World(new EventBusImpl());
+    eventBus = new EventBusImpl();
+    world = new World(eventBus);
 
     // Mock LLM provider
     mockLLM = {

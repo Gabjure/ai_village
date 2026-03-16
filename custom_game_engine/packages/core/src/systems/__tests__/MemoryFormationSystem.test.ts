@@ -1,9 +1,9 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { World } from '../../World';
+import { World } from '../../ecs/World.js';
 import { MemoryFormationSystem } from '../MemoryFormationSystem';
 import { EpisodicMemoryComponent } from '../../components/EpisodicMemoryComponent';
 import { EventBus } from '../../EventBus';
-import { EventBusImpl } from '../events/EventBus.js';
+import { EventBusImpl } from '../../events/EventBus.js';
 
 describe('MemoryFormationSystem', () => {
   let world: World;

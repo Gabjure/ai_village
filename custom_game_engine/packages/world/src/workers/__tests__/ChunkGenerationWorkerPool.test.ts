@@ -6,30 +6,41 @@ import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { ChunkGenerationWorkerPool } from '../ChunkGenerationWorkerPool.js';
 
 describe('ChunkGenerationWorkerPool', () => {
-  let workerPool: ChunkGenerationWorkerPool;
+  let workerPool: ChunkGenerationWorkerPool | null = null;
 
   beforeEach(() => {
+    // Skip if Workers not available (Node.js test environment)
+    if (typeof Worker === 'undefined') {
+      return;
+    }
+
     workerPool = new ChunkGenerationWorkerPool(2, 'test-seed');
   });
 
   afterEach(() => {
-    workerPool.terminate();
+    if (workerPool) {
+      workerPool.terminate();
+      workerPool = null;
+    }
   });
 
-  it('should create worker pool', () => {
+  it.skipIf(typeof Worker === 'undefined')('should create worker pool', () => {
+    if (!workerPool) throw new Error('Worker pool not initialized');
     const status = workerPool.getStatus();
     expect(status.numWorkers).toBe(2);
     expect(status.pendingRequests).toBe(0);
   });
 
-  it('should generate chunk in worker', async () => {
+  it.skipIf(typeof Worker === 'undefined')('should generate chunk in worker', async () => {
+    if (!workerPool) throw new Error('Worker pool not initialized');
     const tiles = await workerPool.generateChunk(0, 0);
     expect(tiles).toBeDefined();
     expect(Array.isArray(tiles)).toBe(true);
     expect(tiles.length).toBeGreaterThan(0);
   });
 
-  it('should handle multiple concurrent requests', async () => {
+  it.skipIf(typeof Worker === 'undefined')('should handle multiple concurrent requests', async () => {
+    if (!workerPool) throw new Error('Worker pool not initialized');
     const promises = [
       workerPool.generateChunk(0, 0),
       workerPool.generateChunk(1, 0),
@@ -45,7 +56,8 @@ describe('ChunkGenerationWorkerPool', () => {
     });
   });
 
-  it('should terminate workers', () => {
+  it.skipIf(typeof Worker === 'undefined')('should terminate workers', () => {
+    if (!workerPool) throw new Error('Worker pool not initialized');
     workerPool.terminate();
     const status = workerPool.getStatus();
     expect(status.numWorkers).toBe(0);
