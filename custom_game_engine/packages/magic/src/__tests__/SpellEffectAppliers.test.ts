@@ -934,9 +934,12 @@ describe('Effect Appliers - Dispel', () => {
     mockWorld = createMockWorld();
     mockCaster = createMockEntity('caster', {
       magic: { techniqueProficiency: { dispel: 50 } },
+      position: { type: 'position', x: 0, y: 0 },
     });
     mockTarget = createMockEntity('target', {
+      position: { type: 'position', x: 10, y: 10 },
       active_effects: {
+        type: 'active_effects',
         effects: [
           { id: 'buff1', category: 'buff', power: 30, source: 'external' },
           { id: 'debuff1', category: 'debuff', power: 40, source: 'external' },
@@ -1182,7 +1185,9 @@ describe('Effect Appliers - Dispel', () => {
       const context2 = createMockContext(effect);
       context2.scaledValues.set('dispel_power', { value: 80, capped: false }); // 30 + 50
       const target2 = createMockEntity('target2', {
+        position: { type: 'position', x: 5, y: 5 },
         active_effects: {
+          type: 'active_effects',
           effects: [{ id: 'strong_buff', category: 'buff', power: 70, source: 'external' }],
         },
       });
@@ -1195,7 +1200,8 @@ describe('Effect Appliers - Dispel', () => {
   describe('Edge Cases', () => {
     it('should fail on target without active effects', () => {
       const cleanTarget = createMockEntity('clean_target', {
-        active_effects: { effects: [] },
+        position: { type: 'position', x: 5, y: 5 },
+        active_effects: { type: 'active_effects', effects: [] },
       });
 
       const effect: SpellEffect = {
@@ -1217,8 +1223,9 @@ describe('Effect Appliers - Dispel', () => {
 
     it('should fail on target out of range', () => {
       const farTarget = createMockEntity('far_target', {
-        position: { x: 100, y: 100 },
+        position: { type: 'position', x: 100, y: 100 },
         active_effects: {
+          type: 'active_effects',
           effects: [{ id: 'buff1', category: 'buff', power: 30 }],
         },
       });
@@ -1242,7 +1249,9 @@ describe('Effect Appliers - Dispel', () => {
 
     it('should handle effects with different power levels', () => {
       const targetWithMixedEffects = createMockEntity('mixed_target', {
+        position: { type: 'position', x: 5, y: 5 },
         active_effects: {
+          type: 'active_effects',
           effects: [
             { id: 'weak_buff', category: 'buff', power: 20, source: 'external' },
             { id: 'medium_buff', category: 'buff', power: 50, source: 'external' },
@@ -1274,7 +1283,9 @@ describe('Effect Appliers - Dispel', () => {
 
     it('should not dispel permanent effects', () => {
       const targetWithPermanent = createMockEntity('permanent_target', {
+        position: { type: 'position', x: 5, y: 5 },
         active_effects: {
+          type: 'active_effects',
           effects: [
             { id: 'curse', category: 'debuff', power: 40, permanent: true },
             { id: 'temp_debuff', category: 'debuff', power: 30, permanent: false },
@@ -1502,7 +1513,7 @@ describe('Effect Appliers - Teleport', () => {
     });
 
     it('should teleport in facing direction', () => {
-      mockCaster.addComponent('orientation', { facing: Math.PI / 2 }); // East
+      mockCaster.addComponent('orientation', { type: 'orientation', facing: Math.PI / 2 }); // East
 
       const effect: SpellEffect = {
         id: 'blink_forward',
@@ -1668,6 +1679,7 @@ describe('Effect Appliers - Teleport', () => {
 
     it('should allow teleport anchors (marked locations)', () => {
       mockCaster.addComponent('teleport_anchors', {
+        type: 'teleport_anchors',
         anchors: [
           { name: 'home', x: 100, y: 100 },
           { name: 'workshop', x: 200, y: 200 },
@@ -1714,7 +1726,8 @@ describe('Effect Appliers - Teleport', () => {
       const result = applier.apply(effect, mockCaster, mockCaster, mockWorld, context);
 
       expect(result.success).toBe(true);
-      expect(result.appliedValues.targetPlane).toBe('ethereal');
+      // targetPlane is returned on the result object directly, not in appliedValues
+      expect((result as any).targetPlane).toBe('ethereal');
     });
 
     it('should handle blink (repeated micro-teleports)', () => {
@@ -1750,6 +1763,10 @@ describe('Effect Appliers - Mental', () => {
     mockCaster = createMockEntity('caster');
     mockTarget = createMockEntity('target', {
       stats: { willpower: 10, intelligence: 10 },
+      behavior: { type: 'behavior', version: 1, currentBehavior: 'idle' },
+      mental_effects: { type: 'mental_effects', version: 1, charmedBy: undefined, aware: true },
+      perception_effects: { type: 'perception_effects', version: 1, illusions: [] },
+      memory: { type: 'memory', version: 1, modified: false },
     });
   });
 
@@ -2022,7 +2039,9 @@ describe('Effect Appliers - Soul', () => {
 
   beforeEach(() => {
     mockWorld = createMockWorld();
-    mockCaster = createMockEntity('caster');
+    mockCaster = createMockEntity('caster', {
+      perception_effects: { type: 'perception_effects', version: 1, detectsSouls: false },
+    });
     mockTarget = createMockEntity('target', {
       soul: { integrity: 100, bound: false },
       needs: { health: 100, maxHealth: 100 },
@@ -3845,10 +3864,14 @@ describe('Effect Appliers - Temporal', () => {
 
       const applier = getEffectApplier('temporal');
 
+      // Lower timeFactor = stronger slow. Higher proficiency produces a lower (stronger) timeFactor.
+      // Provide pre-computed scaled values since the applier reads scaledValues.get('timeFactor').
       const context1 = createMockContext(effect, { proficiency: 20 });
+      context1.scaledValues.set('timeFactor', { value: 0.9, capped: false }); // Weak slow
       const result1 = applier.apply(effect, mockCaster, createMockEntity('target1', { stats: {}, status_effects: { timeScale: 1.0 } }), mockWorld, context1);
 
       const context2 = createMockContext(effect, { proficiency: 80 });
+      context2.scaledValues.set('timeFactor', { value: 0.4, capped: false }); // Strong slow
       const result2 = applier.apply(effect, mockCaster, createMockEntity('target2', { stats: {}, status_effects: { timeScale: 1.0 } }), mockWorld, context2);
 
       expect(result1.success).toBe(true);

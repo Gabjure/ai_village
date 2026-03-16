@@ -788,18 +788,20 @@ function updateEmergencePhase(deity: Deity): string {
 }
 
 function detectCircularHierarchy(deities: Deity[]): any {
-  // Simple cycle detection
-  const visited = new Set();
-  for (const deity of deities) {
-    let current: any = deity;
-    const path = [deity.id];
+  // Cycle detection per starting node using path tracking
+  for (const startDeity of deities) {
+    let current: any = startDeity;
+    const path: string[] = [startDeity.id];
+    const inPath = new Set<string>([startDeity.id]);
 
     while (current && (current as Record<string, unknown>).superior) {
-      if (visited.has((current as Record<string, unknown>).superior)) {
-        return { detected: true, cycle: [...path, (current as Record<string, unknown>).superior] };
+      const superiorId = (current as Record<string, unknown>).superior as string;
+      if (inPath.has(superiorId)) {
+        return { detected: true, cycle: [...path, superiorId] };
       }
-      path.push((current as Record<string, unknown>).superior);
-      current = deities.find((d) => d.id === (current as Record<string, unknown>).superior);
+      path.push(superiorId);
+      inPath.add(superiorId);
+      current = deities.find((d) => d.id === superiorId);
     }
   }
 

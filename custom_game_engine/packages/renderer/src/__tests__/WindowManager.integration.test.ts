@@ -621,7 +621,7 @@ describe('WindowManager Integration Tests', () => {
       expect(() => {
       // @ts-expect-error Testing null parameter validation
         windowManager.registerWindow('null-panel', null, config);
-      }).toThrow('Panel cannot be null or undefined');
+      }).toThrow('Either panel or factory must be provided');
     });
 
     it('should throw when window dimensions are invalid', () => {

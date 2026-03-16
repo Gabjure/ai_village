@@ -440,7 +440,7 @@ describe('Divine Power - Blessings and Curses', () => {
     applyCurse(deity, curse, mockWorld);
 
     // Person performs sacrifice
-    const satisfied = checkCurseLiftCondition(curse, 'sacrifice_performed', mockWorld);
+    const satisfied = checkCurseLiftCondition(curse, 'sacrifice', mockWorld);
 
     expect(satisfied).toBe(true);
 

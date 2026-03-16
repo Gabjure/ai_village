@@ -108,21 +108,33 @@ describe('ProviderPoolManager', () => {
   });
 
   describe('fallback chain', () => {
-    it('should fallback to cerebras on groq rate limit', async () => {
+    it('should retry groq internally on rate limit (ProviderQueue handles 429)', async () => {
+      // ProviderQueue now handles 429 internally via re-queuing with delay.
+      // When groq gets a 429, the queue retries groq after ~1s rather than
+      // propagating the error up to ProviderPoolManager for fallback.
       const rateLimitError: any = new Error('Rate limited');
       rateLimitError.status = 429;
 
       groqProvider.queueError(rateLimitError);
+      // Queue a success so groq succeeds on retry
+      groqProvider.queueResponse({
+        text: 'groq retry response',
+        inputTokens: 10,
+        outputTokens: 20,
+        costUSD: 0.001,
+      });
 
       const request: LLMRequest = { prompt: 'test' };
       const response = await pool.execute('groq', request, 'agent1');
 
-      expect(response.text).toBe('cerebras response');
-      expect(groqProvider.callCount).toBe(1);
-      expect(cerebrasProvider.callCount).toBe(1);
-    });
+      // Groq retries internally and succeeds
+      expect(response.text).toBe('groq retry response');
+      expect(groqProvider.callCount).toBeGreaterThanOrEqual(2);
+      // Cerebras not called since groq handles retry internally
+      expect(cerebrasProvider.callCount).toBe(0);
+    }, 5000);
 
-    it('should not fallback on non-rate-limit errors', async () => {
+    it('should propagate non-rate-limit errors without fallback', async () => {
       const serverError = new Error('Server error');
       groqProvider.queueError(serverError);
 
@@ -134,15 +146,14 @@ describe('ProviderPoolManager', () => {
       expect(cerebrasProvider.callCount).toBe(0);
     });
 
-    it('should skip rate-limited fallback providers', async () => {
-      // Both groq and cerebras rate limited
+    it('should internally retry the provider on rate limit', async () => {
+      // ProviderQueue handles 429 by re-queuing with internal delay
       const rateLimitError: any = new Error('Rate limited');
       rateLimitError.status = 429;
 
       groqProvider.queueError(rateLimitError);
-      cerebrasProvider.queueError(rateLimitError);
 
-      // Queue success responses for retry
+      // Queue success for retry
       groqProvider.queueResponse({
         text: 'groq retry success',
         inputTokens: 10,
@@ -151,22 +162,22 @@ describe('ProviderPoolManager', () => {
       });
 
       const request: LLMRequest = { prompt: 'test' };
-      const response = await pool.execute('groq', request, 'agent1', undefined, 0);
+      const response = await pool.execute('groq', request, 'agent1');
 
-      // Should retry groq after wait
+      // Groq retries internally and succeeds
       expect(response.text).toBe('groq retry success');
       expect(groqProvider.callCount).toBeGreaterThanOrEqual(2);
-    });
+    }, 5000);
   });
 
   describe('retry logic', () => {
-    it('should retry after all providers rate limited', async () => {
+    it('should retry provider internally after rate limit', async () => {
+      // ProviderQueue handles 429 internally by re-queuing with delay.
+      // The queue will retry groq after the rate limit expires.
       const rateLimitError: any = new Error('Rate limited');
       rateLimitError.status = 429;
 
-      // Both providers rate limited initially
       groqProvider.queueError(rateLimitError);
-      cerebrasProvider.queueError(rateLimitError);
 
       // Queue success for retry
       groqProvider.queueResponse({
@@ -180,23 +191,21 @@ describe('ProviderPoolManager', () => {
       const response = await pool.execute('groq', request, 'agent1');
 
       expect(response.text).toBe('retry success');
-    });
+    }, 5000);
 
-    it('should fail after max retries', async () => {
-      pool.setMaxRetries(2);
+    it('should fail after max retries when non-rate-limit errors persist', async () => {
+      // Pool-level maxRetries applies to non-rate-limit fallback scenarios.
+      // For 429s, ProviderQueue handles retries internally.
+      // For non-429 errors with fallback failure, pool maxRetries applies.
+      pool.setMaxRetries(0);
 
-      const rateLimitError: any = new Error('Rate limited');
-      rateLimitError.status = 429;
-
-      // Keep failing with rate limit
-      for (let i = 0; i < 10; i++) {
-        groqProvider.queueError(rateLimitError);
-        cerebrasProvider.queueError(rateLimitError);
-      }
+      // Groq throws non-rate-limit error, cerebras also fails
+      const serverError = new Error('Server error');
+      groqProvider.queueError(serverError);
 
       await expect(
         pool.execute('groq', { prompt: 'test' }, 'agent1')
-      ).rejects.toThrow('All providers exhausted');
+      ).rejects.toThrow('Server error');
     });
   });
 

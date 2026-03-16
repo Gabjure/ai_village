@@ -5,7 +5,7 @@
 
 import { describe, it, expect, beforeEach } from 'vitest';
 import { InventoryUI } from '../InventoryUI.js';
-import { createMockWorld } from '@ai-village/core';
+import { createMockWorld } from '@ai-village/core/__tests__/createMockWorld.js';
 import type { InventoryComponent } from '@ai-village/core';
 
 describe('InventoryUI - Quick Bar', () => {

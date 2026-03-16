@@ -116,6 +116,7 @@ describe('GameIntrospectionAPI - Skills & Progression', () => {
       const entityId = 'test-agent';
       const components = new Map([
         ['skills', {
+          type: 'skills',
           levels: { farming: 0 },
           experience: { farming: 0 },
           totalExperience: { farming: 0 },
@@ -141,6 +142,7 @@ describe('GameIntrospectionAPI - Skills & Progression', () => {
       const entityId = 'test-agent';
       const components = new Map([
         ['skills', {
+          type: 'skills',
           levels: { combat: 0 },
           experience: { combat: 0 },
           totalExperience: { combat: 0 },
@@ -164,6 +166,7 @@ describe('GameIntrospectionAPI - Skills & Progression', () => {
       const entityId = 'test-agent';
       const components = new Map([
         ['skills', {
+          type: 'skills',
           levels: { magic: 0 },
           experience: { magic: 0 },
           totalExperience: { magic: 0 },
@@ -188,6 +191,7 @@ describe('GameIntrospectionAPI - Skills & Progression', () => {
       const entityId = 'test-agent';
       const components = new Map([
         ['skills', {
+          type: 'skills',
           levels: { cooking: 0 },
           experience: { cooking: 0 },
           totalExperience: { cooking: 0 },
@@ -231,6 +235,7 @@ describe('GameIntrospectionAPI - Skills & Progression', () => {
       const entityId = 'test-agent';
       const components = new Map([
         ['skills', {
+          type: 'skills',
           levels: { farming: 0 },
           experience: { farming: 0 },
           totalExperience: { farming: 0 },
@@ -250,6 +255,7 @@ describe('GameIntrospectionAPI - Skills & Progression', () => {
       const entityId = 'test-agent';
       const components = new Map([
         ['skills', {
+          type: 'skills',
           levels: { farming: 1 },
           experience: { farming: 50 },
           totalExperience: { farming: 150 },
@@ -269,6 +275,7 @@ describe('GameIntrospectionAPI - Skills & Progression', () => {
       const entityId = 'test-agent';
       const components = new Map([
         ['skills', {
+          type: 'skills',
           levels: { farming: 0 },
           experience: { farming: 0 },
           totalExperience: { farming: 0 },
@@ -291,6 +298,7 @@ describe('GameIntrospectionAPI - Skills & Progression', () => {
       const entityId = 'test-agent';
       const components = new Map([
         ['skills', {
+          type: 'skills',
           levels: { building: 0 },
           experience: { building: 0 },
           totalExperience: { building: 0 },
@@ -313,6 +321,7 @@ describe('GameIntrospectionAPI - Skills & Progression', () => {
       const entityId = 'test-agent';
       const components = new Map([
         ['skills', {
+          type: 'skills',
           levels: { woodcutting: 0 },
           experience: { woodcutting: 0 },
           totalExperience: { woodcutting: 0 },
@@ -344,6 +353,7 @@ describe('GameIntrospectionAPI - Skills & Progression', () => {
       const entityId = 'test-agent';
       const components = new Map([
         ['skills', {
+          type: 'skills',
           levels: { farming: 2, combat: 1, cooking: 3 },
           experience: { farming: 50, combat: 20, cooking: 100 },
           totalExperience: { farming: 350, combat: 120, cooking: 800 },
@@ -365,6 +375,7 @@ describe('GameIntrospectionAPI - Skills & Progression', () => {
       const entityId = 'test-agent';
       const components = new Map([
         ['skills', {
+          type: 'skills',
           levels: { mining: 4, smithing: 2 },
           experience: { mining: 0, smithing: 50 },
           totalExperience: { mining: 1500, smithing: 350 },
@@ -399,6 +410,7 @@ describe('GameIntrospectionAPI - Skills & Progression', () => {
       const entityId = 'test-agent';
       const components = new Map([
         ['skills', {
+          type: 'skills',
           levels: {},
           experience: {},
           totalExperience: {},
@@ -434,6 +446,7 @@ describe('GameIntrospectionAPI - Behavioral Control', () => {
       const entityId = 'test-agent';
       const components = new Map([
         ['agent', {
+          type: 'agent',
           behaviorQueue: [],
           currentQueueIndex: 0,
           behaviorCompleted: false,
@@ -457,6 +470,7 @@ describe('GameIntrospectionAPI - Behavioral Control', () => {
       const entityId = 'test-agent';
       const components = new Map([
         ['agent', {
+          type: 'agent',
           behaviorQueue: [],
           currentQueueIndex: 0,
           behaviorCompleted: false,
@@ -484,6 +498,7 @@ describe('GameIntrospectionAPI - Behavioral Control', () => {
       const entityId = 'test-agent';
       const components = new Map([
         ['agent', {
+          type: 'agent',
           behaviorQueue: [
             { behavior: 'idle', behaviorState: {} },
             { behavior: 'wander', behaviorState: {} },
@@ -538,6 +553,7 @@ describe('GameIntrospectionAPI - Behavioral Control', () => {
       const entityId = 'test-agent';
       const components = new Map([
         ['agent', {
+          type: 'agent',
           behaviorQueue: [],
           currentQueueIndex: 0,
           behaviorCompleted: false,
@@ -559,6 +575,7 @@ describe('GameIntrospectionAPI - Behavioral Control', () => {
       const entityId = 'test-agent';
       const components = new Map([
         ['agent', {
+          type: 'agent',
           behaviorQueue: [],
           currentQueueIndex: 0,
           behaviorCompleted: false,
@@ -581,6 +598,7 @@ describe('GameIntrospectionAPI - Behavioral Control', () => {
       const entityId = 'test-agent';
       const components = new Map([
         ['agent', {
+          type: 'agent',
           behaviorQueue: [],
           currentQueueIndex: 0,
           behaviorCompleted: false,
@@ -604,6 +622,7 @@ describe('GameIntrospectionAPI - Behavioral Control', () => {
       const entityId = 'test-agent';
       const components = new Map([
         ['agent', {
+          type: 'agent',
           behaviorQueue: [],
           currentQueueIndex: 0,
           behaviorCompleted: false,
@@ -632,6 +651,7 @@ describe('GameIntrospectionAPI - Behavioral Control', () => {
       const entityId = 'test-agent';
       const components = new Map([
         ['agent', {
+          type: 'agent',
           behaviorQueue: [],
           currentQueueIndex: 0,
           behaviorCompleted: false,
@@ -653,6 +673,7 @@ describe('GameIntrospectionAPI - Behavioral Control', () => {
       const entityId = 'test-agent';
       const components = new Map([
         ['agent', {
+          type: 'agent',
           behaviorQueue: [],
           currentQueueIndex: 0,
           behaviorCompleted: false,
@@ -675,6 +696,7 @@ describe('GameIntrospectionAPI - Behavioral Control', () => {
       const entityId = 'test-agent';
       const components = new Map([
         ['agent', {
+          type: 'agent',
           behaviorQueue: [],
           currentQueueIndex: 0,
           behaviorCompleted: false,
@@ -698,6 +720,7 @@ describe('GameIntrospectionAPI - Behavioral Control', () => {
       const entityId = 'test-agent';
       const components = new Map([
         ['agent', {
+          type: 'agent',
           behaviorQueue: [{ behavior: 'idle', behaviorState: {} }],
           currentQueueIndex: 0,
           behaviorCompleted: true, // Was completed

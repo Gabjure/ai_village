@@ -240,7 +240,8 @@ describe('TalkerDeepEval - Response Format', () => {
         with: () => ({
           executeEntities: () => []
         })
-      })
+      }),
+      getPlanet: () => undefined,
     };
 
     const prompt = builder.buildPrompt(mockAgent, mockWorld);

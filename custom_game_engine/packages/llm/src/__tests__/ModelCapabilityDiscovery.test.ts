@@ -365,6 +365,11 @@ describe('ModelCapabilityDiscovery', () => {
 
       discovery.clearCache();
 
+      // Also clear localStorage to ensure no stale cache entries remain
+      if (typeof localStorage !== 'undefined') {
+        localStorage.clear();
+      }
+
       const callCountBefore = mockProvider.getCallCount();
 
       // Both should re-run discovery

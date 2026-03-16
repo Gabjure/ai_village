@@ -5,11 +5,13 @@ import {
   WHIMSICAL_PARADIGM_REGISTRY,
   NULL_PARADIGM_REGISTRY,
   DIMENSIONAL_PARADIGM_REGISTRY,
+  type MagicParadigm,
+} from '@ai-village/magic';
+import {
   POWER_TIER_THRESHOLDS,
   BELIEF_GENERATION_RATES,
-  type MagicParadigm,
   type PowerTier,
-} from '@ai-village/magic';
+} from '@ai-village/divinity';
 
 /**
  * Tests for DevPanel paradigm generation.

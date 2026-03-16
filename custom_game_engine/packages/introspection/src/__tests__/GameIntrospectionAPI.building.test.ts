@@ -424,12 +424,16 @@ class MockGameIntrospectionAPI {
     this.world.addEntity?.(buildingEntity);
 
     // Emit placement event
-    if (this.eventBus && typeof this.eventBus.emit === 'function') {
-      this.eventBus.emit('building_placed', {
-        buildingId: buildingEntity.id,
-        blueprintId: request.blueprintId,
-        position: request.position,
-        owner: request.owner,
+    const eventBus = (this.world as any).eventBus;
+    if (eventBus && typeof eventBus.emit === 'function') {
+      eventBus.emit({
+        type: 'building:placement:confirmed',
+        source: 'introspection-api',
+        data: {
+          blueprintId: request.blueprintId,
+          position: request.position,
+          rotation: 0,
+        },
       });
     }
 
@@ -822,11 +826,14 @@ describe('GameIntrospectionAPI Phase 2 - Building Management', () => {
         owner: 'agent-1',
       });
 
-      expect(emitSpy).toHaveBeenCalledWith('building_placed', {
-        buildingId: result.buildingId,
-        blueprintId: 'workbench',
-        position: { x: 10, y: 20 },
-        owner: 'agent-1',
+      expect(emitSpy).toHaveBeenCalledWith({
+        type: 'building:placement:confirmed',
+        source: 'introspection-api',
+        data: {
+          blueprintId: 'workbench',
+          position: { x: 10, y: 20 },
+          rotation: 0,
+        },
       });
     });
   });

@@ -4,7 +4,6 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { CraftingPanelUI } from '../CraftingPanelUI';
 import { World, EventBusImpl } from '@ai-village/core';
-import { EventBusImpl } from '@ai-village/core';
 
 // Type helpers for testing
 type EntityWithMethods = {
@@ -233,17 +232,15 @@ describe('CraftingPanelUI (REQ-CRAFT-001)', () => {
   });
 
   describe('Mouse Interaction', () => {
-    it('should handle click on close button', () => {
+    it('should have close button defined after render', () => {
+      // Close button is rendered for WindowManager to handle; panel does not close itself
       panel.setActiveAgent(123);
       panel.show();
       panel.render(ctx);
 
-      const closeButtonX = panel.closeButton.x + 5;
-      const closeButtonY = panel.closeButton.y + 5;
-
-      panel.handleClick(closeButtonX, closeButtonY);
-
-      expect(panel.isVisible).toBe(false);
+      expect(panel.closeButton).toBeDefined();
+      expect(panel.closeButton.x).toBeGreaterThan(0);
+      expect(panel.closeButton.y).toBeGreaterThanOrEqual(0);
     });
 
     it('should delegate clicks to sections', () => {
@@ -266,18 +263,21 @@ describe('CraftingPanelUI (REQ-CRAFT-001)', () => {
       expect(mockRecipeListClick).not.toHaveBeenCalled();
     });
 
-    it('should handle clicks outside panel bounds (close panel)', () => {
-      // Panel is 800x600 centered on 800x600 canvas, so it fills entire canvas
-      // We need to test with a larger canvas to have "outside" space
+    it('should not process clicks outside panel bounds', () => {
+      // Panel delegates close-on-outside-click to WindowManager
+      // CraftingPanelUI.handleClick returns false for unhandled clicks
       const largeCanvas = document.createElement('canvas');
       largeCanvas.width = 1200;
       largeCanvas.height = 800;
       const largePanel = new CraftingPanelUI(world, largeCanvas);
 
       largePanel.show();
-      largePanel.handleClick(10, 10); // Click in top-left corner, outside centered panel
+      // Click far outside the panel content area - should not be handled
+      const handled = largePanel.handleClick(10, 10);
 
-      expect(largePanel.isVisible).toBe(false);
+      // Panel remains visible (close is WindowManager's responsibility)
+      expect(largePanel.isVisible).toBe(true);
+      expect(handled).toBe(false);
     });
   });
 
@@ -333,6 +333,9 @@ describe('CraftingPanelUI (REQ-CRAFT-001)', () => {
       panel.show();
       panel.setActiveAgent(123);
 
+      // Mock ingredient panel to avoid real recipe registry lookup
+      vi.spyOn(panel.ingredientPanel, 'setRecipe').mockImplementation(() => {});
+
       panel.selectRecipe('stone_axe');
 
       expect(panel.selectedRecipeId).toBe('stone_axe');
@@ -347,6 +350,8 @@ describe('CraftingPanelUI (REQ-CRAFT-001)', () => {
       panel.show();
       panel.setActiveAgent(123);
 
+      // Mock ingredient panel to avoid real recipe registry lookup
+      vi.spyOn(panel.ingredientPanel, 'setRecipe').mockImplementation(() => {});
       const mockUpdate = vi.spyOn(panel.recipeDetailsSection, 'setRecipe');
       panel.selectRecipe('stone_axe');
 
@@ -357,7 +362,7 @@ describe('CraftingPanelUI (REQ-CRAFT-001)', () => {
       panel.show();
       panel.setActiveAgent(123);
 
-      const mockUpdate = vi.spyOn(panel.ingredientPanel, 'setRecipe');
+      const mockUpdate = vi.spyOn(panel.ingredientPanel, 'setRecipe').mockImplementation(() => {});
       panel.selectRecipe('stone_axe');
 
       expect(mockUpdate).toHaveBeenCalledWith('stone_axe', 123);
@@ -365,6 +370,9 @@ describe('CraftingPanelUI (REQ-CRAFT-001)', () => {
 
     it('should clear selection when null is passed', () => {
       panel.setActiveAgent(123);
+
+      // Mock ingredient panel to avoid real recipe registry lookup
+      vi.spyOn(panel.ingredientPanel, 'setRecipe').mockImplementation(() => {});
       panel.selectRecipe('stone_axe');
       panel.selectRecipe(null);
 
@@ -424,10 +432,15 @@ describe('CraftingPanelUI (REQ-CRAFT-001)', () => {
   });
 
   describe('Error Handling (CLAUDE.md)', () => {
-    it('should throw when rendering without active agent', () => {
+    it('should render placeholder when rendering without active agent', () => {
       panel.show();
-      // No agent set
-      expect(() => panel.render(ctx)).toThrow('No active agent');
+      // No agent set - should render placeholder text, not throw
+      expect(() => panel.render(ctx)).not.toThrow();
+      expect(ctx.fillText).toHaveBeenCalledWith(
+        expect.stringContaining('Select an agent'),
+        expect.any(Number),
+        expect.any(Number)
+      );
     });
 
     it('should throw when selecting recipe without active agent', () => {

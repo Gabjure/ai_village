@@ -126,7 +126,7 @@ describe('ContextMenu Integration', () => {
       expect(talkAction).toBeDefined();
 
       const conversationHandler = vi.fn();
-      eventBus.on('conversation:start', conversationHandler);
+      eventBus.on('conversation:started', conversationHandler);
 
       contextMenu.executeAction(talkAction!.id);
       eventBus.flush(); // Flush conversation event
@@ -308,8 +308,8 @@ describe('ContextMenu Integration', () => {
       expect(harvestHandler).toHaveBeenCalledWith(
         expect.objectContaining({
           data: expect.objectContaining({
-            resourceId: resource.id,
-            resourceType: 'berries'
+            plantId: resource.id,
+            speciesId: 'berries'
           })
         })
       );
@@ -342,7 +342,7 @@ describe('ContextMenu Integration', () => {
         expect.objectContaining({
           data: expect.objectContaining({
             workerId: worker.id,
-            resourceId: resource.id
+            buildingId: resource.id
           })
         })
       );
@@ -408,8 +408,15 @@ describe('ContextMenu Integration', () => {
       contextMenu.executeAction(moveAllAction!.id);
       eventBus.flush(); // Flush move events
 
-      // Should emit move action for each agent
-      expect(moveHandler).toHaveBeenCalledTimes(3);
+      // Should emit a single move action with all selected entities as an array
+      expect(moveHandler).toHaveBeenCalledTimes(1);
+      expect(moveHandler).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.objectContaining({
+            entities: expect.arrayContaining([expect.any(String)])
+          })
+        })
+      );
     });
 
     it('should handle create group workflow', () => {
@@ -434,7 +441,7 @@ describe('ContextMenu Integration', () => {
       expect(groupHandler).toHaveBeenCalledWith(
         expect.objectContaining({
           data: expect.objectContaining({
-            agentIds: expect.arrayContaining([expect.any(String)])
+            entities: expect.arrayContaining([expect.any(String)])
           })
         })
       );

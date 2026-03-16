@@ -94,7 +94,8 @@ describe('StructuredPromptBuilder', () => {
     });
 
     it('should describe energy levels correctly', () => {
-      const exhausted = createMockEntity({ needs: { energy: 0.25 } }); // 0-1 scale
+      // Exhausted threshold: < 10% energy (0.09 = 9%)
+      const exhausted = createMockEntity({ needs: { energy: 0.09 } }); // 0-1 scale
       const rested = createMockEntity({ needs: { energy: 0.95 } }); // 0-1 scale
       const world = createMockWorld();
 
@@ -143,6 +144,7 @@ describe('StructuredPromptBuilder', () => {
     it('should show agents present even if silent', () => {
       const entity = createMockEntity({
         vision: {
+          nearbyAgents: ['agent1', 'agent2'],
           seenAgents: ['agent1', 'agent2'],
           seenResources: []
         }
@@ -151,7 +153,7 @@ describe('StructuredPromptBuilder', () => {
 
       const prompt = builder.buildPrompt(entity, world);
 
-      // Should show the agent names in "You see nearby:"
+      // Should show the agent names in "You see nearby:" (uses nearbyAgents for detail)
       expect(prompt).toContain('You see nearby:');
       expect(prompt).toContain('Agentagent1');
       expect(prompt).toContain('Agentagent2');
@@ -171,13 +173,40 @@ describe('StructuredPromptBuilder', () => {
     });
 
     it('should show memories when present', () => {
-      const entity = createMockEntity({
-        memory: {
-          memories: [
-            { type: 'agent_seen', metadata: {} },
-            { type: 'resource_location', metadata: { resourceType: 'wood' } }
-          ]
-        }
+      // Use episodic_memory component (not legacy memory) with qualifying memories.
+      // Memories qualify if: importance > 0.5, emotionalIntensity > 0.3, memorable eventType, or recent.
+      const entity = createMockEntity({});
+      entity.components.set('episodic_memory', {
+        episodicMemories: [
+          {
+            id: 'mem-1',
+            eventType: 'social:interaction',
+            summary: 'You saw someone',
+            timestamp: Date.now() - 60000, // 1 minute ago
+            emotionalValence: 0.5,
+            emotionalIntensity: 0.6,
+            surprise: 0.3,
+            importance: 0.7,
+            clarity: 0.9,
+            consolidated: false,
+            markedForConsolidation: false,
+            timesRecalled: 0,
+          },
+          {
+            id: 'mem-2',
+            eventType: 'event:novel',
+            summary: 'You found wood',
+            timestamp: Date.now() - 120000, // 2 minutes ago
+            emotionalValence: 0.4,
+            emotionalIntensity: 0.5,
+            surprise: 0.2,
+            importance: 0.6,
+            clarity: 0.8,
+            consolidated: false,
+            markedForConsolidation: false,
+            timesRecalled: 0,
+          },
+        ]
       });
 
       const prompt = builder.buildPrompt(entity, createMockWorld());
@@ -238,7 +267,7 @@ describe('StructuredPromptBuilder', () => {
 
     it('should describe trees when wood resources are visible', () => {
       const entity = createMockEntity({
-        vision: { seenResources: ['tree1', 'tree2'] }
+        vision: { nearbyResources: ['tree1', 'tree2'], seenResources: ['tree1', 'tree2'] }
       });
 
       const mockWorld = createInlineMockWorld((_id: string) => {
@@ -259,7 +288,7 @@ describe('StructuredPromptBuilder', () => {
 
     it('should describe rocks when stone resources are visible', () => {
       const entity = createMockEntity({
-        vision: { seenResources: ['rock1'] }
+        vision: { nearbyResources: ['rock1'], seenResources: ['rock1'] }
       });
 
       const mockWorld = createInlineMockWorld((_id: string) => {
@@ -280,7 +309,7 @@ describe('StructuredPromptBuilder', () => {
 
     it('should describe mixed resources correctly', () => {
       const entity = createMockEntity({
-        vision: { seenResources: ['tree1', 'rock1', 'food1'] }
+        vision: { nearbyResources: ['tree1', 'rock1', 'food1'], seenResources: ['tree1', 'rock1', 'food1'] }
       });
 
       let callCount = 0;

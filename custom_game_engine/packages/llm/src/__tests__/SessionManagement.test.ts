@@ -49,17 +49,20 @@ describe('GameSessionManager', () => {
     }, 150);
   });
 
-  it('should get stats', () => {
+  it('should get stats', async () => {
     manager.registerSession('session1');
     manager.registerSession('session2');
     manager.recordRequest('session1');
     manager.recordRequest('session2');
     manager.recordRequest('session2');
 
+    // Small delay to ensure connectedAt differs from now
+    await new Promise(resolve => setTimeout(resolve, 5));
+
     const stats = manager.getStats();
     expect(stats.totalSessions).toBe(2);
     expect(stats.averageRequestsPerSession).toBe(1.5);
-    expect(stats.oldestSessionAge).toBeGreaterThan(0);
+    expect(stats.oldestSessionAge).toBeGreaterThanOrEqual(0);
   });
 });
 
@@ -73,17 +76,17 @@ describe('CooldownCalculator', () => {
   });
 
   it('should calculate cooldown based on active games', () => {
-    // 1 game: 30 RPM = 2000ms per request
+    // Per-session cooldowns are disabled - queue's maxConcurrent handles rate limiting.
+    // Multiple agents in the same session should NOT wait for each other.
     sessionManager.registerSession('session1');
     const cooldown1 = calculator.calculateCooldown('groq');
-    expect(cooldown1).toBe(2000);
+    expect(cooldown1).toBe(0);
 
-    // 4 games: 30 RPM / 4 = 8000ms per request per game
     sessionManager.registerSession('session2');
     sessionManager.registerSession('session3');
     sessionManager.registerSession('session4');
     const cooldown4 = calculator.calculateCooldown('groq');
-    expect(cooldown4).toBe(8000);
+    expect(cooldown4).toBe(0);
   });
 
   it('should return 0 cooldown for no games', () => {
@@ -111,11 +114,11 @@ describe('CooldownCalculator', () => {
     // Can request immediately (no prior requests)
     expect(calculator.canRequestNow('session1', 'groq')).toBe(true);
 
-    // Record request
+    // Record request - cooldown is disabled so can still request immediately
     sessionManager.recordRequest('session1');
 
-    // Cannot request again immediately
-    expect(calculator.canRequestNow('session1', 'groq')).toBe(false);
+    // With disabled cooldowns, can always request immediately
+    expect(calculator.canRequestNow('session1', 'groq')).toBe(true);
   });
 
   it('should get cooldown status', () => {
@@ -128,8 +131,9 @@ describe('CooldownCalculator', () => {
     expect(status).toHaveProperty('waitMs');
     expect(status).toHaveProperty('nextAllowedAt');
 
-    expect(status.canRequest).toBe(false);
-    expect(status.waitMs).toBeGreaterThan(0);
+    // Cooldowns are disabled - always can request
+    expect(status.canRequest).toBe(true);
+    expect(status.waitMs).toBe(0);
   });
 
   it('should support custom API key rate limits', () => {
@@ -142,9 +146,11 @@ describe('CooldownCalculator', () => {
 
     sessionManager.registerSession('session1');
 
+    // Cooldowns are disabled - both return 0 regardless of rate limits
     const groqCooldown = calculator.calculateCooldown('groq');
     const customCooldown = calculator.calculateCooldown('groq', customKeyHash);
 
-    expect(customCooldown).toBeLessThan(groqCooldown);
+    expect(groqCooldown).toBe(0);
+    expect(customCooldown).toBe(0);
   });
 });

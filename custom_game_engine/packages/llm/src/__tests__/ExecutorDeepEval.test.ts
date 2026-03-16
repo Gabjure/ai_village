@@ -302,7 +302,7 @@ describe('ExecutorDeepEval - Action Selection', () => {
       expect(prompt).toBeDefined();
       // Should still suggest basic actions
       expect(prompt).toContain('pick');
-      expect(prompt).toContain('explore');
+      expect(prompt).toContain('plan_build');
     });
 
     it('should handle missing needs component', async () => {
@@ -319,8 +319,8 @@ describe('ExecutorDeepEval - Action Selection', () => {
       const prompt = promptBuilder.buildPrompt(mockAgent as Entity, mockWorld);
 
       expect(prompt).toBeDefined();
-      // Should still suggest actions like explore
-      expect(prompt).toContain('explore');
+      // Should still suggest basic actions even without resources
+      expect(prompt).toContain('pick');
     });
 
     it('should handle very long goal list', async () => {

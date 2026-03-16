@@ -57,7 +57,7 @@ describe('ResponseParser', () => {
       // NOTE: 'talk' is NOT a valid behavior - speaking happens via "speaking" field
       const actions = [
         'pick', 'gather', 'follow_agent', 'call_meeting', 'attend_meeting', 'help',
-        'build', 'plan_build', 'till', 'farm', 'plant', 'explore', 'research',
+        'build', 'plan_build', 'till', 'farm', 'plant', 'research',
         'tame_animal', 'house_animal', 'hunt', 'butcher', 'initiate_combat', 'cast_spell',
         'set_priorities', 'set_personal_goal', 'set_medium_term_goal', 'set_group_goal',
         'sleep_until_queue_complete'
@@ -90,11 +90,11 @@ describe('ResponseParser', () => {
 
   describe('parseResponse - Text Fallback', () => {
     it('should parse plain text with action name', () => {
-      const response = 'I think I should explore the area';
+      const response = 'I think I should gather some resources';
 
       const result = parser.parseResponse(response);
 
-      expect(result.action).toBe('explore');
+      expect(result.action).toBe('gather');
       expect(result.thinking).toBe(response);
       expect(result.speaking).toBe('');
       expect(result.parseQuality).toBe('fallback');
@@ -102,7 +102,7 @@ describe('ResponseParser', () => {
 
     it('should log warning when using fallback parsing', () => {
       const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
-      const response = 'I think I should explore the area';
+      const response = 'I think I should gather some resources';
 
       parser.parseResponse(response);
 
@@ -110,7 +110,7 @@ describe('ResponseParser', () => {
         expect.stringContaining('[ResponseParser] Falling back to fuzzy text extraction')
       );
       expect(warnSpy).toHaveBeenCalledWith(
-        expect.stringContaining('[ResponseParser] Extracted action via keyword match: "explore"')
+        expect.stringContaining('[ResponseParser] Extracted action via keyword match: "gather"')
       );
 
       warnSpy.mockRestore();
@@ -155,11 +155,11 @@ describe('ResponseParser', () => {
     });
 
     it('should work with text response', () => {
-      const response = 'I should explore the area';
+      const response = 'I should pick up the item';
 
       const behavior = parser.parseBehavior(response);
 
-      expect(behavior).toBe('explore');
+      expect(behavior).toBe('pick');
     });
   });
 
@@ -167,9 +167,10 @@ describe('ResponseParser', () => {
     it('should validate core behaviors', () => {
       // These are actual valid behaviors from ActionDefinitions (not synonyms)
       // NOTE: 'talk' is NOT a valid behavior - speaking happens via "speaking" field
+      // NOTE: 'explore' was removed - it is an autonomic idle-triggered behavior, not LLM-chosen
       const validBehaviors = [
         'pick', 'gather', 'follow_agent', 'call_meeting', 'attend_meeting', 'help',
-        'build', 'plan_build', 'till', 'farm', 'plant', 'explore', 'research',
+        'build', 'plan_build', 'till', 'farm', 'plant', 'research',
         'tame_animal', 'house_animal', 'hunt', 'butcher', 'initiate_combat', 'cast_spell',
         'set_priorities', 'set_personal_goal', 'set_medium_term_goal', 'set_group_goal',
         'sleep_until_queue_complete'
