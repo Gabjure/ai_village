@@ -25,7 +25,10 @@ dotenv.config({ path: path.resolve(__dirname, '../../../../.env') });
 
 // Test configuration
 const LLM_TIMEOUT = 30000; // 30 seconds per LLM call
-const SKIP_LLM_TESTS = process.env.SKIP_LLM_TESTS === 'true' || !process.env.GROQ_API_KEY;
+// Skip LLM tests unless explicitly opted in via ENABLE_LLM_TESTS=true.
+// These tests require a valid, live GROQ_API_KEY and make real network calls.
+// GROQ_API_KEY may be set in .env but still be invalid/expired, so require explicit opt-in.
+const SKIP_LLM_TESTS = process.env.ENABLE_LLM_TESTS !== 'true';
 
 /**
  * Agent persona for conversation simulation

@@ -21,6 +21,9 @@ import { World } from '@ai-village/core';
 import type { EntityImpl } from '@ai-village/core';
 import { ComponentType as CT } from '@ai-village/core';
 import type { MagicComponent, NeedsComponent, BehaviorComponent } from '@ai-village/core';
+import type { SpellKnowledgeComponent } from '@ai-village/core';
+import type { ManaPoolsComponent } from '@ai-village/core';
+import { createSpellKnowledgeComponent, createManaPoolsComponentWithSource } from '@ai-village/core';
 import { SpellEffectExecutor } from '@ai-village/core';
 import { SpellRegistry, type SpellDefinition } from '@ai-village/core';
 import { SpellEffectRegistry } from '@ai-village/core';
@@ -107,6 +110,12 @@ function createMageEntity(world: World, options: {
   };
   entity.addComponent(magicComp);
 
+  // Add SpellKnowledgeComponent (split component - SpellProficiencyManager reads this)
+  entity.addComponent(createSpellKnowledgeComponent());
+
+  // Add ManaPoolsComponent (split component - ManaRegenerationManager reads this)
+  entity.addComponent(createManaPoolsComponentWithSource('internal', options.mana ?? 100));
+
   // Add behavior component
   entity.addComponent({
     type: CT.Behavior,
@@ -114,6 +123,23 @@ function createMageEntity(world: World, options: {
   } as BehaviorComponent);
 
   return entity;
+}
+
+/**
+ * Teach a spell to an entity.
+ *
+ * Registers the spell in both CT.Magic.knownSpells (for SpellCastingManager)
+ * and CT.SpellKnowledgeComponent.knownSpells (for SpellProficiencyManager).
+ */
+function teachSpell(magicSystem: MagicSystem, caster: EntityImpl, spellId: string, proficiency: number = 0): void {
+  // Register in CT.SpellKnowledgeComponent so SpellProficiencyManager can track proficiency
+  magicSystem.learnSpell(caster, spellId, proficiency);
+
+  // Also register in CT.Magic.knownSpells because SpellCastingManager reads from there
+  const magic = caster.getComponent<MagicComponent>(CT.Magic);
+  if (magic && !magic.knownSpells.find(s => s.spellId === spellId)) {
+    magic.knownSpells.push({ spellId, proficiency, timesCast: 0 });
+  }
 }
 
 function createTargetEntity(world: World, options: {
@@ -300,7 +326,7 @@ describe('Complete Spell Casting Pipeline', () => {
     registerTestSpell(spell);
 
     // Teach spell to caster
-    magicSystem.learnSpell(caster, 'fireball', 10);
+    teachSpell(magicSystem, caster, 'fireball', 10);
 
     // Get initial health
     const initialHealth = target.getComponent<NeedsComponent>(CT.Needs)!.health;
@@ -344,7 +370,7 @@ describe('Complete Spell Casting Pipeline', () => {
     };
     registerTestSpell(spell);
 
-    magicSystem.learnSpell(caster, 'heal', 10);
+    teachSpell(magicSystem, caster, 'heal', 10);
 
     const initialMana = caster.getComponent<MagicComponent>(CT.Magic)!.manaPools[0].current;
 
@@ -381,7 +407,7 @@ describe('Complete Spell Casting Pipeline', () => {
     };
     registerTestSpell(spell);
 
-    magicSystem.learnSpell(caster, 'costly_spell', 10);
+    teachSpell(magicSystem, caster, 'costly_spell', 10);
 
     const success = magicSystem.castSpell(caster, world, 'costly_spell', target.id);
 
@@ -413,7 +439,7 @@ describe('Complete Spell Casting Pipeline', () => {
     };
     registerTestSpell(spell);
 
-    magicSystem.learnSpell(caster, 'self_heal', 10);
+    teachSpell(magicSystem, caster, 'self_heal', 10);
 
     const initialHealth = caster.getComponent<NeedsComponent>(CT.Needs)!.health;
 
@@ -468,7 +494,7 @@ describe('Multi-Effect Spells', () => {
     };
     registerTestSpell(spell);
 
-    magicSystem.learnSpell(caster, 'poison_strike', 10);
+    teachSpell(magicSystem, caster, 'poison_strike', 10);
 
     const initialHealth = target.getComponent<NeedsComponent>(CT.Needs)!.health;
 
@@ -504,7 +530,7 @@ describe('Multi-Effect Spells', () => {
     };
     registerTestSpell(spell);
 
-    magicSystem.learnSpell(caster, 'blessing', 10);
+    teachSpell(magicSystem, caster, 'blessing', 10);
 
     const initialHealth = target.getComponent<NeedsComponent>(CT.Needs)!.health;
 
@@ -561,7 +587,7 @@ describe('Effect Interactions', () => {
     };
     registerTestSpell(spell);
 
-    magicSystem.learnSpell(caster, 'shield', 10);
+    teachSpell(magicSystem, caster, 'shield', 10);
 
     // Cast shield - first cast should succeed
     const cast1 = magicSystem.castSpell(caster, world, 'shield', target.id);
@@ -600,7 +626,7 @@ describe('Effect Interactions', () => {
     };
     registerTestSpell(spell);
 
-    magicSystem.learnSpell(caster, 'temp_ward', 10);
+    teachSpell(magicSystem, caster, 'temp_ward', 10);
 
     const castSuccess = magicSystem.castSpell(caster, world, 'temp_ward', target.id);
     expect(castSuccess).toBe(true);
@@ -663,7 +689,7 @@ describe('Cross-System Integration', () => {
     };
     registerTestSpell(spell);
 
-    magicSystem.learnSpell(caster, 'lightning', 10);
+    teachSpell(magicSystem, caster, 'lightning', 10);
 
     const beforeHealth = target.getComponent<NeedsComponent>(CT.Needs)!.health;
 
@@ -700,7 +726,7 @@ describe('Cross-System Integration', () => {
     };
     registerTestSpell(spell);
 
-    magicSystem.learnSpell(caster, 'major_healing', 10);
+    teachSpell(magicSystem, caster, 'major_healing', 10);
 
     const beforeHealth = target.getComponent<NeedsComponent>(CT.Needs)!.health;
 
@@ -737,7 +763,7 @@ describe('Cross-System Integration', () => {
     };
     registerTestSpell(spell);
 
-    magicSystem.learnSpell(caster, 'overheal', 10);
+    teachSpell(magicSystem, caster, 'overheal', 10);
 
     magicSystem.castSpell(caster, world, 'overheal', target.id);
 
@@ -787,7 +813,7 @@ describe('Resource Management', () => {
     };
     registerTestSpell(spell);
 
-    magicSystem.learnSpell(caster, 'mana_test_spell', 10);
+    teachSpell(magicSystem, caster, 'mana_test_spell', 10);
 
     const initialMana = caster.getComponent<MagicComponent>(CT.Magic)!.manaPools[0].current;
 
@@ -824,7 +850,7 @@ describe('Resource Management', () => {
     };
     registerTestSpell(spell);
 
-    magicSystem.learnSpell(caster, 'expensive_spell', 10);
+    teachSpell(magicSystem, caster, 'expensive_spell', 10);
 
     // First cast should succeed
     const success1 = magicSystem.castSpell(caster, world, 'expensive_spell', target.id);
@@ -838,7 +864,8 @@ describe('Resource Management', () => {
   it('should regenerate mana over time', () => {
     const caster = createMageEntity(world, { mana: 50 });
 
-    const initialMana = caster.getComponent<MagicComponent>(CT.Magic)!.manaPools[0].current;
+    // ManaRegenerationManager reads and updates CT.ManaPoolsComponent (split component)
+    const initialMana = caster.getComponent<ManaPoolsComponent>(CT.ManaPoolsComponent)!.manaPools[0].current;
 
     // Process several ticks (mana regen happens in MagicSystem.update)
     // Note: world.tick is a getter, so we update via world.update() instead
@@ -846,7 +873,7 @@ describe('Resource Management', () => {
       magicSystem.update(world, [caster], 1.0);
     }
 
-    const finalMana = caster.getComponent<MagicComponent>(CT.Magic)!.manaPools[0].current;
+    const finalMana = caster.getComponent<ManaPoolsComponent>(CT.ManaPoolsComponent)!.manaPools[0].current;
     expect(finalMana).toBeGreaterThan(initialMana);
   });
 });
@@ -894,7 +921,7 @@ describe('Event System', () => {
     };
     registerTestSpell(spell);
 
-    magicSystem.learnSpell(caster, 'event_test_spell', 10);
+    teachSpell(magicSystem, caster, 'event_test_spell', 10);
 
     // Subscribe BEFORE casting
     let eventEmitted = false;
@@ -945,15 +972,16 @@ describe('Event System', () => {
     };
     registerTestSpell(spell);
 
-    magicSystem.learnSpell(caster, 'proficiency_spell', 0);
+    teachSpell(magicSystem, caster, 'proficiency_spell', 0);
 
-    const beforeMagic = caster.getComponent<MagicComponent>(CT.Magic)!;
-    const beforeProficiency = beforeMagic.knownSpells.find(s => s.spellId === 'proficiency_spell')!.proficiency;
+    // SpellProficiencyManager.updateSpellProficiency updates CT.SpellKnowledgeComponent
+    const beforeKnowledge = caster.getComponent<SpellKnowledgeComponent>(CT.SpellKnowledgeComponent)!;
+    const beforeProficiency = beforeKnowledge.knownSpells.find(s => s.spellId === 'proficiency_spell')!.proficiency;
 
     magicSystem.castSpell(caster, world, 'proficiency_spell', target.id);
 
-    const afterMagic = caster.getComponent<MagicComponent>(CT.Magic)!;
-    const afterProficiency = afterMagic.knownSpells.find(s => s.spellId === 'proficiency_spell')!.proficiency;
+    const afterKnowledge = caster.getComponent<SpellKnowledgeComponent>(CT.SpellKnowledgeComponent)!;
+    const afterProficiency = afterKnowledge.knownSpells.find(s => s.spellId === 'proficiency_spell')!.proficiency;
 
     expect(afterProficiency).toBeGreaterThan(beforeProficiency);
   });
@@ -1000,7 +1028,7 @@ describe('Paradigm Integration', () => {
     };
     registerTestSpell(spell);
 
-    magicSystem.learnSpell(caster, 'academic_spell', 10);
+    teachSpell(magicSystem, caster, 'academic_spell', 10);
 
     const success = magicSystem.castSpell(caster, world, 'academic_spell', target.id);
     expect(success).toBe(true);
@@ -1032,7 +1060,7 @@ describe('Paradigm Integration', () => {
     };
     registerTestSpell(spell);
 
-    magicSystem.learnSpell(caster, 'test_divine_heal', 10);
+    teachSpell(magicSystem, caster, 'test_divine_heal', 10);
 
     const beforeHealth = target.getComponent<NeedsComponent>(CT.Needs)!.health;
 
@@ -1084,7 +1112,7 @@ describe('Edge Cases', () => {
     };
     registerTestSpell(spell);
 
-    magicSystem.learnSpell(caster, 'test_spell', 10);
+    teachSpell(magicSystem, caster, 'test_spell', 10);
 
     const targetId = target.id;
 

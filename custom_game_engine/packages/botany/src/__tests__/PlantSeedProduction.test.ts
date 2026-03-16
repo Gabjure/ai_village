@@ -72,16 +72,23 @@ describe('PlantSeedProduction Integration', () => {
     }
   };
 
-  beforeEach(() => {
+  beforeEach(async () => {
     eventBus = new EventBusImpl();
     world = new World(eventBus);
-    plantSystem = new PlantSystem(eventBus);
+    plantSystem = new PlantSystem();
+
+    // Initialize system so event subscriptions are set up
+    await plantSystem.initialize(world, eventBus);
 
     // Set species lookup
     plantSystem.setSpeciesLookup((id: string) => {
       if (id === 'test-plant') return testSpecies;
       throw new Error(`Unknown species: ${id}`);
     });
+
+    // Advance to tick 86400 so plant entities pass SimulationScheduler frequency check
+    // (plant component has updateFrequency: 86400 in SimulationScheduler config)
+    world.setTick(86400);
 
     // Note: WorldImpl doesn't have registerSystem, we'll call system.update directly
   });
@@ -97,7 +104,8 @@ describe('PlantSeedProduction Integration', () => {
       hydration: 100,
       nutrition: 100,
       genetics: { ...testSpecies.baseGenetics },
-      seedsProduced: 0 // START WITH ZERO SEEDS
+      seedsProduced: 0, // START WITH ZERO SEEDS
+      planted: true, // Ensure plant passes simulation culling (planted crops always simulate)
     });
 
     const entity = new EntityImpl(createEntityId(), 0);
@@ -135,7 +143,8 @@ describe('PlantSeedProduction Integration', () => {
       hydration: 100,
       nutrition: 100,
       genetics: { ...testSpecies.baseGenetics },
-      seedsProduced: 10 // Already has 10 seeds from vegetative → mature
+      seedsProduced: 10, // Already has 10 seeds from vegetative → mature
+      planted: true, // Ensure plant passes simulation culling (planted crops always simulate)
     });
 
     const entity = new EntityImpl(createEntityId(), 0);
@@ -175,7 +184,8 @@ describe('PlantSeedProduction Integration', () => {
       hydration: 100,
       nutrition: 100,
       genetics: { ...testSpecies.baseGenetics },
-      seedsProduced: 0 // Start with zero
+      seedsProduced: 0, // Start with zero
+      planted: true, // Ensure plant passes simulation culling (planted crops always simulate)
     });
 
     const entity = new EntityImpl(createEntityId(), 0);
@@ -195,6 +205,8 @@ describe('PlantSeedProduction Integration', () => {
     expect(plant.seedsProduced).toBe(10);
 
     // TRANSITION 2: mature → seeding
+    // Advance to next active tick (86400 ticks after last processing at 86400)
+    world.setTick(172800);
     plant.stageProgress = 1.0;
     eventBus.emitImmediate({ type: 'time:day_changed', source: 'test', data: {} });
     entities = world.query().with(ComponentType.Plant).executeEntities();

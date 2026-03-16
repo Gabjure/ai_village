@@ -42,7 +42,7 @@ describe('Goal Prompt Integration', () => {
         agreeableness: 0.5,
         neuroticism: 0.5
       }));
-      entity.addComponent('goals', new GoalsComponent());
+      entity.addComponent(new GoalsComponent());
 
       const prompt = promptBuilder.buildPrompt(entity, world);
 
@@ -75,7 +75,7 @@ describe('Goal Prompt Integration', () => {
         createdAt: Date.now(),
         targetCompletionDays: 7
       });
-      entity.addComponent('goals', goals);
+      entity.addComponent(goals);
 
       const prompt = promptBuilder.buildPrompt(entity, world);
 
@@ -111,7 +111,7 @@ describe('Goal Prompt Integration', () => {
         createdAt: Date.now(),
         targetCompletionDays: 10
       });
-      entity.addComponent('goals', goals);
+      entity.addComponent(goals);
 
       const prompt = promptBuilder.buildPrompt(entity, world);
 
@@ -151,7 +151,7 @@ describe('Goal Prompt Integration', () => {
         createdAt: Date.now(),
         targetCompletionDays: 14
       });
-      entity.addComponent('goals', goals);
+      entity.addComponent(goals);
 
       const prompt = promptBuilder.buildPrompt(entity, world);
 
@@ -207,7 +207,7 @@ describe('Goal Prompt Integration', () => {
         createdAt: Date.now(),
         targetCompletionDays: 7
       });
-      entity.addComponent('goals', goals);
+      entity.addComponent(goals);
 
       const prompt = promptBuilder.buildPrompt(entity, world);
 

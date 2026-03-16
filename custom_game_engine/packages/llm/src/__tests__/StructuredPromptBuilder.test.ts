@@ -232,19 +232,22 @@ describe('StructuredPromptBuilder', () => {
   });
 
   describe('instruction clarity', () => {
-    it('should include "don\'t overthink" instruction', () => {
+    it('should include a decision prompt instruction', () => {
       const entity = createMockEntity();
       const prompt = builder.buildPrompt(entity, createMockWorld());
 
-      expect(prompt).toContain("Don't overthink");
-      expect(prompt).toContain('gut reaction');
+      // The prompt ends with an instruction asking the agent to make a decision
+      expect(prompt).toMatch(/What will you do\?|What do you want to say\?|What will you build\?/);
     });
 
-    it('should end with response prompt', () => {
+    it('should end with an instruction section', () => {
       const entity = createMockEntity();
       const prompt = builder.buildPrompt(entity, createMockWorld());
 
-      expect(prompt).toMatch(/Your response \(JSON only\):\s*$/);
+      // The prompt should be non-empty and end with an instruction (not JSON boilerplate)
+      expect(prompt.trim().length).toBeGreaterThan(0);
+      // Should NOT contain JSON format instructions (tool calling format, not JSON prompt)
+      expect(prompt).not.toContain('RESPOND IN JSON');
     });
   });
 

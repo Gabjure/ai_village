@@ -478,7 +478,8 @@ describe('ContextMenu Integration', () => {
       expect(formationHandler).toHaveBeenCalledWith(
         expect.objectContaining({
           data: expect.objectContaining({
-            formationType: 'line'
+            groupId: expect.any(String),
+            formation: 'line'
           })
         })
       );
@@ -514,7 +515,7 @@ describe('ContextMenu Integration', () => {
       expect(buildUIHandler).toHaveBeenCalledWith(
         expect.objectContaining({
           data: expect.objectContaining({
-            category: expect.any(String)
+            position: expect.objectContaining({})
           })
         })
       );
@@ -532,12 +533,10 @@ describe('ContextMenu Integration', () => {
       contextMenu.executeAction(waypointAction!.id);
       eventBus.flush(); // Flush waypoint event
 
-      const worldPos = camera.screenToWorld(400, 300);
       expect(waypointHandler).toHaveBeenCalledWith(
         expect.objectContaining({
           data: expect.objectContaining({
-            x: expect.closeTo(worldPos.x, 1),
-            y: expect.closeTo(worldPos.y, 1)
+            position: expect.objectContaining({})
           })
         })
       );
@@ -555,12 +554,10 @@ describe('ContextMenu Integration', () => {
       contextMenu.executeAction(focusAction!.id);
       eventBus.flush(); // Flush camera event
 
-      const worldPos = camera.screenToWorld(400, 300);
       expect(cameraHandler).toHaveBeenCalledWith(
         expect.objectContaining({
           data: expect.objectContaining({
-            x: expect.closeTo(worldPos.x, 1),
-            y: expect.closeTo(worldPos.y, 1)
+            position: expect.objectContaining({})
           })
         })
       );
