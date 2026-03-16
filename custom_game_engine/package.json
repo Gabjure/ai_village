@@ -10,7 +10,6 @@
     "build": "tsc --build",
     "build:stable": "npx tsx scripts/create-stable-build.ts",
     "build:prod": "cd demo && npx vite build --config vite.config.prod.ts",
-    "build:itchio": "cd demo && npx vite build --config vite.config.itchio.ts",
     "dev": "tsc --build --watch",
     "test": "npm run validate-data && vitest run",
     "test:watch": "vitest",
