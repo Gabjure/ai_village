@@ -203,9 +203,78 @@ export class CombatHUDPanel implements IWindowPanel {
   }
 
   /**
+   * Inject keyframe CSS once into the document
+   */
+  private static stylesInjected = false;
+  private static injectStyles(): void {
+    if (CombatHUDPanel.stylesInjected) return;
+    CombatHUDPanel.stylesInjected = true;
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes combatHudSlideIn {
+        from { opacity: 0; transform: translateX(-50%) translateY(-16px); }
+        to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+      }
+      @keyframes combatHudSlideOut {
+        from { opacity: 1; transform: translateX(-50%) translateY(0); }
+        to   { opacity: 0; transform: translateX(-50%) translateY(-12px); }
+      }
+      @keyframes threatPulse {
+        0%, 100% { box-shadow: 0 0 6px 1px var(--threat-glow, #ff4400); }
+        50%       { box-shadow: 0 0 14px 4px var(--threat-glow, #ff4400); }
+      }
+    `;
+    document.head.appendChild(style);
+  }
+
+  /** Return an emoji glyph for a conflict type string */
+  private conflictTypeGlyph(type: string): string {
+    const t = type.toLowerCase();
+    if (t.includes('raid') || t.includes('attack')) return '⚔️';
+    if (t.includes('siege'))                         return '🏰';
+    if (t.includes('duel'))                          return '🗡️';
+    if (t.includes('hunt') || t.includes('animal'))  return '🐗';
+    if (t.includes('brawl') || t.includes('fight'))  return '👊';
+    if (t.includes('skirmish'))                      return '💥';
+    return '⚡';
+  }
+
+  /** Relative elapsed time string for a conflict */
+  private elapsedLabel(startTime: number): string {
+    const secs = Math.floor((Date.now() - startTime) / 1000);
+    if (secs < 60)  return `${secs}s`;
+    const mins = Math.floor(secs / 60);
+    return `${mins}m ${secs % 60}s`;
+  }
+
+  /** Color and glyph for a recent-event message */
+  private eventStyle(message: string): { color: string; glyph: string } {
+    const m = message.toLowerCase();
+    if (m.includes('attacks'))  return { color: '#ff8844', glyph: '⚔' };
+    if (m.includes('resolved')) return { color: '#66dd88', glyph: '✓' };
+    if (m.includes('started'))  return { color: '#ff5555', glyph: '!' };
+    return { color: '#aaaaaa', glyph: '·' };
+  }
+
+  /**
    * Render the HUD panel
    */
   public render(): HTMLElement {
+    CombatHUDPanel.injectStyles();
+
+    const threatLevel = this.calculateThreatLevel();
+    const isHighStakes = threatLevel === 'critical' || threatLevel === 'high';
+
+    // Threat-appropriate glow color for CSS variable
+    const glowMap: Record<string, string> = {
+      critical: '#cc0033',
+      high:     '#ff4400',
+      medium:   '#ff9900',
+      low:      '#ddcc00',
+      none:     '#00aa00',
+    };
+    const glowColor = glowMap[threatLevel] ?? '#666';
+
     const container = document.createElement('div');
     container.id = this.getId();
     container.style.cssText = `
@@ -213,116 +282,145 @@ export class CombatHUDPanel implements IWindowPanel {
       top: 0;
       left: 50%;
       transform: translateX(-50%);
-      background: rgba(0, 0, 0, 0.8);
-      border: 2px solid #666;
-      border-radius: 4px;
-      padding: 12px;
+      background: linear-gradient(180deg, rgba(18,8,8,0.94) 0%, rgba(10,5,5,0.92) 100%);
+      border: 1.5px solid ${glowColor};
+      border-top: 3px solid ${glowColor};
+      border-radius: 0 0 8px 8px;
+      padding: 10px 14px 12px;
       min-width: 300px;
-      max-width: 500px;
+      max-width: 480px;
       display: ${this.isVisible() ? 'block' : 'none'};
-      opacity: 0.9;
       z-index: 1000;
+      font-family: 'Courier New', monospace;
+      box-shadow: 0 4px 18px rgba(0,0,0,0.7), 0 0 10px ${glowColor}44;
+      animation: ${this.isVisible() ? 'combatHudSlideIn 220ms ease-out' : 'none'};
     `;
 
-    // Title
+    // ── Header row: title + threat badge ───────────────────────────────────
+    const header = document.createElement('div');
+    header.style.cssText = `
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    `;
+
     const title = document.createElement('div');
-    title.textContent = this.getTitle();
+    title.textContent = '⚔ Combat Status';
     title.style.cssText = `
-      color: #FFF;
-      font-size: 16px;
+      color: #e8c87a;
+      font-size: 13px;
       font-weight: bold;
-      margin-bottom: 8px;
-      text-align: center;
+      letter-spacing: 0.06em;
+      text-shadow: 0 0 6px #e8c87a88;
     `;
-    container.appendChild(title);
+    header.appendChild(title);
 
-    // Threat level indicator
-    const threatLevel = this.calculateThreatLevel();
-    const threatIndicator = document.createElement('div');
-    threatIndicator.className = `threat-level threat-${threatLevel}`;
-    threatIndicator.style.cssText = `
-      text-align: center;
-      padding: 4px 8px;
-      margin-bottom: 8px;
-      border-radius: 3px;
+    const threatBadge = document.createElement('div');
+    threatBadge.className = `threat-level threat-${threatLevel}`;
+    threatBadge.style.cssText = `
+      padding: 2px 9px;
+      border-radius: 10px;
+      font-size: 10px;
       font-weight: bold;
-      background: ${this.getThreatColor(threatLevel)};
-      color: #FFF;
+      letter-spacing: 0.08em;
+      background: ${glowColor}22;
+      border: 1px solid ${glowColor};
+      color: ${glowColor};
+      --threat-glow: ${glowColor};
+      ${isHighStakes ? 'animation: threatPulse 1.4s ease-in-out infinite;' : ''}
     `;
-    threatIndicator.textContent = `Threat Level: ${threatLevel.toUpperCase()}`;
-    container.appendChild(threatIndicator);
+    threatBadge.textContent = threatLevel.toUpperCase();
+    header.appendChild(threatBadge);
 
-    // Active conflicts list
+    container.appendChild(header);
+
+    // ── Divider ────────────────────────────────────────────────────────────
+    const divider = document.createElement('div');
+    divider.style.cssText = `
+      height: 1px;
+      background: linear-gradient(90deg, transparent, ${glowColor}66, transparent);
+      margin-bottom: 8px;
+    `;
+    container.appendChild(divider);
+
+    // ── Active conflicts ───────────────────────────────────────────────────
     if (this.activeConflicts.size > 0) {
       const conflictsList = document.createElement('div');
-      conflictsList.style.cssText = `
-        margin-bottom: 8px;
-      `;
+      conflictsList.style.cssText = 'margin-bottom: 8px;';
 
       for (const conflict of this.activeConflicts.values()) {
+        const tColor = glowMap[conflict.threatLevel ?? 'medium'] ?? '#ff9900';
         const conflictItem = document.createElement('div');
         conflictItem.className = 'conflict-item';
         conflictItem.style.cssText = `
-          background: rgba(100, 100, 100, 0.3);
-          padding: 6px;
-          margin-bottom: 4px;
-          border-radius: 3px;
+          background: rgba(${tColor === '#cc0033' ? '80,0,20' : tColor === '#ff4400' ? '60,20,0' : '40,30,0'},0.35);
+          border: 1px solid ${tColor}55;
+          border-left: 3px solid ${tColor};
+          padding: 6px 8px;
+          margin-bottom: 5px;
+          border-radius: 0 5px 5px 0;
           cursor: pointer;
+          transition: background 120ms, border-color 120ms;
         `;
 
-        const typeDisplay = document.createElement('div');
-        typeDisplay.className = 'conflict-type';
-        typeDisplay.textContent = `Type: ${conflict.type}`;
-        typeDisplay.style.cssText = `
-          color: #FFA500;
-          font-size: 12px;
+        // Type + elapsed row
+        const typeRow = document.createElement('div');
+        typeRow.style.cssText = `
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          margin-bottom: 3px;
+        `;
+
+        const typeLabel = document.createElement('div');
+        typeLabel.textContent = `${this.conflictTypeGlyph(conflict.type)} ${conflict.type}`;
+        typeLabel.style.cssText = `
+          color: ${tColor};
+          font-size: 11.5px;
           font-weight: bold;
         `;
-        conflictItem.appendChild(typeDisplay);
+        typeRow.appendChild(typeLabel);
 
-        const participantsDisplay = document.createElement('div');
-        participantsDisplay.style.cssText = `
-          color: #CCC;
-          font-size: 11px;
-          margin-top: 2px;
+        const elapsed = document.createElement('div');
+        elapsed.textContent = this.elapsedLabel(conflict.startTime);
+        elapsed.style.cssText = `
+          color: #887766;
+          font-size: 10px;
         `;
-        participantsDisplay.textContent = `Participants: ${conflict.participants.length}`;
+        typeRow.appendChild(elapsed);
+        conflictItem.appendChild(typeRow);
 
-        // Add participant list
-        for (const participantId of conflict.participants) {
-          const participantEl = document.createElement('div');
-          participantEl.className = 'participant';
-          participantEl.textContent = `- ${participantId}`;
-          participantEl.style.cssText = `
-            color: #AAA;
-            font-size: 10px;
-            margin-left: 8px;
-          `;
-          participantsDisplay.appendChild(participantEl);
-        }
+        // Participants
+        const participantsRow = document.createElement('div');
+        participantsRow.style.cssText = `
+          color: #998877;
+          font-size: 10px;
+          line-height: 1.4;
+        `;
+        participantsRow.textContent = conflict.participants.join(' · ');
+        conflictItem.appendChild(participantsRow);
 
-        conflictItem.appendChild(participantsDisplay);
-
-        // Click to focus on conflict
+        // Click to focus
         conflictItem.addEventListener('click', () => {
           const firstParticipant = conflict.participants[0];
           if (firstParticipant) {
             this.eventBus.emit({
               type: 'ui:entity:selected',
               source: 'combat-hud',
-              data: {
-                entityId: firstParticipant,
-              },
+              data: { entityId: firstParticipant },
             });
           }
         });
 
-        // Hover effect
+        // Hover
         conflictItem.addEventListener('mouseenter', () => {
-          conflictItem.style.background = 'rgba(150, 150, 150, 0.4)';
+          conflictItem.style.background = `rgba(${tColor === '#cc0033' ? '100,10,30' : '70,45,10'},0.5)`;
+          conflictItem.style.borderColor = `${tColor}99`;
         });
         conflictItem.addEventListener('mouseleave', () => {
-          conflictItem.style.background = 'rgba(100, 100, 100, 0.3)';
+          conflictItem.style.background = `rgba(${tColor === '#cc0033' ? '80,0,20' : tColor === '#ff4400' ? '60,20,0' : '40,30,0'},0.35)`;
+          conflictItem.style.borderColor = `${tColor}55`;
         });
 
         conflictsList.appendChild(conflictItem);
@@ -331,32 +429,46 @@ export class CombatHUDPanel implements IWindowPanel {
       container.appendChild(conflictsList);
     }
 
-    // Recent events log
+    // ── Recent events log ──────────────────────────────────────────────────
     if (this.recentEvents.length > 0) {
       const recentLog = document.createElement('div');
       recentLog.style.cssText = `
-        border-top: 1px solid #666;
-        padding-top: 8px;
+        border-top: 1px solid #33221188;
+        padding-top: 7px;
       `;
 
       const logTitle = document.createElement('div');
-      logTitle.textContent = 'Recent Events:';
+      logTitle.textContent = 'Recent';
       logTitle.style.cssText = `
-        color: #CCC;
-        font-size: 11px;
+        color: #665544;
+        font-size: 9.5px;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
         margin-bottom: 4px;
       `;
       recentLog.appendChild(logTitle);
 
-      for (const event of this.recentEvents) {
+      for (const ev of this.recentEvents) {
+        const { color, glyph } = this.eventStyle(ev.message);
         const eventEntry = document.createElement('div');
         eventEntry.className = 'recent-log-entry';
-        eventEntry.textContent = event.message;
         eventEntry.style.cssText = `
-          color: #AAA;
-          font-size: 10px;
-          padding: 2px 0;
+          display: flex;
+          align-items: baseline;
+          gap: 5px;
+          padding: 1px 0;
         `;
+
+        const glyphEl = document.createElement('span');
+        glyphEl.textContent = glyph;
+        glyphEl.style.cssText = `color: ${color}; font-size: 10px; flex-shrink: 0;`;
+
+        const msgEl = document.createElement('span');
+        msgEl.textContent = ev.message;
+        msgEl.style.cssText = `color: ${color}; font-size: 10px; opacity: 0.85;`;
+
+        eventEntry.appendChild(glyphEl);
+        eventEntry.appendChild(msgEl);
         recentLog.appendChild(eventEntry);
       }
 
@@ -384,18 +496,12 @@ export class CombatHUDPanel implements IWindowPanel {
    */
   private getThreatColor(level: string): string {
     switch (level) {
-      case 'none':
-        return '#00AA00';
-      case 'low':
-        return '#FFFF00';
-      case 'medium':
-        return '#FF9900';
-      case 'high':
-        return '#FF0000';
-      case 'critical':
-        return '#CC0033';
-      default:
-        return '#666';
+      case 'none':     return '#00aa00';
+      case 'low':      return '#ddcc00';
+      case 'medium':   return '#ff9900';
+      case 'high':     return '#ff4400';
+      case 'critical': return '#cc0033';
+      default:         return '#666';
     }
   }
 
