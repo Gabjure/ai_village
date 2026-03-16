@@ -176,7 +176,7 @@ describe('BackgroundChunkGenerator', () => {
       // Clear mock
       vi.clearAllMocks();
 
-      // Process at tick 1 (before throttle interval of 2 ticks)
+      // Process at tick 5 (before throttle interval of THROTTLE.FAST = 10 ticks)
       generator.queueChunk({
         chunkX: 1,
         chunkY: 1,
@@ -184,7 +184,7 @@ describe('BackgroundChunkGenerator', () => {
         requestedBy: 'test',
       });
       // @ts-expect-error MockWorldMutator doesn't implement full WorldMutator interface (test-only properties)
-      generator.processQueue(mockWorld, 1);
+      generator.processQueue(mockWorld, 5);
 
       // Should not have processed
       expect(mockWorld.eventBus.emit).not.toHaveBeenCalled();
@@ -206,7 +206,7 @@ describe('BackgroundChunkGenerator', () => {
       // Clear mock
       vi.clearAllMocks();
 
-      // Process at tick 2 (after throttle interval)
+      // Process at tick 10 (after throttle interval of THROTTLE.FAST = 10 ticks)
       generator.queueChunk({
         chunkX: 1,
         chunkY: 1,
@@ -214,7 +214,7 @@ describe('BackgroundChunkGenerator', () => {
         requestedBy: 'test',
       });
       // @ts-expect-error MockWorldMutator doesn't implement full WorldMutator interface (test-only properties)
-      generator.processQueue(mockWorld, 2);
+      generator.processQueue(mockWorld, 10);
 
       // Should have processed
       expect(mockWorld.eventBus.emit).toHaveBeenCalled();
@@ -257,10 +257,10 @@ describe('BackgroundChunkGenerator', () => {
         })
       );
 
-      // Process second chunk
+      // Process second chunk (tick 10, after THROTTLE.FAST interval)
       vi.clearAllMocks();
       // @ts-expect-error MockWorldMutator doesn't implement full WorldMutator interface (test-only properties)
-      generator.processQueue(mockWorld, 2);
+      generator.processQueue(mockWorld, 10);
 
       // Should process MEDIUM priority chunk (1,1)
       expect(mockWorld.eventBus.emit).toHaveBeenCalledWith(
@@ -274,10 +274,10 @@ describe('BackgroundChunkGenerator', () => {
         })
       );
 
-      // Process third chunk
+      // Process third chunk (tick 20, after another THROTTLE.FAST interval)
       vi.clearAllMocks();
       // @ts-expect-error MockWorldMutator doesn't implement full WorldMutator interface (test-only properties)
-      generator.processQueue(mockWorld, 4);
+      generator.processQueue(mockWorld, 20);
 
       // Should process LOW priority chunk (0,0)
       expect(mockWorld.eventBus.emit).toHaveBeenCalledWith(
