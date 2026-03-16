@@ -73,6 +73,9 @@ export class WildPlantPopulationSystem extends BaseSystem {
   private accumulatedTime: number = 0;
   private readonly UPDATE_INTERVAL = 24; // Update once per game day
 
+  /** Per-tick counter for unique seed IDs — reset each update pass */
+  private seedIdCounter: number = 0;
+
   constructor(config?: Partial<PopulationConfig>) {
     super();
     this.config = {
@@ -353,6 +356,7 @@ export class WildPlantPopulationSystem extends BaseSystem {
     // PERFORMANCE: Cache plant query before loop - avoids O(chunks × seeds × plants) → O(plants + chunks × seeds)
     const allPlants = world.query().with(CT.Plant).executeEntities();
     const crowdingRadiusSquared = this.config.crowdingRadius * this.config.crowdingRadius;
+    this.seedIdCounter = 0;
 
     for (const [chunkKey, bank] of this.seedBanks) {
       const currentCount = this.chunkPlantCounts.get(chunkKey) || 0;
@@ -374,7 +378,7 @@ export class WildPlantPopulationSystem extends BaseSystem {
         if (Math.random() < seed.viability * 0.3) { // 30% max chance
           // Check for crowding at specific position (using cached plants)
           if (!this.isPositionCrowdedCached(seed.position, allPlants, crowdingRadiusSquared)) {
-            this.emitGerminationEvent(seed);
+            this.emitGerminationEvent(seed, world.tick);
             seed.viability = 0; // Mark as used
             germinated++;
           }
@@ -506,9 +510,9 @@ export class WildPlantPopulationSystem extends BaseSystem {
   /**
    * Emit germination event for world to handle
    */
-  private emitGerminationEvent(seed: SeedBankEntry): void {
+  private emitGerminationEvent(seed: SeedBankEntry, tick: number): void {
     this.events.emit('seed:germinated', {
-      seedId: `seedbank_${Date.now()}`,
+      seedId: `seedbank_${tick}_${this.seedIdCounter++}`,
       speciesId: seed.speciesId,
       position: seed.position,
       generation: 0
