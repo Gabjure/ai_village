@@ -587,6 +587,12 @@ export {
 // ============================================================================
 // Divinity system - Universe configuration
 export { createUniverseConfig } from './divinity/index.js';
+// Divinity types needed by persistence serializers
+export type {
+  DivinePowerType,
+  ActiveBlessing,
+  ActiveCurse,
+} from './divinity/DivinePowerTypes.js';
 
 // ============================================================================
 // Dashboard & UI

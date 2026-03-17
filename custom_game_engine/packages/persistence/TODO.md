@@ -26,24 +26,7 @@ This means:
 
 ## Minor TODOs and Missing Features
 
-### 1. Weather/Buildings Deserialization (Low Priority)
-- **File**: `WorldSerializer.ts:144`
-- **Issue**: Comment says "TODO: Deserialize weather, buildings"
-- **Reality**:
-  - Weather is stored as `WeatherComponent` on entities (already serialized)
-  - Buildings are stored in tiles and `BuildingComponent` entities (already serialized)
-  - This TODO is **misleading** - no actual work needed
-- **Action**: Remove the comment or clarify that these are handled via entities
-
-### 2. Passage Restoration (Medium Priority)
-- **File**: `SaveLoadService.ts:343`
-- **Issue**: `// TODO: Restore passages (need to recreate passage connections)`
-- **Reality**: Passages ARE saved (line 220-228), but NOT restored on load
-- **Impact**: After loading a save, multiverse passages don't exist
-- **Workaround**: Passages are serialized and stored, just not deserialized
-- **Action**: Implement passage deserialization in `SaveLoadService.load()`
-
-### 3. Game Version Hardcoded (Low Priority)
+### 1. Game Version Hardcoded (Low Priority)
 - **File**: `utils.ts:239`
 - **Issue**: `// TODO: Read from package.json at build time`
 - **Reality**: Game version is hardcoded to `'0.1.0'` as fallback
@@ -51,13 +34,12 @@ This means:
 - **Workaround**: Use `GAME_VERSION` environment variable
 - **Action**: Add build-time script to inject version from `package.json`
 
-### 4. World.clear() Missing from Interface (Low Priority)
-- **File**: `SaveLoadService.ts:332`
-- **Issue**: `// TODO: Add clear() to World interface`
-- **Reality**: Code uses `(world as any)._entities.clear()` to bypass type system
-- **Impact**: Type-unsafe access to internal API
-- **Workaround**: Works fine, just not type-safe
-- **Action**: Add `clear(): void` method to `World` interface in `@ai-village/core`
+## Previously Listed Issues (Now Resolved)
+
+- **Passage Restoration**: ✅ DONE — passages are fully saved and restored in `SaveLoadService.load()` (lines 449-498)
+- **World.clear() type cast**: ✅ DONE — `world.clear()` is called directly; no unsafe cast
+- **Misleading WorldSerializer TODO comment**: ✅ DONE — comment has been removed
+- **Map/Set serialization gaps** (MUL-1610): ✅ DONE — 5 custom serializers added for `social_memory`, `belief`, `deity`, `divine_ability`, `needs`
 
 ## Features That Work But Aren't Obvious
 
@@ -119,56 +101,7 @@ No unreachable code, unused exports, or abandoned implementations.
 
 ## Priority Fixes
 
-### 1. **HIGH**: Implement Passage Restoration
-**Why**: Multiverse passages are saved but not restored, breaking multiverse navigation after load.
-
-**File**: `SaveLoadService.ts:343-344`
-
-**Implementation needed**:
-```typescript
-// In SaveLoadService.load(), after restoring god-crafted queue:
-if (saveFile.passages && saveFile.passages.length > 0) {
-  for (const passage of saveFile.passages) {
-    multiverseCoordinator.createPassage({
-      id: passage.id,
-      sourceUniverseId: passage.sourceUniverseId,
-      targetUniverseId: passage.targetUniverseId,
-      type: passage.type,
-      active: passage.active,
-    });
-  }
-}
-```
-
-### 2. **MEDIUM**: Add World.clear() to Interface
-**Why**: Type-unsafe access to internal API is fragile and breaks TypeScript guarantees.
-
-**Files**:
-- `packages/core/src/World.ts` (add to interface)
-- `SaveLoadService.ts:332` (remove cast)
-
-**Implementation needed**:
-```typescript
-// In World interface:
-clear(): void;
-
-// In WorldImpl:
-clear(): void {
-  this._entities.clear();
-}
-```
-
-### 3. **LOW**: Remove Misleading TODO in WorldSerializer
-**Why**: Confusing comment suggests missing functionality that already exists.
-
-**File**: `WorldSerializer.ts:144`
-
-**Action**: Delete comment or replace with:
-```typescript
-// Weather and buildings are already deserialized via entity components
-```
-
-### 4. **LOW**: Inject Game Version at Build Time
+### 1. **LOW**: Inject Game Version at Build Time
 **Why**: Better version tracking for save file compatibility.
 
 **File**: `utils.ts:239`
@@ -180,13 +113,12 @@ clear(): void {
 
 ## Metrics
 
-- **Total Files**: 34 TypeScript files
+- **Total Files**: 39 TypeScript files (34 core + 5 new serializers)
 - **Stubs Found**: 0
 - **Fake Implementations**: 0
-- **Missing Integrations**: 1 (passage restoration)
-- **Misleading TODOs**: 1 (weather/buildings deserialization)
-- **Type Safety Issues**: 1 (World.clear() cast)
-- **Coverage**: ~95% complete
+- **Missing Integrations**: 0
+- **Open TODOs**: 1 (build-time version injection — low priority)
+- **Coverage**: ~99% complete
 
 ## Conclusion
 
@@ -198,14 +130,11 @@ The persistence package is **production-ready** with excellent architecture:
 ✅ Schema migrations
 ✅ Multiple storage backends
 ✅ Time travel support
-
-The only missing piece is **passage restoration** (medium priority). Everything else is polish.
+✅ Passage restoration
+✅ Map/Set serialization for all components with complex field types
 
 ## Recommended Next Steps
 
-1. **Implement passage restoration** - restore multiverse passages on load
-2. **Add World.clear()** to interface - eliminate type-unsafe cast
-3. **Clean up misleading comments** - remove or clarify TODO about weather/buildings
-4. **Consider build-time version injection** - optional improvement for version tracking
+1. **Consider build-time version injection** - optional improvement for version tracking
 
 No urgent blockers. The package is fully functional for all documented use cases.

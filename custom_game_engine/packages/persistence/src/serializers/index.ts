@@ -41,6 +41,14 @@ import { AdminAngelSerializer } from './AdminAngelSerializer.js';
 import { MarketStateSerializer } from './MarketStateSerializer.js';
 import { TechnologyUnlockSerializer } from './TechnologyUnlockSerializer.js';
 
+// Map/Set serializers for components that were incorrectly using GenericSerializer
+import { SocialMemorySerializer } from './SocialMemorySerializer.js';
+import { BeliefSerializer } from './BeliefSerializer.js';
+import { DeitySerializer } from './DeitySerializer.js';
+import { DivineAbilitySerializer } from './DivineAbilitySerializer.js';
+import { NeedsSerializer } from './NeedsSerializer.js';
+import { PlantKnowledgeSerializer } from './PlantKnowledgeSerializer.js';
+
 /**
  * Register all component serializers.
  * Called automatically when this module is imported.
@@ -85,12 +93,22 @@ export function registerAllSerializers(): void {
   componentSerializerRegistry.register('market_state', new MarketStateSerializer());
   componentSerializerRegistry.register('technology_unlock', new TechnologyUnlockSerializer());
 
+  // Register Map/Set serializers (fix silent data loss on save/load)
+  componentSerializerRegistry.register('social_memory', new SocialMemorySerializer());
+  componentSerializerRegistry.register('belief', new BeliefSerializer());
+  componentSerializerRegistry.register('deity', new DeitySerializer());
+  componentSerializerRegistry.register('divine_ability', new DivineAbilitySerializer());
+  componentSerializerRegistry.register('needs', new NeedsSerializer());
+
+  // Register plant knowledge serializer (handles Map<string, PlantKnowledgeEntry> and Set<string>)
+  componentSerializerRegistry.register('plant_knowledge', new PlantKnowledgeSerializer());
+
   // Register generic serializers for all other components
   // These can be replaced with specific serializers later
   const genericComponents = [
     'agent',
     'inventory',
-    'needs',
+    // 'needs' - now has specific serializer (handles Set<number> starvationDayMemoriesIssued)
     'physical_needs',
     'social_needs',
     'skills',
@@ -112,14 +130,14 @@ export function registerAllSerializers(): void {
     'circadian',
     'preference',
     'health',
-    'belief',
+    // 'belief' - now has specific serializer (handles Map<string, Belief> and Map<string, EvidenceRecord[]>)
     'body',
     'conversation',
     'cooking_skill',
     'crafting_station',
-    'deity',
+    // 'deity' - now has specific serializer (handles Set<string> believers/sacredSites, Map<string,number> traitConfidence)
     'divine_power',
-    'divine_ability',  // DivineAbility component (newer name)
+    // 'divine_ability' - now has specific serializer (handles 4 Map fields)
     'avatar',
     'angel',
     'blessed',
@@ -138,7 +156,7 @@ export function registerAllSerializers(): void {
     'equipment_slots',
     'temperature',
     'semantic_memory',
-    'social_memory',
+    // 'social_memory' - now has specific serializer (handles Map<string, SocialMemory>)
     'hearsay_memory',
     'goals',
     'reflection',
@@ -434,3 +452,11 @@ export * from './AdminAngelSerializer.js';
 // Sprint 3 specific serializers
 export { MarketStateSerializer } from './MarketStateSerializer.js';
 export { TechnologyUnlockSerializer } from './TechnologyUnlockSerializer.js';
+
+// Map/Set serializers
+export { SocialMemorySerializer } from './SocialMemorySerializer.js';
+export { BeliefSerializer } from './BeliefSerializer.js';
+export { DeitySerializer } from './DeitySerializer.js';
+export { DivineAbilitySerializer } from './DivineAbilitySerializer.js';
+export { NeedsSerializer } from './NeedsSerializer.js';
+export { PlantKnowledgeSerializer } from './PlantKnowledgeSerializer.js';
