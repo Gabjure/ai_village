@@ -133,6 +133,11 @@ export type {
 } from './types/LLMTypes.js';
 
 // ============================================================================
+// Governance (LLM-driven political decision-making)
+// ============================================================================
+export { initializeGovernorLLM } from './governance/GovernorLLMIntegration.js';
+
+// ============================================================================
 // Data & Metrics
 // ============================================================================
 export * from './data/index.js';
