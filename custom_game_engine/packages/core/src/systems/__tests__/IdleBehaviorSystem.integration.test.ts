@@ -24,13 +24,14 @@ describe('IdleBehaviorSystem Integration', () => {
   let eventBus: EventBusImpl;
   let idleBehaviorSystem: IdleBehaviorSystem;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     eventBus = new EventBusImpl();
     world = new World(eventBus);
     idleBehaviorSystem = new IdleBehaviorSystem();
+    await idleBehaviorSystem.initialize(world, eventBus);
   });
 
-  it('should select varied idle behaviors over 100 iterations', () => {
+  it('should select varied idle behaviors over 100 iterations', async () => {
     // Create agent with balanced personality
     const agent = new EntityImpl(createEntityId(), 0);
     agent.addComponent(createAgentComponent('Test Agent'));
@@ -57,12 +58,13 @@ describe('IdleBehaviorSystem Integration', () => {
     const behaviors = new Set<string>();
     const behaviorCounts: Record<string, number> = {};
 
-    // Run 100 iterations
+    // Run 100 iterations - advance tick by 100 each time to trigger throttled system
     for (let i = 0; i < 100; i++) {
+      world.setTick(world.tick + 100);
       const actionQueue = agent.getComponent(ComponentType.ActionQueue);
       actionQueue.clear();
 
-      idleBehaviorSystem.update(world, [], 1);
+      idleBehaviorSystem.update(world, [agent], 1); // Fixed: pass entity so system can process it
 
       const action = actionQueue.peek();
       if (action) {
@@ -79,7 +81,7 @@ describe('IdleBehaviorSystem Integration', () => {
     expect(idleCount / 100).toBeLessThan(0.3);
   });
 
-  it('should select chat_idle more often when agent is lonely', () => {
+  it('should select chat_idle more often when agent is lonely', async () => {
     const agent = new EntityImpl(createEntityId(), 0);
     agent.addComponent(createAgentComponent('Lonely Agent'));
     agent.addComponent(new PersonalityComponent({
@@ -106,12 +108,13 @@ describe('IdleBehaviorSystem Integration', () => {
 
     const behaviorCounts: Record<string, number> = {};
 
-    // Run 50 iterations
+    // Run 50 iterations - advance tick by 100 each time to trigger throttled system
     for (let i = 0; i < 50; i++) {
+      world.setTick(world.tick + 100);
       const actionQueue = agent.getComponent(ComponentType.ActionQueue);
       actionQueue.clear();
 
-      idleBehaviorSystem.update(world, [], 1);
+      idleBehaviorSystem.update(world, [agent], 1); // Fixed: pass entity so system can process it
 
       const action = actionQueue.peek();
       if (action) {
@@ -123,7 +126,7 @@ describe('IdleBehaviorSystem Integration', () => {
     expect(behaviorCounts['chat_idle'] || 0).toBeGreaterThan(5);
   });
 
-  it('should select sit_quietly more often when agent is content', () => {
+  it('should select sit_quietly more often when agent is content', async () => {
     const agent = new EntityImpl(createEntityId(), 0);
     agent.addComponent(createAgentComponent('Content Agent'));
     agent.addComponent(new PersonalityComponent({
@@ -150,12 +153,13 @@ describe('IdleBehaviorSystem Integration', () => {
 
     const behaviorCounts: Record<string, number> = {};
 
-    // Run 50 iterations
+    // Run 50 iterations - advance tick by 100 each time to trigger throttled system
     for (let i = 0; i < 50; i++) {
+      world.setTick(world.tick + 100);
       const actionQueue = agent.getComponent(ComponentType.ActionQueue);
       actionQueue.clear();
 
-      idleBehaviorSystem.update(world, [], 1);
+      idleBehaviorSystem.update(world, [agent], 1); // Fixed: pass entity so system can process it
 
       const action = actionQueue.peek();
       if (action) {
@@ -167,7 +171,7 @@ describe('IdleBehaviorSystem Integration', () => {
     expect(behaviorCounts['sit_quietly'] || 0).toBeGreaterThan(0);
   });
 
-  it('should weight reflection higher for conscientious agents', () => {
+  it('should weight reflection higher for conscientious agents', async () => {
     const agent = new EntityImpl(createEntityId(), 0);
     agent.addComponent(createAgentComponent('Reflective Agent'));
     agent.addComponent(new PersonalityComponent({
@@ -195,12 +199,13 @@ describe('IdleBehaviorSystem Integration', () => {
 
     const behaviorCounts: Record<string, number> = {};
 
-    // Run 50 iterations
+    // Run 50 iterations - advance tick by 100 each time to trigger throttled system
     for (let i = 0; i < 50; i++) {
+      world.setTick(world.tick + 100);
       const actionQueue = agent.getComponent(ComponentType.ActionQueue);
       actionQueue.clear();
 
-      idleBehaviorSystem.update(world, [], 1);
+      idleBehaviorSystem.update(world, [agent], 1); // Fixed: pass entity so system can process it
 
       const action = actionQueue.peek();
       if (action) {
@@ -212,7 +217,7 @@ describe('IdleBehaviorSystem Integration', () => {
     expect(behaviorCounts['reflect'] || 0).toBeGreaterThan(0);
   });
 
-  it('should NOT select behaviors when agent has existing actions', () => {
+  it('should NOT select behaviors when agent has existing actions', async () => {
     const agent = new EntityImpl(createEntityId(), 0);
     agent.addComponent(createAgentComponent('Busy Agent'));
     agent.addComponent(new PersonalityComponent({
@@ -243,12 +248,13 @@ describe('IdleBehaviorSystem Integration', () => {
     const initialQueueSize = queue.size();
 
     // System should not add idle behaviors to a non-empty queue
-    idleBehaviorSystem.update(world, [], 1);
+    world.setTick(world.tick + 100); // Advance tick so throttled system runs
+    idleBehaviorSystem.update(world, [agent], 1); // Fixed: pass entity so system can process it
 
     expect(queue.size()).toBe(initialQueueSize); // Queue unchanged
   });
 
-  it('should select practice_skill when agent is highly conscientious', () => {
+  it('should select practice_skill when agent is highly conscientious', async () => {
     const agent = new EntityImpl(createEntityId(), 0);
     agent.addComponent(createAgentComponent('Skilled Agent'));
     agent.addComponent(new PersonalityComponent({
@@ -285,12 +291,13 @@ describe('IdleBehaviorSystem Integration', () => {
 
     const behaviorCounts: Record<string, number> = {};
 
-    // Run 50 iterations
+    // Run 50 iterations - advance tick by 100 each time to trigger throttled system
     for (let i = 0; i < 50; i++) {
+      world.setTick(world.tick + 100);
       const actionQueue = agent.getComponent(ComponentType.ActionQueue);
       actionQueue.clear();
 
-      idleBehaviorSystem.update(world, [], 1);
+      idleBehaviorSystem.update(world, [agent], 1); // Fixed: pass entity so system can process it
 
       const action = actionQueue.peek();
       if (action) {
@@ -302,7 +309,7 @@ describe('IdleBehaviorSystem Integration', () => {
     expect(behaviorCounts['practice_skill'] || 0).toBeGreaterThan(0);
   });
 
-  it('should select behaviors based on personality weighting', () => {
+  it('should select behaviors based on personality weighting', async () => {
     const agent = new EntityImpl(createEntityId(), 0);
     agent.addComponent(createAgentComponent('Stable Agent'));
     agent.addComponent(new PersonalityComponent({
@@ -327,12 +334,13 @@ describe('IdleBehaviorSystem Integration', () => {
 
     const behaviors = new Set<string>();
 
-    // Run 50 iterations
+    // Run 50 iterations - advance tick by 100 each time to trigger throttled system
     for (let i = 0; i < 50; i++) {
+      world.setTick(world.tick + 100);
       const actionQueue = agent.getComponent(ComponentType.ActionQueue);
       actionQueue.clear();
 
-      idleBehaviorSystem.update(world, [], 1);
+      idleBehaviorSystem.update(world, [agent], 1); // Fixed: pass entity so system can process it
 
       const action = actionQueue.peek();
       if (action) {

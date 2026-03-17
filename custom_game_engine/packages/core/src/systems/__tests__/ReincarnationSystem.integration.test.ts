@@ -120,7 +120,7 @@ describe('ReincarnationSystem Integration', () => {
       expect(reincarnationSystem.getQueuedSoulCount()).toBe(1);
 
       // Advance time and process reincarnation
-      (world as WorldImpl)._tick = 100;
+      (world as WorldImpl)._tick = 200; // Must be multiple of throttleInterval (200) for system to run
       reincarnationSystem.update(world, [], 1);
 
       eventBus.flush();
@@ -193,7 +193,7 @@ describe('ReincarnationSystem Integration', () => {
 
       eventBus.flush();
 
-      (world as WorldImpl)._tick = 100;
+      (world as WorldImpl)._tick = 200; // Must be multiple of throttleInterval (200) for system to run
       reincarnationSystem.update(world, [], 1);
 
       eventBus.flush();
@@ -253,7 +253,7 @@ describe('ReincarnationSystem Integration', () => {
 
       eventBus.flush();
 
-      (world as WorldImpl)._tick = 100;
+      (world as WorldImpl)._tick = 200; // Must be multiple of throttleInterval (200) for system to run
       reincarnationSystem.update(world, [], 1);
 
       eventBus.flush();
@@ -291,7 +291,7 @@ describe('ReincarnationSystem Integration', () => {
 
       eventBus.flush();
 
-      (world as WorldImpl)._tick = 100;
+      (world as WorldImpl)._tick = 200; // Must be multiple of throttleInterval (200) for system to run
       reincarnationSystem.update(world, [], 1);
 
       eventBus.flush();
@@ -333,7 +333,7 @@ describe('ReincarnationSystem Integration', () => {
 
       eventBus.flush();
 
-      (world as WorldImpl)._tick = 100;
+      (world as WorldImpl)._tick = 200; // Must be multiple of throttleInterval (200) for system to run
       reincarnationSystem.update(world, [], 1);
 
       eventBus.flush();
@@ -388,7 +388,7 @@ describe('ReincarnationSystem Integration', () => {
 
       eventBus.flush();
 
-      (world as WorldImpl)._tick = 100;
+      (world as WorldImpl)._tick = 200; // Must be multiple of throttleInterval (200) for system to run
       reincarnationSystem.update(world, [], 1);
 
       eventBus.flush();
@@ -438,7 +438,7 @@ describe('ReincarnationSystem Integration', () => {
       });
 
       // Advance time and process all
-      (world as WorldImpl)._tick = 100;
+      (world as WorldImpl)._tick = 200; // Must be multiple of throttleInterval (200) for system to run
       reincarnationSystem.update(world, [], 1);
 
       eventBus.flush();
@@ -476,7 +476,7 @@ describe('ReincarnationSystem Integration', () => {
 
       eventBus.flush();
 
-      (world as WorldImpl)._tick = 100;
+      (world as WorldImpl)._tick = 200; // Must be multiple of throttleInterval (200) for system to run
       reincarnationSystem.update(world, [], 1);
 
       eventBus.flush();

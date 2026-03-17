@@ -39,7 +39,7 @@ describe('Species + Genetics + Body - Complete Integration', () => {
   let world: World;
   let reproductionSystem: ReproductionSystem;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     const eventBus = new EventBusImpl();
     world = new World(eventBus);
 
@@ -49,10 +49,11 @@ describe('Species + Genetics + Body - Complete Integration', () => {
       trackInbreeding: true,
       minGeneticHealth: 0.3,
     });
+    await reproductionSystem.initialize(world, eventBus);
   });
 
   describe('Pure Species Reproduction', () => {
-    it('should create a pure human child from two human parents', () => {
+    it('should create a pure human child from two human parents', async () => {
       // Create two human parents
       const humanTemplate = getSpeciesTemplate('human');
       if (!humanTemplate) throw new Error('Human template not found');
@@ -93,7 +94,7 @@ describe('Species + Genetics + Body - Complete Integration', () => {
       expect(childBody.speciesId).toBe('human');
     });
 
-    it('should inherit genetic alleles from both parents', () => {
+    it('should inherit genetic alleles from both parents', async () => {
       // Create two human parents with specific alleles
       const parent1 = world.createEntity() as EntityImpl;
       const parent1Species = createSpeciesFromTemplate(getSpeciesTemplate('human')!);
@@ -148,7 +149,7 @@ describe('Species + Genetics + Body - Complete Integration', () => {
   });
 
   describe('Hybrid Species Creation', () => {
-    it('should create a half-elf from elf and human parents', () => {
+    it('should create a half-elf from elf and human parents', async () => {
       // Create elf parent
       const parent1 = world.createEntity() as EntityImpl;
       const parent1Species = createSpeciesFromTemplate(getSpeciesTemplate('elf')!);
@@ -189,7 +190,7 @@ describe('Species + Genetics + Body - Complete Integration', () => {
       expect(childBody).toBeDefined();
     });
 
-    it('should blend physical characteristics from both parent species', () => {
+    it('should blend physical characteristics from both parent species', async () => {
       // Create elf parent (taller, lighter)
       const elfTemplate = getSpeciesTemplate('elf');
       const elf = world.createEntity() as EntityImpl;
@@ -235,7 +236,7 @@ describe('Species + Genetics + Body - Complete Integration', () => {
   });
 
   describe('Mutation System', () => {
-    it('should apply mutations at the configured rate', () => {
+    it('should apply mutations at the configured rate', async () => {
       // Set a high mutation rate for testing
       const highMutationSystem = new ReproductionSystem({
         allowHybrids: true,
@@ -281,7 +282,7 @@ describe('Species + Genetics + Body - Complete Integration', () => {
       expect(mutation.inheritanceChance).toBeLessThanOrEqual(1);
     });
 
-    it('should create extra limb mutations', () => {
+    it('should create extra limb mutations', async () => {
       // Test multiple times to get an extra limb mutation
       let foundExtraLimb = false;
 
@@ -329,7 +330,7 @@ describe('Species + Genetics + Body - Complete Integration', () => {
       expect(foundExtraLimb).toBe(true);
     });
 
-    it('should create size change mutations', () => {
+    it('should create size change mutations', async () => {
       // Test multiple times to get a size change mutation
       let foundSizeChange = false;
 
@@ -371,7 +372,7 @@ describe('Species + Genetics + Body - Complete Integration', () => {
   });
 
   describe('Hereditary Divine Modifications', () => {
-    it('should pass divine wings to offspring at 50% rate', () => {
+    it('should pass divine wings to offspring at 50% rate', async () => {
       // Create parent with divine wings
       const parent1 = world.createEntity() as EntityImpl;
       const parent1Species = createSpeciesFromTemplate(getSpeciesTemplate('human')!);
@@ -424,7 +425,7 @@ describe('Species + Genetics + Body - Complete Integration', () => {
       expect(inheritanceRate).toBeLessThan(0.7);    // At most 70%
     });
 
-    it('should track generations for hereditary modifications', () => {
+    it('should track generations for hereditary modifications', async () => {
       // Create grandparent with divine modification
       const grandparent1 = world.createEntity() as EntityImpl;
       const gp1Species = createSpeciesFromTemplate(getSpeciesTemplate('human')!);
@@ -488,7 +489,7 @@ describe('Species + Genetics + Body - Complete Integration', () => {
   });
 
   describe('Inbreeding Tracking', () => {
-    it('should track inbreeding coefficient for siblings', () => {
+    it('should track inbreeding coefficient for siblings', async () => {
       // Create parents
       const parent1 = world.createEntity() as EntityImpl;
       const parent1Species = createSpeciesFromTemplate(getSpeciesTemplate('human')!);
@@ -524,7 +525,7 @@ describe('Species + Genetics + Body - Complete Integration', () => {
       expect(inbreeding).toBe(0.25);
     });
 
-    it('should reduce genetic health due to inbreeding', () => {
+    it('should reduce genetic health due to inbreeding', async () => {
       // Create parents with high genetic health
       const parent1 = world.createEntity() as EntityImpl;
       const parent1Species = createSpeciesFromTemplate(getSpeciesTemplate('human')!);
@@ -558,7 +559,7 @@ describe('Species + Genetics + Body - Complete Integration', () => {
       }
     });
 
-    it('should track combined effects of low genetic health and inbreeding', () => {
+    it('should track combined effects of low genetic health and inbreeding', async () => {
       // Create grandparents first
       const grandparent1Id = 'gp1';
       const grandparent2Id = 'gp2';
@@ -596,7 +597,7 @@ describe('Species + Genetics + Body - Complete Integration', () => {
   });
 
   describe('Multi-Generation Bloodlines', () => {
-    it('should track lineage across 3 generations', () => {
+    it('should track lineage across 3 generations', async () => {
       // Generation 0 (grandparents)
       const gp1 = world.createEntity() as EntityImpl;
       const gp1Species = createSpeciesFromTemplate(getSpeciesTemplate('human')!);
@@ -642,7 +643,7 @@ describe('Species + Genetics + Body - Complete Integration', () => {
       expect(parentGenetics.generation).toBeGreaterThan(gp1Genetics.generation);
     });
 
-    it('should accumulate traits across generations', () => {
+    it('should accumulate traits across generations', async () => {
       // Grandparent with specific trait
       const gp1 = world.createEntity() as EntityImpl;
       const gp1Species = createSpeciesFromTemplate(getSpeciesTemplate('elf')!); // Elves have ageless trait
@@ -686,7 +687,7 @@ describe('Species + Genetics + Body - Complete Integration', () => {
   });
 
   describe('Body System Integration', () => {
-    it('should create body with species-appropriate body plan', () => {
+    it('should create body with species-appropriate body plan', async () => {
       // Create human
       const human = world.createEntity() as EntityImpl;
       const humanSpecies = createSpeciesFromTemplate(getSpeciesTemplate('human')!);
@@ -719,7 +720,7 @@ describe('Species + Genetics + Body - Complete Integration', () => {
       expect(partTypes).toContain('torso');
     });
 
-    it('should apply hereditary modifications to body', () => {
+    it('should apply hereditary modifications to body', async () => {
       // Create parent with hereditary wings
       const parent1 = world.createEntity() as EntityImpl;
       const parent1Species = createSpeciesFromTemplate(getSpeciesTemplate('human')!);

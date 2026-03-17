@@ -11,16 +11,17 @@ describe('Taming System', () => {
   let tamingSystem: TamingSystem;
   let eventBus: EventBusImpl;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     eventBus = new EventBusImpl();
     world = new World(eventBus);
 
     tamingSystem = new TamingSystem();
+    await tamingSystem.initialize(world, eventBus);
     tamingSystem.setWorld(world);
   });
 
   describe('Acceptance Criterion 5: Taming System - Feeding Method', () => {
-    it('should calculate taming chance based on species tameDifficulty', () => {
+    it('should calculate taming chance based on species tameDifficulty', async () => {
       const entity = world.createEntity();
       const component = new AnimalComponent({
         id: 'animal-1',
@@ -54,7 +55,7 @@ describe('Taming System', () => {
       expect(tameChance).toBeLessThanOrEqual(100);
     });
 
-    it('should have higher taming chance with preferred food', () => {
+    it('should have higher taming chance with preferred food', async () => {
       const entity = world.createEntity();
       const component = new AnimalComponent({
         id: 'animal-2',
@@ -94,7 +95,7 @@ describe('Taming System', () => {
       expect(preferredChance).toBeGreaterThan(nonPreferredChance);
     });
 
-    it('should have higher taming chance with higher trust level', () => {
+    it('should have higher taming chance with higher trust level', async () => {
       const lowTrustEntity = world.createEntity();
       const lowTrustComponent = new AnimalComponent({
         id: 'animal-3a',
@@ -154,7 +155,7 @@ describe('Taming System', () => {
       expect(highTrustChance).toBeGreaterThan(lowTrustChance);
     });
 
-    it('should successfully tame animal when attempt succeeds', () => {
+    it('should successfully tame animal when attempt succeeds', async () => {
       const eventHandler = vi.fn();
       eventBus.subscribe('animal_tamed', eventHandler);
 
@@ -212,7 +213,7 @@ describe('Taming System', () => {
       );
     });
 
-    it('should increase trust level on failed taming attempt', () => {
+    it('should increase trust level on failed taming attempt', async () => {
       const entity = world.createEntity();
       const component = new AnimalComponent({
         id: 'animal-5',
@@ -257,7 +258,7 @@ describe('Taming System', () => {
   });
 
   describe('Acceptance Criterion 6: Bond System', () => {
-    it('should increase bond level by 2 when feeding', () => {
+    it('should increase bond level by 2 when feeding', async () => {
       const entity = world.createEntity();
       const component = new AnimalComponent({
         id: 'animal-6',
@@ -290,7 +291,7 @@ describe('Taming System', () => {
       expect(animal.bondLevel).toBe(initialBond + 2);
     });
 
-    it('should increase bond level by 3 when grooming', () => {
+    it('should increase bond level by 3 when grooming', async () => {
       const entity = world.createEntity();
       const component = new AnimalComponent({
         id: 'animal-7',
@@ -323,7 +324,7 @@ describe('Taming System', () => {
       expect(animal.bondLevel).toBe(initialBond + 3);
     });
 
-    it('should increase bond level by 4 when playing', () => {
+    it('should increase bond level by 4 when playing', async () => {
       const entity = world.createEntity();
       const component = new AnimalComponent({
         id: 'animal-8',
@@ -356,7 +357,7 @@ describe('Taming System', () => {
       expect(animal.bondLevel).toBe(initialBond + 4);
     });
 
-    it('should increase bond level by 10 when rescuing', () => {
+    it('should increase bond level by 10 when rescuing', async () => {
       const entity = world.createEntity();
       const component = new AnimalComponent({
         id: 'animal-9',
@@ -389,7 +390,7 @@ describe('Taming System', () => {
       expect(animal.bondLevel).toBe(initialBond + 10);
     });
 
-    it('should cap bond level at 100', () => {
+    it('should cap bond level at 100', async () => {
       const entity = world.createEntity();
       const component = new AnimalComponent({
         id: 'animal-10',
@@ -419,7 +420,7 @@ describe('Taming System', () => {
       expect(animal.bondLevel).toBe(100); // Capped
     });
 
-    it('should emit bond_level_changed event when bond increases across threshold', () => {
+    it('should emit bond_level_changed event when bond increases across threshold', async () => {
       const eventHandler = vi.fn();
       eventBus.subscribe('bond_level_changed', eventHandler);
 
@@ -468,7 +469,7 @@ describe('Taming System', () => {
   });
 
   describe('Bond Level Categories', () => {
-    it('should recognize wary bond level (0-20)', () => {
+    it('should recognize wary bond level (0-20)', async () => {
       const entity = world.createEntity();
       const component = new AnimalComponent({
         id: 'animal-12',
@@ -496,7 +497,7 @@ describe('Taming System', () => {
       expect(bondCategory).toBe('wary');
     });
 
-    it('should recognize accepting bond level (21-40)', () => {
+    it('should recognize accepting bond level (21-40)', async () => {
       const entity = world.createEntity();
       const component = new AnimalComponent({
         id: 'animal-13',
@@ -524,7 +525,7 @@ describe('Taming System', () => {
       expect(bondCategory).toBe('accepting');
     });
 
-    it('should recognize friendly bond level (41-60)', () => {
+    it('should recognize friendly bond level (41-60)', async () => {
       const entity = world.createEntity();
       const component = new AnimalComponent({
         id: 'animal-14',
@@ -552,7 +553,7 @@ describe('Taming System', () => {
       expect(bondCategory).toBe('friendly');
     });
 
-    it('should recognize loyal bond level (61-80)', () => {
+    it('should recognize loyal bond level (61-80)', async () => {
       const entity = world.createEntity();
       const component = new AnimalComponent({
         id: 'animal-15',
@@ -580,7 +581,7 @@ describe('Taming System', () => {
       expect(bondCategory).toBe('loyal');
     });
 
-    it('should recognize bonded level (81-100)', () => {
+    it('should recognize bonded level (81-100)', async () => {
       const entity = world.createEntity();
       const component = new AnimalComponent({
         id: 'animal-16',
@@ -610,7 +611,7 @@ describe('Taming System', () => {
   });
 
   describe('Error Handling', () => {
-    it('should throw when attempting to tame animal with missing speciesId', () => {
+    it('should throw when attempting to tame animal with missing speciesId', async () => {
       const entity = world.createEntity();
       const invalidAnimal = {
         id: 'invalid-animal',

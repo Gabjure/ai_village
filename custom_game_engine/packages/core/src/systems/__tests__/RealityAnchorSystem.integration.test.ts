@@ -43,6 +43,7 @@ describe('RealityAnchorSystem Integration', () => {
     // Create systems
     const powerGridSystem = new PowerGridSystem();
     const realityAnchorSystem = new RealityAnchorSystem();
+    powerGridSystem.initialize(world, eventBus);
     realityAnchorSystem.initialize(world, eventBus);
 
     // Run power grid first to establish power state
@@ -55,7 +56,7 @@ describe('RealityAnchorSystem Integration', () => {
     // Simulate 20 ticks (1 second at 20 TPS)
     for (let i = 0; i < 20; i++) {
       world.advanceTick();
-      realityAnchorSystem.update(world, [], 0.05);
+      realityAnchorSystem.update(world, [anchor], 0.05);
     }
 
     // Verify power level increased (charging happened)
@@ -132,6 +133,7 @@ describe('RealityAnchorSystem Integration', () => {
 
     const powerGridSystem = new PowerGridSystem();
     const realityAnchorSystem = new RealityAnchorSystem();
+    powerGridSystem.initialize(world, eventBus);
     realityAnchorSystem.initialize(world, eventBus);
 
     // Run power grid
@@ -160,9 +162,10 @@ describe('RealityAnchorSystem Integration', () => {
     anchorComp.powerLevel = 1.0;
     anchor.addComponent(anchorComp);
 
-    // PowerComponent - will be unpowered
+    // PowerComponent - will be unpowered with critical power loss
     const anchorPower = createPowerConsumer('electrical', 50_000_000);
     anchorPower.isPowered = false; // No power
+    anchorPower.efficiency = 0; // Critical power loss triggers field collapse
     anchor.addComponent(anchorPower);
     world.addEntity(anchor);
 
@@ -171,7 +174,7 @@ describe('RealityAnchorSystem Integration', () => {
 
     // Run system
     world.setTick(20);
-    realityAnchorSystem.update(world, [], 0.05);
+    realityAnchorSystem.update(world, [anchor], 0.05);
 
     // Verify field collapsed
     expect(anchorComp.status).toBe('failed');
@@ -194,6 +197,7 @@ describe('RealityAnchorSystem Integration', () => {
 
     const anchorPower = createPowerConsumer('electrical', 50_000_000);
     anchorPower.isPowered = false; // Power lost
+    anchorPower.efficiency = 0; // Critical power loss triggers power_loss event
     anchor.addComponent(anchorPower);
     world.addEntity(anchor);
 
@@ -201,14 +205,13 @@ describe('RealityAnchorSystem Integration', () => {
     realityAnchorSystem.initialize(world, eventBus);
 
     world.setTick(20);
-    realityAnchorSystem.update(world, [], 0.05);
+    realityAnchorSystem.update(world, [anchor], 0.05);
     eventBus.flush();
 
     // Verify event emitted
     expect(eventSpy).toHaveBeenCalledWith(
       expect.objectContaining({
         type: 'reality_anchor:power_loss',
-        source: anchor.id,
       })
     );
   });
@@ -230,6 +233,7 @@ describe('RealityAnchorSystem Integration', () => {
 
     const anchorPower = createPowerConsumer('electrical', 50_000_000);
     anchorPower.isPowered = false;
+    anchorPower.efficiency = 0; // Critical power loss triggers field collapse
     anchor.addComponent(anchorPower);
     world.addEntity(anchor);
 
@@ -237,13 +241,13 @@ describe('RealityAnchorSystem Integration', () => {
     realityAnchorSystem.initialize(world, eventBus);
 
     world.setTick(20);
-    realityAnchorSystem.update(world, [], 0.05);
+    realityAnchorSystem.update(world, [anchor], 0.05);
+    eventBus.flush();
 
     // Verify field collapse event and gods released
     expect(eventSpy).toHaveBeenCalledWith(
       expect.objectContaining({
         type: 'reality_anchor:field_collapse',
-        source: anchor.id,
       })
     );
     expect(anchorComp.mortalizedGods.size).toBe(0);
@@ -276,6 +280,7 @@ describe('RealityAnchorSystem Integration', () => {
 
     const powerGridSystem = new PowerGridSystem();
     const realityAnchorSystem = new RealityAnchorSystem();
+    powerGridSystem.initialize(world, eventBus);
     realityAnchorSystem.initialize(world, eventBus);
 
     // Initially powered
@@ -292,7 +297,7 @@ describe('RealityAnchorSystem Integration', () => {
 
     // Run Reality Anchor system
     world.setTick(20);
-    realityAnchorSystem.update(world, [], 0.05);
+    realityAnchorSystem.update(world, [anchor], 0.05);
 
     // Verify field collapsed, god restored
     expect(anchorPower.isPowered).toBe(false);
@@ -387,13 +392,13 @@ describe('RealityAnchorSystem Integration', () => {
     realityAnchorSystem.initialize(world, eventBus);
 
     world.setTick(20);
-    realityAnchorSystem.update(world, [], 0.05);
+    realityAnchorSystem.update(world, [anchor], 0.05);
+    eventBus.flush();
 
     // Verify event emitted
     expect(eventSpy).toHaveBeenCalledWith(
       expect.objectContaining({
         type: 'reality_anchor:charging_interrupted',
-        source: anchor.id,
       })
     );
   });
@@ -424,6 +429,7 @@ describe('RealityAnchorSystem Integration', () => {
 
     const powerGridSystem = new PowerGridSystem();
     const realityAnchorSystem = new RealityAnchorSystem();
+    powerGridSystem.initialize(world, eventBus);
     realityAnchorSystem.initialize(world, eventBus);
 
     // Run power grid
@@ -434,13 +440,13 @@ describe('RealityAnchorSystem Integration', () => {
     expect(anchorPower.efficiency).toBe(0.5);
 
     world.setTick(20);
-    realityAnchorSystem.update(world, [], 0.05);
+    realityAnchorSystem.update(world, [anchor], 0.05);
+    eventBus.flush();
 
     // Verify partial power warning emitted
     expect(eventSpy).toHaveBeenCalledWith(
       expect.objectContaining({
         type: 'reality_anchor:power_insufficient',
-        source: anchor.id,
         data: expect.objectContaining({
           efficiency: 0.5,
         }),

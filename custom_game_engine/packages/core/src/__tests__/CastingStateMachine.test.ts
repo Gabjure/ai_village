@@ -9,6 +9,8 @@ import { MagicSystem } from '../systems/MagicSystem.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import { createMagicUserComponent } from '../components/MagicComponent.js';
 import type { MagicComponent } from '../components/MagicComponent.js';
+import { createSpellKnowledgeComponent } from '../components/SpellKnowledgeComponent.js';
+import type { SpellKnowledgeComponent } from '../components/SpellKnowledgeComponent.js';
 import { SpellRegistry } from '../magic/SpellRegistry.js';
 import { initializeMagicSystem } from '../magic/InitializeMagicSystem.js';
 import { costCalculatorRegistry } from '../magic/costs/CostCalculatorRegistry.js';
@@ -108,6 +110,27 @@ describe('Multi-Tick Casting State Machine', () => {
     entity.updateComponent(CT.Magic, () => magic);
   }
 
+  /**
+   * Tick casting forward by one step, bypassing MagicSystem's throttle (interval=100).
+   * The throttle is for performance in production; tests need per-tick casting updates.
+   */
+  function tickCasting(entities: any[]): void {
+    world.advanceTick();
+    // @ts-expect-error Accessing private manager to bypass throttle for casting tests
+    const castingManager = magicSystem['castingManager'];
+    if (castingManager) {
+      // @ts-expect-error Accessing private manager to bypass throttle for casting tests
+      const proficiencyManager = magicSystem['proficiencyManager'];
+      // @ts-expect-error Accessing private manager to bypass throttle for casting tests
+      const skillTreeManager = magicSystem['skillTreeManager'];
+      castingManager.tickAllActiveCasts(
+        world,
+        proficiencyManager ? (e: any, s: any) => proficiencyManager.updateSpellProficiency(e, s) : undefined,
+        skillTreeManager ? (e: any, p: any, x: any) => skillTreeManager.grantSkillXP(e, p, x) : undefined
+      );
+    }
+  }
+
   beforeEach(() => {
     // Clear the global spell registry instance before creating world
     // @ts-expect-error Accessing private field for testing
@@ -148,6 +171,9 @@ describe('Multi-Tick Casting State Machine', () => {
       const magicComp = createProperMagicComponent('academic', 100);
       magicComp.knownSpells = [{ spellId: 'instant_fireball', proficiency: 50, timesCast: 0 }];
       caster.addComponent(magicComp);
+      const spellKnowledge = createSpellKnowledgeComponent();
+      spellKnowledge.knownSpells = [{ spellId: 'instant_fireball', proficiency: 50, timesCast: 0 }];
+      caster.addComponent(spellKnowledge);
 
       const magic = caster.getComponent<MagicComponent>(CT.Magic);
       const initialMana = magic.resourcePools.mana?.current ?? magic.manaPools[0]?.current ?? 100;
@@ -193,6 +219,9 @@ describe('Multi-Tick Casting State Machine', () => {
         ...current,
         knownSpells: [{ spellId: 'quick_heal', proficiency: 50, timesCast: 0 }],
       }));
+      const spellKnowledge = createSpellKnowledgeComponent();
+      spellKnowledge.knownSpells = [{ spellId: 'quick_heal', proficiency: 50, timesCast: 0 }];
+      caster.addComponent(spellKnowledge);
 
       // Start cast
       const result = magicSystem.castSpell(caster as Record<string, unknown>, world, 'quick_heal');
@@ -207,16 +236,14 @@ describe('Multi-Tick Casting State Machine', () => {
 
       // Tick 1-4: Still casting
       for (let i = 1; i <= 4; i++) {
-        world.advanceTick();
-        magicSystem.update(world, [caster], 0.05);
+        tickCasting([caster]);
         magic = caster.getComponent<MagicComponent>(CT.Magic);
         expect(magic.casting).toBe(true);
         expect(magic.castingState?.progress).toBe(i);
       }
 
       // Tick 5: Cast completes
-      world.advanceTick();
-      magicSystem.update(world, [caster], 0.05);
+      tickCasting([caster]);
       magic = caster.getComponent<MagicComponent>(CT.Magic);
       expect(magic.casting).toBe(false);
       expect(magic.castingState).toBeNull();
@@ -249,6 +276,9 @@ describe('Multi-Tick Casting State Machine', () => {
         ...current,
         knownSpells: [{ spellId: 'slow_ritual', proficiency: 50, timesCast: 0 }],
       }));
+      const spellKnowledge = createSpellKnowledgeComponent();
+      spellKnowledge.knownSpells = [{ spellId: 'slow_ritual', proficiency: 50, timesCast: 0 }];
+      caster.addComponent(spellKnowledge);
 
       // Start cast
       const result = magicSystem.castSpell(caster as Record<string, unknown>, world, 'slow_ritual');
@@ -269,8 +299,7 @@ describe('Multi-Tick Casting State Machine', () => {
       }));
 
       // Tick - should cancel
-      world.advanceTick();
-      magicSystem.update(world, [caster], 0.05);
+      tickCasting([caster]);
 
       // Cast should be cancelled
       magic = caster.getComponent<MagicComponent>(CT.Magic);
@@ -308,6 +337,9 @@ describe('Multi-Tick Casting State Machine', () => {
         ...current,
         knownSpells: [{ spellId: 'channeled_beam', proficiency: 50, timesCast: 0 }],
       }));
+      const spellKnowledge = createSpellKnowledgeComponent();
+      spellKnowledge.knownSpells = [{ spellId: 'channeled_beam', proficiency: 50, timesCast: 0 }];
+      caster.addComponent(spellKnowledge);
 
       // Start cast
       const result = magicSystem.castSpell(caster as Record<string, unknown>, world, 'channeled_beam');
@@ -318,15 +350,13 @@ describe('Multi-Tick Casting State Machine', () => {
 
       // Move caster slightly (< 1 tile) - should NOT interrupt
       caster.updateComponent(CT.Position, (pos: Record<string, unknown>) => ({ ...pos, x: 0.5, y: 0.5 }));
-      world.advanceTick();
-      magicSystem.update(world, [caster], 0.05);
+      tickCasting([caster]);
       magic = caster.getComponent<MagicComponent>(CT.Magic);
       expect(magic.casting).toBe(true); // Still casting
 
       // Move caster more than 1 tile - should interrupt
       caster.updateComponent(CT.Position, (pos: Record<string, unknown>) => ({ ...pos, x: 2, y: 2 }));
-      world.advanceTick();
-      magicSystem.update(world, [caster], 0.05);
+      tickCasting([caster]);
 
       // Cast should be cancelled
       magic = caster.getComponent<MagicComponent>(CT.Magic);
@@ -366,6 +396,9 @@ describe('Multi-Tick Casting State Machine', () => {
           favor: { type: 'favor', current: 100, maximum: 100, regenRate: 0, locked: 0 },
         },
       }));
+      const spellKnowledge = createSpellKnowledgeComponent();
+      spellKnowledge.knownSpells = [{ spellId: 'resurrection', proficiency: 50, timesCast: 0 }];
+      caster.addComponent(spellKnowledge);
 
       // Start cast
       const result = magicSystem.castSpell(caster as Record<string, unknown>, world, 'resurrection');
@@ -378,8 +411,7 @@ describe('Multi-Tick Casting State Machine', () => {
       caster.updateComponent(CT.Needs, (needs: Record<string, unknown>) => ({ ...needs, health: 0 }));
 
       // Tick - should cancel
-      world.advanceTick();
-      magicSystem.update(world, [caster], 0.05);
+      tickCasting([caster]);
 
       // Cast should be cancelled
       magic = caster.getComponent<MagicComponent>(CT.Magic);
@@ -413,6 +445,9 @@ describe('Multi-Tick Casting State Machine', () => {
         ...current,
         knownSpells: [{ spellId: 'targeted_curse', proficiency: 50, timesCast: 0 }],
       }));
+      const spellKnowledge = createSpellKnowledgeComponent();
+      spellKnowledge.knownSpells = [{ spellId: 'targeted_curse', proficiency: 50, timesCast: 0 }];
+      caster.addComponent(spellKnowledge);
 
       const target = world.createEntity();
       target.addComponent({ type: 'position', x: 10, y: 10 });
@@ -430,8 +465,7 @@ describe('Multi-Tick Casting State Machine', () => {
       world.destroyEntity(target.id, 'test');
 
       // Tick - should cancel
-      world.advanceTick();
-      magicSystem.update(world, [caster], 0.05);
+      tickCasting([caster]);
 
       // Cast should be cancelled
       magic = caster.getComponent<MagicComponent>(CT.Magic);
@@ -465,6 +499,9 @@ describe('Multi-Tick Casting State Machine', () => {
           favor: { type: 'favor', current: 100, maximum: 100, regenRate: 0, locked: 0 },
         },
       }));
+      const spellKnowledge = createSpellKnowledgeComponent();
+      spellKnowledge.knownSpells = [{ spellId: 'major_heal', proficiency: 50, timesCast: 0 }];
+      caster.addComponent(spellKnowledge);
 
       const target = world.createEntity();
       target.addComponent({ type: 'position', x: 5, y: 5 });
@@ -481,8 +518,7 @@ describe('Multi-Tick Casting State Machine', () => {
       target.updateComponent(CT.Needs, (needs: Record<string, unknown>) => ({ ...needs, health: 0 }));
 
       // Tick - should cancel
-      world.advanceTick();
-      magicSystem.update(world, [caster], 0.05);
+      tickCasting([caster]);
 
       // Cast should be cancelled
       magic = caster.getComponent<MagicComponent>(CT.Magic);
@@ -516,6 +552,9 @@ describe('Multi-Tick Casting State Machine', () => {
         ...current,
         knownSpells: [{ spellId: 'epic_ritual', proficiency: 50, timesCast: 0 }],
       }));
+      const spellKnowledge = createSpellKnowledgeComponent();
+      spellKnowledge.knownSpells = [{ spellId: 'epic_ritual', proficiency: 50, timesCast: 0 }];
+      caster.addComponent(spellKnowledge);
 
       // Start cast
       const result = magicSystem.castSpell(caster as Record<string, unknown>, world, 'epic_ritual');
@@ -527,8 +566,7 @@ describe('Multi-Tick Casting State Machine', () => {
 
       // Tick through entire cast
       for (let i = 1; i <= 100; i++) {
-        world.advanceTick();
-        magicSystem.update(world, [caster], 0.05);
+        tickCasting([caster]);
 
         magic = caster.getComponent<MagicComponent>(CT.Magic);
 
@@ -575,6 +613,9 @@ describe('Multi-Tick Casting State Machine', () => {
           ...current,
           knownSpells: [{ spellId: 'group_spell', proficiency: 50, timesCast: 0 }],
         }));
+        const sk = createSpellKnowledgeComponent();
+        sk.knownSpells = [{ spellId: 'group_spell', proficiency: 50, timesCast: 0 }];
+        caster.addComponent(sk);
         casters.push(caster);
       }
 
@@ -592,8 +633,7 @@ describe('Multi-Tick Casting State Machine', () => {
 
       // Tick through cast
       for (let i = 1; i <= 10; i++) {
-        world.advanceTick();
-        magicSystem.update(world, casters, 0.05);
+        tickCasting(casters);
       }
 
       // All should complete
@@ -628,6 +668,9 @@ describe('Multi-Tick Casting State Machine', () => {
         ...current,
         knownSpells: [{ spellId: 'instant', proficiency: 50, timesCast: 0 }],
       }));
+      const spellKnowledgeInstant = createSpellKnowledgeComponent();
+      spellKnowledgeInstant.knownSpells = [{ spellId: 'instant', proficiency: 50, timesCast: 0 }];
+      caster.addComponent(spellKnowledgeInstant);
 
       const result = magicSystem.castSpell(caster as Record<string, unknown>, world, 'instant');
       expect(result).toBe(true);
@@ -658,6 +701,9 @@ describe('Multi-Tick Casting State Machine', () => {
         ...current,
         knownSpells: [{ spellId: 'epic_ritual_hour', proficiency: 50, timesCast: 0 }],
       }));
+      const spellKnowledgeEpic = createSpellKnowledgeComponent();
+      spellKnowledgeEpic.knownSpells = [{ spellId: 'epic_ritual_hour', proficiency: 50, timesCast: 0 }];
+      caster.addComponent(spellKnowledgeEpic);
 
       const result = magicSystem.castSpell(caster as Record<string, unknown>, world, 'epic_ritual_hour');
       expect(result).toBe(true);

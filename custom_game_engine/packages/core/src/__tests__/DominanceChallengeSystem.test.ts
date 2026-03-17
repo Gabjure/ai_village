@@ -70,7 +70,7 @@ describe('DominanceChallengeSystem', () => {
         target: incumbent.id,
         state: 'active',
         startTime: Date.now(),
-        metadata: { method: 'combat' },
+        method: 'combat',
       }));
 
       // Track events
@@ -144,7 +144,7 @@ describe('DominanceChallengeSystem', () => {
         target: incumbent.id,
         state: 'active',
         startTime: Date.now(),
-        metadata: { method: 'combat' },
+        method: 'combat',
       }));
 
       // Run system multiple times until challenger wins
@@ -167,7 +167,7 @@ describe('DominanceChallengeSystem', () => {
             target: incumbent.id,
             state: 'active',
             startTime: Date.now(),
-            metadata: { method: 'combat' },
+            method: 'combat',
           }));
         }
       }
@@ -228,7 +228,7 @@ describe('DominanceChallengeSystem', () => {
         target: incumbent.id,
         state: 'active',
         startTime: Date.now(),
-        metadata: { method: 'display' },
+        method: 'display',
       }));
 
       // Run system
@@ -296,7 +296,7 @@ describe('DominanceChallengeSystem', () => {
         target: incumbent.id,
         state: 'active',
         startTime: Date.now(),
-        metadata: { method: 'combat' },
+        method: 'combat',
       }));
 
       // Run system multiple times until resolution occurs
@@ -319,7 +319,7 @@ describe('DominanceChallengeSystem', () => {
             target: incumbent.id,
             state: 'active',
             startTime: Date.now(),
-            metadata: { method: 'combat' },
+            method: 'combat',
           }));
         }
       }
@@ -359,6 +359,7 @@ describe('DominanceChallengeSystem', () => {
         target: incumbent.id,
         state: 'active',
         startTime: Date.now(),
+        method: 'combat',
       }));
 
       const entities = world.getAllEntities();
@@ -394,6 +395,7 @@ describe('DominanceChallengeSystem', () => {
         target: incumbent.id,
         state: 'active',
         startTime: Date.now(),
+        method: 'combat',
       }));
 
       const entities = world.getAllEntities();
@@ -429,6 +431,7 @@ describe('DominanceChallengeSystem', () => {
         target: incumbent.id,
         state: 'active',
         startTime: Date.now(),
+        method: 'combat',
       }));
 
       const entities = world.getAllEntities();
@@ -464,6 +467,7 @@ describe('DominanceChallengeSystem', () => {
         target: incumbent.id,
         state: 'active',
         startTime: Date.now(),
+        method: 'combat',
       }));
 
       const entities = world.getAllEntities();
@@ -511,7 +515,7 @@ describe('DominanceChallengeSystem', () => {
         target: incumbent.id,
         state: 'active',
         startTime: Date.now(),
-        metadata: { method: 'follower_theft' },
+        method: 'follower_theft',
       }));
 
       const entities = world.getAllEntities();
@@ -562,7 +566,7 @@ describe('DominanceChallengeSystem', () => {
         target: incumbent.id,
         state: 'active',
         startTime: Date.now(),
-        metadata: { method: 'resource_seizure' },
+        method: 'resource_seizure',
       }));
 
       const entities = world.getAllEntities();

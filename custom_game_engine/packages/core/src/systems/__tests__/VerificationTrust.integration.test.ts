@@ -22,12 +22,13 @@ import { EventBusImpl } from '../events/EventBus.js';
 describe('VerificationSystem + TrustNetwork Integration', () => {
   let harness: IntegrationTestHarness;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     harness = createMinimalWorld();
   });
 
-  it('should verification system process agents', () => {
+  it('should verification system process agents', async () => {
     const verificationSystem = new VerificationSystem(harness.eventBus);
+    await verificationSystem.initialize(harness.world, harness.eventBus);
     harness.registerSystem('VerificationSystem', verificationSystem);
 
     const agent1 = harness.createTestAgent({ x: 10, y: 10 });
@@ -45,7 +46,7 @@ describe('VerificationSystem + TrustNetwork Integration', () => {
     }).not.toThrow();
   });
 
-  it('should trust network initialize with default values', () => {
+  it('should trust network initialize with default values', async () => {
     const agent = harness.createTestAgent({ x: 10, y: 10 });
     const trustNetwork = new TrustNetworkComponent();
 
@@ -55,8 +56,9 @@ describe('VerificationSystem + TrustNetwork Integration', () => {
     expect(trustNetwork.trustLevels.size).toBe(0);
   });
 
-  it('should trust levels update after verification', () => {
+  it('should trust levels update after verification', async () => {
     const verificationSystem = new VerificationSystem(harness.eventBus);
+    await verificationSystem.initialize(harness.world, harness.eventBus);
     harness.registerSystem('VerificationSystem', verificationSystem);
 
     const agent1 = harness.createTestAgent({ x: 10, y: 10 });
@@ -94,8 +96,9 @@ describe('VerificationSystem + TrustNetwork Integration', () => {
     expect(trust1.trustLevels.has(agent2.id)).toBe(true);
   });
 
-  it('should verification events be emitted', () => {
+  it('should verification events be emitted', async () => {
     const verificationSystem = new VerificationSystem(harness.eventBus);
+    await verificationSystem.initialize(harness.world, harness.eventBus);
     harness.registerSystem('VerificationSystem', verificationSystem);
 
     const agent1 = harness.createTestAgent({ x: 10, y: 10 });
@@ -131,7 +134,7 @@ describe('VerificationSystem + TrustNetwork Integration', () => {
     expect(verifiedEvents.length + violatedEvents.length).toBeGreaterThanOrEqual(0);
   });
 
-  it('should trust network track multiple relationships', () => {
+  it('should trust network track multiple relationships', async () => {
     const agent1 = harness.createTestAgent({ x: 10, y: 10 });
     const agent2 = harness.createTestAgent({ x: 11, y: 11 });
     const agent3 = harness.createTestAgent({ x: 12, y: 12 });
@@ -149,8 +152,9 @@ describe('VerificationSystem + TrustNetwork Integration', () => {
     expect(trust1.trustLevels.get(agent3.id)).toBe(0.3);
   });
 
-  it('should beliefs integrate with verification', () => {
+  it('should beliefs integrate with verification', async () => {
     const verificationSystem = new VerificationSystem(harness.eventBus);
+    await verificationSystem.initialize(harness.world, harness.eventBus);
     harness.registerSystem('VerificationSystem', verificationSystem);
 
     const agent = harness.createTestAgent({ x: 10, y: 10 });
@@ -166,8 +170,9 @@ describe('VerificationSystem + TrustNetwork Integration', () => {
     }).not.toThrow();
   });
 
-  it('should verification handle missing trust networks', () => {
+  it('should verification handle missing trust networks', async () => {
     const verificationSystem = new VerificationSystem(harness.eventBus);
+    await verificationSystem.initialize(harness.world, harness.eventBus);
     harness.registerSystem('VerificationSystem', verificationSystem);
 
     // Agent without trust network
@@ -182,7 +187,7 @@ describe('VerificationSystem + TrustNetwork Integration', () => {
     }).not.toThrow();
   });
 
-  it('should trust levels bounded between 0 and 1', () => {
+  it('should trust levels bounded between 0 and 1', async () => {
     const trust = new TrustNetworkComponent();
     const agentId = 'test-agent-id';
 

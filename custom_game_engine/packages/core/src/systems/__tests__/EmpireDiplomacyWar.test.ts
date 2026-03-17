@@ -23,13 +23,14 @@ describe('Empire Diplomacy System', () => {
   let eventBus: EventBusImpl;
   let diplomacySystem: EmpireDiplomacySystem;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     eventBus = new EventBusImpl(); world = new World(eventBus);
     diplomacySystem = new EmpireDiplomacySystem();
+    await diplomacySystem.initialize(world, eventBus);
   });
 
   describe('Opinion Calculation', () => {
-    it('should calculate positive opinion for allies with treaties', () => {
+    it('should calculate positive opinion for allies with treaties', async () => {
       const empire1 = world.createEntity();
       const empireComp1 = createEmpireComponent('Empire1', 0);
 
@@ -56,7 +57,7 @@ describe('Empire Diplomacy System', () => {
       expect(relation.interImperialTrade).toBeGreaterThan(0);
     });
 
-    it('should calculate negative opinion for recent wars', () => {
+    it('should calculate negative opinion for recent wars', async () => {
       const empire1 = world.createEntity();
       const empireComp1 = createEmpireComponent('Empire1', 0);
 
@@ -97,7 +98,7 @@ describe('Empire Diplomacy System', () => {
   });
 
   describe('Alliance Formation', () => {
-    it('should form alliance when conditions met (shared threat + high opinion)', () => {
+    it('should form alliance when conditions met (shared threat + high opinion)', async () => {
       const empire1 = world.createEntity();
       const empire2 = world.createEntity();
       const empire3 = world.createEntity(); // Common enemy
@@ -147,13 +148,14 @@ describe('Empire War System', () => {
   let eventBus: EventBusImpl;
   let warSystem: EmpireWarSystem;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     eventBus = new EventBusImpl(); world = new World(eventBus);
     warSystem = new EmpireWarSystem();
+    await warSystem.initialize(world, eventBus);
   });
 
   describe('War Score Calculation', () => {
-    it('should award points for territory occupied', () => {
+    it('should award points for territory occupied', async () => {
       const empire1 = world.createEntity();
       const empireComp1 = createEmpireComponent('Empire1', 0);
 
@@ -204,7 +206,7 @@ describe('Empire War System', () => {
   });
 
   describe('Peace Treaty Generation', () => {
-    it('should generate appropriate demands for decisive victory', () => {
+    it('should generate appropriate demands for decisive victory', async () => {
       const war = {
         id: 'war1',
         name: 'War 1',
@@ -232,7 +234,7 @@ describe('Empire War System', () => {
       // Expected: Math.ceil(3 * 0.5) = 2 nations transferred
     });
 
-    it('should generate status quo for stalemate', () => {
+    it('should generate status quo for stalemate', async () => {
       // Stalemate (warScore 45-55) should result in:
       // - No territory transfers
       // - No reparations
@@ -252,7 +254,7 @@ describe('Empire War System', () => {
   });
 
   describe('War Exhaustion', () => {
-    it('should force peace when both sides exceed 90 exhaustion', () => {
+    it('should force peace when both sides exceed 90 exhaustion', async () => {
       const war = {
         id: 'war1',
         name: 'Long War',
@@ -281,12 +283,12 @@ describe('Treaty Execution', () => {
   let world: World;
   let eventBus: EventBusImpl;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     eventBus = new EventBusImpl(); world = new World(eventBus);
   });
 
   describe('Defense Pact', () => {
-    it('should auto-join war when ally is attacked', () => {
+    it('should auto-join war when ally is attacked', async () => {
       const empire1 = world.createEntity();
       const empire2 = world.createEntity();
 
@@ -337,7 +339,7 @@ describe('Treaty Execution', () => {
   });
 
   describe('Trade Agreement', () => {
-    it('should increase trade volume over time', () => {
+    it('should increase trade volume over time', async () => {
       const empire1 = world.createEntity();
       const empireComp1 = createEmpireComponent('Empire1', 0);
 

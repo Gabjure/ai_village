@@ -18,10 +18,11 @@ describe('Tilling Action', () => {
   let eventBus: EventBusImpl;
   let soilSystem: SoilSystem;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     eventBus = new EventBusImpl();
     world = new World(eventBus);
     soilSystem = new SoilSystem();
+    await soilSystem.initialize(world, eventBus);
   });
 
   /**
@@ -54,7 +55,7 @@ describe('Tilling Action', () => {
       expect(isValidAction(action)).toBe(true);
     });
 
-    it('should have required fields for till action', () => {
+    it('should have required fields for till action', async () => {
       const action = { type: 'till', position: { x: 5, y: 5 } };
       expect(action.type).toBe('till');
       expect(action.position).toBeDefined();
@@ -64,7 +65,7 @@ describe('Tilling Action', () => {
   });
 
   describe('Acceptance Criterion 2: Basic Tilling Success', () => {
-    it('should change terrain from grass to dirt when tilled', () => {
+    it('should change terrain from grass to dirt when tilled', async () => {
       const tile = createTile('grass', 'plains');
 
       soilSystem.tillTile(world, tile, 5, 5);
@@ -72,7 +73,7 @@ describe('Tilling Action', () => {
       expect(tile.terrain).toBe('dirt');
     });
 
-    it('should set tilled flag to true', () => {
+    it('should set tilled flag to true', async () => {
       const tile = createTile('grass', 'plains');
 
       soilSystem.tillTile(world, tile, 5, 5);
@@ -80,7 +81,7 @@ describe('Tilling Action', () => {
       expect(tile.tilled).toBe(true);
     });
 
-    it('should set plantability counter to 3', () => {
+    it('should set plantability counter to 3', async () => {
       const tile = createTile('grass', 'plains');
 
       soilSystem.tillTile(world, tile, 5, 5);
@@ -88,7 +89,7 @@ describe('Tilling Action', () => {
       expect(tile.plantability).toBe(3);
     });
 
-    it('should set fertility based on biome', () => {
+    it('should set fertility based on biome', async () => {
       const tile = createTile('grass', 'plains');
 
       soilSystem.tillTile(world, tile, 5, 5);
@@ -97,7 +98,7 @@ describe('Tilling Action', () => {
       expect(tile.fertility).toBeLessThanOrEqual(100);
     });
 
-    it('should initialize nutrients (N, P, K)', () => {
+    it('should initialize nutrients (N, P, K)', async () => {
       const tile = createTile('grass', 'plains');
 
       soilSystem.tillTile(world, tile, 5, 5);
@@ -109,14 +110,14 @@ describe('Tilling Action', () => {
   });
 
   describe('Acceptance Criterion 3: Tilling Validation - Valid Terrain', () => {
-    it('should successfully till grass terrain', () => {
+    it('should successfully till grass terrain', async () => {
       const tile = createTile('grass', 'plains');
 
       expect(() => soilSystem.tillTile(world, tile, 5, 5)).not.toThrow();
       expect(tile.terrain).toBe('dirt');
     });
 
-    it('should successfully till dirt terrain (re-tilling)', () => {
+    it('should successfully till dirt terrain (re-tilling)', async () => {
       const tile = createTile('dirt', 'plains');
 
       expect(() => soilSystem.tillTile(world, tile, 5, 5)).not.toThrow();
@@ -125,7 +126,7 @@ describe('Tilling Action', () => {
   });
 
   describe('Acceptance Criterion 4: Tilling Validation - Invalid Terrain', () => {
-    it('should throw error when attempting to till stone terrain', () => {
+    it('should throw error when attempting to till stone terrain', async () => {
       const tile = createTile('stone', 'mountains');
 
       expect(() => soilSystem.tillTile(world, tile, 5, 5)).toThrow(
@@ -133,7 +134,7 @@ describe('Tilling Action', () => {
       );
     });
 
-    it('should throw error when attempting to till water terrain', () => {
+    it('should throw error when attempting to till water terrain', async () => {
       const tile = createTile('water', 'river');
 
       expect(() => soilSystem.tillTile(world, tile, 5, 5)).toThrow(
@@ -141,7 +142,7 @@ describe('Tilling Action', () => {
       );
     });
 
-    it('should throw error when attempting to till sand terrain', () => {
+    it('should throw error when attempting to till sand terrain', async () => {
       const tile = createTile('sand', 'desert');
 
       expect(() => soilSystem.tillTile(world, tile, 5, 5)).toThrow(
@@ -149,7 +150,7 @@ describe('Tilling Action', () => {
       );
     });
 
-    it('should NOT modify tile state when validation fails', () => {
+    it('should NOT modify tile state when validation fails', async () => {
       const tile = createTile('stone', 'mountains');
       const originalTerrain = tile.terrain;
       const originalTilled = tile.tilled;
@@ -164,7 +165,7 @@ describe('Tilling Action', () => {
       expect(tile.tilled).toBe(originalTilled);
     });
 
-    it('should NOT emit tilling event when validation fails', () => {
+    it('should NOT emit tilling event when validation fails', async () => {
       const tile = createTile('water', 'river');
       const handler = vi.fn();
       eventBus.subscribe('soil:tilled', handler);
@@ -181,7 +182,7 @@ describe('Tilling Action', () => {
   });
 
   describe('Acceptance Criterion 5: Position Validation', () => {
-    it('should validate agent is adjacent to target tile (distance <= √2)', () => {
+    it('should validate agent is adjacent to target tile (distance <= √2)', async () => {
       // This will be tested in ActionHandler integration tests
       // Testing distance formula: √((x2-x1)² + (y2-y1)²) ≤ √2
 
@@ -205,7 +206,7 @@ describe('Tilling Action', () => {
       });
     });
 
-    it('should reject action if agent is too far from target', () => {
+    it('should reject action if agent is too far from target', async () => {
       // This will be tested in ActionHandler integration tests
       const agentPos = { x: 5, y: 5 };
       const farPos = { x: 8, y: 8 };
@@ -219,7 +220,7 @@ describe('Tilling Action', () => {
   });
 
   describe('Acceptance Criterion 6: SoilSystem Integration', () => {
-    it('should call SoilSystem.tillTile with correct parameters', () => {
+    it('should call SoilSystem.tillTile with correct parameters', async () => {
       const tile = createTile('grass', 'plains');
       const tillSpy = vi.spyOn(soilSystem, 'tillTile');
 
@@ -228,7 +229,7 @@ describe('Tilling Action', () => {
       expect(tillSpy).toHaveBeenCalledWith(world, tile, 5, 5);
     });
 
-    it('should use existing fertility calculation logic', () => {
+    it('should use existing fertility calculation logic', async () => {
       const tile = createTile('grass', 'plains');
 
       soilSystem.tillTile(world, tile, 5, 5);
@@ -238,7 +239,7 @@ describe('Tilling Action', () => {
       expect(tile.fertility).toBeLessThanOrEqual(80);
     });
 
-    it('should initialize nutrients based on fertility', () => {
+    it('should initialize nutrients based on fertility', async () => {
       const tile = createTile('grass', 'plains');
 
       soilSystem.tillTile(world, tile, 5, 5);
@@ -251,7 +252,7 @@ describe('Tilling Action', () => {
   });
 
   describe('Acceptance Criterion 7: EventBus Integration', () => {
-    it('should emit soil:tilled event when tilling succeeds', () => {
+    it('should emit soil:tilled event when tilling succeeds', async () => {
       const tile = createTile('grass', 'plains');
       const handler = vi.fn();
       eventBus.subscribe('soil:tilled', handler);
@@ -262,7 +263,7 @@ describe('Tilling Action', () => {
       expect(handler).toHaveBeenCalled();
     });
 
-    it('should emit soil:tilled event with position data', () => {
+    it('should emit soil:tilled event with position data', async () => {
       const tile = createTile('grass', 'plains');
       const handler = vi.fn();
       eventBus.subscribe('soil:tilled', handler);
@@ -281,7 +282,7 @@ describe('Tilling Action', () => {
       );
     });
 
-    it('should emit soil:tilled event with fertility data', () => {
+    it('should emit soil:tilled event with fertility data', async () => {
       const tile = createTile('grass', 'plains');
       const handler = vi.fn();
       eventBus.subscribe('soil:tilled', handler);
@@ -302,7 +303,7 @@ describe('Tilling Action', () => {
       expect(tile.fertility).toBeGreaterThan(0);
     });
 
-    it('should emit soil:tilled event with biome data', () => {
+    it('should emit soil:tilled event with biome data', async () => {
       const tile = createTile('grass', 'plains');
       const handler = vi.fn();
       eventBus.subscribe('soil:tilled', handler);
@@ -325,7 +326,7 @@ describe('Tilling Action', () => {
   });
 
   describe('Acceptance Criterion 8: Fertility by Biome', () => {
-    it('should set fertility 70-80 for plains biome', () => {
+    it('should set fertility 70-80 for plains biome', async () => {
       const tile = createTile('grass', 'plains');
 
       soilSystem.tillTile(world, tile, 5, 5);
@@ -334,7 +335,7 @@ describe('Tilling Action', () => {
       expect(tile.fertility).toBeLessThanOrEqual(80);
     });
 
-    it('should set fertility 60-70 for forest biome', () => {
+    it('should set fertility 60-70 for forest biome', async () => {
       const tile = createTile('grass', 'forest');
 
       soilSystem.tillTile(world, tile, 5, 5);
@@ -343,7 +344,7 @@ describe('Tilling Action', () => {
       expect(tile.fertility).toBeLessThanOrEqual(70);
     });
 
-    it('should set fertility 80-90 for river biome', () => {
+    it('should set fertility 80-90 for river biome', async () => {
       const tile = createTile('grass', 'river');
 
       soilSystem.tillTile(world, tile, 5, 5);
@@ -352,7 +353,7 @@ describe('Tilling Action', () => {
       expect(tile.fertility).toBeLessThanOrEqual(90);
     });
 
-    it('should set fertility 20-30 for desert biome', () => {
+    it('should set fertility 20-30 for desert biome', async () => {
       const tile = createTile('grass', 'desert');
 
       soilSystem.tillTile(world, tile, 5, 5);
@@ -361,7 +362,7 @@ describe('Tilling Action', () => {
       expect(tile.fertility).toBeLessThanOrEqual(30);
     });
 
-    it('should set fertility 40-50 for mountains biome', () => {
+    it('should set fertility 40-50 for mountains biome', async () => {
       const tile = createTile('grass', 'mountains');
 
       soilSystem.tillTile(world, tile, 5, 5);
@@ -370,7 +371,7 @@ describe('Tilling Action', () => {
       expect(tile.fertility).toBeLessThanOrEqual(50);
     });
 
-    it('should set fertility 0 for ocean biome (not tillable)', () => {
+    it('should set fertility 0 for ocean biome (not tillable)', async () => {
       const tile = createTile('grass', 'ocean');
 
       soilSystem.tillTile(world, tile, 5, 5);
@@ -380,14 +381,14 @@ describe('Tilling Action', () => {
   });
 
   describe('Acceptance Criterion 9: Action Queue Processing', () => {
-    it('should recognize till action type in ActionHandler', () => {
+    it('should recognize till action type in ActionHandler', async () => {
       // This will be implemented when ActionHandler is updated
       // For now, verify the action structure is valid
       const action = { type: 'till', position: { x: 5, y: 5 } };
       expect(isValidAction(action)).toBe(true);
     });
 
-    it('should extract position from till action', () => {
+    it('should extract position from till action', async () => {
       const action = { type: 'till' as const, position: { x: 10, y: 15 } };
       expect(action.position.x).toBe(10);
       expect(action.position.y).toBe(15);
@@ -443,7 +444,7 @@ describe('Tilling Action', () => {
       );
     });
 
-    it('should extract position from till response', () => {
+    it('should extract position from till response', async () => {
       // This will be implemented when parseAction is updated
       // For now, verify we can handle position context
       const action = parseAction('I will till at position 5,5');
@@ -453,7 +454,7 @@ describe('Tilling Action', () => {
   });
 
   describe('Acceptance Criterion 11: CLAUDE.md Compliance - No Silent Fallbacks', () => {
-    it('should throw when tile is null/undefined', () => {
+    it('should throw when tile is null/undefined', async () => {
       // Testing null validation: use unknown pattern per CLAUDE.md type safety guidelines
       const invalidTile: unknown = null;
       expect(() => {
@@ -461,7 +462,7 @@ describe('Tilling Action', () => {
       }).toThrow();
     });
 
-    it('should throw when position is invalid', () => {
+    it('should throw when position is invalid', async () => {
       const tile = createTile('grass', 'plains');
 
       expect(() => {
@@ -469,7 +470,7 @@ describe('Tilling Action', () => {
       }).toThrow();
     });
 
-    it('should throw clear error message for invalid terrain', () => {
+    it('should throw clear error message for invalid terrain', async () => {
       const tile = createTile('stone', 'mountains');
 
       expect(() => {
@@ -477,7 +478,7 @@ describe('Tilling Action', () => {
       }).toThrow(/Cannot till .* terrain/);
     });
 
-    it('should NOT use fallback fertility values', () => {
+    it('should NOT use fallback fertility values', async () => {
       const tile = createTile('grass', 'plains');
 
       soilSystem.tillTile(world, tile, 5, 5);
@@ -487,7 +488,7 @@ describe('Tilling Action', () => {
       expect(tile.fertility).toBeGreaterThanOrEqual(70);
     });
 
-    it('should NOT catch and swallow errors', () => {
+    it('should NOT catch and swallow errors', async () => {
       const tile = createTile('water', 'river');
 
       // Error should propagate, not be caught silently
@@ -498,7 +499,7 @@ describe('Tilling Action', () => {
   });
 
   describe('Acceptance Criterion 12: Idempotency - Re-tilling', () => {
-    it('should allow re-tilling an already-tilled depleted tile', () => {
+    it('should allow re-tilling an already-tilled depleted tile', async () => {
       const tile = createTile('grass', 'plains');
 
       // First tilling
@@ -514,7 +515,7 @@ describe('Tilling Action', () => {
       expect(tile.plantability).toBe(3); // Reset to 3
     });
 
-    it('should reset plantability counter to 3 when re-tilling', () => {
+    it('should reset plantability counter to 3 when re-tilling', async () => {
       const tile = createTile('dirt', 'plains');
       tile.tilled = true;
       tile.plantability = 0; // Depleted
@@ -524,7 +525,7 @@ describe('Tilling Action', () => {
       expect(tile.plantability).toBe(3);
     });
 
-    it('should refresh fertility when re-tilling', () => {
+    it('should refresh fertility when re-tilling', async () => {
       const tile = createTile('dirt', 'plains');
       tile.tilled = true;
       tile.fertility = 30; // Depleted
@@ -535,7 +536,7 @@ describe('Tilling Action', () => {
       expect(tile.fertility).toBeGreaterThanOrEqual(70);
     });
 
-    it('should emit tilling event when re-tilling', () => {
+    it('should emit tilling event when re-tilling', async () => {
       const tile = createTile('dirt', 'plains');
       tile.tilled = true;
       const handler = vi.fn();
@@ -549,7 +550,7 @@ describe('Tilling Action', () => {
   });
 
   describe('Edge Cases', () => {
-    it('should throw error when tilling tile without biome (CLAUDE.md)', () => {
+    it('should throw error when tilling tile without biome (CLAUDE.md)', async () => {
       const tile = createTile('grass', 'plains');
       tile.biome = undefined;
 
@@ -559,19 +560,19 @@ describe('Tilling Action', () => {
       );
     });
 
-    it('should handle tilling at negative coordinates', () => {
+    it('should handle tilling at negative coordinates', async () => {
       const tile = createTile('grass', 'plains');
 
       expect(() => soilSystem.tillTile(world, tile, -5, -5)).not.toThrow();
     });
 
-    it('should handle tilling at large coordinates', () => {
+    it('should handle tilling at large coordinates', async () => {
       const tile = createTile('grass', 'plains');
 
       expect(() => soilSystem.tillTile(world, tile, 1000, 1000)).not.toThrow();
     });
 
-    it('should preserve existing moisture when tilling', () => {
+    it('should preserve existing moisture when tilling', async () => {
       const tile = createTile('grass', 'plains');
       tile.moisture = 75;
 
@@ -580,7 +581,7 @@ describe('Tilling Action', () => {
       expect(tile.moisture).toBe(75);
     });
 
-    it('should reset fertilizer state when tilling', () => {
+    it('should reset fertilizer state when tilling', async () => {
       const tile = createTile('dirt', 'plains');
       tile.fertilized = true;
       tile.fertilizerDuration = 100;
@@ -594,7 +595,7 @@ describe('Tilling Action', () => {
   });
 
   describe('Integration with Other Systems', () => {
-    it('should work with PlantSystem (planted flag check)', () => {
+    it('should work with PlantSystem (planted flag check)', async () => {
       const tile = createTile('grass', 'plains');
 
       soilSystem.tillTile(world, tile, 5, 5);
@@ -604,7 +605,7 @@ describe('Tilling Action', () => {
       expect(tile.plantability).toBeGreaterThan(0);
     });
 
-    it('should work with WaterSystem (moisture tracking)', () => {
+    it('should work with WaterSystem (moisture tracking)', async () => {
       const tile = createTile('grass', 'plains');
 
       soilSystem.tillTile(world, tile, 5, 5);
@@ -613,7 +614,7 @@ describe('Tilling Action', () => {
       expect(tile.moisture).toBeDefined();
     });
 
-    it('should work with WeatherSystem (rain effects)', () => {
+    it('should work with WeatherSystem (rain effects)', async () => {
       const tile = createTile('grass', 'plains');
 
       soilSystem.tillTile(world, tile, 5, 5);

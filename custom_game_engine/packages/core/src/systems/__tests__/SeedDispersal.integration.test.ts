@@ -71,10 +71,11 @@ describe('Seed Dispersal Integration (Bug Fix Verification)', () => {
     }
   };
 
-  beforeEach(() => {
+  beforeEach(async () => {
     eventBus = new EventBusImpl();
     world = new World(eventBus);
     plantSystem = new PlantSystem(eventBus);
+    await plantSystem.initialize(world, eventBus);
 
     plantSystem.setSpeciesLookup((id: string) => {
       if (id === 'grass') return grassSpecies;
@@ -82,7 +83,7 @@ describe('Seed Dispersal Integration (Bug Fix Verification)', () => {
     });
   });
 
-  it('should emit seed:dispersed event WITH seed object (NOT undefined)', () => {
+  it('should emit seed:dispersed event WITH seed object (NOT undefined)', async () => {
     // This test verifies the critical bug fix:
     // Before fix: PlantSystem emitted seed:dispersed WITHOUT seed object
     // After fix: PlantSystem creates seed via createSeedFromPlant() before emit
@@ -153,7 +154,7 @@ describe('Seed Dispersal Integration (Bug Fix Verification)', () => {
     }
   });
 
-  it('should seed object have required genetics field', () => {
+  it('should seed object have required genetics field', async () => {
     // Verifies that seed.genetics is present and accessible
     // Bug was: main.ts tried to access seed.genetics, but seed was undefined
 
@@ -228,7 +229,7 @@ describe('Seed Dispersal Integration (Bug Fix Verification)', () => {
     }
   });
 
-  it('should seed inherit genetics from parent plant', () => {
+  it('should seed inherit genetics from parent plant', async () => {
     // Verifies genetic inheritance works correctly
 
     const parentGenetics = {
@@ -301,7 +302,7 @@ describe('Seed Dispersal Integration (Bug Fix Verification)', () => {
     }
   });
 
-  it('should event handler not crash when accessing seed properties', () => {
+  it('should event handler not crash when accessing seed properties', async () => {
     // Simulates what main.ts does in the seed:dispersed event handler
     // Before fix: Would crash with "Cannot read properties of undefined"
     // After fix: Should work without errors
@@ -369,7 +370,7 @@ describe('Seed Dispersal Integration (Bug Fix Verification)', () => {
     }).not.toThrow();
   });
 
-  it('should seed have quality, viability, and vigor calculated', () => {
+  it('should seed have quality, viability, and vigor calculated', async () => {
     // Verifies that createSeedFromPlant() properly calculates seed attributes
 
     const plant = new PlantComponent({

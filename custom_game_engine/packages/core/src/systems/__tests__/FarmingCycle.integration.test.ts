@@ -23,13 +23,15 @@ import { EventBusImpl } from '../events/EventBus.js';
 describe('Complete Farming Cycle Integration', () => {
   let harness: IntegrationTestHarness;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     harness = createMinimalWorld();
   });
 
-  it('should plant system process plants over time', () => {
+  it('should plant system process plants over time', async () => {
     const plantSystem = new PlantSystem(harness.eventBus);
+    await plantSystem.initialize(harness.world, harness.eventBus);
     const timeSystem = new TimeSystem();
+    await timeSystem.initialize(harness.world, harness.eventBus);
 
     harness.registerSystem('PlantSystem', plantSystem);
     harness.registerSystem('TimeSystem', timeSystem);
@@ -49,8 +51,9 @@ describe('Complete Farming Cycle Integration', () => {
     expect(harness.world.tick).toBeGreaterThanOrEqual(initialTick);
   });
 
-  it('should soil system manage moisture and nutrients', () => {
+  it('should soil system manage moisture and nutrients', async () => {
     const soilSystem = new SoilSystem(harness.eventBus);
+    await soilSystem.initialize(harness.world, harness.eventBus);
     harness.registerSystem('SoilSystem', soilSystem);
 
     harness.clearEvents();
@@ -66,9 +69,11 @@ describe('Complete Farming Cycle Integration', () => {
     expect(entities).toBeDefined();
   });
 
-  it('should weather affect soil moisture', () => {
+  it('should weather affect soil moisture', async () => {
     const soilSystem = new SoilSystem(harness.eventBus);
+    await soilSystem.initialize(harness.world, harness.eventBus);
     const weatherSystem = new WeatherSystem(harness.eventBus);
+    await weatherSystem.initialize(harness.world, harness.eventBus);
 
     harness.registerSystem('SoilSystem', soilSystem);
     harness.registerSystem('WeatherSystem', weatherSystem);
@@ -94,9 +99,11 @@ describe('Complete Farming Cycle Integration', () => {
     expect(rainEvents[0].data.intensity).toBe('moderate');
   });
 
-  it('should time progression trigger plant growth', () => {
+  it('should time progression trigger plant growth', async () => {
     const plantSystem = new PlantSystem(harness.eventBus);
+    await plantSystem.initialize(harness.world, harness.eventBus);
     const timeSystem = new TimeSystem();
+    await timeSystem.initialize(harness.world, harness.eventBus);
 
     harness.registerSystem('PlantSystem', plantSystem);
     harness.registerSystem('TimeSystem', timeSystem);
@@ -118,8 +125,9 @@ describe('Complete Farming Cycle Integration', () => {
     expect(plantEvents.length).toBeGreaterThanOrEqual(0);
   });
 
-  it('should soil nutrients deplete with plant growth', () => {
+  it('should soil nutrients deplete with plant growth', async () => {
     const soilSystem = new SoilSystem(harness.eventBus);
+    await soilSystem.initialize(harness.world, harness.eventBus);
     harness.registerSystem('SoilSystem', soilSystem);
 
     harness.clearEvents();
@@ -136,8 +144,9 @@ describe('Complete Farming Cycle Integration', () => {
     expect(depletedEvents.length).toBeGreaterThanOrEqual(0);
   });
 
-  it('should watering increase soil moisture', () => {
+  it('should watering increase soil moisture', async () => {
     const soilSystem = new SoilSystem(harness.eventBus);
+    await soilSystem.initialize(harness.world, harness.eventBus);
     harness.registerSystem('SoilSystem', soilSystem);
 
     harness.clearEvents();
@@ -162,8 +171,9 @@ describe('Complete Farming Cycle Integration', () => {
     expect(wateredEvents[0].data.amount).toBe(50);
   });
 
-  it('should fertilizing boost soil nutrients', () => {
+  it('should fertilizing boost soil nutrients', async () => {
     const soilSystem = new SoilSystem(harness.eventBus);
+    await soilSystem.initialize(harness.world, harness.eventBus);
     harness.registerSystem('SoilSystem', soilSystem);
 
     harness.clearEvents();
@@ -190,8 +200,9 @@ describe('Complete Farming Cycle Integration', () => {
     expect(fertilizedEvents[0].data.nutrientBoost).toBe(30);
   });
 
-  it('should tilling prepare soil for planting', () => {
+  it('should tilling prepare soil for planting', async () => {
     const soilSystem = new SoilSystem(harness.eventBus);
+    await soilSystem.initialize(harness.world, harness.eventBus);
     harness.registerSystem('SoilSystem', soilSystem);
 
     harness.clearEvents();
@@ -215,10 +226,13 @@ describe('Complete Farming Cycle Integration', () => {
     expect(tilledEvents.length).toBeGreaterThan(0);
   });
 
-  it('should harvest cycle complete from seed to harvest', () => {
+  it('should harvest cycle complete from seed to harvest', async () => {
     const plantSystem = new PlantSystem(harness.eventBus);
+    await plantSystem.initialize(harness.world, harness.eventBus);
     const soilSystem = new SoilSystem(harness.eventBus);
+    await soilSystem.initialize(harness.world, harness.eventBus);
     const timeSystem = new TimeSystem();
+    await timeSystem.initialize(harness.world, harness.eventBus);
 
     harness.registerSystem('PlantSystem', plantSystem);
     harness.registerSystem('SoilSystem', soilSystem);
@@ -243,9 +257,11 @@ describe('Complete Farming Cycle Integration', () => {
     expect(harvestEvents.length).toBeGreaterThanOrEqual(0);
   });
 
-  it('should multiple crops grow independently', () => {
+  it('should multiple crops grow independently', async () => {
     const plantSystem = new PlantSystem(harness.eventBus);
+    await plantSystem.initialize(harness.world, harness.eventBus);
     const timeSystem = new TimeSystem();
+    await timeSystem.initialize(harness.world, harness.eventBus);
 
     harness.registerSystem('PlantSystem', plantSystem);
     harness.registerSystem('TimeSystem', timeSystem);
@@ -262,9 +278,11 @@ describe('Complete Farming Cycle Integration', () => {
     expect(entities.length).toBeGreaterThanOrEqual(0);
   });
 
-  it('should weather system integrate with farming', () => {
+  it('should weather system integrate with farming', async () => {
     const weatherSystem = new WeatherSystem(harness.eventBus);
+    await weatherSystem.initialize(harness.world, harness.eventBus);
     const soilSystem = new SoilSystem(harness.eventBus);
+    await soilSystem.initialize(harness.world, harness.eventBus);
 
     harness.registerSystem('WeatherSystem', weatherSystem);
     harness.registerSystem('SoilSystem', soilSystem);
@@ -285,9 +303,11 @@ describe('Complete Farming Cycle Integration', () => {
     expect(entities).toBeDefined();
   });
 
-  it('should plant health affected by soil conditions', () => {
+  it('should plant health affected by soil conditions', async () => {
     const plantSystem = new PlantSystem(harness.eventBus);
+    await plantSystem.initialize(harness.world, harness.eventBus);
     const soilSystem = new SoilSystem(harness.eventBus);
+    await soilSystem.initialize(harness.world, harness.eventBus);
 
     harness.registerSystem('PlantSystem', plantSystem);
     harness.registerSystem('SoilSystem', soilSystem);

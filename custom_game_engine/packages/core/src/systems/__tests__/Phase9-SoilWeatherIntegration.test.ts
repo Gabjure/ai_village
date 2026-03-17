@@ -41,19 +41,22 @@ describe('Phase 9: Soil + Weather Integration', () => {
   let weatherSystem: WeatherSystem;
   let temperatureSystem: TemperatureSystem;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     eventBus = new EventBusImpl();
     _world = new World(eventBus);
     soilSystem = new SoilSystem();
+    await soilSystem.initialize(_world, eventBus);
     weatherSystem = new WeatherSystem();
+    await weatherSystem.initialize(_world, eventBus);
     temperatureSystem = new TemperatureSystem();
+    await temperatureSystem.initialize(_world, eventBus);
 
     // Systems are instantiated but don't need to be registered in tests
     // Tests will call system methods directly
   });
 
   describe('Rain → Soil Moisture', () => {
-    it('should increase soil moisture when rain event occurs', () => {
+    it('should increase soil moisture when rain event occurs', async () => {
       // SoilSystem subscribes to weather:changed events and calls applyRain
       const world = new World(eventBus);
       const tile = {
@@ -78,7 +81,7 @@ describe('Phase 9: Soil + Weather Integration', () => {
       expect(tile.moisture).toBe(70);
     });
 
-    it('should increase moisture by +40 for standard rain', () => {
+    it('should increase moisture by +40 for standard rain', async () => {
       const world = new World(eventBus);
       const tile = {
         terrain: 'dirt',
@@ -101,7 +104,7 @@ describe('Phase 9: Soil + Weather Integration', () => {
       expect(tile.moisture).toBe(90);
     });
 
-    it('should increase moisture by +20 for snow', () => {
+    it('should increase moisture by +20 for snow', async () => {
       const world = new World(eventBus);
       const tile = {
         terrain: 'dirt',
@@ -124,7 +127,7 @@ describe('Phase 9: Soil + Weather Integration', () => {
       expect(tile.moisture).toBe(70);
     });
 
-    it('should cap moisture at 100 during heavy rain', () => {
+    it('should cap moisture at 100 during heavy rain', async () => {
       const world = new World(eventBus);
       const tile = {
         terrain: 'dirt',
@@ -152,7 +155,7 @@ describe('Phase 9: Soil + Weather Integration', () => {
       // The filtering logic exists in handleRainEvent but needs chunk manager
     });
 
-    it('should scale rain moisture by intensity', () => {
+    it('should scale rain moisture by intensity', async () => {
       const world = new World(eventBus);
 
       // Test light rain (0.3 intensity)
@@ -194,7 +197,7 @@ describe('Phase 9: Soil + Weather Integration', () => {
   });
 
   describe('Temperature → Evaporation Rate', () => {
-    it('should increase evaporation in hot temperatures', () => {
+    it('should increase evaporation in hot temperatures', async () => {
       const world = new World(eventBus);
       // Create time entity for season
       const timeEntity = world.createEntity();
@@ -233,7 +236,7 @@ describe('Phase 9: Soil + Weather Integration', () => {
       expect(tile.moisture).toBe(85);
     });
 
-    it('should decrease evaporation in cold temperatures', () => {
+    it('should decrease evaporation in cold temperatures', async () => {
       const world = new World(eventBus);
       const timeEntity = world.createEntity();
       timeEntity.addComponent({
@@ -271,7 +274,7 @@ describe('Phase 9: Soil + Weather Integration', () => {
       expect(tile.moisture).toBe(95);
     });
 
-    it('should apply +50% evaporation modifier in hot weather', () => {
+    it('should apply +50% evaporation modifier in hot weather', async () => {
       const world = new World(eventBus);
       const timeEntity = world.createEntity();
       timeEntity.addComponent({
@@ -325,7 +328,7 @@ describe('Phase 9: Soil + Weather Integration', () => {
       expect(coldTile.moisture - hotTile.moisture).toBe(5); // 50% more evaporation
     });
 
-    it('should apply -50% evaporation modifier in cold weather', () => {
+    it('should apply -50% evaporation modifier in cold weather', async () => {
       const world = new World(eventBus);
       const timeEntity = world.createEntity();
       timeEntity.addComponent({
@@ -381,7 +384,7 @@ describe('Phase 9: Soil + Weather Integration', () => {
   });
 
   describe('Season → Moisture Decay', () => {
-    it('should increase evaporation in summer (+25%)', () => {
+    it('should increase evaporation in summer (+25%)', async () => {
       // Summer: 1.25x decay multiplier
       // Setup: Create world with summer season
       const world = new World(eventBus);
@@ -422,7 +425,7 @@ describe('Phase 9: Soil + Weather Integration', () => {
       expect(tile.moisture).toBe(100 - 12.5);
     });
 
-    it('should decrease evaporation in winter (-50%)', () => {
+    it('should decrease evaporation in winter (-50%)', async () => {
       // Winter: 0.5x decay multiplier
       const world = new World(eventBus);
       const timeEntity = world.createEntity();
@@ -460,7 +463,7 @@ describe('Phase 9: Soil + Weather Integration', () => {
       expect(tile.moisture).toBe(100 - 5);
     });
 
-    it('should apply normal evaporation in spring', () => {
+    it('should apply normal evaporation in spring', async () => {
       // Spring: 1.0x decay multiplier
       const world = new World(eventBus);
       const timeEntity = world.createEntity();
@@ -498,7 +501,7 @@ describe('Phase 9: Soil + Weather Integration', () => {
       expect(tile.moisture).toBe(100 - 10);
     });
 
-    it('should apply normal evaporation in fall', () => {
+    it('should apply normal evaporation in fall', async () => {
       // Fall: 1.0x decay multiplier
       const world = new World(eventBus);
       const timeEntity = world.createEntity();
@@ -552,7 +555,7 @@ describe('Phase 9: Soil + Weather Integration', () => {
   });
 
   describe('Event Flow Integration', () => {
-    it('should listen for weather:changed event', () => {
+    it('should listen for weather:changed event', async () => {
       const handler = vi.fn();
       eventBus.subscribe('weather:changed', handler);
 
@@ -566,7 +569,7 @@ describe('Phase 9: Soil + Weather Integration', () => {
       expect(handler).toHaveBeenCalled();
     });
 
-    it('should listen for weather:rain event', () => {
+    it('should listen for weather:rain event', async () => {
       const handler = vi.fn();
       eventBus.subscribe('weather:rain', handler);
 
@@ -580,7 +583,7 @@ describe('Phase 9: Soil + Weather Integration', () => {
       expect(handler).toHaveBeenCalled();
     });
 
-    it('should emit soil:moistureChanged when moisture updates', () => {
+    it('should emit soil:moistureChanged when moisture updates', async () => {
       const handler = vi.fn();
       eventBus.subscribe('soil:moistureChanged', handler);
 
@@ -595,7 +598,7 @@ describe('Phase 9: Soil + Weather Integration', () => {
       expect(handler).toHaveBeenCalled();
     });
 
-    it('should process weather → soil in correct system order', () => {
+    it('should process weather → soil in correct system order', async () => {
       // WeatherSystem should emit events before SoilSystem processes them
       // Verify system priority order: Weather (10) → Temperature (12) → Soil (15)
       expect(weatherSystem.priority).toBeLessThan(temperatureSystem.priority);
@@ -604,7 +607,7 @@ describe('Phase 9: Soil + Weather Integration', () => {
   });
 
   describe('Time-Based Updates', () => {
-    it('should process moisture decay on time:dayStart event', () => {
+    it('should process moisture decay on time:dayStart event', async () => {
       const handler = vi.fn();
       eventBus.subscribe('time:dayStart', handler);
 
@@ -637,7 +640,7 @@ describe('Phase 9: Soil + Weather Integration', () => {
       // TODO: Implement event-based integration layer with proper validation
     });
 
-    it('should NOT use fallback temperature if data missing', () => {
+    it('should NOT use fallback temperature if data missing', async () => {
       // Per CLAUDE.md: no fallback values
       // Missing temperature should throw, not assume 'normal'
       const validateTemp = (temp: any) => {

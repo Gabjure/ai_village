@@ -23,10 +23,11 @@ describe('SvetzRetrievalSystem', () => {
   let system: SvetzRetrievalSystem;
   let eventBus: EventBusImpl;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     eventBus = new EventBusImpl();
     world = new World(eventBus);
     system = new SvetzRetrievalSystem();
+    await system.initialize(world, eventBus);
   });
 
   /**
@@ -87,7 +88,7 @@ describe('SvetzRetrievalSystem', () => {
   }
 
   describe('Mission Initialization', () => {
-    it('should start a Svetz retrieval mission', () => {
+    it('should start a Svetz retrieval mission', async () => {
       const ship = createRetrievalShip('Svetz Alpha');
       const targetBranchId = 'extinct_branch_001';
       const targetSpec: SvetzRetrievalMissionComponent['targetSpec'] = {
@@ -112,7 +113,7 @@ describe('SvetzRetrievalSystem', () => {
       expect(mission?.failedAttempts).toBe(0);
     });
 
-    it('should calculate anchoring capacity based on ship mass', () => {
+    it('should calculate anchoring capacity based on ship mass', async () => {
       // 800 mass = 4 slots (800 / 200)
       const mediumShip = createRetrievalShip('Medium Ship', 800);
       system.startMission(world, mediumShip, 'branch_001', {
@@ -147,7 +148,7 @@ describe('SvetzRetrievalSystem', () => {
       expect(smallMission?.anchoringCapacity).toBe(1);
     });
 
-    it('should reject mission start for non-svetz ships', () => {
+    it('should reject mission start for non-svetz ships', async () => {
       const nonSvetzShip = world.createEntity();
       nonSvetzShip.addComponent<SpaceshipComponent>({
         type: 'spaceship',
@@ -201,7 +202,7 @@ describe('SvetzRetrievalSystem', () => {
   });
 
   describe('Target Specification Types', () => {
-    it('should accept item type targets', () => {
+    it('should accept item type targets', async () => {
       const ship = createRetrievalShip('Svetz Beta');
       const success = system.startMission(world, ship, 'branch_001', {
         type: 'item',
@@ -214,7 +215,7 @@ describe('SvetzRetrievalSystem', () => {
       expect(mission?.targetSpec.type).toBe('item');
     });
 
-    it('should accept entity type targets', () => {
+    it('should accept entity type targets', async () => {
       const ship = createRetrievalShip('Svetz Gamma');
       const success = system.startMission(world, ship, 'branch_002', {
         type: 'entity',
@@ -227,7 +228,7 @@ describe('SvetzRetrievalSystem', () => {
       expect(mission?.targetSpec.type).toBe('entity');
     });
 
-    it('should accept technology type targets', () => {
+    it('should accept technology type targets', async () => {
       const ship = createRetrievalShip('Svetz Delta');
       const success = system.startMission(world, ship, 'branch_003', {
         type: 'technology',
@@ -242,7 +243,7 @@ describe('SvetzRetrievalSystem', () => {
   });
 
   describe('Mission Status', () => {
-    it('should retrieve mission status', () => {
+    it('should retrieve mission status', async () => {
       const ship = createRetrievalShip('Svetz Echo');
       system.startMission(world, ship, 'branch_001', {
         type: 'item',
@@ -256,7 +257,7 @@ describe('SvetzRetrievalSystem', () => {
       expect(status?.phase).toBe('navigating');
     });
 
-    it('should return undefined for ships without mission', () => {
+    it('should return undefined for ships without mission', async () => {
       const ship = createRetrievalShip('Svetz Foxtrot');
 
       const status = system.getMissionStatus(ship);
@@ -266,7 +267,7 @@ describe('SvetzRetrievalSystem', () => {
   });
 
   describe('Retrieved Items', () => {
-    it('should start with empty retrieved items array', () => {
+    it('should start with empty retrieved items array', async () => {
       const ship = createRetrievalShip('Svetz Golf');
       system.startMission(world, ship, 'branch_001', {
         type: 'item',
@@ -278,7 +279,7 @@ describe('SvetzRetrievalSystem', () => {
       expect(items).toHaveLength(0);
     });
 
-    it('should track ship ID in mission component', () => {
+    it('should track ship ID in mission component', async () => {
       const ship = createRetrievalShip('Svetz Hotel');
       system.startMission(world, ship, 'branch_001', {
         type: 'item',
@@ -292,24 +293,24 @@ describe('SvetzRetrievalSystem', () => {
   });
 
   describe('System Metadata', () => {
-    it('should have correct system ID and priority', () => {
+    it('should have correct system ID and priority', async () => {
       expect(system.id).toBe('svetz_retrieval');
       expect(system.priority).toBe(97);
     });
 
-    it('should have correct activation components', () => {
+    it('should have correct activation components', async () => {
       expect(system.activationComponents).toContain(CT.Spaceship);
       expect(system.activationComponents).toContain(CT.SvetzRetrievalMission);
     });
 
-    it('should have correct metadata category', () => {
+    it('should have correct metadata category', async () => {
       expect(system.metadata.category).toBe('infrastructure');
       expect(system.metadata.description).toContain('svetz_retrieval');
     });
   });
 
   describe('Mission Failure Tracking', () => {
-    it('should start with zero failed attempts', () => {
+    it('should start with zero failed attempts', async () => {
       const ship = createRetrievalShip('Svetz India');
       system.startMission(world, ship, 'branch_001', {
         type: 'item',
@@ -322,7 +323,7 @@ describe('SvetzRetrievalSystem', () => {
       expect(mission?.lastFailureReason).toBeUndefined();
     });
 
-    it('should start with zero contamination', () => {
+    it('should start with zero contamination', async () => {
       const ship = createRetrievalShip('Svetz Juliet');
       system.startMission(world, ship, 'branch_001', {
         type: 'item',

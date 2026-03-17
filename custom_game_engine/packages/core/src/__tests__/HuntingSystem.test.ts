@@ -17,7 +17,7 @@ describe('HuntingSystem', () => {
       narrative: 'The hunter tracked the prey through the forest.',
       memorable_details: ['successful hunt'],
     });
-    system = new HuntingSystem(eventBus, mockLLM);
+    system = new HuntingSystem(mockLLM);
     await system.initialize(world, eventBus);
 
     // Create hunter entity

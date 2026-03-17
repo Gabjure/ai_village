@@ -50,7 +50,7 @@ function makePackGroup(maxSize = 8): AnimalGroupComponent {
 // ---------------------------------------------------------------------------
 
 describe('AnimalGroupComponent constructor', () => {
-  it('creates a valid component with required fields', () => {
+  it('creates a valid component with required fields', async () => {
     const group = new AnimalGroupComponent({
       groupType: 'pack',
       members: [],
@@ -66,7 +66,7 @@ describe('AnimalGroupComponent constructor', () => {
     expect(group.territory).toBeUndefined();
   });
 
-  it('copies members to avoid reference sharing', () => {
+  it('copies members to avoid reference sharing', async () => {
     const originalMembers = [{ entityId: 'e1', rank: 0, joinedAt: 10 }];
     const group = new AnimalGroupComponent({
       groupType: 'herd',
@@ -78,7 +78,7 @@ describe('AnimalGroupComponent constructor', () => {
     expect(group.members[0].rank).toBe(0); // Not mutated
   });
 
-  it('throws when groupType is missing', () => {
+  it('throws when groupType is missing', async () => {
     expect(() =>
       new AnimalGroupComponent({
         groupType: undefined as unknown as 'pack',
@@ -89,7 +89,7 @@ describe('AnimalGroupComponent constructor', () => {
     ).toThrow('AnimalGroupComponent requires "groupType" field');
   });
 
-  it('throws when members is missing', () => {
+  it('throws when members is missing', async () => {
     expect(() =>
       new AnimalGroupComponent({
         groupType: 'pack',
@@ -100,7 +100,7 @@ describe('AnimalGroupComponent constructor', () => {
     ).toThrow('AnimalGroupComponent requires "members" field');
   });
 
-  it('throws when maxSize is missing', () => {
+  it('throws when maxSize is missing', async () => {
     expect(() =>
       new AnimalGroupComponent({
         groupType: 'pack',
@@ -111,7 +111,7 @@ describe('AnimalGroupComponent constructor', () => {
     ).toThrow('AnimalGroupComponent requires "maxSize" field');
   });
 
-  it('throws when cohesion is missing', () => {
+  it('throws when cohesion is missing', async () => {
     expect(() =>
       new AnimalGroupComponent({
         groupType: 'pack',
@@ -128,7 +128,7 @@ describe('AnimalGroupComponent constructor', () => {
 // ---------------------------------------------------------------------------
 
 describe('addMemberToGroup', () => {
-  it('adds a new member and returns true', () => {
+  it('adds a new member and returns true', async () => {
     const group = makePackGroup();
     const result = addMemberToGroup(group, 'wolf-1', 100);
     expect(result).toBe(true);
@@ -138,7 +138,7 @@ describe('addMemberToGroup', () => {
     expect(group.members[0].joinedAt).toBe(100);
   });
 
-  it('assigns sequential ranks to multiple members', () => {
+  it('assigns sequential ranks to multiple members', async () => {
     const group = makePackGroup();
     addMemberToGroup(group, 'wolf-1', 100);
     addMemberToGroup(group, 'wolf-2', 110);
@@ -147,7 +147,7 @@ describe('addMemberToGroup', () => {
     expect(group.members[2].rank).toBe(2);
   });
 
-  it('returns false when group is at max capacity', () => {
+  it('returns false when group is at max capacity', async () => {
     const group = makePackGroup(2);
     addMemberToGroup(group, 'wolf-1', 1);
     addMemberToGroup(group, 'wolf-2', 2);
@@ -156,7 +156,7 @@ describe('addMemberToGroup', () => {
     expect(group.members).toHaveLength(2);
   });
 
-  it('deduplicates — returns false if entity already a member', () => {
+  it('deduplicates — returns false if entity already a member', async () => {
     const group = makePackGroup();
     addMemberToGroup(group, 'wolf-1', 100);
     const result = addMemberToGroup(group, 'wolf-1', 200);
@@ -170,7 +170,7 @@ describe('addMemberToGroup', () => {
 // ---------------------------------------------------------------------------
 
 describe('removeMemberFromGroup', () => {
-  it('removes an existing member and returns true', () => {
+  it('removes an existing member and returns true', async () => {
     const group = makePackGroup();
     addMemberToGroup(group, 'wolf-1', 1);
     addMemberToGroup(group, 'wolf-2', 2);
@@ -180,13 +180,13 @@ describe('removeMemberFromGroup', () => {
     expect(group.members[0].entityId).toBe('wolf-2');
   });
 
-  it('returns false when member not in group', () => {
+  it('returns false when member not in group', async () => {
     const group = makePackGroup();
     const result = removeMemberFromGroup(group, 'ghost');
     expect(result).toBe(false);
   });
 
-  it('re-ranks remaining members after removal', () => {
+  it('re-ranks remaining members after removal', async () => {
     const group = makePackGroup();
     addMemberToGroup(group, 'wolf-1', 1);
     addMemberToGroup(group, 'wolf-2', 2);
@@ -196,7 +196,7 @@ describe('removeMemberFromGroup', () => {
     expect(group.members[1].rank).toBe(1);
   });
 
-  it('updates alphaEntityId when alpha is removed', () => {
+  it('updates alphaEntityId when alpha is removed', async () => {
     const group = new AnimalGroupComponent({
       groupType: 'pack',
       members: [],
@@ -211,7 +211,7 @@ describe('removeMemberFromGroup', () => {
     expect(group.alphaEntityId).toBe('wolf-2');
   });
 
-  it('sets alphaEntityId to undefined when last member removed', () => {
+  it('sets alphaEntityId to undefined when last member removed', async () => {
     const group = new AnimalGroupComponent({
       groupType: 'pack',
       members: [],
@@ -257,12 +257,12 @@ describe('defaultCohesionForGroupType', () => {
 describe('AnimalGroupSystem', () => {
   let system: AnimalGroupSystem;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     system = new AnimalGroupSystem();
   });
 
   describe('createGroup', () => {
-    it('creates a pack group with the founder as alpha at rank 0', () => {
+    it('creates a pack group with the founder as alpha at rank 0', async () => {
       const group = system.createGroup('pack', 'wolf-1', 50);
       expect(group.groupType).toBe('pack');
       expect(group.alphaEntityId).toBe('wolf-1');
@@ -272,7 +272,7 @@ describe('AnimalGroupSystem', () => {
       expect(group.members[0].joinedAt).toBe(50);
     });
 
-    it('sets default maxSize for the group type', () => {
+    it('sets default maxSize for the group type', async () => {
       const pack = system.createGroup('pack', 'wolf-1', 1);
       expect(pack.maxSize).toBe(8);
 
@@ -280,14 +280,14 @@ describe('AnimalGroupSystem', () => {
       expect(herd.maxSize).toBe(30);
     });
 
-    it('sets default cohesion for the group type', () => {
+    it('sets default cohesion for the group type', async () => {
       const colony = system.createGroup('colony', 'bee-1', 1);
       expect(colony.cohesion).toBe(95);
     });
   });
 
   describe('joinGroup', () => {
-    it('adds animal to group and sets animal.groupId', () => {
+    it('adds animal to group and sets animal.groupId', async () => {
       const group = system.createGroup('pack', 'wolf-1', 1);
       const wolf2 = makeAnimalComponent('wolf-2');
       const joined = system.joinGroup(group, 'group-entity-1', wolf2, 10);
@@ -296,7 +296,7 @@ describe('AnimalGroupSystem', () => {
       expect(wolf2.groupId).toBe('group-entity-1');
     });
 
-    it('returns false and does not set groupId when group is full', () => {
+    it('returns false and does not set groupId when group is full', async () => {
       const group = new AnimalGroupComponent({
         groupType: 'pack',
         members: [],
@@ -311,7 +311,7 @@ describe('AnimalGroupSystem', () => {
       expect(wolf.groupId).toBeUndefined();
     });
 
-    it('returns false when animal is already a member', () => {
+    it('returns false when animal is already a member', async () => {
       const group = system.createGroup('pack', 'wolf-1', 1);
       const wolf1 = makeAnimalComponent('wolf-1');
       wolf1.groupId = 'group-entity-1';
@@ -321,7 +321,7 @@ describe('AnimalGroupSystem', () => {
   });
 
   describe('leaveGroup', () => {
-    it('removes animal from group and clears animal.groupId', () => {
+    it('removes animal from group and clears animal.groupId', async () => {
       const group = system.createGroup('pack', 'wolf-1', 1);
       const wolf1 = makeAnimalComponent('wolf-1', 0, 0, 'group-entity-1');
       system.leaveGroup(group, wolf1);
@@ -329,7 +329,7 @@ describe('AnimalGroupSystem', () => {
       expect(wolf1.groupId).toBeUndefined();
     });
 
-    it('updates alpha when alpha leaves', () => {
+    it('updates alpha when alpha leaves', async () => {
       const group = system.createGroup('pack', 'wolf-1', 1);
       const wolf2 = makeAnimalComponent('wolf-2');
       system.joinGroup(group, 'group-entity-1', wolf2, 2);

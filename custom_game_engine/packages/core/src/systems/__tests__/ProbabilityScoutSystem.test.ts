@@ -22,10 +22,11 @@ describe('ProbabilityScoutSystem', () => {
   let system: ProbabilityScoutSystem;
   let eventBus: EventBusImpl;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     eventBus = new EventBusImpl();
     world = new World(eventBus);
     system = new ProbabilityScoutSystem();
+    await system.initialize(world, eventBus);
   });
 
   /**
@@ -86,7 +87,7 @@ describe('ProbabilityScoutSystem', () => {
   }
 
   describe('Mission Initialization', () => {
-    it('should start a probability scout mission', () => {
+    it('should start a probability scout mission', async () => {
       const ship = createScoutShip('Scout Alpha');
 
       const success = system.startMission(world, ship);
@@ -103,7 +104,7 @@ describe('ProbabilityScoutSystem', () => {
       expect(mission?.collapseEventsTriggered).toBe(0);
     });
 
-    it('should start mission with specific target branch', () => {
+    it('should start mission with specific target branch', async () => {
       const ship = createScoutShip('Scout Beta');
       const targetBranchId = 'branch_target_123';
 
@@ -115,7 +116,7 @@ describe('ProbabilityScoutSystem', () => {
       expect(mission?.targetBranchId).toBe(targetBranchId);
     });
 
-    it('should reject mission start for non-scout ships', () => {
+    it('should reject mission start for non-scout ships', async () => {
       const nonScoutShip = world.createEntity();
       nonScoutShip.addComponent<SpaceshipComponent>({
         type: 'spaceship',
@@ -165,7 +166,7 @@ describe('ProbabilityScoutSystem', () => {
   });
 
   describe('Mission Status', () => {
-    it('should retrieve mission status', () => {
+    it('should retrieve mission status', async () => {
       const ship = createScoutShip('Scout Gamma');
       system.startMission(world, ship);
 
@@ -175,7 +176,7 @@ describe('ProbabilityScoutSystem', () => {
       expect(status?.phase).toBe('scanning');
     });
 
-    it('should return undefined for ships without mission', () => {
+    it('should return undefined for ships without mission', async () => {
       const ship = createScoutShip('Scout Delta');
 
       const status = system.getMissionStatus(ship);
@@ -185,7 +186,7 @@ describe('ProbabilityScoutSystem', () => {
   });
 
   describe('Mission Configuration', () => {
-    it('should use observation precision from ship config', () => {
+    it('should use observation precision from ship config', async () => {
       const highPrecisionShip = createScoutShip('High Precision', 0.95);
       system.startMission(world, highPrecisionShip);
 
@@ -193,7 +194,7 @@ describe('ProbabilityScoutSystem', () => {
       expect(mission?.observationPrecision).toBe(0.95);
     });
 
-    it('should track ship ID in mission component', () => {
+    it('should track ship ID in mission component', async () => {
       const ship = createScoutShip('Scout Echo');
       system.startMission(world, ship);
 
@@ -203,24 +204,24 @@ describe('ProbabilityScoutSystem', () => {
   });
 
   describe('System Metadata', () => {
-    it('should have correct system ID and priority', () => {
+    it('should have correct system ID and priority', async () => {
       expect(system.id).toBe('probability_scout');
       expect(system.priority).toBe(96);
     });
 
-    it('should have correct activation components', () => {
+    it('should have correct activation components', async () => {
       expect(system.activationComponents).toContain(CT.Spaceship);
       expect(system.activationComponents).toContain(CT.ProbabilityScoutMission);
     });
 
-    it('should have correct metadata category', () => {
+    it('should have correct metadata category', async () => {
       expect(system.metadata.category).toBe('infrastructure');
       expect(system.metadata.description).toContain('probability_scout');
     });
   });
 
   describe('Contamination and Collapse Risk', () => {
-    it('should start with zero contamination', () => {
+    it('should start with zero contamination', async () => {
       const ship = createScoutShip('Scout Foxtrot');
       system.startMission(world, ship);
 
@@ -228,7 +229,7 @@ describe('ProbabilityScoutSystem', () => {
       expect(mission?.contaminationLevel).toBe(0);
     });
 
-    it('should start with zero collapse events', () => {
+    it('should start with zero collapse events', async () => {
       const ship = createScoutShip('Scout Golf');
       system.startMission(world, ship);
 

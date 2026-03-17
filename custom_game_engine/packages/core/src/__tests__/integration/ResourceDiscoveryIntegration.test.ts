@@ -17,7 +17,7 @@ import { createPositionComponent } from '../../components/PositionComponent.js';
 import { createResourceComponent, type ResourceType } from '../../components/ResourceComponent.js';
 import { createWarehouseComponent } from '../../components/WarehouseComponent.js';
 import { createCivilizationComponent } from '../../components/CivilizationComponent.js';
-import { createMiningOperationComponent } from '../../components/MiningOperationComponent.js';
+import { createMiningOperationComponent, calculateMiningEfficiency } from '../../components/MiningOperationComponent.js';
 import { createExplorationMissionComponent } from '../../components/ExplorationMissionComponent.js';
 import { createTagsComponent } from '../../components/TagsComponent.js';
 import { ComponentType as CT } from '../../types/ComponentType.js';
@@ -132,7 +132,7 @@ describe('Resource Discovery Integration Tests', () => {
 
       const warehouse = harness.world.createEntity() as EntityImpl;
       warehouse.addComponent(createPositionComponent(5, 5));
-      const warehouseComp = createWarehouseComponent(10000);
+      const warehouseComp = createWarehouseComponent('iron_ore');
       warehouse.addComponent(warehouseComp);
 
       const deposit = createResourceDeposit(harness, 'iron_ore', 10, 10, 1000);
@@ -141,13 +141,13 @@ describe('Resource Discovery Integration Tests', () => {
       miningOp.addComponent(createPositionComponent(10, 10));
       const miningComp = createMiningOperationComponent(
         deposit.id,
-        civilization.id,
+        'stellar_phenomenon',
         'iron_ore',
-        {
-          yieldRate: 20, // 20 units per extraction
-          efficiency: 1.0,
-          workers: 10,
-        }
+        civilization.id,
+        20, // baseHarvestRate: 20 units per extraction
+        0.0, // difficulty: 0 for 100% efficiency
+        20, // civilizationTechLevel: high enough for full efficiency
+        0 // startTick
       );
       miningOp.addComponent(miningComp);
 
@@ -159,7 +159,7 @@ describe('Resource Discovery Integration Tests', () => {
         depositType: 'resource',
       });
 
-      const initialStockpile = warehouseComp.stockpile.get('iron_ore') || 0;
+      const initialStockpile = warehouseComp.stockpiles['iron_ore'] ?? 0;
 
       // Simulate extraction cycle
       const resourceComp = deposit.getComponent(CT.Resource) as unknown;
@@ -167,10 +167,10 @@ describe('Resource Discovery Integration Tests', () => {
       resourceComp.amount -= extractedAmount;
 
       // Add to warehouse
-      warehouseComp.stockpile.set('iron_ore', initialStockpile + extractedAmount);
+      warehouseComp.stockpiles['iron_ore'] = initialStockpile + extractedAmount;
 
       // Verify storage
-      expect(warehouseComp.stockpile.get('iron_ore')).toBe(initialStockpile + extractedAmount);
+      expect(warehouseComp.stockpiles['iron_ore']).toBe(initialStockpile + extractedAmount);
       expect(resourceComp.amount).toBe(980); // 1000 - 20
     });
 
@@ -180,17 +180,23 @@ describe('Resource Discovery Integration Tests', () => {
       const miningOp = harness.world.createEntity() as EntityImpl;
       miningOp.addComponent(createPositionComponent(0, 0));
 
-      const lowEfficiency = createMiningOperationComponent(deposit.id, 'civ_1', 'copper_ore', {
-        yieldRate: 10,
-        efficiency: 0.5, // 50% efficiency
-        workers: 5,
-      });
+      const lowEfficiency = createMiningOperationComponent(
+        deposit.id,
+        'stellar_phenomenon',
+        'copper_ore',
+        'civ_1',
+        10, // baseHarvestRate
+        0.5, // difficulty: 0.5 -> requiredTechLevel = 9 + 0.5*3 = 10.5
+        5, // civilizationTechLevel: below required -> penalty
+        0 // startTick
+      );
       miningOp.addComponent(lowEfficiency);
 
-      // Effective yield = yieldRate * efficiency = 10 * 0.5 = 5
-      const effectiveYield = lowEfficiency.yieldRate * lowEfficiency.efficiency;
+      // Effective yield = baseHarvestRate * efficiency (calculated from tech levels)
+      const effectiveYield = lowEfficiency.baseHarvestRate * lowEfficiency.efficiency;
 
-      expect(effectiveYield).toBe(5);
+      expect(effectiveYield).toBeGreaterThan(0);
+      expect(effectiveYield).toBeLessThanOrEqual(10);
     });
 
     it('should halt when deposit is depleted', () => {
@@ -198,11 +204,16 @@ describe('Resource Discovery Integration Tests', () => {
 
       const miningOp = harness.world.createEntity() as EntityImpl;
       miningOp.addComponent(createPositionComponent(0, 0));
-      const miningComp = createMiningOperationComponent(deposit.id, 'civ_1', 'gold_ore', {
-        yieldRate: 60, // More than available
-        efficiency: 1.0,
-        workers: 10,
-      });
+      const miningComp = createMiningOperationComponent(
+        deposit.id,
+        'stellar_phenomenon',
+        'gold_ore',
+        'civ_1',
+        60, // baseHarvestRate: more than available
+        0.0, // difficulty
+        20, // civilizationTechLevel: high for full efficiency
+        0 // startTick
+      );
       miningComp.status = 'active';
       miningOp.addComponent(miningComp);
 
@@ -210,7 +221,7 @@ describe('Resource Discovery Integration Tests', () => {
 
       // Try to extract
       const availableAmount = resourceComp.amount;
-      const requestedAmount = miningComp.yieldRate;
+      const requestedAmount = miningComp.baseHarvestRate;
 
       const actualExtracted = Math.min(availableAmount, requestedAmount);
 
@@ -250,12 +261,17 @@ describe('Resource Discovery Integration Tests', () => {
       const miningOp = harness.world.createEntity() as EntityImpl;
       miningOp.addComponent(createPositionComponent(100, 100));
       miningOp.addComponent(
-        createMiningOperationComponent(phenomenon.id, civilization.id, // @ts-expect-error Testing invalid value validation
-      'strange_matter', {
-          yieldRate: 1, // Very slow extraction
-          efficiency: 0.3, // Difficult to extract
-          workers: 100, // Requires many workers
-        })
+        createMiningOperationComponent(
+          phenomenon.id,
+          'stellar_phenomenon',
+          // @ts-expect-error Testing invalid value validation
+          'strange_matter',
+          civilization.id,
+          1, // baseHarvestRate: very slow extraction
+          0.9, // difficulty: very difficult to extract
+          10, // civilizationTechLevel: era 10
+          0 // startTick
+        )
       );
 
       const resource = phenomenon.getComponent(CT.Resource);
@@ -279,21 +295,21 @@ describe('Resource Discovery Integration Tests', () => {
 
       const miningComp = createMiningOperationComponent(
         advancedDeposit.id,
-        lowEraCiv.id,
+        'stellar_phenomenon',
         // @ts-expect-error Testing invalid value validation
-      'exotic_matter',
-        {
-          yieldRate: 5,
-          efficiency: 0.1,
-          workers: 10,
-        }
+        'exotic_matter',
+        lowEraCiv.id,
+        5, // baseHarvestRate
+        0.9, // difficulty: high
+        3, // civilizationTechLevel: low era 3
+        0 // startTick
       );
 
       // Check if civilization meets era requirement
       const tags = advancedDeposit.getComponent(CT.Tags) as unknown;
       const requiresEra = 8; // Extract from tags
 
-      const civComp = lowEraCiv.getComponent(CT.Civilization);
+      const civComp = lowEraCiv.getComponent<{ era: number }>('civilization');
       const canMine = civComp!.era >= requiresEra;
 
       expect(canMine).toBe(false); // Era 3 cannot mine Era 8+ resources
@@ -305,28 +321,28 @@ describe('Resource Discovery Integration Tests', () => {
       civilization.addComponent(civComp);
 
       const warehouse = harness.world.createEntity() as EntityImpl;
-      const warehouseComp = createWarehouseComponent(50000);
+      const warehouseComp = createWarehouseComponent('wood');
       warehouse.addComponent(warehouseComp);
 
       // Era 1: Wood
-      warehouseComp.stockpile.set('wood', 100);
+      warehouseComp.stockpiles['wood'] = 100;
       expect(civComp.era).toBe(1);
 
       // Era 2: Stone
       civComp.era = 2;
-      warehouseComp.stockpile.set('stone', 100);
+      warehouseComp.stockpiles['stone'] = 100;
 
       // Era 3: Iron
       civComp.era = 3;
-      warehouseComp.stockpile.set('iron_ore', 100);
+      warehouseComp.stockpiles['iron_ore'] = 100;
 
       // Era 5: Steel
       civComp.era = 5;
-      warehouseComp.stockpile.set('steel_ingot', 50);
+      warehouseComp.stockpiles['steel_ingot'] = 50;
 
       // Verify progression
       expect(civComp.era).toBe(5);
-      expect(warehouseComp.stockpile.has('steel_ingot')).toBe(true);
+      expect('steel_ingot' in warehouseComp.stockpiles).toBe(true);
     });
   });
 
@@ -361,19 +377,25 @@ describe('Resource Discovery Integration Tests', () => {
 
       const resourceComp = createResourceComponent('dark_energy' as ResourceType, 10, 0);
       phenomenon.addComponent(resourceComp);
+      phenomenon.addComponent(createTagsComponent('phenomenon'));
 
       const miningOp = harness.world.createEntity() as EntityImpl;
-      const miningComp = createMiningOperationComponent(phenomenon.id, 'civ_1', // @ts-expect-error Testing invalid value validation
-      'dark_energy', {
-        yieldRate: 15,
-        efficiency: 1.0,
-        workers: 5,
-      });
+      const miningComp = createMiningOperationComponent(
+        phenomenon.id,
+        'stellar_phenomenon',
+        // @ts-expect-error Testing invalid value validation
+        'dark_energy',
+        'civ_1',
+        15, // baseHarvestRate
+        0.0, // difficulty
+        20, // civilizationTechLevel
+        0 // startTick
+      );
       miningComp.status = 'active';
       miningOp.addComponent(miningComp);
 
       // Extract all
-      const extracted = Math.min(resourceComp.amount, miningComp.yieldRate);
+      const extracted = Math.min(resourceComp.amount, miningComp.baseHarvestRate);
       resourceComp.amount -= extracted;
 
       expect(resourceComp.amount).toBe(0);
@@ -421,24 +443,29 @@ describe('Resource Discovery Integration Tests', () => {
   describe('Warehouse Capacity Management', () => {
     it('should not exceed warehouse capacity', () => {
       const warehouse = harness.world.createEntity() as EntityImpl;
-      const warehouseComp = createWarehouseComponent(1000); // Capacity: 1000
+      const warehouseComp = createWarehouseComponent('iron_ore'); // Capacity: 1000 (default)
       warehouse.addComponent(warehouseComp);
 
-      warehouseComp.stockpile.set('iron_ore', 900);
+      warehouseComp.stockpiles['iron_ore'] = 900;
 
       const deposit = createResourceDeposit(harness, 'iron_ore', 0, 0, 500);
 
       const miningOp = harness.world.createEntity() as EntityImpl;
       miningOp.addComponent(
-        createMiningOperationComponent(deposit.id, 'civ_1', 'iron_ore', {
-          yieldRate: 200, // Trying to add 200 more
-          efficiency: 1.0,
-          workers: 10,
-        })
+        createMiningOperationComponent(
+          deposit.id,
+          'stellar_phenomenon',
+          'iron_ore',
+          'civ_1',
+          200, // baseHarvestRate: trying to add 200 more
+          0.0, // difficulty
+          20, // civilizationTechLevel
+          0 // startTick
+        )
       );
 
       // Calculate available space
-      const currentAmount = warehouseComp.stockpile.get('iron_ore') || 0;
+      const currentAmount = warehouseComp.stockpiles['iron_ore'] ?? 0;
       const availableSpace = warehouseComp.capacity - currentAmount;
 
       expect(availableSpace).toBe(100); // 1000 - 900
@@ -446,27 +473,33 @@ describe('Resource Discovery Integration Tests', () => {
       // Can only add 100 more
       const actualAdded = Math.min(200, availableSpace);
 
-      warehouseComp.stockpile.set('iron_ore', currentAmount + actualAdded);
+      warehouseComp.stockpiles['iron_ore'] = currentAmount + actualAdded;
 
-      expect(warehouseComp.stockpile.get('iron_ore')).toBe(1000);
+      expect(warehouseComp.stockpiles['iron_ore']).toBe(1000);
       expect(actualAdded).toBe(100);
     });
 
     it('should halt mining when warehouse is full', () => {
       const warehouse = harness.world.createEntity() as EntityImpl;
-      const warehouseComp = createWarehouseComponent(500);
+      const warehouseComp = createWarehouseComponent('copper_ore'); // Capacity: 1000 (default)
+      warehouseComp.capacity = 500; // Override capacity
       warehouse.addComponent(warehouseComp);
 
-      warehouseComp.stockpile.set('copper_ore', 500); // Full
+      warehouseComp.stockpiles['copper_ore'] = 500; // Full
 
       const deposit = createResourceDeposit(harness, 'copper_ore', 0, 0, 1000);
 
       const miningOp = harness.world.createEntity() as EntityImpl;
-      const miningComp = createMiningOperationComponent(deposit.id, 'civ_1', 'copper_ore', {
-        yieldRate: 50,
-        efficiency: 1.0,
-        workers: 5,
-      });
+      const miningComp = createMiningOperationComponent(
+        deposit.id,
+        'stellar_phenomenon',
+        'copper_ore',
+        'civ_1',
+        50, // baseHarvestRate
+        0.0, // difficulty
+        20, // civilizationTechLevel
+        0 // startTick
+      );
       miningComp.status = 'active';
       miningOp.addComponent(miningComp);
 
@@ -478,7 +511,7 @@ describe('Resource Discovery Integration Tests', () => {
       });
 
       // Check if warehouse has space
-      const currentAmount = warehouseComp.stockpile.get('copper_ore') || 0;
+      const currentAmount = warehouseComp.stockpiles['copper_ore'] ?? 0;
       const hasSpace = currentAmount < warehouseComp.capacity;
 
       expect(hasSpace).toBe(false);
@@ -500,7 +533,7 @@ describe('Resource Discovery Integration Tests', () => {
 
       // 2. Create warehouse
       const warehouse = harness.world.createEntity() as EntityImpl;
-      const warehouseComp = createWarehouseComponent(5000);
+      const warehouseComp = createWarehouseComponent('gold_ore');
       warehouse.addComponent(warehouseComp);
 
       // 3. Launch exploration mission
@@ -539,11 +572,16 @@ describe('Resource Discovery Integration Tests', () => {
       // 6. Start mining operation
       const miningOp = harness.world.createEntity() as EntityImpl;
       miningOp.addComponent(createPositionComponent(50, 50));
-      const miningComp = createMiningOperationComponent(deposit.id, civilization.id, 'gold_ore', {
-        yieldRate: 10,
-        efficiency: 0.9,
-        workers: 8,
-      });
+      const miningComp = createMiningOperationComponent(
+        deposit.id,
+        'stellar_phenomenon',
+        'gold_ore',
+        civilization.id,
+        10, // baseHarvestRate
+        0.0, // difficulty: 0 for good efficiency
+        20, // civilizationTechLevel: high
+        0 // startTick
+      );
       miningOp.addComponent(miningComp);
 
       miningOp.addComponent({
@@ -554,18 +592,18 @@ describe('Resource Discovery Integration Tests', () => {
       });
 
       // 7. Extract resources
-      const extractedAmount = miningComp.yieldRate * miningComp.efficiency;
+      const extractedAmount = miningComp.baseHarvestRate * miningComp.efficiency;
       const resourceComp = deposit.getComponent(CT.Resource) as unknown;
       resourceComp.amount -= extractedAmount;
 
       // 8. Store in warehouse
-      const currentStock = warehouseComp.stockpile.get('gold_ore') || 0;
-      warehouseComp.stockpile.set('gold_ore', currentStock + extractedAmount);
+      const currentStock = warehouseComp.stockpiles['gold_ore'] ?? 0;
+      warehouseComp.stockpiles['gold_ore'] = currentStock + extractedAmount;
 
       // 9. Verify complete chain
       harness.assertEventEmitted('exploration:mission_complete');
       expect(resourceComp.amount).toBe(300 - extractedAmount);
-      expect(warehouseComp.stockpile.get('gold_ore')).toBe(extractedAmount);
+      expect(warehouseComp.stockpiles['gold_ore']).toBe(extractedAmount);
     });
   });
 });

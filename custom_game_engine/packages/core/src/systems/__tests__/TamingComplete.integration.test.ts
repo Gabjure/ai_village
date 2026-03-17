@@ -21,12 +21,13 @@ import { ComponentType } from '../../types/ComponentType.js';
 describe('TamingSystem + AnimalSystem + InventorySystem Integration', () => {
   let harness: IntegrationTestHarness;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     harness = createMinimalWorld();
   });
 
-  it('should successful taming mark animal as domesticated', () => {
+  it('should successful taming mark animal as domesticated', async () => {
     const tamingSystem = new TamingSystem();
+    await tamingSystem.initialize(harness.world, harness.eventBus);
     harness.registerSystem('TamingSystem', tamingSystem);
 
     const animal = harness.createTestAnimal('chicken', { x: 10, y: 10 });
@@ -74,8 +75,9 @@ describe('TamingSystem + AnimalSystem + InventorySystem Integration', () => {
     }
   });
 
-  it('should taming already tamed animal fail', () => {
+  it('should taming already tamed animal fail', async () => {
     const tamingSystem = new TamingSystem();
+    await tamingSystem.initialize(harness.world, harness.eventBus);
     harness.registerSystem('TamingSystem', tamingSystem);
 
     const animalComponent = {
@@ -112,8 +114,9 @@ describe('TamingSystem + AnimalSystem + InventorySystem Integration', () => {
     expect(result.reason).toContain('already tamed');
   });
 
-  it('should failed taming still increase trust', () => {
+  it('should failed taming still increase trust', async () => {
     const tamingSystem = new TamingSystem();
+    await tamingSystem.initialize(harness.world, harness.eventBus);
     harness.registerSystem('TamingSystem', tamingSystem);
 
     const animalComponent = {
@@ -155,8 +158,9 @@ describe('TamingSystem + AnimalSystem + InventorySystem Integration', () => {
     expect(animalComponent.trustLevel).toBeGreaterThan(initialTrust);
   });
 
-  it('should rescue method be very effective', () => {
+  it('should rescue method be very effective', async () => {
     const tamingSystem = new TamingSystem();
+    await tamingSystem.initialize(harness.world, harness.eventBus);
     harness.registerSystem('TamingSystem', tamingSystem);
 
     const animalComponent = {
@@ -194,8 +198,9 @@ describe('TamingSystem + AnimalSystem + InventorySystem Integration', () => {
     expect(result.success !== undefined).toBe(true);
   });
 
-  it('should raising from birth be most effective', () => {
+  it('should raising from birth be most effective', async () => {
     const tamingSystem = new TamingSystem();
+    await tamingSystem.initialize(harness.world, harness.eventBus);
     harness.registerSystem('TamingSystem', tamingSystem);
 
     const animalComponent = {
@@ -233,8 +238,9 @@ describe('TamingSystem + AnimalSystem + InventorySystem Integration', () => {
     expect(result.success !== undefined).toBe(true);
   });
 
-  it('should interacting with tamed animal build bond', () => {
+  it('should interacting with tamed animal build bond', async () => {
     const tamingSystem = new TamingSystem();
+    await tamingSystem.initialize(harness.world, harness.eventBus);
     harness.registerSystem('TamingSystem', tamingSystem);
 
     const agent = harness.createTestAgent({ x: 10, y: 10 });
@@ -278,8 +284,9 @@ describe('TamingSystem + AnimalSystem + InventorySystem Integration', () => {
     expect(animalComponent.bondLevel).toBeGreaterThan(initialBond);
   });
 
-  it('should interacting with wild animal fail', () => {
+  it('should interacting with wild animal fail', async () => {
     const tamingSystem = new TamingSystem();
+    await tamingSystem.initialize(harness.world, harness.eventBus);
     harness.registerSystem('TamingSystem', tamingSystem);
 
     const agent = harness.createTestAgent({ x: 10, y: 10 });
@@ -316,8 +323,9 @@ describe('TamingSystem + AnimalSystem + InventorySystem Integration', () => {
     expect(result.reason).toContain('wild');
   });
 
-  it('should non-owner cannot interact with tamed animal', () => {
+  it('should non-owner cannot interact with tamed animal', async () => {
     const tamingSystem = new TamingSystem();
+    await tamingSystem.initialize(harness.world, harness.eventBus);
     harness.registerSystem('TamingSystem', tamingSystem);
 
     const owner = harness.createTestAgent({ x: 10, y: 10 });
@@ -357,8 +365,9 @@ describe('TamingSystem + AnimalSystem + InventorySystem Integration', () => {
     expect(result.reason).toContain('not the owner');
   });
 
-  it('should taming emit animal_tamed event on success', () => {
+  it('should taming emit animal_tamed event on success', async () => {
     const tamingSystem = new TamingSystem();
+    await tamingSystem.initialize(harness.world, harness.eventBus);
     harness.registerSystem('TamingSystem', tamingSystem);
 
     const agent = harness.createTestAgent({ x: 10, y: 10 });

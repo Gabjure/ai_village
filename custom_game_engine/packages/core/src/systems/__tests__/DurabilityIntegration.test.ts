@@ -22,7 +22,7 @@ describe('Durability System Integration', () => {
   let system: DurabilitySystem;
   let eventBus: EventBusImpl;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     // Reset registries
     itemRegistry.clear();
     itemInstanceRegistry.clear();
@@ -70,7 +70,7 @@ describe('Durability System Integration', () => {
    * Future work should add these integration points in CraftingSystem and ResourceGatheringSystem.
    */
   describe.skip('Integration with CraftingSystem (requires CraftingSystem modification)', () => {
-    it('CraftingSystem should call DurabilitySystem.applyToolWear() after crafting', () => {
+    it('CraftingSystem should call DurabilitySystem.applyToolWear() after crafting', async () => {
       // This test is skipped because it requires modifying CraftingSystem
       // to integrate with DurabilitySystem.
     });
@@ -81,7 +81,7 @@ describe('Durability System Integration', () => {
    * Verify correct event flow during durability operations
    */
   describe('Event Flow Integration', () => {
-    it('should emit events in correct order during tool wear', () => {
+    it('should emit events in correct order during tool wear', async () => {
       const hammer = itemInstanceRegistry.createInstance({
         definitionId: 'hammer',
         quality: 50,
@@ -120,7 +120,7 @@ describe('Durability System Integration', () => {
    * Inventory filtering logic would use DurabilitySystem helper methods
    */
   describe('Inventory Component Integration', () => {
-    it('should identify broken tools using isToolBroken()', () => {
+    it('should identify broken tools using isToolBroken()', async () => {
       const broken = itemInstanceRegistry.createInstance({
         definitionId: 'hammer',
         quality: 50,
@@ -138,7 +138,7 @@ describe('Durability System Integration', () => {
       expect(system.isToolBroken(working.instanceId)).toBe(false);
     });
 
-    it('should identify low durability tools using hasLowDurability()', () => {
+    it('should identify low durability tools using hasLowDurability()', async () => {
       const lowDurability = itemInstanceRegistry.createInstance({
         definitionId: 'hammer',
         quality: 50,
@@ -162,7 +162,7 @@ describe('Durability System Integration', () => {
    * Quality should affect durability loss rates
    */
   describe('Quality System Integration', () => {
-    it('should combine quality and durability correctly', () => {
+    it('should combine quality and durability correctly', async () => {
       const poorHammer = itemInstanceRegistry.createInstance({
         definitionId: 'hammer',
         quality: 30, // Poor (1.5x wear)
@@ -200,7 +200,7 @@ describe('Durability System Integration', () => {
    * Test unusual scenarios that might occur in gameplay
    */
   describe('Edge Cases', () => {
-    it('should handle concurrent tool use by multiple agents', () => {
+    it('should handle concurrent tool use by multiple agents', async () => {
       const hammer = itemInstanceRegistry.createInstance({
         definitionId: 'hammer',
         quality: 50,
@@ -215,7 +215,7 @@ describe('Durability System Integration', () => {
       expect(hammer.condition).toBe(80);
     });
 
-    it('should handle tool breaking mid-task gracefully', () => {
+    it('should handle tool breaking mid-task gracefully', async () => {
       const hammer = itemInstanceRegistry.createInstance({
         definitionId: 'hammer',
         quality: 50,
@@ -238,7 +238,7 @@ describe('Durability System Integration', () => {
       }).toThrow(/cannot use broken tool/i);
     });
 
-    it('should handle multiple tools with different durability rates', () => {
+    it('should handle multiple tools with different durability rates', async () => {
       const hammer = itemInstanceRegistry.createInstance({
         definitionId: 'hammer',
         quality: 50,
@@ -268,7 +268,7 @@ describe('Durability System Integration', () => {
    * Verify system performs well under load
    */
   describe('Performance Under Load', () => {
-    it('should handle hundreds of tool uses efficiently', () => {
+    it('should handle hundreds of tool uses efficiently', async () => {
       const tools = [];
       for (let i = 0; i < 100; i++) {
         tools.push(

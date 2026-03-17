@@ -24,7 +24,7 @@ describe('DeityEmergenceSystem - LLM Prayer Domain Inference', () => {
   let mockLLMQueue: LLMDecisionQueue;
   let system: DeityEmergenceSystem;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     // Create mock LLM queue
     mockLLMQueue = {
       requestDecision: vi.fn().mockResolvedValue(''),
@@ -38,7 +38,7 @@ describe('DeityEmergenceSystem - LLM Prayer Domain Inference', () => {
     system = new DeityEmergenceSystem({}, mockLLMQueue);
   });
 
-  it('should use keyword matching as immediate fallback', () => {
+  it('should use keyword matching as immediate fallback', async () => {
     // Access private method via type assertion for testing
     const inferDomain = (system as Record<string, unknown>).inferDomainFromPrayer.bind(system);
 
@@ -50,7 +50,7 @@ describe('DeityEmergenceSystem - LLM Prayer Domain Inference', () => {
     expect(inferDomain('Help us in battle against our enemies')).toBe('war');
   });
 
-  it('should request LLM inference when available', () => {
+  it('should request LLM inference when available', async () => {
     // Access private method
     const inferDomain = (system as Record<string, unknown>).inferDomainFromPrayer.bind(system);
 
@@ -64,7 +64,7 @@ describe('DeityEmergenceSystem - LLM Prayer Domain Inference', () => {
     expect(callArgs[1]).toContain('divine domain');
   });
 
-  it('should cache LLM responses', () => {
+  it('should cache LLM responses', async () => {
     // Mock LLM response
     const mockResponse = JSON.stringify({
       domain: 'healing',
@@ -93,7 +93,7 @@ describe('DeityEmergenceSystem - LLM Prayer Domain Inference', () => {
     expect(mockLLMQueue.requestDecision).not.toHaveBeenCalled();
   });
 
-  it('should handle invalid LLM responses gracefully', () => {
+  it('should handle invalid LLM responses gracefully', async () => {
     // Mock invalid JSON response
     mockLLMQueue.getDecision = vi.fn().mockReturnValue('invalid json');
 
@@ -104,7 +104,7 @@ describe('DeityEmergenceSystem - LLM Prayer Domain Inference', () => {
     expect(() => processLLM()).not.toThrow();
   });
 
-  it('should validate LLM domain responses', () => {
+  it('should validate LLM domain responses', async () => {
     // Mock response with invalid domain
     const mockResponse = JSON.stringify({
       domain: 'invalid_domain_name',
@@ -120,7 +120,7 @@ describe('DeityEmergenceSystem - LLM Prayer Domain Inference', () => {
     expect(() => processLLM()).not.toThrow();
   });
 
-  it('should work without LLM queue (fallback only)', () => {
+  it('should work without LLM queue (fallback only)', async () => {
     const systemNoLLM = new DeityEmergenceSystem({});
 
     // Access private method
@@ -130,7 +130,7 @@ describe('DeityEmergenceSystem - LLM Prayer Domain Inference', () => {
     expect(inferDomain('Please bless our harvest')).toBe('harvest');
   });
 
-  it('should include all valid domains in prompt', () => {
+  it('should include all valid domains in prompt', async () => {
     const inferDomain = (system as Record<string, unknown>).inferDomainFromPrayer.bind(system);
 
     inferDomain('Test prayer');

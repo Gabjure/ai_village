@@ -20,12 +20,13 @@ import { ComponentType } from '../../types/ComponentType.js';
 describe('WildAnimalSpawningSystem + World + AnimalSystem Integration', () => {
   let harness: IntegrationTestHarness;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     harness = createMinimalWorld();
   });
 
-  it('should spawn animals in appropriate biomes', () => {
+  it('should spawn animals in appropriate biomes', async () => {
     const spawningSystem = new WildAnimalSpawningSystem();
+    await spawningSystem.initialize(harness.world, harness.eventBus);
     harness.registerSystem('WildAnimalSpawningSystem', spawningSystem);
 
     const chunkData = {
@@ -41,8 +42,9 @@ describe('WildAnimalSpawningSystem + World + AnimalSystem Integration', () => {
     expect(Array.isArray(spawnedAnimals)).toBe(true);
   });
 
-  it('should throw on missing biome data', () => {
+  it('should throw on missing biome data', async () => {
     const spawningSystem = new WildAnimalSpawningSystem();
+    await spawningSystem.initialize(harness.world, harness.eventBus);
     harness.registerSystem('WildAnimalSpawningSystem', spawningSystem);
 
     const invalidChunk = {
@@ -58,8 +60,9 @@ describe('WildAnimalSpawningSystem + World + AnimalSystem Integration', () => {
     }).toThrow('missing required "biome" field');
   });
 
-  it('should throw on missing chunk coordinates', () => {
+  it('should throw on missing chunk coordinates', async () => {
     const spawningSystem = new WildAnimalSpawningSystem();
+    await spawningSystem.initialize(harness.world, harness.eventBus);
     harness.registerSystem('WildAnimalSpawningSystem', spawningSystem);
 
     const invalidChunk = {
@@ -75,8 +78,9 @@ describe('WildAnimalSpawningSystem + World + AnimalSystem Integration', () => {
     }).toThrow('missing required "x" field');
   });
 
-  it('should throw on missing chunk size', () => {
+  it('should throw on missing chunk size', async () => {
     const spawningSystem = new WildAnimalSpawningSystem();
+    await spawningSystem.initialize(harness.world, harness.eventBus);
     harness.registerSystem('WildAnimalSpawningSystem', spawningSystem);
 
     const invalidChunk = {
@@ -92,8 +96,9 @@ describe('WildAnimalSpawningSystem + World + AnimalSystem Integration', () => {
     }).toThrow('missing required "size" field');
   });
 
-  it('should not spawn in same chunk twice', () => {
+  it('should not spawn in same chunk twice', async () => {
     const spawningSystem = new WildAnimalSpawningSystem();
+    await spawningSystem.initialize(harness.world, harness.eventBus);
     harness.registerSystem('WildAnimalSpawningSystem', spawningSystem);
 
     const chunkData = {
@@ -113,8 +118,9 @@ describe('WildAnimalSpawningSystem + World + AnimalSystem Integration', () => {
     expect(secondSpawn.length).toBe(0);
   });
 
-  it('should spawn multiple animals for herd/flock species', () => {
+  it('should spawn multiple animals for herd/flock species', async () => {
     const spawningSystem = new WildAnimalSpawningSystem();
+    await spawningSystem.initialize(harness.world, harness.eventBus);
     harness.registerSystem('WildAnimalSpawningSystem', spawningSystem);
 
     // Try multiple chunks to increase spawn chances
@@ -135,8 +141,9 @@ describe('WildAnimalSpawningSystem + World + AnimalSystem Integration', () => {
     expect(totalSpawned).toBeGreaterThanOrEqual(0);
   });
 
-  it('should spawned animals have required components', () => {
+  it('should spawned animals have required components', async () => {
     const spawningSystem = new WildAnimalSpawningSystem();
+    await spawningSystem.initialize(harness.world, harness.eventBus);
     harness.registerSystem('WildAnimalSpawningSystem', spawningSystem);
 
     // Spawn in forest (likely has deer or other animals)
@@ -160,8 +167,9 @@ describe('WildAnimalSpawningSystem + World + AnimalSystem Integration', () => {
     }
   });
 
-  it('should spawned animals be wild by default', () => {
+  it('should spawned animals be wild by default', async () => {
     const spawningSystem = new WildAnimalSpawningSystem();
+    await spawningSystem.initialize(harness.world, harness.eventBus);
     harness.registerSystem('WildAnimalSpawningSystem', spawningSystem);
 
     const chunkData = {
@@ -182,9 +190,11 @@ describe('WildAnimalSpawningSystem + World + AnimalSystem Integration', () => {
     }
   });
 
-  it('should spawning system integrate with animal system', () => {
+  it('should spawning system integrate with animal system', async () => {
     const spawningSystem = new WildAnimalSpawningSystem();
+    await spawningSystem.initialize(harness.world, harness.eventBus);
     const animalSystem = new AnimalSystem();
+    await animalSystem.initialize(harness.world, harness.eventBus);
 
     harness.registerSystem('WildAnimalSpawningSystem', spawningSystem);
     harness.registerSystem('AnimalSystem', animalSystem);
@@ -210,8 +220,9 @@ describe('WildAnimalSpawningSystem + World + AnimalSystem Integration', () => {
     }
   });
 
-  it('should empty biome return no animals', () => {
+  it('should empty biome return no animals', async () => {
     const spawningSystem = new WildAnimalSpawningSystem();
+    await spawningSystem.initialize(harness.world, harness.eventBus);
     harness.registerSystem('WildAnimalSpawningSystem', spawningSystem);
 
     const chunkData = {

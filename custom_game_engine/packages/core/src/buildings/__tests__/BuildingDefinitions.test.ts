@@ -483,10 +483,10 @@ describe('Building Functionality Tracking', () => {
     });
 
     it('should have actual buildings for all 8 function types including research and automation', () => {
-      // Register all building types
-      registry.registerTier2Stations();
-      registry.registerTier3Stations();
-      registry.registerExampleBuildings();
+      // Register all building types (registerDefaults() may already include tier2/tier3)
+      try { registry.registerTier2Stations(); } catch { /* already registered */ }
+      try { registry.registerTier3Stations(); } catch { /* already registered */ }
+      try { registry.registerExampleBuildings(); } catch { /* already registered */ }
 
       const allBuildings = registry.getAll();
       const allFunctions = allBuildings.flatMap((b) => b.functionality);

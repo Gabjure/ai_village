@@ -19,13 +19,13 @@ describe('Soil Depletion', () => {
   let _world: World;
   let eventBus: EventBusImpl;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     eventBus = new EventBusImpl();
     _world = new World(eventBus);
   });
 
   describe('Harvest Depletion', () => {
-    it('should decrement plantability counter on harvest', () => {
+    it('should decrement plantability counter on harvest', async () => {
       // SoilSystem.depleteSoil is implemented - test the actual behavior
       const tile = {
         terrain: 'dirt' as const,
@@ -43,13 +43,14 @@ describe('Soil Depletion', () => {
       };
 
       const soilSystem = new SoilSystem();
+      await soilSystem.initialize(_world, eventBus);
 
       soilSystem.depleteSoil(_world, tile, 5, 5);
 
       expect(tile.plantability).toBe(2);
     });
 
-    it('should reduce fertility by 15 on harvest', () => {
+    it('should reduce fertility by 15 on harvest', async () => {
       const tile = {
         terrain: 'dirt' as const,
         fertility: 70,
@@ -66,13 +67,14 @@ describe('Soil Depletion', () => {
       };
 
       const soilSystem = new SoilSystem();
+      await soilSystem.initialize(_world, eventBus);
 
       soilSystem.depleteSoil(_world, tile, 5, 5);
 
       expect(tile.fertility).toBe(55);
     });
 
-    it('should not allow fertility to go negative', () => {
+    it('should not allow fertility to go negative', async () => {
       const tile = {
         terrain: 'dirt' as const,
         fertility: 10,
@@ -89,13 +91,14 @@ describe('Soil Depletion', () => {
       };
 
       const soilSystem = new SoilSystem();
+      await soilSystem.initialize(_world, eventBus);
 
       soilSystem.depleteSoil(_world, tile, 5, 5);
 
       expect(tile.fertility).toBe(0); // Clamped via Math.max(0, ...)
     });
 
-    it('should emit soil:depleted event when plantability reaches 0', () => {
+    it('should emit soil:depleted event when plantability reaches 0', async () => {
       const handler = vi.fn();
       eventBus.subscribe('soil:depleted', handler);
 
@@ -121,7 +124,7 @@ describe('Soil Depletion', () => {
   });
 
   describe('Multiple Harvest Cycle', () => {
-    it('should allow 3 plantings before requiring re-tilling', () => {
+    it('should allow 3 plantings before requiring re-tilling', async () => {
       const tile = {
         terrain: 'dirt' as const,
         fertility: 70,
@@ -138,6 +141,7 @@ describe('Soil Depletion', () => {
       };
 
       const soilSystem = new SoilSystem();
+      await soilSystem.initialize(_world, eventBus);
 
       // Harvest 1
       soilSystem.depleteSoil(_world, tile, 5, 5);
@@ -155,7 +159,7 @@ describe('Soil Depletion', () => {
       expect(tile.tilled).toBe(false); // Requires re-tilling
     });
 
-    it('should track fertility decline through multiple harvests', () => {
+    it('should track fertility decline through multiple harvests', async () => {
       const tile = {
         terrain: 'dirt' as const,
         fertility: 70,
@@ -172,6 +176,7 @@ describe('Soil Depletion', () => {
       };
 
       const soilSystem = new SoilSystem();
+      await soilSystem.initialize(_world, eventBus);
 
       // Harvest 1: 70 - 15 = 55
       soilSystem.depleteSoil(_world, tile, 5, 5);
@@ -186,7 +191,7 @@ describe('Soil Depletion', () => {
       expect(tile.fertility).toBe(25);
     });
 
-    it('should set tilled flag to false when plantability reaches 0', () => {
+    it('should set tilled flag to false when plantability reaches 0', async () => {
       const tile = {
         terrain: 'dirt' as const,
         fertility: 70,
@@ -203,6 +208,7 @@ describe('Soil Depletion', () => {
       };
 
       const soilSystem = new SoilSystem();
+      await soilSystem.initialize(_world, eventBus);
 
       soilSystem.depleteSoil(_world, tile, 5, 5);
 
@@ -212,7 +218,7 @@ describe('Soil Depletion', () => {
   });
 
   describe('Listening for crop:harvested Events', () => {
-    it('should process crop:harvested event', () => {
+    it('should process crop:harvested event', async () => {
       const handler = vi.fn();
       eventBus.subscribe('crop:harvested', handler);
 
@@ -242,7 +248,7 @@ describe('Soil Depletion', () => {
   });
 
   describe('Re-tilling Depleted Soil', () => {
-    it('should restore plantability to 3 when re-tilled', () => {
+    it('should restore plantability to 3 when re-tilled', async () => {
       const tile = {
         terrain: 'dirt' as const,
         fertility: 25,
@@ -259,13 +265,14 @@ describe('Soil Depletion', () => {
       };
 
       const soilSystem = new SoilSystem();
+      await soilSystem.initialize(_world, eventBus);
 
       soilSystem.tillTile(_world, tile, 5, 5);
 
       expect(tile.plantability).toBe(3);
     });
 
-    it('should partially restore fertility when re-tilled', () => {
+    it('should partially restore fertility when re-tilled', async () => {
       const tile = {
         terrain: 'dirt' as const,
         fertility: 25,
@@ -282,6 +289,7 @@ describe('Soil Depletion', () => {
       };
 
       const soilSystem = new SoilSystem();
+      await soilSystem.initialize(_world, eventBus);
 
       soilSystem.tillTile(_world, tile, 5, 5);
 
@@ -290,7 +298,7 @@ describe('Soil Depletion', () => {
       expect(tile.fertility).toBeLessThanOrEqual(80);
     });
 
-    it('should set tilled flag to true when re-tilled', () => {
+    it('should set tilled flag to true when re-tilled', async () => {
       const tile = {
         terrain: 'dirt' as const,
         fertility: 25,
@@ -307,6 +315,7 @@ describe('Soil Depletion', () => {
       };
 
       const soilSystem = new SoilSystem();
+      await soilSystem.initialize(_world, eventBus);
 
       soilSystem.tillTile(_world, tile, 5, 5);
 
@@ -315,7 +324,7 @@ describe('Soil Depletion', () => {
   });
 
   describe('Error Handling - No Fallbacks', () => {
-    it('should throw when depleting tile without plantability', () => {
+    it('should throw when depleting tile without plantability', async () => {
       const incompleteTile = {
         terrain: 'dirt' as const,
         fertility: 50,
@@ -332,7 +341,7 @@ describe('Soil Depletion', () => {
       expect(() => depleteSoil(incompleteTile)).toThrow('Tile plantability not set - required for depletion tracking');
     });
 
-    it('should throw when depleting tile without fertility', () => {
+    it('should throw when depleting tile without fertility', async () => {
       const incompleteTile = {
         terrain: 'dirt' as const,
         plantability: 3,

@@ -22,15 +22,16 @@ import { createInventoryComponent, addToInventory } from '../../components/Inven
 describe('CraftingSystem + Inventory + Building Integration', () => {
   let harness: IntegrationTestHarness;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     harness = createMinimalWorld();
   });
 
-  it('should queue crafting jobs for agents', () => {
+  it('should queue crafting jobs for agents', async () => {
     const agent = harness.createTestAgent({ x: 10, y: 10 });
     agent.addComponent(createInventoryComponent());
 
     const craftingSystem = new CraftingSystem();
+    await craftingSystem.initialize(harness.world, harness.eventBus);
     harness.registerSystem('CraftingSystem', craftingSystem);
 
     // Create a simple recipe
@@ -55,10 +56,11 @@ describe('CraftingSystem + Inventory + Building Integration', () => {
     expect(queue[0].recipeId).toBe('wood_plank');
   });
 
-  it('should reject invalid job quantities', () => {
+  it('should reject invalid job quantities', async () => {
     const agent = harness.createTestAgent({ x: 10, y: 10 });
 
     const craftingSystem = new CraftingSystem();
+    await craftingSystem.initialize(harness.world, harness.eventBus);
     harness.registerSystem('CraftingSystem', craftingSystem);
 
     const recipe = {
@@ -80,10 +82,11 @@ describe('CraftingSystem + Inventory + Building Integration', () => {
     }).toThrow('Job quantity must be positive');
   });
 
-  it('should enforce queue size limit', () => {
+  it('should enforce queue size limit', async () => {
     const agent = harness.createTestAgent({ x: 10, y: 10 });
 
     const craftingSystem = new CraftingSystem();
+    await craftingSystem.initialize(harness.world, harness.eventBus);
     harness.registerSystem('CraftingSystem', craftingSystem);
 
     const recipe = {
@@ -106,10 +109,11 @@ describe('CraftingSystem + Inventory + Building Integration', () => {
     }).toThrow('Queue is full');
   });
 
-  it('should allow canceling queued jobs', () => {
+  it('should allow canceling queued jobs', async () => {
     const agent = harness.createTestAgent({ x: 10, y: 10 });
 
     const craftingSystem = new CraftingSystem();
+    await craftingSystem.initialize(harness.world, harness.eventBus);
     harness.registerSystem('CraftingSystem', craftingSystem);
 
     const recipe = {
@@ -134,10 +138,11 @@ describe('CraftingSystem + Inventory + Building Integration', () => {
     expect(queue[0].id).toBe(job2.id);
   });
 
-  it('should prevent canceling non-existent jobs', () => {
+  it('should prevent canceling non-existent jobs', async () => {
     const agent = harness.createTestAgent({ x: 10, y: 10 });
 
     const craftingSystem = new CraftingSystem();
+    await craftingSystem.initialize(harness.world, harness.eventBus);
     harness.registerSystem('CraftingSystem', craftingSystem);
 
     expect(() => {
@@ -160,10 +165,11 @@ describe('CraftingSystem + Inventory + Building Integration', () => {
     }).toThrow('Job not found');
   });
 
-  it('should allow reordering queued jobs', () => {
+  it('should allow reordering queued jobs', async () => {
     const agent = harness.createTestAgent({ x: 10, y: 10 });
 
     const craftingSystem = new CraftingSystem();
+    await craftingSystem.initialize(harness.world, harness.eventBus);
     harness.registerSystem('CraftingSystem', craftingSystem);
 
     const recipe = {
@@ -188,10 +194,11 @@ describe('CraftingSystem + Inventory + Building Integration', () => {
     expect(queue[2].id).toBe(job2.id);
   });
 
-  it('should prevent reordering to invalid positions', () => {
+  it('should prevent reordering to invalid positions', async () => {
     const agent = harness.createTestAgent({ x: 10, y: 10 });
 
     const craftingSystem = new CraftingSystem();
+    await craftingSystem.initialize(harness.world, harness.eventBus);
     harness.registerSystem('CraftingSystem', craftingSystem);
 
     const recipe = {
@@ -214,10 +221,11 @@ describe('CraftingSystem + Inventory + Building Integration', () => {
     }).toThrow('Invalid position');
   });
 
-  it('should get current active job', () => {
+  it('should get current active job', async () => {
     const agent = harness.createTestAgent({ x: 10, y: 10 });
 
     const craftingSystem = new CraftingSystem();
+    await craftingSystem.initialize(harness.world, harness.eventBus);
     harness.registerSystem('CraftingSystem', craftingSystem);
 
     // No jobs initially
@@ -241,7 +249,7 @@ describe('CraftingSystem + Inventory + Building Integration', () => {
     expect(currentJob?.id).toBe(job1.id);
   });
 
-  it('should crafting system update process jobs over time', () => {
+  it('should crafting system update process jobs over time', async () => {
     const agent = harness.createTestAgent({ x: 10, y: 10 });
     // Add inventory with ingredients for crafting
     let inventory = createInventoryComponent();
@@ -249,6 +257,7 @@ describe('CraftingSystem + Inventory + Building Integration', () => {
     agent.addComponent(inventory);
 
     const craftingSystem = new CraftingSystem();
+    await craftingSystem.initialize(harness.world, harness.eventBus);
     const recipeRegistry = new RecipeRegistry();
 
     const recipe: Recipe = {
@@ -281,10 +290,11 @@ describe('CraftingSystem + Inventory + Building Integration', () => {
     expect(currentJob).toBeDefined();
   });
 
-  it('should empty queue return empty array', () => {
+  it('should empty queue return empty array', async () => {
     const agent = harness.createTestAgent({ x: 10, y: 10 });
 
     const craftingSystem = new CraftingSystem();
+    await craftingSystem.initialize(harness.world, harness.eventBus);
     harness.registerSystem('CraftingSystem', craftingSystem);
 
     const queue = craftingSystem.getQueue(agent.id);

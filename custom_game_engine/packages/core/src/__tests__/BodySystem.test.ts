@@ -32,14 +32,15 @@ describe('BodySystem - Multi-Species Support', () => {
   let bodySystem: BodySystem;
   let eventBus: EventBusImpl;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     eventBus = new EventBusImpl();
     world = new World(eventBus);
     bodySystem = new BodySystem();
+    await bodySystem.initialize(world, eventBus);
   });
 
   describe('Body Plan Creation', () => {
-    it('should create standard humanoid body', () => {
+    it('should create standard humanoid body', async () => {
       const body = createBodyComponentFromPlan('humanoid_standard', 'human');
 
       expect(body.speciesId).toBe('human');
@@ -58,7 +59,7 @@ describe('BodySystem - Multi-Species Support', () => {
       expect(partTypes.filter(t => t === 'foot')).toHaveLength(2);
     });
 
-    it('should create 4-armed insectoid body', () => {
+    it('should create 4-armed insectoid body', async () => {
       const body = createBodyComponentFromPlan('insectoid_4arm', 'thrakeen');
 
       expect(body.speciesId).toBe('thrakeen');
@@ -82,7 +83,7 @@ describe('BodySystem - Multi-Species Support', () => {
       expect(getPartsByType(body, 'abdomen')).toHaveLength(1);
     });
 
-    it('should create winged avian body', () => {
+    it('should create winged avian body', async () => {
       const body = createBodyComponentFromPlan('avian_winged', 'angel');
 
       // Should have wings
@@ -97,7 +98,7 @@ describe('BodySystem - Multi-Species Support', () => {
       expect(tail[0].functions).toContain('flight');
     });
 
-    it('should create tentacled aquatic body', () => {
+    it('should create tentacled aquatic body', async () => {
       const body = createBodyComponentFromPlan('aquatic_tentacled', 'mindflayer');
 
       expect(body.skeletonType).toBe('hydrostatic');
@@ -113,7 +114,7 @@ describe('BodySystem - Multi-Species Support', () => {
       expect(gills).toHaveLength(6);
     });
 
-    it('should create celestial winged body', () => {
+    it('should create celestial winged body', async () => {
       const body = createBodyComponentFromPlan('celestial_winged', 'seraph');
 
       expect(body.bloodType).toBe('ichor');
@@ -128,7 +129,7 @@ describe('BodySystem - Multi-Species Support', () => {
       expect(wings).toHaveLength(2);
     });
 
-    it('should create demonic horned body', () => {
+    it('should create demonic horned body', async () => {
       const body = createBodyComponentFromPlan('demonic_horned', 'demon');
 
       expect(body.size).toBe('large');
@@ -148,13 +149,13 @@ describe('BodySystem - Multi-Species Support', () => {
       expect(tail[0].functions).toContain('attack');
     });
 
-    it('should throw error for unknown body plan', () => {
+    it('should throw error for unknown body plan', async () => {
       expect(() => {
         createBodyComponentFromPlan('nonexistent_plan', 'alien');
       }).toThrow(/Unknown body plan/);
     });
 
-    it('should list all available body plans', () => {
+    it('should list all available body plans', async () => {
       const plans = getAvailableBodyPlans();
       expect(plans).toContain('humanoid_standard');
       expect(plans).toContain('insectoid_4arm');
@@ -166,7 +167,7 @@ describe('BodySystem - Multi-Species Support', () => {
   });
 
   describe('Skill Debuffs with Redundancy', () => {
-    it('should apply less debuff per arm when having 4 arms', () => {
+    it('should apply less debuff per arm when having 4 arms', async () => {
       const humanBody = createBodyComponentFromPlan('humanoid_standard', 'human');
       const insectBody = createBodyComponentFromPlan('insectoid_4arm', 'thrakeen');
 
@@ -190,7 +191,7 @@ describe('BodySystem - Multi-Species Support', () => {
       expect(insectDebuff).toBeCloseTo(0.0625, 2);
     });
 
-    it('should calculate movement speed based on leg health', () => {
+    it('should calculate movement speed based on leg health', async () => {
       const body = createBodyComponentFromPlan('humanoid_standard', 'human');
 
       // Full health = 100% speed
@@ -214,7 +215,7 @@ describe('BodySystem - Multi-Species Support', () => {
       expect(speedWith2BadLegs).toBeLessThan(speedWith1Leg);
     });
 
-    it('should handle entities with no legs (tentacles for movement)', () => {
+    it('should handle entities with no legs (tentacles for movement)', async () => {
       const body = createBodyComponentFromPlan('aquatic_tentacled', 'mindflayer');
 
       // Tentacles provide locomotion
@@ -224,7 +225,7 @@ describe('BodySystem - Multi-Species Support', () => {
   });
 
   describe('Injury System', () => {
-    it('should track injuries on body parts', () => {
+    it('should track injuries on body parts', async () => {
       const body = createBodyComponentFromPlan('humanoid_standard', 'human');
       const arm = getPartsByType(body, 'arm')[0];
 
@@ -245,7 +246,7 @@ describe('BodySystem - Multi-Species Support', () => {
       expect(arm.injuries[0].bleedRate).toBe(0.5);
     });
 
-    it('should calculate total pain from all injuries', () => {
+    it('should calculate total pain from all injuries', async () => {
       const body = createBodyComponentFromPlan('humanoid_standard', 'human');
 
       const arm = getPartsByType(body, 'arm')[0];
@@ -275,7 +276,7 @@ describe('BodySystem - Multi-Species Support', () => {
       expect(totalPain).toBe(75);
     });
 
-    it('should calculate overall health from all parts', () => {
+    it('should calculate overall health from all parts', async () => {
       const body = createBodyComponentFromPlan('humanoid_standard', 'human');
 
       // All parts at full health
@@ -293,7 +294,7 @@ describe('BodySystem - Multi-Species Support', () => {
   });
 
   describe('Vital Parts & Death', () => {
-    it('should mark head and torso as vital', () => {
+    it('should mark head and torso as vital', async () => {
       const body = createBodyComponentFromPlan('humanoid_standard', 'human');
 
       const head = getPartsByType(body, 'head')[0];
@@ -305,7 +306,7 @@ describe('BodySystem - Multi-Species Support', () => {
       expect(arm.vital).toBe(false);
     });
 
-    it('should detect destroyed vital parts', () => {
+    it('should detect destroyed vital parts', async () => {
       const body = createBodyComponentFromPlan('humanoid_standard', 'human');
 
       expect(hasDestroyedVitalParts(body)).toBe(false);
@@ -317,7 +318,7 @@ describe('BodySystem - Multi-Species Support', () => {
       expect(hasDestroyedVitalParts(body)).toBe(true);
     });
 
-    it('should allow losing non-vital parts', () => {
+    it('should allow losing non-vital parts', async () => {
       const body = createBodyComponentFromPlan('humanoid_standard', 'human');
 
       // Destroy an arm (non-vital)
@@ -329,7 +330,7 @@ describe('BodySystem - Multi-Species Support', () => {
   });
 
   describe('Magic Body Modifications', () => {
-    it('should add wings via magic modification', () => {
+    it('should add wings via magic modification', async () => {
       const body = createBodyComponentFromPlan('humanoid_standard', 'human');
 
       // Initially no wings
@@ -387,7 +388,7 @@ describe('BodySystem - Multi-Species Support', () => {
       expect(getPartsByType(body, 'wing')).toHaveLength(2);
     });
 
-    it('should track temporary vs permanent modifications', () => {
+    it('should track temporary vs permanent modifications', async () => {
       const body = createBodyComponentFromPlan('humanoid_standard', 'human');
 
       const permanentMod: GlobalBodyModification = {
@@ -422,7 +423,7 @@ describe('BodySystem - Multi-Species Support', () => {
   });
 
   describe('Species-Specific Features', () => {
-    it('should have different blood types for different species', () => {
+    it('should have different blood types for different species', async () => {
       const human = createBodyComponentFromPlan('humanoid_standard', 'human');
       const insect = createBodyComponentFromPlan('insectoid_4arm', 'thrakeen');
       const divine = createBodyComponentFromPlan('celestial_winged', 'angel');
@@ -432,7 +433,7 @@ describe('BodySystem - Multi-Species Support', () => {
       expect(divine.bloodType).toBe('ichor');
     });
 
-    it('should have different skeleton types', () => {
+    it('should have different skeleton types', async () => {
       const human = createBodyComponentFromPlan('humanoid_standard', 'human');
       const insect = createBodyComponentFromPlan('insectoid_4arm', 'thrakeen');
       const aquatic = createBodyComponentFromPlan('aquatic_tentacled', 'mindflayer');
@@ -442,7 +443,7 @@ describe('BodySystem - Multi-Species Support', () => {
       expect(aquatic.skeletonType).toBe('hydrostatic');
     });
 
-    it('should assign skills based on body part functions', () => {
+    it('should assign skills based on body part functions', async () => {
       const body = createBodyComponentFromPlan('humanoid_standard', 'human');
 
       const hands = getPartsByType(body, 'hand');
@@ -455,7 +456,7 @@ describe('BodySystem - Multi-Species Support', () => {
   });
 
   describe('Body Plan Registry', () => {
-    it('should retrieve body plan template', () => {
+    it('should retrieve body plan template', async () => {
       const plan = getBodyPlan('humanoid_standard');
 
       expect(plan).toBeDefined();
@@ -464,7 +465,7 @@ describe('BodySystem - Multi-Species Support', () => {
       expect(plan?.baseType).toBe('humanoid');
     });
 
-    it('should return undefined for unknown plan', () => {
+    it('should return undefined for unknown plan', async () => {
       const plan = getBodyPlan('unknown_plan');
       expect(plan).toBeUndefined();
     });

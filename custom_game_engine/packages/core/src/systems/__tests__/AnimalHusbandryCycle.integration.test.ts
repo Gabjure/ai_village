@@ -26,19 +26,22 @@ import { EventBusImpl } from '../events/EventBus.js';
 describe('Complete Animal Husbandry Cycle Integration', () => {
   let harness: IntegrationTestHarness;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     harness = createMinimalWorld();
   });
 
-  it('should animal system process animal lifecycles', () => {
+  it('should animal system process animal lifecycles', async () => {
     // Create and wire StateMutatorSystem (required for AnimalSystem)
     const stateMutator = new StateMutatorSystem();
+    await stateMutator.initialize(harness.world, harness.eventBus);
     harness.registerSystem('StateMutatorSystem', stateMutator);
 
     const animalSystem = new AnimalSystem();
+    await animalSystem.initialize(harness.world, harness.eventBus);
     harness.registerSystem('AnimalSystem', animalSystem);
 
     const timeSystem = new TimeSystem();
+    await timeSystem.initialize(harness.world, harness.eventBus);
     harness.registerSystem('TimeSystem', timeSystem);
 
     const animal = harness.createTestAnimal('chicken', { x: 10, y: 10 });
@@ -58,8 +61,9 @@ describe('Complete Animal Husbandry Cycle Integration', () => {
     expect(animal.getComponent(ComponentType.Animal)).toBeDefined();
   });
 
-  it('should taming system convert wild to domesticated', () => {
+  it('should taming system convert wild to domesticated', async () => {
     const tamingSystem = new TamingSystem(harness.eventBus);
+    await tamingSystem.initialize(harness.world, harness.eventBus);
     harness.registerSystem('TamingSystem', tamingSystem);
 
     const animal = harness.createTestAnimal('chicken', { x: 10, y: 10 });
@@ -79,8 +83,9 @@ describe('Complete Animal Husbandry Cycle Integration', () => {
     expect(tamingEvents.length).toBeGreaterThanOrEqual(0);
   });
 
-  it('should housing system manage animal shelter', () => {
+  it('should housing system manage animal shelter', async () => {
     const housingSystem = new AnimalHousingSystem(harness.eventBus);
+    await housingSystem.initialize(harness.world, harness.eventBus);
     harness.registerSystem('AnimalHousingSystem', housingSystem);
 
     const animal = harness.createTestAnimal('chicken', { x: 10, y: 10 });
@@ -95,15 +100,18 @@ describe('Complete Animal Husbandry Cycle Integration', () => {
     expect(coop.getComponent(ComponentType.Building)).toBeDefined();
   });
 
-  it('should animals age through life stages', () => {
+  it('should animals age through life stages', async () => {
     // Create and wire StateMutatorSystem (required for AnimalSystem)
     const stateMutator = new StateMutatorSystem();
+    await stateMutator.initialize(harness.world, harness.eventBus);
     harness.registerSystem('StateMutatorSystem', stateMutator);
 
     const animalSystem = new AnimalSystem();
+    await animalSystem.initialize(harness.world, harness.eventBus);
     harness.registerSystem('AnimalSystem', animalSystem);
 
     const timeSystem = new TimeSystem();
+    await timeSystem.initialize(harness.world, harness.eventBus);
     harness.registerSystem('TimeSystem', timeSystem);
 
     const animal = harness.createTestAnimal('chicken', { x: 10, y: 10 });
@@ -128,9 +136,11 @@ describe('Complete Animal Husbandry Cycle Integration', () => {
     expect(stageEvents.length).toBeGreaterThanOrEqual(0);
   });
 
-  it('should animals produce products over time', () => {
+  it('should animals produce products over time', async () => {
     const productionSystem = new AnimalProductionSystem(harness.eventBus);
+    await productionSystem.initialize(harness.world, harness.eventBus);
     const timeSystem = new TimeSystem();
+    await timeSystem.initialize(harness.world, harness.eventBus);
 
     harness.registerSystem('AnimalProductionSystem', productionSystem);
     harness.registerSystem('TimeSystem', timeSystem);
@@ -152,14 +162,17 @@ describe('Complete Animal Husbandry Cycle Integration', () => {
     expect(productEvents.length).toBeGreaterThanOrEqual(0);
   });
 
-  it('should housing cleanliness affect animal health', () => {
+  it('should housing cleanliness affect animal health', async () => {
     const housingSystem = new AnimalHousingSystem(harness.eventBus);
+    await housingSystem.initialize(harness.world, harness.eventBus);
 
     // Create and wire StateMutatorSystem (required for AnimalSystem)
     const stateMutator = new StateMutatorSystem();
+    await stateMutator.initialize(harness.world, harness.eventBus);
     harness.registerSystem('StateMutatorSystem', stateMutator);
 
     const animalSystem = new AnimalSystem();
+    await animalSystem.initialize(harness.world, harness.eventBus);
     harness.registerSystem('AnimalSystem', animalSystem);
     harness.registerSystem('AnimalHousingSystem', housingSystem);
 
@@ -184,8 +197,9 @@ describe('Complete Animal Husbandry Cycle Integration', () => {
     expect(dirtyEvents.length).toBeGreaterThanOrEqual(0);
   });
 
-  it('should multiple animals in housing tracked', () => {
+  it('should multiple animals in housing tracked', async () => {
     const housingSystem = new AnimalHousingSystem(harness.eventBus);
+    await housingSystem.initialize(harness.world, harness.eventBus);
     harness.registerSystem('AnimalHousingSystem', housingSystem);
 
     const coop = harness.createTestBuilding('chicken_coop', { x: 10, y: 10 });
@@ -201,12 +215,14 @@ describe('Complete Animal Husbandry Cycle Integration', () => {
     expect(entities.length).toBeGreaterThan(1);
   });
 
-  it('should animal death trigger replacement cycle', () => {
+  it('should animal death trigger replacement cycle', async () => {
     // Create and wire StateMutatorSystem (required for AnimalSystem)
     const stateMutator = new StateMutatorSystem();
+    await stateMutator.initialize(harness.world, harness.eventBus);
     harness.registerSystem('StateMutatorSystem', stateMutator);
 
     const animalSystem = new AnimalSystem();
+    await animalSystem.initialize(harness.world, harness.eventBus);
     harness.registerSystem('AnimalSystem', animalSystem);
 
     const animal = harness.createTestAnimal('chicken', { x: 10, y: 10 });
@@ -235,8 +251,9 @@ describe('Complete Animal Husbandry Cycle Integration', () => {
     expect(deathEvents.length).toBeGreaterThan(0);
   });
 
-  it('should taming build trust over multiple interactions', () => {
+  it('should taming build trust over multiple interactions', async () => {
     const tamingSystem = new TamingSystem(harness.eventBus);
+    await tamingSystem.initialize(harness.world, harness.eventBus);
     harness.registerSystem('TamingSystem', tamingSystem);
 
     const animal = harness.createTestAnimal('chicken', { x: 10, y: 10 });
@@ -260,18 +277,24 @@ describe('Complete Animal Husbandry Cycle Integration', () => {
     expect(tamingEvents.length).toBeGreaterThanOrEqual(0);
   });
 
-  it('should full husbandry cycle integrate all systems', () => {
+  it('should full husbandry cycle integrate all systems', async () => {
     // Create and wire StateMutatorSystem (required for AnimalSystem)
     const stateMutator = new StateMutatorSystem();
+    await stateMutator.initialize(harness.world, harness.eventBus);
     harness.registerSystem('StateMutatorSystem', stateMutator);
 
     const animalSystem = new AnimalSystem();
+    await animalSystem.initialize(harness.world, harness.eventBus);
     harness.registerSystem('AnimalSystem', animalSystem);
 
     const tamingSystem = new TamingSystem(harness.eventBus);
+    await tamingSystem.initialize(harness.world, harness.eventBus);
     const housingSystem = new AnimalHousingSystem(harness.eventBus);
+    await housingSystem.initialize(harness.world, harness.eventBus);
     const productionSystem = new AnimalProductionSystem(harness.eventBus);
+    await productionSystem.initialize(harness.world, harness.eventBus);
     const timeSystem = new TimeSystem();
+    await timeSystem.initialize(harness.world, harness.eventBus);
 
     harness.registerSystem('TamingSystem', tamingSystem);
     harness.registerSystem('AnimalHousingSystem', housingSystem);
@@ -303,12 +326,14 @@ describe('Complete Animal Husbandry Cycle Integration', () => {
     expect(coop.getComponent(ComponentType.Building)).toBeDefined();
   });
 
-  it('should animal needs decay and require care', () => {
+  it('should animal needs decay and require care', async () => {
     // Create and wire StateMutatorSystem (required for AnimalSystem)
     const stateMutator = new StateMutatorSystem();
+    await stateMutator.initialize(harness.world, harness.eventBus);
     harness.registerSystem('StateMutatorSystem', stateMutator);
 
     const animalSystem = new AnimalSystem();
+    await animalSystem.initialize(harness.world, harness.eventBus);
     harness.registerSystem('AnimalSystem', animalSystem);
 
     const animal = harness.createTestAnimal('chicken', { x: 10, y: 10 });
@@ -327,8 +352,9 @@ describe('Complete Animal Husbandry Cycle Integration', () => {
     expect(animal.getComponent(ComponentType.Animal)).toBeDefined();
   });
 
-  it('should housing capacity limits enforced', () => {
+  it('should housing capacity limits enforced', async () => {
     const housingSystem = new AnimalHousingSystem(harness.eventBus);
+    await housingSystem.initialize(harness.world, harness.eventBus);
     harness.registerSystem('AnimalHousingSystem', housingSystem);
 
     const coop = harness.createTestBuilding('chicken_coop', { x: 10, y: 10 });

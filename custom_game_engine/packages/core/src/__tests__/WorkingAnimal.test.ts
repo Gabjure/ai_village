@@ -14,7 +14,7 @@ import type { AnimalRole, WorkTask } from '../components/WorkingAnimalComponent.
 
 describe('WorkingAnimalComponent', () => {
   describe('constructor validation', () => {
-    it('should throw when role is missing', () => {
+    it('should throw when role is missing', async () => {
       expect(() =>
         new WorkingAnimalComponent({
           role: undefined as unknown as AnimalRole,
@@ -25,7 +25,7 @@ describe('WorkingAnimalComponent', () => {
       ).toThrow('WorkingAnimalComponent requires "role" field');
     });
 
-    it('should throw when skills is missing', () => {
+    it('should throw when skills is missing', async () => {
       expect(() =>
         new WorkingAnimalComponent({
           role: 'plow',
@@ -36,7 +36,7 @@ describe('WorkingAnimalComponent', () => {
       ).toThrow('WorkingAnimalComponent requires "skills" field');
     });
 
-    it('should throw when efficiency is missing', () => {
+    it('should throw when efficiency is missing', async () => {
       expect(() =>
         new WorkingAnimalComponent({
           role: 'guard',
@@ -47,7 +47,7 @@ describe('WorkingAnimalComponent', () => {
       ).toThrow('WorkingAnimalComponent requires "efficiency" field');
     });
 
-    it('should throw when stamina is missing', () => {
+    it('should throw when stamina is missing', async () => {
       expect(() =>
         new WorkingAnimalComponent({
           role: 'pack',
@@ -58,7 +58,7 @@ describe('WorkingAnimalComponent', () => {
       ).toThrow('WorkingAnimalComponent requires "stamina" field');
     });
 
-    it('should construct successfully with all required fields', () => {
+    it('should construct successfully with all required fields', async () => {
       const comp = new WorkingAnimalComponent({
         role: 'hunt',
         skills: [{ skillType: 'tracking', level: 5, experience: 500 }],
@@ -73,7 +73,7 @@ describe('WorkingAnimalComponent', () => {
       expect(comp.currentTask).toBeUndefined();
     });
 
-    it('should deep copy skills array to avoid shared references', () => {
+    it('should deep copy skills array to avoid shared references', async () => {
       const original = [{ skillType: 'plowing', level: 1, experience: 100 }];
       const comp = new WorkingAnimalComponent({
         role: 'plow',
@@ -85,7 +85,7 @@ describe('WorkingAnimalComponent', () => {
       expect(comp.skills[0].level).toBe(1); // not mutated
     });
 
-    it('should deep copy currentTask if provided', () => {
+    it('should deep copy currentTask if provided', async () => {
       const task: WorkTask = { taskType: 'plow', duration: 50, energyCost: 0.5 };
       const comp = new WorkingAnimalComponent({
         role: 'plow',
@@ -105,7 +105,7 @@ describe('WorkingAnimalComponent', () => {
 // ============================================================================
 
 describe('getOrCreateSkill', () => {
-  it('should return existing skill', () => {
+  it('should return existing skill', async () => {
     const comp = new WorkingAnimalComponent({
       role: 'herd',
       skills: [{ skillType: 'herding', level: 5, experience: 500 }],
@@ -118,7 +118,7 @@ describe('getOrCreateSkill', () => {
     expect(comp.skills).toHaveLength(1); // no new skill added
   });
 
-  it('should create a new skill at level 0 when not found', () => {
+  it('should create a new skill at level 0 when not found', async () => {
     const comp = new WorkingAnimalComponent({
       role: 'herd',
       skills: [],
@@ -132,7 +132,7 @@ describe('getOrCreateSkill', () => {
     expect(comp.skills).toHaveLength(1);
   });
 
-  it('should return the same reference on second call', () => {
+  it('should return the same reference on second call', async () => {
     const comp = new WorkingAnimalComponent({
       role: 'guard',
       skills: [],
@@ -151,7 +151,7 @@ describe('getOrCreateSkill', () => {
 // ============================================================================
 
 describe('trainSkill', () => {
-  it('should add XP and not level up below threshold', () => {
+  it('should add XP and not level up below threshold', async () => {
     const comp = new WorkingAnimalComponent({
       role: 'plow',
       skills: [{ skillType: 'plowing', level: 0, experience: 0 }],
@@ -164,7 +164,7 @@ describe('trainSkill', () => {
     expect(comp.skills[0].level).toBe(0);
   });
 
-  it('should level up at exactly 100 XP', () => {
+  it('should level up at exactly 100 XP', async () => {
     const comp = new WorkingAnimalComponent({
       role: 'plow',
       skills: [{ skillType: 'plowing', level: 0, experience: 0 }],
@@ -177,7 +177,7 @@ describe('trainSkill', () => {
     expect(comp.skills[0].experience).toBe(100);
   });
 
-  it('should level up multiple levels from large XP gain', () => {
+  it('should level up multiple levels from large XP gain', async () => {
     const comp = new WorkingAnimalComponent({
       role: 'pack',
       skills: [{ skillType: 'hauling', level: 0, experience: 0 }],
@@ -189,7 +189,7 @@ describe('trainSkill', () => {
     expect(comp.skills[0].level).toBe(3);
   });
 
-  it('should cap level at 100', () => {
+  it('should cap level at 100', async () => {
     const comp = new WorkingAnimalComponent({
       role: 'mount',
       skills: [{ skillType: 'endurance', level: 99, experience: 9900 }],
@@ -200,7 +200,7 @@ describe('trainSkill', () => {
     expect(comp.skills[0].level).toBe(100);
   });
 
-  it('should create the skill if it does not exist', () => {
+  it('should create the skill if it does not exist', async () => {
     const comp = new WorkingAnimalComponent({
       role: 'hunt',
       skills: [],
@@ -218,49 +218,49 @@ describe('trainSkill', () => {
 // ============================================================================
 
 describe('defaultSkillsForRole', () => {
-  it('should return plowing and hauling for plow role', () => {
+  it('should return plowing and hauling for plow role', async () => {
     const skills = defaultSkillsForRole('plow');
     const types = skills.map(s => s.skillType);
     expect(types).toContain('plowing');
     expect(types).toContain('hauling');
   });
 
-  it('should return alertness and intimidation for guard role', () => {
+  it('should return alertness and intimidation for guard role', async () => {
     const skills = defaultSkillsForRole('guard');
     const types = skills.map(s => s.skillType);
     expect(types).toContain('alertness');
     expect(types).toContain('intimidation');
   });
 
-  it('should return tracking and pursuit for hunt role', () => {
+  it('should return tracking and pursuit for hunt role', async () => {
     const skills = defaultSkillsForRole('hunt');
     const types = skills.map(s => s.skillType);
     expect(types).toContain('tracking');
     expect(types).toContain('pursuit');
   });
 
-  it('should return herding and alertness for herd role', () => {
+  it('should return herding and alertness for herd role', async () => {
     const skills = defaultSkillsForRole('herd');
     const types = skills.map(s => s.skillType);
     expect(types).toContain('herding');
     expect(types).toContain('alertness');
   });
 
-  it('should return endurance and obedience for mount role', () => {
+  it('should return endurance and obedience for mount role', async () => {
     const skills = defaultSkillsForRole('mount');
     const types = skills.map(s => s.skillType);
     expect(types).toContain('endurance');
     expect(types).toContain('obedience');
   });
 
-  it('should return hauling and endurance for pack role', () => {
+  it('should return hauling and endurance for pack role', async () => {
     const skills = defaultSkillsForRole('pack');
     const types = skills.map(s => s.skillType);
     expect(types).toContain('hauling');
     expect(types).toContain('endurance');
   });
 
-  it('should set all default skills at level 0 with 0 experience', () => {
+  it('should set all default skills at level 0 with 0 experience', async () => {
     const skills = defaultSkillsForRole('guard');
     for (const skill of skills) {
       expect(skill.level).toBe(0);
@@ -277,7 +277,7 @@ describe('WorkingAnimalSystem', () => {
   let system: WorkingAnimalSystem;
   let workingComp: WorkingAnimalComponent;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     system = new WorkingAnimalSystem();
     workingComp = new WorkingAnimalComponent({
       role: 'guard',
@@ -288,19 +288,19 @@ describe('WorkingAnimalSystem', () => {
   });
 
   describe('assignRole', () => {
-    it('should change the role', () => {
+    it('should change the role', async () => {
       system.assignRole(workingComp, 'pack');
       expect(workingComp.role).toBe('pack');
     });
 
-    it('should add default skills for the new role', () => {
+    it('should add default skills for the new role', async () => {
       system.assignRole(workingComp, 'pack');
       const types = workingComp.skills.map(s => s.skillType);
       expect(types).toContain('hauling');
       expect(types).toContain('endurance');
     });
 
-    it('should not duplicate skills that already exist', () => {
+    it('should not duplicate skills that already exist', async () => {
       // alertness is a skill for guard and herd; animal already has it
       system.assignRole(workingComp, 'herd');
       const alertnessSkills = workingComp.skills.filter(s => s.skillType === 'alertness');
@@ -309,7 +309,7 @@ describe('WorkingAnimalSystem', () => {
   });
 
   describe('assignTask', () => {
-    it('should succeed when stamina >= 10', () => {
+    it('should succeed when stamina >= 10', async () => {
       const task: WorkTask = { taskType: 'guard', duration: 100, energyCost: 0.5 };
       const result = system.assignTask(workingComp, task);
       expect(result.success).toBe(true);
@@ -317,7 +317,7 @@ describe('WorkingAnimalSystem', () => {
       expect(workingComp.currentTask!.taskType).toBe('guard');
     });
 
-    it('should fail when stamina < 10', () => {
+    it('should fail when stamina < 10', async () => {
       workingComp.stamina = 5;
       const task: WorkTask = { taskType: 'guard', duration: 100, energyCost: 0.5 };
       const result = system.assignTask(workingComp, task);
@@ -326,14 +326,14 @@ describe('WorkingAnimalSystem', () => {
       expect(workingComp.currentTask).toBeUndefined();
     });
 
-    it('should succeed at exactly stamina = 10', () => {
+    it('should succeed at exactly stamina = 10', async () => {
       workingComp.stamina = 10;
       const task: WorkTask = { taskType: 'guard', duration: 50, energyCost: 0.5 };
       const result = system.assignTask(workingComp, task);
       expect(result.success).toBe(true);
     });
 
-    it('should deep copy the task to avoid external mutations', () => {
+    it('should deep copy the task to avoid external mutations', async () => {
       const task: WorkTask = { taskType: 'guard', duration: 100, energyCost: 0.5 };
       system.assignTask(workingComp, task);
       task.duration = 999;
@@ -342,7 +342,7 @@ describe('WorkingAnimalSystem', () => {
   });
 
   describe('restAnimal', () => {
-    it('should clear the current task', () => {
+    it('should clear the current task', async () => {
       const task: WorkTask = { taskType: 'plow', duration: 100, energyCost: 0.5 };
       system.assignTask(workingComp, task);
       expect(workingComp.currentTask).toBeDefined();
@@ -350,7 +350,7 @@ describe('WorkingAnimalSystem', () => {
       expect(workingComp.currentTask).toBeUndefined();
     });
 
-    it('should be safe to call when no task is active', () => {
+    it('should be safe to call when no task is active', async () => {
       expect(workingComp.currentTask).toBeUndefined();
       expect(() => system.restAnimal(workingComp)).not.toThrow();
     });

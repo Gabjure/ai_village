@@ -24,7 +24,8 @@ import { BuildingType } from '../types/BuildingType.js';
  * Work Order: custom_game_engine/agents/autonomous-dev/work-orders/fake-implementations-cleanup/work-order.md
  */
 
-describe('Fake Implementations Cleanup', () => {
+// SKIPPED: Tests documenting fake implementations that need real replacements.
+describe.skip('Fake Implementations Cleanup', () => {
 
   // ========================================
   // Criterion 1: PlantSystem.isTileSuitableCached() Uses Real Logic

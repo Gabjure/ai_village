@@ -19,20 +19,23 @@ describe('Animal Housing - Integration Tests', () => {
   let animalSystem: AnimalSystem;
   let stateMutator: StateMutatorSystem;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     eventBus = new EventBusImpl();
     world = new World(eventBus);
 
     // Create StateMutatorSystem for test usage
     stateMutator = new StateMutatorSystem();
+    await stateMutator.initialize(world, eventBus);
 
     temperatureSystem = new TemperatureSystem();
+    await temperatureSystem.initialize(world, eventBus);
 
     animalSystem = new AnimalSystem(eventBus);
+    await animalSystem.initialize(world, eventBus);
   });
 
   describe('Temperature System Integration', () => {
-    it('should apply building insulation to housed animals', () => {
+    it('should apply building insulation to housed animals', async () => {
       // Create stable with insulation
       const stableEntity = world.createEntity();
       const stablePos: PositionComponent = { type: ComponentType.Position, version: 1, x: 50, y: 50 };
@@ -203,7 +206,7 @@ describe('Animal Housing - Integration Tests', () => {
       expect(housedTemp.currentTemp).toBeGreaterThan(unhousedTemp.currentTemp);
     });
 
-    it('should apply weather protection to housed animals during storms', () => {
+    it('should apply weather protection to housed animals during storms', async () => {
       // Create chicken coop with weather protection
       const coopEntity = world.createEntity();
       const coopPos: PositionComponent = { type: ComponentType.Position, version: 1, x: 30, y: 30 };
@@ -259,7 +262,7 @@ describe('Animal Housing - Integration Tests', () => {
       // Housed chicken should have low/no stress
     });
 
-    it('should not apply building effects to animals outside interior radius', () => {
+    it('should not apply building effects to animals outside interior radius', async () => {
       // Create barn
       const barnEntity = world.createEntity();
       const barnPos: PositionComponent = { type: ComponentType.Position, version: 1, x: 50, y: 50 };
@@ -317,7 +320,7 @@ describe('Animal Housing - Integration Tests', () => {
   });
 
   describe('Animal System Integration', () => {
-    it('should reduce housed animal stress from cleanliness penalty', () => {
+    it('should reduce housed animal stress from cleanliness penalty', async () => {
       // Create dirty kennel
       const kennelEntity = world.createEntity();
       const kennel: Partial<BuildingComponent> = createBuildingComponent(BuildingType.Kennel, 2);
@@ -364,7 +367,7 @@ describe('Animal Housing - Integration Tests', () => {
       // This will fail until AnimalHousingSystem applies cleanliness penalty
     });
 
-    it('should improve animal mood when housing is cleaned', () => {
+    it('should improve animal mood when housing is cleaned', async () => {
       // Create dirty chicken coop
       const coopEntity = world.createEntity();
       const coop: Partial<BuildingComponent> = createBuildingComponent(BuildingType.ChickenCoop, 2);
@@ -415,7 +418,7 @@ describe('Animal Housing - Integration Tests', () => {
       // Mood should improve after cleaning (stress reduced)
     });
 
-    it('should handle animal lifecycle events while housed', () => {
+    it('should handle animal lifecycle events while housed', async () => {
       // Create stable
       const stableEntity = world.createEntity();
       const stable: Partial<BuildingComponent> = createBuildingComponent(BuildingType.Stable, 2);
@@ -460,7 +463,7 @@ describe('Animal Housing - Integration Tests', () => {
   });
 
   describe('Event-Driven Integration', () => {
-    it('should emit animal_housed event when animal assigned to housing', () => {
+    it('should emit animal_housed event when animal assigned to housing', async () => {
       const coopEntity = world.createEntity();
       const coop: Partial<BuildingComponent> = createBuildingComponent(BuildingType.ChickenCoop, 2);
       coop.isComplete = true;
@@ -498,7 +501,7 @@ describe('Animal Housing - Integration Tests', () => {
       // This will fail until event emission is implemented
     });
 
-    it('should emit animal_unhoused event when animal removed from housing', () => {
+    it('should emit animal_unhoused event when animal removed from housing', async () => {
       const kennelEntity = world.createEntity();
       const kennel: Partial<BuildingComponent> = createBuildingComponent(BuildingType.Kennel, 2);
       kennel.isComplete = true;
@@ -537,7 +540,7 @@ describe('Animal Housing - Integration Tests', () => {
       // This will fail until event emission is implemented
     });
 
-    it('should listen to new_day event and decay cleanliness', () => {
+    it('should listen to new_day event and decay cleanliness', async () => {
       const barnEntity = world.createEntity();
       const barn: Partial<BuildingComponent> = createBuildingComponent(BuildingType.Barn, 3);
       barn.isComplete = true;
@@ -560,7 +563,7 @@ describe('Animal Housing - Integration Tests', () => {
       // This will fail until event listener is implemented
     });
 
-    it('should listen to tick event for system updates', () => {
+    it('should listen to tick event for system updates', async () => {
       const stableEntity = world.createEntity();
       const stable: Partial<BuildingComponent> = createBuildingComponent(BuildingType.Stable, 2);
       stable.isComplete = true;
@@ -579,7 +582,7 @@ describe('Animal Housing - Integration Tests', () => {
   });
 
   describe('Multi-System Interactions', () => {
-    it('should coordinate TemperatureSystem, AnimalSystem, and AnimalHousingSystem', () => {
+    it('should coordinate TemperatureSystem, AnimalSystem, and AnimalHousingSystem', async () => {
       // Create complete scenario: cold weather + housed animals + cleanliness
 
       // Create stable
@@ -658,7 +661,7 @@ describe('Animal Housing - Integration Tests', () => {
   });
 
   describe('Capacity and Assignment Edge Cases', () => {
-    it('should reject assignment when housing is at capacity', () => {
+    it('should reject assignment when housing is at capacity', async () => {
       const coopEntity = world.createEntity();
       const coop: Partial<BuildingComponent> = createBuildingComponent(BuildingType.ChickenCoop, 2);
       coop.isComplete = true;
@@ -695,7 +698,7 @@ describe('Animal Housing - Integration Tests', () => {
       // AssignAnimalToHousingAction should throw or return error
     });
 
-    it('should allow reassignment from one housing to another', () => {
+    it('should allow reassignment from one housing to another', async () => {
       const coop1 = world.createEntity();
       const building1: Partial<BuildingComponent> = createBuildingComponent(BuildingType.ChickenCoop, 2);
       building1.isComplete = true;

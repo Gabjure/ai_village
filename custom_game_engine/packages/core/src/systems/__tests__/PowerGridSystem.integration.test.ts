@@ -14,7 +14,7 @@ import { ComponentType as CT } from '../../types/ComponentType.js';
  */
 
 describe('PowerGridSystem Integration', () => {
-  it('should power consumer when generator produces sufficient power', () => {
+  it('should power consumer when generator produces sufficient power', async () => {
     // Create world with EventBus
     const eventBus = new EventBusImpl();
     const world = new World(eventBus);
@@ -34,6 +34,7 @@ describe('PowerGridSystem Integration', () => {
 
     // Run the system
     const powerGridSystem = new PowerGridSystem();
+    await powerGridSystem.initialize(world, eventBus);
     const entities = [generator, consumer];
     powerGridSystem.update(world, entities, 1);
 
@@ -42,7 +43,7 @@ describe('PowerGridSystem Integration', () => {
     expect(consumerPower.efficiency).toBe(1.0);
   });
 
-  it('should NOT power consumer when generator produces insufficient power', () => {
+  it('should NOT power consumer when generator produces insufficient power', async () => {
     const eventBus = new EventBusImpl();
     const world = new World(eventBus);
 
@@ -61,6 +62,7 @@ describe('PowerGridSystem Integration', () => {
 
     // Run the system
     const powerGridSystem = new PowerGridSystem();
+    await powerGridSystem.initialize(world, eventBus);
     const entities = [generator, consumer];
     powerGridSystem.update(world, entities, 1);
 
@@ -69,7 +71,7 @@ describe('PowerGridSystem Integration', () => {
     expect(consumerPower.efficiency).toBe(0.5); // 50/100 = 0.5
   });
 
-  it('should distribute power across multiple consumers correctly', () => {
+  it('should distribute power across multiple consumers correctly', async () => {
     const eventBus = new EventBusImpl();
     const world = new World(eventBus);
 
@@ -94,6 +96,7 @@ describe('PowerGridSystem Integration', () => {
 
     // Run the system
     const powerGridSystem = new PowerGridSystem();
+    await powerGridSystem.initialize(world, eventBus);
     const entities = [generator, consumer1, consumer2];
     powerGridSystem.update(world, entities, 1);
 
@@ -102,7 +105,7 @@ describe('PowerGridSystem Integration', () => {
     expect(consumer2Power.isPowered).toBe(true);
   });
 
-  it('should handle power network isolation correctly', () => {
+  it('should handle power network isolation correctly', async () => {
     const eventBus = new EventBusImpl();
     const world = new World(eventBus);
 
@@ -121,6 +124,7 @@ describe('PowerGridSystem Integration', () => {
 
     // Run the system
     const powerGridSystem = new PowerGridSystem();
+    await powerGridSystem.initialize(world, eventBus);
     const entities = [generator, consumer];
     powerGridSystem.update(world, entities, 1);
 
@@ -128,7 +132,7 @@ describe('PowerGridSystem Integration', () => {
     expect(consumerPower.isPowered).toBe(false);
   });
 
-  it('should connect generator to consumer via power pole', () => {
+  it('should connect generator to consumer via power pole', async () => {
     const eventBus = new EventBusImpl();
     const world = new World(eventBus);
 
@@ -165,6 +169,7 @@ describe('PowerGridSystem Integration', () => {
 
     // Run the system
     const powerGridSystem = new PowerGridSystem();
+    await powerGridSystem.initialize(world, eventBus);
     const entities = [generator, powerPole, consumer];
     powerGridSystem.update(world, entities, 1);
 
@@ -172,7 +177,7 @@ describe('PowerGridSystem Integration', () => {
     expect(consumerPower.isPowered).toBe(true);
   });
 
-  it('should separate networks by power type', () => {
+  it('should separate networks by power type', async () => {
     const eventBus = new EventBusImpl();
     const world = new World(eventBus);
 
@@ -190,6 +195,7 @@ describe('PowerGridSystem Integration', () => {
 
     // Run the system
     const powerGridSystem = new PowerGridSystem();
+    await powerGridSystem.initialize(world, eventBus);
     const entities = [electricalGen, mechanicalGen];
     powerGridSystem.update(world, entities, 1);
 
@@ -198,7 +204,7 @@ describe('PowerGridSystem Integration', () => {
     expect(networks.length).toBe(2);
   });
 
-  it('should update power state over multiple ticks', () => {
+  it('should update power state over multiple ticks', async () => {
     const eventBus = new EventBusImpl();
     const world = new World(eventBus);
 
@@ -217,6 +223,7 @@ describe('PowerGridSystem Integration', () => {
     world.addEntity(consumer);
 
     const powerGridSystem = new PowerGridSystem();
+    await powerGridSystem.initialize(world, eventBus);
     const entities = [generator, consumer];
 
     // Tick 1: Normal operation
@@ -234,7 +241,7 @@ describe('PowerGridSystem Integration', () => {
     expect(consumerPower.isPowered).toBe(true);
   });
 
-  it('should handle zero consumption consumer gracefully', () => {
+  it('should handle zero consumption consumer gracefully', async () => {
     const eventBus = new EventBusImpl();
     const world = new World(eventBus);
 
@@ -251,6 +258,7 @@ describe('PowerGridSystem Integration', () => {
     world.addEntity(consumer);
 
     const powerGridSystem = new PowerGridSystem();
+    await powerGridSystem.initialize(world, eventBus);
     const entities = [generator, consumer];
     powerGridSystem.update(world, entities, 1);
 

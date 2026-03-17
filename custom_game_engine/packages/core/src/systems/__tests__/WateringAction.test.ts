@@ -18,13 +18,13 @@ describe('Watering Action', () => {
   let _world: World;
   let eventBus: EventBusImpl;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     eventBus = new EventBusImpl();
     _world = new World(eventBus);
   });
 
   describe('Manual Watering', () => {
-    it('should increase tile moisture when watered', () => {
+    it('should increase tile moisture when watered', async () => {
       const tile = {
         terrain: 'dirt' as const,
         fertility: 70,
@@ -41,6 +41,7 @@ describe('Watering Action', () => {
       };
 
       const soilSystem = new SoilSystem();
+      await soilSystem.initialize(_world, eventBus);
 
       soilSystem.waterTile(_world, tile, 5, 5);
 
@@ -48,7 +49,7 @@ describe('Watering Action', () => {
       expect(tile.moisture).toBe(50);
     });
 
-    it('should cap moisture at 100', () => {
+    it('should cap moisture at 100', async () => {
       const tile = {
         terrain: 'dirt' as const,
         fertility: 70,
@@ -65,6 +66,7 @@ describe('Watering Action', () => {
       };
 
       const soilSystem = new SoilSystem();
+      await soilSystem.initialize(_world, eventBus);
 
       soilSystem.waterTile(_world, tile, 5, 5);
 
@@ -72,7 +74,7 @@ describe('Watering Action', () => {
       expect(tile.moisture).toBe(100);
     });
 
-    it('should update lastWatered timestamp', () => {
+    it('should update lastWatered timestamp', async () => {
       const tile = {
         terrain: 'dirt' as const,
         fertility: 70,
@@ -92,13 +94,14 @@ describe('Watering Action', () => {
       _world.setTick(1000);
 
       const soilSystem = new SoilSystem();
+      await soilSystem.initialize(_world, eventBus);
 
       soilSystem.waterTile(_world, tile, 5, 5);
 
       expect(tile.lastWatered).toBe(1000);
     });
 
-    it('should emit soil:watered event', () => {
+    it('should emit soil:watered event', async () => {
       const handler = vi.fn();
       eventBus.subscribe('soil:watered', handler);
 
@@ -121,7 +124,7 @@ describe('Watering Action', () => {
       );
     });
 
-    it('should emit soil:moistureChanged event', () => {
+    it('should emit soil:moistureChanged event', async () => {
       const handler = vi.fn();
       eventBus.subscribe('soil:moistureChanged', handler);
 
@@ -148,7 +151,7 @@ describe('Watering Action', () => {
       expect(action.type).toBe('water');
     });
 
-    it('should require agentId', () => {
+    it('should require agentId', async () => {
       const action = {
         type: 'water',
         agentId: 'agent-1',
@@ -159,7 +162,7 @@ describe('Watering Action', () => {
       expect(typeof action.agentId).toBe('string');
     });
 
-    it('should require position coordinates', () => {
+    it('should require position coordinates', async () => {
       const action = {
         type: 'water',
         agentId: 'agent-1',
@@ -173,7 +176,7 @@ describe('Watering Action', () => {
   });
 
   describe('Error Handling - No Fallbacks', () => {
-    it('should throw when watering tile without moisture property', () => {
+    it('should throw when watering tile without moisture property', async () => {
       const incompleteTile = {
         terrain: 'grass' as const,
         fertility: 0.5,
@@ -190,7 +193,7 @@ describe('Watering Action', () => {
       expect(() => waterTile(incompleteTile)).toThrow('Tile moisture not set - required for watering');
     });
 
-    it('should throw when position is invalid', () => {
+    it('should throw when position is invalid', async () => {
       const invalidAction = {
         type: 'water',
         agentId: 'agent-1',

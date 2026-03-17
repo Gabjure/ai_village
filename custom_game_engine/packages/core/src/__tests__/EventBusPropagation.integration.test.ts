@@ -26,11 +26,11 @@ import { EventBusImpl } from '../events/EventBus.js';
 describe('EventBus Propagation Integration', () => {
   let harness: IntegrationTestHarness;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     harness = createDawnWorld();
   });
 
-  it('should propagate events to multiple listening systems', () => {
+  it('should propagate events to multiple listening systems', async () => {
     const agent = harness.createTestAgent({ x: 10, y: 10 });
     agent.addComponent(new MemoryComponent(agent.id || entity.id));
     agent.addComponent(new NeedsComponent({
@@ -43,6 +43,7 @@ describe('EventBus Propagation Integration', () => {
 
     // Create systems that listen to events - pass eventBus
     const memorySystem = new MemoryFormationSystem(harness.eventBus);
+    await memorySystem.initialize(harness.world, harness.eventBus);
     harness.registerSystem('MemoryFormationSystem', memorySystem);
 
     // Clear setup events
@@ -69,7 +70,7 @@ describe('EventBus Propagation Integration', () => {
     expect(events[0].data.amount).toBe(5);
   });
 
-  it('should maintain event ordering: time → weather → temperature', () => {
+  it('should maintain event ordering: time → weather → temperature', async () => {
     // Create weather entity
     const weatherEntity = harness.world.createEntity('weather');
     weatherEntity.addComponent({
@@ -93,8 +94,11 @@ describe('EventBus Propagation Integration', () => {
 
     // Create systems in correct priority order
     const timeSystem = new TimeSystem();
+    await timeSystem.initialize(harness.world, harness.eventBus);
     const weatherSystem = new WeatherSystem();
+    await weatherSystem.initialize(harness.world, harness.eventBus);
     const tempSystem = new TemperatureSystem();
+    await tempSystem.initialize(harness.world, harness.eventBus);
 
     harness.registerSystem('TimeSystem', timeSystem);
     harness.registerSystem('WeatherSystem', weatherSystem);
@@ -119,7 +123,7 @@ describe('EventBus Propagation Integration', () => {
     expect(allEvents.length).toBeGreaterThanOrEqual(0);
   });
 
-  it('should not drop events under rapid emission', () => {
+  it('should not drop events under rapid emission', async () => {
     harness.clearEvents();
 
     // Emit many events rapidly
@@ -143,7 +147,7 @@ describe('EventBus Propagation Integration', () => {
     }
   });
 
-  it('should include required fields in event payloads', () => {
+  it('should include required fields in event payloads', async () => {
     harness.clearEvents();
 
     // Emit event with full payload
@@ -167,7 +171,7 @@ describe('EventBus Propagation Integration', () => {
     expect(events[0].data.success).toBe(true);
   });
 
-  it('should handle event chains without infinite loops', () => {
+  it('should handle event chains without infinite loops', async () => {
     let eventHandlerCallCount = 0;
     const maxCallCount = 10;
 
@@ -201,7 +205,7 @@ describe('EventBus Propagation Integration', () => {
     expect(eventHandlerCallCount).toBeLessThanOrEqual(maxCallCount);
   });
 
-  it('should allow event listeners to modify world state', () => {
+  it('should allow event listeners to modify world state', async () => {
     const agent = harness.createTestAgent({ x: 10, y: 10 });
     agent.addComponent(new NeedsComponent({
     hunger: 1.0,
@@ -242,7 +246,7 @@ describe('EventBus Propagation Integration', () => {
     expect(needs.hunger).toBe(50);
   });
 
-  it('should support multiple subscribers to same event', () => {
+  it('should support multiple subscribers to same event', async () => {
     let subscriber1Called = false;
     let subscriber2Called = false;
     let subscriber3Called = false;
@@ -282,7 +286,7 @@ describe('EventBus Propagation Integration', () => {
     expect(subscriber3Called).toBe(true);
   });
 
-  it('should properly unsubscribe event listeners', () => {
+  it('should properly unsubscribe event listeners', async () => {
     let callCount = 0;
 
     const unsub = harness.eventBus.subscribe('test:unsub', () => {
@@ -320,7 +324,7 @@ describe('EventBus Propagation Integration', () => {
     expect(callCount).toBe(1);
   });
 
-  it('should handle events with complex data payloads', () => {
+  it('should handle events with complex data payloads', async () => {
     const complexData = {
       agent: {
         id: 'agent-1',

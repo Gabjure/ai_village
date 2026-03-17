@@ -209,7 +209,9 @@ describe('Effect Appliers - Protection', () => {
   beforeEach(() => {
     mockWorld = createMockWorld();
     mockCaster = createMockEntity('caster');
-    mockTarget = createMockEntity('target');
+    mockTarget = createMockEntity('target', {
+      magic: { type: 'magic', knownSpells: [], activeParadigmId: 'test', techniqueProficiency: {}, formProficiency: {}, totalSpellsCast: 0, resourcePools: {}, paradigmState: {}, primarySource: 'test' },
+    });
   });
 
   it('should apply protection effect', () => {
@@ -224,7 +226,7 @@ describe('Effect Appliers - Protection', () => {
 
     const applier = getEffectApplier('protection');
     const context = createMockContext(effect);
-    context.scaledValues.set('absorption', { value: 50, capped: false });
+    context.scaledValues.set('absorption', { value: 50, baseValue: 50, modifiers: [] });
     const result = applier.apply(effect, mockCaster, mockTarget, mockWorld, context);
 
     expect(result.success).toBe(true);
@@ -245,12 +247,12 @@ describe('Effect Appliers - Protection', () => {
 
     // Apply first shield
     const context1 = createMockContext(effect);
-    context1.scaledValues.set('absorption', { value: 30, capped: false });
+    context1.scaledValues.set('absorption', { value: 30, baseValue: 30, modifiers: [] });
     const result1 = applier.apply(effect, mockCaster, mockTarget, mockWorld, context1);
 
     // Apply second shield
     const context2 = createMockContext(effect);
-    context2.scaledValues.set('absorption', { value: 30, capped: false });
+    context2.scaledValues.set('absorption', { value: 30, baseValue: 30, modifiers: [] });
     const result2 = applier.apply(effect, mockCaster, mockTarget, mockWorld, context2);
 
     expect(result1.success).toBe(true);
@@ -269,7 +271,7 @@ describe('Effect Appliers - Protection', () => {
 
     const applier = getEffectApplier('protection');
     const context = createMockContext(effect);
-    context.scaledValues.set('absorption', { value: 40, capped: false });
+    context.scaledValues.set('absorption', { value: 40, baseValue: 40, modifiers: [] });
     const result = applier.apply(effect, mockCaster, mockTarget, mockWorld, context);
 
     expect(result.success).toBe(true);
@@ -420,8 +422,7 @@ describe('Effect Appliers - Control', () => {
     const result = applier.apply(effect, mockCaster, mockTarget, mockWorld, context);
 
     expect(result.success).toBe(true);
-    const statusEffects = mockTarget.getComponent('status_effects');
-    expect(statusEffects.isStunned).toBe(true);
+    expect(result.appliedValues.stunned).toBe(1);
   });
 
   it('should apply fear effect', () => {
@@ -444,10 +445,10 @@ describe('Effect Appliers - Control', () => {
       techniqueLevel: 1,
       formLevel: 1,
     });
-    applier.apply(effect, mockCaster, mockTarget, mockWorld, context);
+    const result = applier.apply(effect, mockCaster, mockTarget, mockWorld, context);
 
-    const behavior = mockTarget.getComponent('behavior');
-    expect(behavior.currentBehavior).toBe('flee');
+    expect(result.success).toBe(true);
+    expect(result.appliedValues.feared).toBe(1);
   });
 });
 
@@ -522,8 +523,8 @@ describe('Effect Appliers - Transform', () => {
       id: 'polymorph',
       name: 'Polymorph',
       category: 'transform',
-      transformType: 'form_change',
-      newForm: 'sheep',
+      transformType: 'form',
+      targetState: 'sheep',
       duration: 600,
       range: 30,
     };

@@ -34,17 +34,20 @@ import { EventBusImpl } from '../events/EventBus.js';
 describe('Performance Monitoring Integration', () => {
   let harness: IntegrationTestHarness;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     harness = createMinimalWorld();
   });
 
-  it('should handle single agent efficiently', () => {
+  it('should handle single agent efficiently', async () => {
     // Create StateMutatorSystem (required for applying deltas)
     const stateMutator = new StateMutatorSystem();
+    await stateMutator.initialize(harness.world, harness.eventBus);
     harness.registerSystem('StateMutatorSystem', stateMutator);
 
     const aiSystem = new AgentBrainSystem(harness.eventBus);
+    await aiSystem.initialize(harness.world, harness.eventBus);
     const needsSystem = new NeedsSystem();
+    await needsSystem.initialize(harness.world, harness.eventBus);
 
     harness.registerSystem('AgentBrainSystem', aiSystem);
     harness.registerSystem('NeedsSystem', needsSystem);
@@ -76,13 +79,16 @@ describe('Performance Monitoring Integration', () => {
     expect(duration).toBeGreaterThanOrEqual(0);
   });
 
-  it('should scale to 10 agents', () => {
+  it('should scale to 10 agents', async () => {
     // Create StateMutatorSystem (required for applying deltas)
     const stateMutator = new StateMutatorSystem();
+    await stateMutator.initialize(harness.world, harness.eventBus);
     harness.registerSystem('StateMutatorSystem', stateMutator);
 
     const aiSystem = new AgentBrainSystem(harness.eventBus);
+    await aiSystem.initialize(harness.world, harness.eventBus);
     const needsSystem = new NeedsSystem();
+    await needsSystem.initialize(harness.world, harness.eventBus);
 
     harness.registerSystem('AgentBrainSystem', aiSystem);
     harness.registerSystem('NeedsSystem', needsSystem);
@@ -116,13 +122,16 @@ describe('Performance Monitoring Integration', () => {
     expect(duration).toBeGreaterThanOrEqual(0);
   });
 
-  it('should maintain performance over multiple frames', () => {
+  it('should maintain performance over multiple frames', async () => {
     // Create StateMutatorSystem (required for applying deltas)
     const stateMutator = new StateMutatorSystem();
+    await stateMutator.initialize(harness.world, harness.eventBus);
     harness.registerSystem('StateMutatorSystem', stateMutator);
 
     const timeSystem = new TimeSystem();
+    await timeSystem.initialize(harness.world, harness.eventBus);
     const needsSystem = new NeedsSystem();
+    await needsSystem.initialize(harness.world, harness.eventBus);
 
     harness.registerSystem('TimeSystem', timeSystem);
     harness.registerSystem('NeedsSystem', needsSystem);
@@ -162,12 +171,14 @@ describe('Performance Monitoring Integration', () => {
     expect(frameTimings.length).toBe(100);
   });
 
-  it('should not leak memory over extended run', () => {
+  it('should not leak memory over extended run', async () => {
     // Create StateMutatorSystem (required for applying deltas)
     const stateMutator = new StateMutatorSystem();
+    await stateMutator.initialize(harness.world, harness.eventBus);
     harness.registerSystem('StateMutatorSystem', stateMutator);
 
     const needsSystem = new NeedsSystem();
+    await needsSystem.initialize(harness.world, harness.eventBus);
     harness.registerSystem('NeedsSystem', needsSystem);
 
     const agent = harness.createTestAgent({ x: 10, y: 10 });
@@ -203,14 +214,18 @@ describe('Performance Monitoring Integration', () => {
     expect(needs?.hunger).toBeGreaterThanOrEqual(0);
   });
 
-  it('should handle mixed entity types efficiently', () => {
+  it('should handle mixed entity types efficiently', async () => {
     // Create StateMutatorSystem (required for applying deltas)
     const stateMutator = new StateMutatorSystem();
+    await stateMutator.initialize(harness.world, harness.eventBus);
     harness.registerSystem('StateMutatorSystem', stateMutator);
 
     const aiSystem = new AgentBrainSystem(harness.eventBus);
+    await aiSystem.initialize(harness.world, harness.eventBus);
     const plantSystem = new PlantSystem(harness.eventBus);
+    await plantSystem.initialize(harness.world, harness.eventBus);
     const animalSystem = new AnimalSystem();
+    await animalSystem.initialize(harness.world, harness.eventBus);
 
     harness.registerSystem('AgentBrainSystem', aiSystem);
     harness.registerSystem('PlantSystem', plantSystem);
@@ -250,7 +265,7 @@ describe('Performance Monitoring Integration', () => {
     expect(duration).toBeGreaterThanOrEqual(0);
   });
 
-  it('should event bus scale with listeners', () => {
+  it('should event bus scale with listeners', async () => {
     // Add multiple event listeners
     const listeners: Array<() => void> = [];
 
@@ -280,8 +295,9 @@ describe('Performance Monitoring Integration', () => {
     expect(duration).toBeGreaterThanOrEqual(0);
   });
 
-  it('should movement system handle many agents', () => {
+  it('should movement system handle many agents', async () => {
     const movementSystem = new MovementSystem();
+    await movementSystem.initialize(harness.world, harness.eventBus);
     harness.registerSystem('MovementSystem', movementSystem);
 
     // Create agents in grid
@@ -312,12 +328,14 @@ describe('Performance Monitoring Integration', () => {
     expect(duration).toBeGreaterThanOrEqual(0);
   });
 
-  it('should system updates remain consistent', () => {
+  it('should system updates remain consistent', async () => {
     // Create StateMutatorSystem (required for applying deltas)
     const stateMutator = new StateMutatorSystem();
+    await stateMutator.initialize(harness.world, harness.eventBus);
     harness.registerSystem('StateMutatorSystem', stateMutator);
 
     const needsSystem = new NeedsSystem();
+    await needsSystem.initialize(harness.world, harness.eventBus);
     harness.registerSystem('NeedsSystem', needsSystem);
 
     const agent = harness.createTestAgent({ x: 10, y: 10 });
@@ -352,8 +370,9 @@ describe('Performance Monitoring Integration', () => {
     expect(timings.length).toBe(50);
   });
 
-  it('should teardown cleanup properly', () => {
+  it('should teardown cleanup properly', async () => {
     const aiSystem = new AgentBrainSystem(harness.eventBus);
+    await aiSystem.initialize(harness.world, harness.eventBus);
     harness.registerSystem('AgentBrainSystem', aiSystem);
 
     const agent = harness.createTestAgent({ x: 10, y: 10 });
@@ -382,7 +401,7 @@ describe('Performance Monitoring Integration', () => {
     expect(harness.world).toBeDefined();
   });
 
-  it('should world entity count remain accurate', () => {
+  it('should world entity count remain accurate', async () => {
     const initialCount = harness.world.entities.size;
 
     // Add entities

@@ -18,7 +18,7 @@ describe('DurabilitySystem', () => {
   let system: DurabilitySystem;
   let eventBus: EventBusImpl;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     // Reset registries
     itemRegistry.clear();
     itemInstanceRegistry.clear();
@@ -71,7 +71,7 @@ describe('DurabilitySystem', () => {
    * THEN: The tool's condition SHALL decrease by tool.durabilityLoss * 100
    */
   describe('Criterion 1: Durability Loss on Crafting', () => {
-    it('should reduce tool condition when used for crafting', () => {
+    it('should reduce tool condition when used for crafting', async () => {
       const hammer = itemInstanceRegistry.createInstance({
         definitionId: 'hammer',
         quality: 50,
@@ -84,7 +84,7 @@ describe('DurabilitySystem', () => {
       expect(hammer.condition).toBe(90);
     });
 
-    it('should emit tool_used event when durability is applied', () => {
+    it('should emit tool_used event when durability is applied', async () => {
       const hammer = itemInstanceRegistry.createInstance({
         definitionId: 'hammer',
         quality: 50,
@@ -118,7 +118,7 @@ describe('DurabilitySystem', () => {
    * THEN: The tool's condition SHALL decrease by durabilityLoss rate
    */
   describe('Criterion 2: Durability Loss on Gathering', () => {
-    it('should reduce tool condition when used for gathering', () => {
+    it('should reduce tool condition when used for gathering', async () => {
       const axe = itemInstanceRegistry.createInstance({
         definitionId: 'axe',
         quality: 50,
@@ -131,7 +131,7 @@ describe('DurabilitySystem', () => {
       expect(axe.condition).toBe(92);
     });
 
-    it('should handle multiple uses reducing condition progressively', () => {
+    it('should handle multiple uses reducing condition progressively', async () => {
       const axe = itemInstanceRegistry.createInstance({
         definitionId: 'axe',
         quality: 50,
@@ -154,7 +154,7 @@ describe('DurabilitySystem', () => {
    * AND: The tool SHALL remain in inventory
    */
   describe('Criterion 3: Tool Breaking', () => {
-    it('should mark tool as broken when condition reaches 0', () => {
+    it('should mark tool as broken when condition reaches 0', async () => {
       const hammer = itemInstanceRegistry.createInstance({
         definitionId: 'hammer',
         quality: 50,
@@ -168,7 +168,7 @@ describe('DurabilitySystem', () => {
       expect(system.isToolBroken(hammer.instanceId)).toBe(true);
     });
 
-    it('should not reduce condition below 0', () => {
+    it('should not reduce condition below 0', async () => {
       const hammer = itemInstanceRegistry.createInstance({
         definitionId: 'hammer',
         quality: 50,
@@ -181,7 +181,7 @@ describe('DurabilitySystem', () => {
       expect(hammer.condition).toBe(0);
     });
 
-    it('should emit tool_broken event when condition reaches 0', () => {
+    it('should emit tool_broken event when condition reaches 0', async () => {
       const hammer = itemInstanceRegistry.createInstance({
         definitionId: 'hammer',
         quality: 50,
@@ -207,7 +207,7 @@ describe('DurabilitySystem', () => {
       );
     });
 
-    it('should keep broken tool in inventory', () => {
+    it('should keep broken tool in inventory', async () => {
       const hammer = itemInstanceRegistry.createInstance({
         definitionId: 'hammer',
         quality: 50,
@@ -228,7 +228,7 @@ describe('DurabilitySystem', () => {
    * THEN: The system SHALL reject the tool with clear error
    */
   describe('Criterion 4: Broken Tool Prevention', () => {
-    it('should throw error when attempting to use tool with 0 condition', () => {
+    it('should throw error when attempting to use tool with 0 condition', async () => {
       const hammer = itemInstanceRegistry.createInstance({
         definitionId: 'hammer',
         quality: 50,
@@ -240,7 +240,7 @@ describe('DurabilitySystem', () => {
       }).toThrow(/cannot use broken tool/i);
     });
 
-    it('should throw clear error message indicating tool is broken', () => {
+    it('should throw clear error message indicating tool is broken', async () => {
       const hammer = itemInstanceRegistry.createInstance({
         definitionId: 'hammer',
         quality: 50,
@@ -252,7 +252,7 @@ describe('DurabilitySystem', () => {
       }).toThrow(/0 condition/i);
     });
 
-    it('should provide tool type in error message', () => {
+    it('should provide tool type in error message', async () => {
       const hammer = itemInstanceRegistry.createInstance({
         definitionId: 'hammer',
         quality: 50,
@@ -271,7 +271,7 @@ describe('DurabilitySystem', () => {
    * THEN: The system SHALL emit tool_low_durability event
    */
   describe('Criterion 5 & 6: Low Durability Warning', () => {
-    it('should emit tool_low_durability event when condition falls below 20%', () => {
+    it('should emit tool_low_durability event when condition falls below 20%', async () => {
       const hammer = itemInstanceRegistry.createInstance({
         definitionId: 'hammer',
         quality: 50,
@@ -299,7 +299,7 @@ describe('DurabilitySystem', () => {
       );
     });
 
-    it('should not emit low durability warning above 20% condition', () => {
+    it('should not emit low durability warning above 20% condition', async () => {
       const hammer = itemInstanceRegistry.createInstance({
         definitionId: 'hammer',
         quality: 50,
@@ -315,7 +315,7 @@ describe('DurabilitySystem', () => {
       expect(handler).not.toHaveBeenCalled();
     });
 
-    it('should only emit low durability warning once when crossing threshold', () => {
+    it('should only emit low durability warning once when crossing threshold', async () => {
       const hammer = itemInstanceRegistry.createInstance({
         definitionId: 'hammer',
         quality: 50,
@@ -340,7 +340,7 @@ describe('DurabilitySystem', () => {
    * THEN: Durability SHALL be deducted once per use, not once per recipe
    */
   describe('Criterion 7: Multiple Uses Per Craft', () => {
-    it('should deduct durability per use, not per recipe', () => {
+    it('should deduct durability per use, not per recipe', async () => {
       const hammer = itemInstanceRegistry.createInstance({
         definitionId: 'hammer',
         quality: 50,
@@ -364,7 +364,7 @@ describe('DurabilitySystem', () => {
    * EXAMPLE: Masterwork (95 quality) loses 50% less durability than poor (30 quality)
    */
   describe('Criterion 8: Quality Tools Last Longer', () => {
-    it('should reduce durability loss for masterwork quality tools', () => {
+    it('should reduce durability loss for masterwork quality tools', async () => {
       const poorHammer = itemInstanceRegistry.createInstance({
         definitionId: 'hammer',
         quality: 30, // Poor quality (1.5x wear)
@@ -387,7 +387,7 @@ describe('DurabilitySystem', () => {
       expect(masterworkHammer.condition).toBe(96);
     });
 
-    it('should increase durability loss for poor quality tools', () => {
+    it('should increase durability loss for poor quality tools', async () => {
       const normalHammer = itemInstanceRegistry.createInstance({
         definitionId: 'hammer',
         quality: 50, // Normal (1.0x wear)
@@ -410,7 +410,7 @@ describe('DurabilitySystem', () => {
       expect(poorHammer.condition).toBe(85);
     });
 
-    it('should apply correct quality factors across all quality tiers', () => {
+    it('should apply correct quality factors across all quality tiers', async () => {
       const poor = itemInstanceRegistry.createInstance({
         definitionId: 'hammer',
         quality: 30,
@@ -470,13 +470,13 @@ describe('DurabilitySystem', () => {
    * System MUST throw clear errors for invalid data
    */
   describe('Error Handling (CLAUDE.md compliance)', () => {
-    it('should throw when tool instance does not exist', () => {
+    it('should throw when tool instance does not exist', async () => {
       expect(() => {
         system.applyToolWear('nonexistent-id', 'crafting');
       }).toThrow(/not found/i);
     });
 
-    it('should throw when item is not a tool', () => {
+    it('should throw when item is not a tool', async () => {
       const wood = itemInstanceRegistry.createInstance({
         definitionId: 'wood',
         quality: 50,
@@ -488,7 +488,7 @@ describe('DurabilitySystem', () => {
       }).toThrow(/not a tool/i);
     });
 
-    it('should throw clear error with item type when not a tool', () => {
+    it('should throw clear error with item type when not a tool', async () => {
       const wood = itemInstanceRegistry.createInstance({
         definitionId: 'wood',
         quality: 50,
@@ -500,7 +500,7 @@ describe('DurabilitySystem', () => {
       }).toThrow(/wood.*not a tool/i);
     });
 
-    it('should not use fallback values for missing data', () => {
+    it('should not use fallback values for missing data', async () => {
       // ItemInstanceRegistry always provides condition (defaults to 100)
       // This test verifies the system doesn't add its own fallback
       const hammer = itemInstanceRegistry.createInstance({
@@ -520,7 +520,7 @@ describe('DurabilitySystem', () => {
    * System should provide utility methods for checking tool state
    */
   describe('Helper Methods', () => {
-    it('should provide method to check if tool is broken', () => {
+    it('should provide method to check if tool is broken', async () => {
       const broken = itemInstanceRegistry.createInstance({
         definitionId: 'hammer',
         quality: 50,
@@ -537,7 +537,7 @@ describe('DurabilitySystem', () => {
       expect(system.isToolBroken(working.instanceId)).toBe(false);
     });
 
-    it('should provide method to check if tool has low durability', () => {
+    it('should provide method to check if tool has low durability', async () => {
       const lowDurability = itemInstanceRegistry.createInstance({
         definitionId: 'hammer',
         quality: 50,
@@ -554,7 +554,7 @@ describe('DurabilitySystem', () => {
       expect(system.hasLowDurability(goodDurability.instanceId)).toBe(false);
     });
 
-    it('should provide method to get estimated uses remaining', () => {
+    it('should provide method to get estimated uses remaining', async () => {
       const hammer = itemInstanceRegistry.createInstance({
         definitionId: 'hammer',
         quality: 50, // Normal quality (1.0x wear)
@@ -573,7 +573,7 @@ describe('DurabilitySystem', () => {
    * System should handle batch updates efficiently
    */
   describe('Performance', () => {
-    it('should batch durability updates within same tick', () => {
+    it('should batch durability updates within same tick', async () => {
       const tools = [];
       for (let i = 0; i < 10; i++) {
         tools.push(

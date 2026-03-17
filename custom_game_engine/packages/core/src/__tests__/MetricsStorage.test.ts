@@ -1,3 +1,4 @@
+// @vitest-environment node
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { MetricsStorage } from '../metrics/MetricsStorage';
 import { promises as fs } from 'fs';

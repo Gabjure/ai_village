@@ -61,7 +61,6 @@ describe('FluidDynamicsSystem', () => {
     expect(system.getDebugInfo().dirtyTileCount).toBe(1);
 
     // Mark neighbors via event (simulating digging)
-    const eventBus = eventBus;
     system.initialize(world, eventBus);
 
     eventBus.emit({

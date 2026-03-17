@@ -131,18 +131,52 @@ describe('ExecutorDeepEval - Action Selection', () => {
   });
 
   describe('Resource-Aware Actions', () => {
-    // SKIP: These tests relied on context objects to pass resource info
-    // The buildPrompt API only takes (agent, world), so resources must be in world entities
-    it.skip('should only suggest gather for visible resources', async () => {
-      // TODO: Add resource entities to mockWorld instead of passing context
+    it('should show visible resources in environment context', async () => {
+      // Add vision component with seen resource entity IDs
+      mockAgent.components.set('vision', {
+        type: 'vision',
+        version: 1,
+        range: 50,
+        closeRange: 10,
+        distantRange: 200,
+        fieldOfView: 360,
+        canSeeAgents: true,
+        canSeeResources: true,
+        seenResources: ['resource-stone-1', 'resource-stone-2', 'resource-wood-1'],
+        seenPlants: [],
+        seenAgents: [],
+        heardSpeech: [],
+      });
+
+      // World returns resource entities for those IDs
+      mockWorld = {
+        query: () => ({
+          with: () => ({
+            executeEntities: () => []
+          })
+        }),
+        getEntity: (id: string) => {
+          if (id === 'resource-stone-1' || id === 'resource-stone-2') {
+            return { components: new Map([['resource', { resourceType: 'stone' }]]) };
+          }
+          if (id === 'resource-wood-1') {
+            return { components: new Map([['resource', { resourceType: 'wood' }]]) };
+          }
+          return null;
+        },
+      };
+
       const prompt = promptBuilder.buildPrompt(mockAgent as Entity, mockWorld);
       expect(prompt).toContain('stone');
       expect(prompt).toContain('wood');
     });
 
-    it.skip('should not suggest building when no resources available', async () => {
-      // TODO: Test with world state instead of context
+    it('should still suggest plan_build when no resources are visible', async () => {
+      // No vision component — empty environment
+      mockAgent.components.delete('vision');
+
       const prompt = promptBuilder.buildPrompt(mockAgent as Entity, mockWorld);
+      // plan_build is always available because it auto-gathers its own materials
       expect(prompt).toContain('plan_build');
     });
 

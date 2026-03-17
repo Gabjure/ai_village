@@ -13,41 +13,42 @@ describe('SoilSystem Weather Integration (Simple)', () => {
   let eventBus: EventBusImpl;
   let soilSystem: SoilSystem;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     eventBus = new EventBusImpl();
     world = new World(eventBus);
     soilSystem = new SoilSystem();
+    await soilSystem.initialize(world, eventBus);
   });
 
-  it('should have onInitialize method', () => {
+  it('should have onInitialize method', async () => {
     expect(typeof (soilSystem as Record<string, unknown>).onInitialize).toBe('function');
   });
 
-  it('should have handleWeatherChange method', () => {
+  it('should have handleWeatherChange method', async () => {
     expect(typeof (soilSystem as Record<string, unknown>).handleWeatherChange).toBe('function');
   });
 
-  it('should have handleRainEvent method', () => {
+  it('should have handleRainEvent method', async () => {
     expect(typeof (soilSystem as Record<string, unknown>).handleRainEvent).toBe('function');
   });
 
-  it('should have handleSnowEvent method', () => {
+  it('should have handleSnowEvent method', async () => {
     expect(typeof (soilSystem as Record<string, unknown>).handleSnowEvent).toBe('function');
   });
 
-  it('should have processDailyMoistureDecay method', () => {
+  it('should have processDailyMoistureDecay method', async () => {
     expect(typeof (soilSystem as Record<string, unknown>).processDailyMoistureDecay).toBe('function');
   });
 
-  it('should have isTileIndoors method', () => {
+  it('should have isTileIndoors method', async () => {
     expect(typeof (soilSystem as Record<string, unknown>).isTileIndoors).toBe('function');
   });
 
-  it('should have getCurrentTemperature method', () => {
+  it('should have getCurrentTemperature method', async () => {
     expect(typeof (soilSystem as Record<string, unknown>).getCurrentTemperature).toBe('function');
   });
 
-  it('should call onInitialize when system context initializes', () => {
+  it('should call onInitialize when system context initializes', async () => {
     // Create a mock system context
     const ctx = {
       world,
@@ -64,7 +65,7 @@ describe('SoilSystem Weather Integration (Simple)', () => {
     expect((soilSystem as Record<string, unknown>).initialized).toBe(true);
   });
 
-  it('should handle weather change event for rain', () => {
+  it('should handle weather change event for rain', async () => {
     const event = {
       type: 'weather:changed',
       source: 'test',
@@ -80,7 +81,7 @@ describe('SoilSystem Weather Integration (Simple)', () => {
     }).not.toThrow();
   });
 
-  it('should handle weather change event for snow', () => {
+  it('should handle weather change event for snow', async () => {
     const event = {
       type: 'weather:changed',
       source: 'test',
@@ -96,7 +97,7 @@ describe('SoilSystem Weather Integration (Simple)', () => {
     }).not.toThrow();
   });
 
-  it('should get current temperature without throwing', () => {
+  it('should get current temperature without throwing', async () => {
     // Should not throw even if no temperature component exists
     expect(() => {
       const temp = (soilSystem as Record<string, unknown>).getCurrentTemperature(world);
@@ -104,7 +105,7 @@ describe('SoilSystem Weather Integration (Simple)', () => {
     }).not.toThrow();
   });
 
-  it('should check if tile is indoors (currently returns false)', () => {
+  it('should check if tile is indoors (currently returns false)', async () => {
     const result = (soilSystem as Record<string, unknown>).isTileIndoors({}, world, 0, 0);
     expect(result).toBe(false); // Currently all tiles are outdoor
   });

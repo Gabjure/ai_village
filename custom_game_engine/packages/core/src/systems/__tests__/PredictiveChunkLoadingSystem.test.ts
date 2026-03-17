@@ -15,24 +15,24 @@ interface PredictiveChunkLoadingSystemInternal {
 describe('PredictiveChunkLoadingSystem', () => {
   const system = new PredictiveChunkLoadingSystem();
 
-  it('should have correct priority', () => {
+  it('should have correct priority', async () => {
     expect(system.priority).toBe(7);
   });
 
-  it('should require position and velocity components', () => {
+  it('should require position and velocity components', async () => {
     expect(system.requiredComponents).toContain('position');
     expect(system.requiredComponents).toContain('velocity');
   });
 
-  it('should have throttle interval of 20 ticks', () => {
+  it('should have throttle interval of 20 ticks', async () => {
     expect((system as PredictiveChunkLoadingSystemInternal).throttleInterval).toBe(20);
   });
 
-  it('should have correct system id', () => {
+  it('should have correct system id', async () => {
     expect(system.id).toBe('predictive_chunk_loading');
   });
 
-  it('should calculate correct chunk coordinates from position', () => {
+  it('should calculate correct chunk coordinates from position', async () => {
     // Chunk size is 32, so:
     // x=100 -> chunkX = floor(100/32) = 3
     // y=50 -> chunkY = floor(50/32) = 1
@@ -41,7 +41,7 @@ describe('PredictiveChunkLoadingSystem', () => {
     expect(pos.chunkY).toBe(1);
   });
 
-  it('should normalize velocity correctly', () => {
+  it('should normalize velocity correctly', async () => {
     const vx = 3;
     const vy = 4;
     const magnitude = Math.sqrt(vx * vx + vy * vy); // = 5
@@ -52,7 +52,7 @@ describe('PredictiveChunkLoadingSystem', () => {
     expect(normalizedY).toBeCloseTo(0.8);
   });
 
-  it('should predict chunks along movement direction', () => {
+  it('should predict chunks along movement direction', async () => {
     // Agent at (100, 50) moving east with velocity (2, 0)
     // Current chunk: (3, 1)
     // Direction: (1, 0) - normalized
@@ -92,7 +92,7 @@ describe('PredictiveChunkLoadingSystem', () => {
     ]);
   });
 
-  it('should skip stationary agents', () => {
+  it('should skip stationary agents', async () => {
     // Velocity magnitude < 0.1 should be skipped
     const vx = 0.05;
     const vy = 0.05;
@@ -101,7 +101,7 @@ describe('PredictiveChunkLoadingSystem', () => {
     expect(magnitude).toBeLessThan(0.1);
   });
 
-  it('should calculate perpendicular direction for lateral checks', () => {
+  it('should calculate perpendicular direction for lateral checks', async () => {
     // For direction (1, 0), perpendicular is (0, 1)
     const dirX = 1;
     const dirY = 0;
@@ -135,7 +135,7 @@ describe('PredictiveChunkLoadingSystem', () => {
       );
     };
 
-    it('should predict 2 chunks for slow agents (speed 0.2)', () => {
+    it('should predict 2 chunks for slow agents (speed 0.2)', async () => {
       // Agent with velocity (0.2, 0) has speed = 0.2
       const speed = 0.2;
       const prediction = calculatePredictionDistance(speed);
@@ -144,7 +144,7 @@ describe('PredictiveChunkLoadingSystem', () => {
       expect(prediction).toBe(2);
     });
 
-    it('should predict 2 chunks for slow diagonal agents (speed 0.3)', () => {
+    it('should predict 2 chunks for slow diagonal agents (speed 0.3)', async () => {
       // Agent with velocity (0.2, 0.2) has speed ≈ 0.283
       const vx = 0.2;
       const vy = 0.2;
@@ -155,7 +155,7 @@ describe('PredictiveChunkLoadingSystem', () => {
       expect(prediction).toBe(2);
     });
 
-    it('should predict 3 chunks for medium-slow agents (speed 0.5)', () => {
+    it('should predict 3 chunks for medium-slow agents (speed 0.5)', async () => {
       // Agent with velocity (0.5, 0) has speed = 0.5
       const speed = 0.5;
       const prediction = calculatePredictionDistance(speed);
@@ -164,7 +164,7 @@ describe('PredictiveChunkLoadingSystem', () => {
       expect(prediction).toBe(3);
     });
 
-    it('should predict 5 chunks for medium agents (speed 1.0)', () => {
+    it('should predict 5 chunks for medium agents (speed 1.0)', async () => {
       // Agent with velocity (0.7, 0.7) has speed ≈ 0.99
       const vx = 0.7;
       const vy = 0.7;
@@ -175,7 +175,7 @@ describe('PredictiveChunkLoadingSystem', () => {
       expect(prediction).toBe(5);
     });
 
-    it('should predict 10 chunks for fast agents (speed 2.0)', () => {
+    it('should predict 10 chunks for fast agents (speed 2.0)', async () => {
       // Agent with velocity (2.0, 0) has speed = 2.0
       const speed = 2.0;
       const prediction = calculatePredictionDistance(speed);
@@ -184,7 +184,7 @@ describe('PredictiveChunkLoadingSystem', () => {
       expect(prediction).toBe(10);
     });
 
-    it('should predict 12 chunks (max) for very fast agents (speed 3.0)', () => {
+    it('should predict 12 chunks (max) for very fast agents (speed 3.0)', async () => {
       // Agent with velocity (3.0, 0) has speed = 3.0
       const speed = 3.0;
       const prediction = calculatePredictionDistance(speed);
@@ -193,7 +193,7 @@ describe('PredictiveChunkLoadingSystem', () => {
       expect(prediction).toBe(12);
     });
 
-    it('should cap at max prediction distance for extremely fast agents (speed 5.0)', () => {
+    it('should cap at max prediction distance for extremely fast agents (speed 5.0)', async () => {
       // Agent with velocity (5.0, 0) has speed = 5.0
       const speed = 5.0;
       const prediction = calculatePredictionDistance(speed);
@@ -202,7 +202,7 @@ describe('PredictiveChunkLoadingSystem', () => {
       expect(prediction).toBe(12);
     });
 
-    it('should handle edge case at minimum threshold (speed 0.1)', () => {
+    it('should handle edge case at minimum threshold (speed 0.1)', async () => {
       // Agent at minimum movement threshold
       const speed = 0.1;
       const prediction = calculatePredictionDistance(speed);
@@ -211,7 +211,7 @@ describe('PredictiveChunkLoadingSystem', () => {
       expect(prediction).toBe(2);
     });
 
-    it('should scale linearly between min and max', () => {
+    it('should scale linearly between min and max', async () => {
       // Test that prediction scales smoothly
       const speed_0_4 = 0.4; // -> 2
       const speed_0_6 = 0.6; // -> 3

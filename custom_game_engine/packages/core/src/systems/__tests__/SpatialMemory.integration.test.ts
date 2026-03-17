@@ -25,12 +25,13 @@ import { EventBusImpl } from '../events/EventBus.js';
 describe('SpatialMemoryQuerySystem + MemorySystem + ExplorationSystem Integration', () => {
   let harness: IntegrationTestHarness;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     harness = createMinimalWorld();
   });
 
-  it('should spatial memory system process agents', () => {
+  it('should spatial memory system process agents', async () => {
     const spatialSystem = new SpatialMemoryQuerySystem();
+    await spatialSystem.initialize(harness.world, harness.eventBus);
     harness.registerSystem('SpatialMemoryQuerySystem', spatialSystem);
 
     const agent = harness.createTestAgent({ x: 10, y: 10 });
@@ -44,9 +45,11 @@ describe('SpatialMemoryQuerySystem + MemorySystem + ExplorationSystem Integratio
     }).not.toThrow();
   });
 
-  it('should exploration system integrate with memory', () => {
+  it('should exploration system integrate with memory', async () => {
     const explorationSystem = new ExplorationSystem(harness.eventBus);
+    await explorationSystem.initialize(harness.world, harness.eventBus);
     const memorySystem = new MemorySystem();
+    await memorySystem.initialize(harness.world, harness.eventBus);
 
     harness.registerSystem('ExplorationSystem', explorationSystem);
     harness.registerSystem('MemorySystem', memorySystem);

@@ -22,12 +22,13 @@ import { EventBusImpl } from '../events/EventBus.js';
 describe('CommunicationSystem + Social Network Integration', () => {
   let harness: IntegrationTestHarness;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     harness = createMinimalWorld();
   });
 
-  it('should communication system process agents', () => {
+  it('should communication system process agents', async () => {
     const commSystem = new CommunicationSystem(harness.eventBus);
+    await commSystem.initialize(harness.world, harness.eventBus);
     harness.registerSystem('CommunicationSystem', commSystem);
 
     const agent1 = harness.createTestAgent({ x: 10, y: 10 });
@@ -45,8 +46,9 @@ describe('CommunicationSystem + Social Network Integration', () => {
     }).not.toThrow();
   });
 
-  it('should conversations start between nearby agents', () => {
+  it('should conversations start between nearby agents', async () => {
     const commSystem = new CommunicationSystem(harness.eventBus);
+    await commSystem.initialize(harness.world, harness.eventBus);
     harness.registerSystem('CommunicationSystem', commSystem);
 
     const agent1 = harness.createTestAgent({ x: 10, y: 10 });
@@ -73,8 +75,9 @@ describe('CommunicationSystem + Social Network Integration', () => {
     expect(conversationEvents.length).toBeGreaterThanOrEqual(0);
   });
 
-  it('should distant agents not start conversations', () => {
+  it('should distant agents not start conversations', async () => {
     const commSystem = new CommunicationSystem(harness.eventBus);
+    await commSystem.initialize(harness.world, harness.eventBus);
     harness.registerSystem('CommunicationSystem', commSystem);
 
     const agent1 = harness.createTestAgent({ x: 10, y: 10 });
@@ -95,7 +98,7 @@ describe('CommunicationSystem + Social Network Integration', () => {
     expect(conversationEvents.length).toBe(0);
   });
 
-  it('should trust network track relationships', () => {
+  it('should trust network track relationships', async () => {
     const agent1 = harness.createTestAgent({ x: 10, y: 10 });
     const agent2 = harness.createTestAgent({ x: 11, y: 11 });
 
@@ -113,8 +116,9 @@ describe('CommunicationSystem + Social Network Integration', () => {
     expect(trust2.trustLevels.get(agent1.id)).toBe(0.6);
   });
 
-  it('should information sharing update trust', () => {
+  it('should information sharing update trust', async () => {
     const commSystem = new CommunicationSystem(harness.eventBus);
+    await commSystem.initialize(harness.world, harness.eventBus);
     harness.registerSystem('CommunicationSystem', commSystem);
 
     const agent1 = harness.createTestAgent({ x: 10, y: 10 });
@@ -154,8 +158,9 @@ describe('CommunicationSystem + Social Network Integration', () => {
     expect(trust2After).toBeDefined();
   });
 
-  it('should conversation system handle multiple agents', () => {
+  it('should conversation system handle multiple agents', async () => {
     const commSystem = new CommunicationSystem(harness.eventBus);
+    await commSystem.initialize(harness.world, harness.eventBus);
     harness.registerSystem('CommunicationSystem', commSystem);
 
     // Create 5 agents in proximity
@@ -177,7 +182,7 @@ describe('CommunicationSystem + Social Network Integration', () => {
     }
   });
 
-  it('should memory component track conversation events', () => {
+  it('should memory component track conversation events', async () => {
     const agent1 = harness.createTestAgent({ x: 10, y: 10 });
     const agent2 = harness.createTestAgent({ x: 11, y: 11 });
 

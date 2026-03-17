@@ -24,12 +24,13 @@ import { EventBusImpl } from '../events/EventBus.js';
 describe('SoilSystem + PlantSystem + WeatherSystem Integration', () => {
   let harness: IntegrationTestHarness;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     harness = createDawnWorld();
   });
 
-  it('should tilling grass create farmable soil', () => {
+  it('should tilling grass create farmable soil', async () => {
     const soilSystem = new SoilSystem();
+    await soilSystem.initialize(harness.world, harness.eventBus);
     harness.registerSystem('SoilSystem', soilSystem);
 
     // Create a grass tile
@@ -56,8 +57,9 @@ describe('SoilSystem + PlantSystem + WeatherSystem Integration', () => {
     expect(tile.plantability).toBeGreaterThan(0);
   });
 
-  it('should tilling require grass or dirt terrain', () => {
+  it('should tilling require grass or dirt terrain', async () => {
     const soilSystem = new SoilSystem();
+    await soilSystem.initialize(harness.world, harness.eventBus);
     harness.registerSystem('SoilSystem', soilSystem);
 
     // Try to till water (should fail)
@@ -81,8 +83,9 @@ describe('SoilSystem + PlantSystem + WeatherSystem Integration', () => {
     }).toThrow('Cannot till water terrain');
   });
 
-  it('should prevent re-tilling already tilled soil with plantability remaining', () => {
+  it('should prevent re-tilling already tilled soil with plantability remaining', async () => {
     const soilSystem = new SoilSystem();
+    await soilSystem.initialize(harness.world, harness.eventBus);
     harness.registerSystem('SoilSystem', soilSystem);
 
     const tile: Tile = {
@@ -105,8 +108,9 @@ describe('SoilSystem + PlantSystem + WeatherSystem Integration', () => {
     }).toThrow('already tilled');
   });
 
-  it('should allow re-tilling when soil is depleted', () => {
+  it('should allow re-tilling when soil is depleted', async () => {
     const soilSystem = new SoilSystem();
+    await soilSystem.initialize(harness.world, harness.eventBus);
     harness.registerSystem('SoilSystem', soilSystem);
 
     const tile: Tile = {
@@ -131,8 +135,9 @@ describe('SoilSystem + PlantSystem + WeatherSystem Integration', () => {
     expect(tile.plantability).toBeGreaterThan(0);
   });
 
-  it('should require biome data for tilling', () => {
+  it('should require biome data for tilling', async () => {
     const soilSystem = new SoilSystem();
+    await soilSystem.initialize(harness.world, harness.eventBus);
     harness.registerSystem('SoilSystem', soilSystem);
 
     const tile: Tile = {
@@ -155,7 +160,7 @@ describe('SoilSystem + PlantSystem + WeatherSystem Integration', () => {
     }).toThrow('has no biome data');
   });
 
-  it('should weather system emit rain events that affect soil', () => {
+  it('should weather system emit rain events that affect soil', async () => {
     // Create weather entity with rain
     const weatherEntity = harness.world.createEntity('weather');
     weatherEntity.addComponent({
@@ -169,6 +174,7 @@ describe('SoilSystem + PlantSystem + WeatherSystem Integration', () => {
     });
 
     const weatherSystem = new WeatherSystem();
+    await weatherSystem.initialize(harness.world, harness.eventBus);
     harness.registerSystem('WeatherSystem', weatherSystem);
 
     harness.clearEvents();
@@ -186,8 +192,9 @@ describe('SoilSystem + PlantSystem + WeatherSystem Integration', () => {
     expect(weather.intensity).toBeLessThanOrEqual(1);
   });
 
-  it('should plant system subscribe to weather events', () => {
+  it('should plant system subscribe to weather events', async () => {
     const plantSystem = new PlantSystem(harness.eventBus);
+    await plantSystem.initialize(harness.world, harness.eventBus);
     harness.registerSystem('PlantSystem', plantSystem);
 
     harness.clearEvents();
@@ -206,8 +213,9 @@ describe('SoilSystem + PlantSystem + WeatherSystem Integration', () => {
     expect(rainEvents[0].data.intensity).toBe('heavy');
   });
 
-  it('should frost weather damage plants', () => {
+  it('should frost weather damage plants', async () => {
     const plantSystem = new PlantSystem(harness.eventBus);
+    await plantSystem.initialize(harness.world, harness.eventBus);
     harness.registerSystem('PlantSystem', plantSystem);
 
     // Create a plant
@@ -239,8 +247,9 @@ describe('SoilSystem + PlantSystem + WeatherSystem Integration', () => {
     expect(plant.getComponent(ComponentType.Plant)).toBeDefined();
   });
 
-  it('should soil moisture changes propagate to plant system', () => {
+  it('should soil moisture changes propagate to plant system', async () => {
     const plantSystem = new PlantSystem(harness.eventBus);
+    await plantSystem.initialize(harness.world, harness.eventBus);
     harness.registerSystem('PlantSystem', plantSystem);
 
     harness.clearEvents();
@@ -263,8 +272,9 @@ describe('SoilSystem + PlantSystem + WeatherSystem Integration', () => {
     expect(moistureEvents[0].data.moisture).toBe(80);
   });
 
-  it('should soil depletion affect plant nutrients', () => {
+  it('should soil depletion affect plant nutrients', async () => {
     const plantSystem = new PlantSystem(harness.eventBus);
+    await plantSystem.initialize(harness.world, harness.eventBus);
     harness.registerSystem('PlantSystem', plantSystem);
 
     harness.clearEvents();
@@ -285,8 +295,9 @@ describe('SoilSystem + PlantSystem + WeatherSystem Integration', () => {
     expect(depletedEvents[0].data.nutrients).toBe(20);
   });
 
-  it('should plants respond to day change events', () => {
+  it('should plants respond to day change events', async () => {
     const plantSystem = new PlantSystem(harness.eventBus);
+    await plantSystem.initialize(harness.world, harness.eventBus);
     harness.registerSystem('PlantSystem', plantSystem);
 
     harness.clearEvents();
@@ -304,8 +315,9 @@ describe('SoilSystem + PlantSystem + WeatherSystem Integration', () => {
     expect(dayEvents[0].data.day).toBe(2);
   });
 
-  it('should soil system track daily updates', () => {
+  it('should soil system track daily updates', async () => {
     const soilSystem = new SoilSystem();
+    await soilSystem.initialize(harness.world, harness.eventBus);
     harness.registerSystem('SoilSystem', soilSystem);
 
     const entities = Array.from(harness.world.entities.values());
@@ -324,7 +336,7 @@ describe('SoilSystem + PlantSystem + WeatherSystem Integration', () => {
     expect(harness.world.tick).toBeGreaterThanOrEqual(initialTick);
   });
 
-  it('should weather affect temperature which affects plant growth', () => {
+  it('should weather affect temperature which affects plant growth', async () => {
     // Create weather with temperature modifier
     const weatherEntity = harness.world.createEntity('weather');
     weatherEntity.addComponent({
@@ -338,6 +350,7 @@ describe('SoilSystem + PlantSystem + WeatherSystem Integration', () => {
     });
 
     const plantSystem = new PlantSystem(harness.eventBus);
+    await plantSystem.initialize(harness.world, harness.eventBus);
     harness.registerSystem('PlantSystem', plantSystem);
 
     harness.clearEvents();

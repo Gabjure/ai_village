@@ -19,13 +19,13 @@ describe('Fertilizer Application', () => {
   let _world: World;
   let eventBus: EventBusImpl;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     eventBus = new EventBusImpl();
     _world = new World(eventBus);
   });
 
   describe('Compost Application', () => {
-    it('should increase fertility by 20 when compost is applied', () => {
+    it('should increase fertility by 20 when compost is applied', async () => {
       const tile = {
         terrain: 'dirt' as const,
         fertility: 40,
@@ -42,13 +42,14 @@ describe('Fertilizer Application', () => {
       };
 
       const soilSystem = new SoilSystem();
+      await soilSystem.initialize(_world, eventBus);
 
       soilSystem.fertilizeTile(_world, tile, 5, 5, FERTILIZERS.compost);
 
       expect(tile.fertility).toBe(60); // 40 + 20
     });
 
-    it('should set fertilized flag to true', () => {
+    it('should set fertilized flag to true', async () => {
       const tile = {
         terrain: 'dirt' as const,
         fertility: 40,
@@ -65,13 +66,14 @@ describe('Fertilizer Application', () => {
       };
 
       const soilSystem = new SoilSystem();
+      await soilSystem.initialize(_world, eventBus);
 
       soilSystem.fertilizeTile(_world, tile, 5, 5, FERTILIZERS.compost);
 
       expect(tile.fertilized).toBe(true);
     });
 
-    it('should set fertilizerDuration for one season', () => {
+    it('should set fertilizerDuration for one season', async () => {
       const tile = {
         terrain: 'dirt' as const,
         fertility: 40,
@@ -88,6 +90,7 @@ describe('Fertilizer Application', () => {
       };
 
       const soilSystem = new SoilSystem();
+      await soilSystem.initialize(_world, eventBus);
 
       soilSystem.fertilizeTile(_world, tile, 5, 5, FERTILIZERS.compost);
 
@@ -95,7 +98,7 @@ describe('Fertilizer Application', () => {
       expect(tile.fertilizerDuration).toBe(90 * 86400);
     });
 
-    it('should cap fertility at 100', () => {
+    it('should cap fertility at 100', async () => {
       const tile = {
         terrain: 'dirt' as const,
         fertility: 90,
@@ -112,6 +115,7 @@ describe('Fertilizer Application', () => {
       };
 
       const soilSystem = new SoilSystem();
+      await soilSystem.initialize(_world, eventBus);
 
       soilSystem.fertilizeTile(_world, tile, 5, 5, FERTILIZERS.compost);
 
@@ -120,7 +124,7 @@ describe('Fertilizer Application', () => {
   });
 
   describe('Fish Meal Application', () => {
-    it('should increase fertility by 15', () => {
+    it('should increase fertility by 15', async () => {
       // Note: Fish meal gives +15, not +30 (based on FERTILIZERS constant)
       const tile = {
         terrain: 'dirt' as const,
@@ -138,13 +142,14 @@ describe('Fertilizer Application', () => {
       };
 
       const soilSystem = new SoilSystem();
+      await soilSystem.initialize(_world, eventBus);
 
       soilSystem.fertilizeTile(_world, tile, 5, 5, FERTILIZERS['fish-meal']);
 
       expect(tile.fertility).toBe(55); // 40 + 15
     });
 
-    it('should last for 7 days', () => {
+    it('should last for 7 days', async () => {
       const tile = {
         terrain: 'dirt' as const,
         fertility: 40,
@@ -161,6 +166,7 @@ describe('Fertilizer Application', () => {
       };
 
       const soilSystem = new SoilSystem();
+      await soilSystem.initialize(_world, eventBus);
 
       soilSystem.fertilizeTile(_world, tile, 5, 5, FERTILIZERS['fish-meal']);
 
@@ -170,7 +176,7 @@ describe('Fertilizer Application', () => {
   });
 
   describe('Bone Meal Application', () => {
-    it('should apply quality bonus', () => {
+    it('should apply quality bonus', async () => {
       const tile = {
         terrain: 'dirt' as const,
         fertility: 40,
@@ -187,6 +193,7 @@ describe('Fertilizer Application', () => {
       };
 
       const soilSystem = new SoilSystem();
+      await soilSystem.initialize(_world, eventBus);
 
       soilSystem.fertilizeTile(_world, tile, 5, 5, FERTILIZERS['bone-meal']);
 
@@ -195,7 +202,7 @@ describe('Fertilizer Application', () => {
       expect(tile.nutrients.phosphorus).toBe(57); // 32 + 25
     });
 
-    it('should last for 14 days', () => {
+    it('should last for 14 days', async () => {
       const tile = {
         terrain: 'dirt' as const,
         fertility: 40,
@@ -212,6 +219,7 @@ describe('Fertilizer Application', () => {
       };
 
       const soilSystem = new SoilSystem();
+      await soilSystem.initialize(_world, eventBus);
 
       soilSystem.fertilizeTile(_world, tile, 5, 5, FERTILIZERS['bone-meal']);
 
@@ -221,7 +229,7 @@ describe('Fertilizer Application', () => {
   });
 
   describe('Manure Application', () => {
-    it('should increase fertility by 25', () => {
+    it('should increase fertility by 25', async () => {
       const tile = {
         terrain: 'dirt' as const,
         fertility: 40,
@@ -238,13 +246,14 @@ describe('Fertilizer Application', () => {
       };
 
       const soilSystem = new SoilSystem();
+      await soilSystem.initialize(_world, eventBus);
 
       soilSystem.fertilizeTile(_world, tile, 5, 5, FERTILIZERS.manure);
 
       expect(tile.fertility).toBe(65); // 40 + 25
     });
 
-    it('should increase nitrogen by 15', () => {
+    it('should increase nitrogen by 15', async () => {
       const tile = {
         terrain: 'dirt' as const,
         fertility: 40,
@@ -261,13 +270,14 @@ describe('Fertilizer Application', () => {
       };
 
       const soilSystem = new SoilSystem();
+      await soilSystem.initialize(_world, eventBus);
 
       soilSystem.fertilizeTile(_world, tile, 5, 5, FERTILIZERS.manure);
 
       expect(tile.nutrients.nitrogen).toBe(55); // 40 + 15
     });
 
-    it('should last for one season', () => {
+    it('should last for one season', async () => {
       const tile = {
         terrain: 'dirt' as const,
         fertility: 40,
@@ -284,6 +294,7 @@ describe('Fertilizer Application', () => {
       };
 
       const soilSystem = new SoilSystem();
+      await soilSystem.initialize(_world, eventBus);
 
       soilSystem.fertilizeTile(_world, tile, 5, 5, FERTILIZERS.manure);
 
@@ -293,7 +304,7 @@ describe('Fertilizer Application', () => {
   });
 
   describe('Nutrient Tracking', () => {
-    it('should increase nitrogen when appropriate fertilizer is applied', () => {
+    it('should increase nitrogen when appropriate fertilizer is applied', async () => {
       const tile = {
         terrain: 'dirt' as const,
         fertility: 50,
@@ -310,6 +321,7 @@ describe('Fertilizer Application', () => {
       };
 
       const soilSystem = new SoilSystem();
+      await soilSystem.initialize(_world, eventBus);
 
       // Fish meal is nitrogen-rich (+20 nitrogen)
       soilSystem.fertilizeTile(_world, tile, 5, 5, FERTILIZERS['fish-meal']);
@@ -317,7 +329,7 @@ describe('Fertilizer Application', () => {
       expect(tile.nutrients.nitrogen).toBe(70); // 50 + 20
     });
 
-    it('should increase phosphorus when appropriate fertilizer is applied', () => {
+    it('should increase phosphorus when appropriate fertilizer is applied', async () => {
       const tile = {
         terrain: 'dirt' as const,
         fertility: 50,
@@ -334,6 +346,7 @@ describe('Fertilizer Application', () => {
       };
 
       const soilSystem = new SoilSystem();
+      await soilSystem.initialize(_world, eventBus);
 
       // Bone meal is phosphorus-rich (+25 phosphorus)
       soilSystem.fertilizeTile(_world, tile, 5, 5, FERTILIZERS['bone-meal']);
@@ -341,7 +354,7 @@ describe('Fertilizer Application', () => {
       expect(tile.nutrients.phosphorus).toBe(65); // 40 + 25
     });
 
-    it('should increase potassium when appropriate fertilizer is applied', () => {
+    it('should increase potassium when appropriate fertilizer is applied', async () => {
       const tile = {
         terrain: 'dirt' as const,
         fertility: 50,
@@ -358,6 +371,7 @@ describe('Fertilizer Application', () => {
       };
 
       const soilSystem = new SoilSystem();
+      await soilSystem.initialize(_world, eventBus);
 
       // Manure has good potassium (+12 potassium)
       soilSystem.fertilizeTile(_world, tile, 5, 5, FERTILIZERS.manure);
@@ -365,7 +379,7 @@ describe('Fertilizer Application', () => {
       expect(tile.nutrients.potassium).toBe(57); // 45 + 12
     });
 
-    it('should cap nutrients at 100', () => {
+    it('should cap nutrients at 100', async () => {
       const tile = {
         terrain: 'dirt' as const,
         fertility: 50,
@@ -382,6 +396,7 @@ describe('Fertilizer Application', () => {
       };
 
       const soilSystem = new SoilSystem();
+      await soilSystem.initialize(_world, eventBus);
 
       // Compost adds +10 nitrogen
       soilSystem.fertilizeTile(_world, tile, 5, 5, FERTILIZERS.compost);
@@ -425,7 +440,7 @@ describe('Fertilizer Application', () => {
       expect(action.type).toBe('fertilize');
     });
 
-    it('should require agentId', () => {
+    it('should require agentId', async () => {
       const action = {
         type: 'fertilize',
         agentId: 'agent-1',
@@ -437,7 +452,7 @@ describe('Fertilizer Application', () => {
       expect(typeof action.agentId).toBe('string');
     });
 
-    it('should require position coordinates', () => {
+    it('should require position coordinates', async () => {
       const action = {
         type: 'fertilize',
         agentId: 'agent-1',
@@ -450,7 +465,7 @@ describe('Fertilizer Application', () => {
       expect(action.position.y).toBeDefined();
     });
 
-    it('should require fertilizerType', () => {
+    it('should require fertilizerType', async () => {
       const action = {
         type: 'fertilize',
         agentId: 'agent-1',
@@ -464,7 +479,7 @@ describe('Fertilizer Application', () => {
   });
 
   describe('Event Emission', () => {
-    it('should emit soil:fertilized event', () => {
+    it('should emit soil:fertilized event', async () => {
       const handler = vi.fn();
       eventBus.subscribe('soil:fertilized', handler);
 
@@ -493,7 +508,7 @@ describe('Fertilizer Application', () => {
   });
 
   describe('Error Handling - No Fallbacks', () => {
-    it('should throw when applying fertilizer to tile without nutrients', () => {
+    it('should throw when applying fertilizer to tile without nutrients', async () => {
       const incompleteTile = {
         terrain: 'dirt' as const,
         fertility: 0.5,
@@ -510,7 +525,7 @@ describe('Fertilizer Application', () => {
       expect(() => applyFertilizer(incompleteTile)).toThrow('Tile nutrients not set - required for fertilizer application');
     });
 
-    it('should throw when fertilizer type is invalid', () => {
+    it('should throw when fertilizer type is invalid', async () => {
       const invalidAction = {
         type: 'fertilize',
         agentId: 'agent-1',
@@ -528,7 +543,7 @@ describe('Fertilizer Application', () => {
       expect(() => validateFertilizerType(invalidAction)).toThrow('Invalid fertilizer type');
     });
 
-    it('should throw when position is invalid', () => {
+    it('should throw when position is invalid', async () => {
       const invalidAction = {
         type: 'fertilize',
         agentId: 'agent-1',

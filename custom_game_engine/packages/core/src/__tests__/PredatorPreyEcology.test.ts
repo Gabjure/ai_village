@@ -88,12 +88,12 @@ function callOnUpdate(system: PredatorPreyEcologySystem, ctx: SystemContext): vo
 describe('PredatorPreyEcologySystem', () => {
   let system: PredatorPreyEcologySystem;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     idCounter = 0;
     system = new PredatorPreyEcologySystem();
   });
 
-  it('hungry predator near prey → predator state becomes hunting, prey state becomes fleeing', () => {
+  it('hungry predator near prey → predator state becomes hunting, prey state becomes fleeing', async () => {
     // cat is a real carnivore; cow is a real herbivore
     const predator = makeAnimal({ speciesId: 'cat', hunger: 80, x: 0, y: 0 });
     const prey = makeAnimal({ speciesId: 'cow', x: 5, y: 0 }); // distSq=25, within 225 detection range
@@ -105,7 +105,7 @@ describe('PredatorPreyEcologySystem', () => {
     expect(prey.stress).toBeGreaterThan(0);
   });
 
-  it('predator within attack range catches prey — prey loses health, predator hunger decreases', () => {
+  it('predator within attack range catches prey — prey loses health, predator hunger decreases', async () => {
     const predator = makeAnimal({ speciesId: 'cat', hunger: 80, x: 0, y: 0 });
     const prey = makeAnimal({ speciesId: 'cow', x: 2, y: 0 }); // distSq=4, within attack range of 9
 
@@ -116,7 +116,7 @@ describe('PredatorPreyEcologySystem', () => {
     expect(predator.state).toBe('eating');
   });
 
-  it('satiated predator (hunger < 60) stays idle and does not hunt', () => {
+  it('satiated predator (hunger < 60) stays idle and does not hunt', async () => {
     const predator = makeAnimal({ speciesId: 'cat', hunger: 30, x: 0, y: 0 });
     const prey = makeAnimal({ speciesId: 'cow', x: 5, y: 0 });
 
@@ -126,7 +126,7 @@ describe('PredatorPreyEcologySystem', () => {
     expect(prey.state).toBe('idle'); // prey should not flee from a non-hunting predator
   });
 
-  it('hungry predator with no prey in range reverts from hunting to foraging', () => {
+  it('hungry predator with no prey in range reverts from hunting to foraging', async () => {
     const predator = makeAnimal({ speciesId: 'cat', hunger: 80, state: 'hunting', x: 0, y: 0 });
     const farPrey = makeAnimal({ speciesId: 'cow', x: 100, y: 0 }); // distSq=10000 > 225
 
@@ -135,7 +135,7 @@ describe('PredatorPreyEcologySystem', () => {
     expect(predator.state).toBe('foraging');
   });
 
-  it('prey calms down when no hunting predators nearby', () => {
+  it('prey calms down when no hunting predators nearby', async () => {
     // Prey is currently fleeing with stress just below the calm threshold boundary
     const prey = makeAnimal({ speciesId: 'cow', state: 'fleeing', stress: 15, x: 0, y: 0 });
     // Predator present but satiated — not in hunting state
@@ -148,7 +148,7 @@ describe('PredatorPreyEcologySystem', () => {
     expect(prey.state).toBe('idle');
   });
 
-  it('omnivores are not treated as predators or prey', () => {
+  it('omnivores are not treated as predators or prey', async () => {
     // pig is a real omnivore
     const omnivore = makeAnimal({ speciesId: 'pig', hunger: 80, x: 0, y: 0 });
     const herbivore = makeAnimal({ speciesId: 'cow', x: 5, y: 0 });
@@ -159,7 +159,7 @@ describe('PredatorPreyEcologySystem', () => {
     expect(herbivore.state).toBe('idle');
   });
 
-  it('dead animals (health <= 0) are skipped', () => {
+  it('dead animals (health <= 0) are skipped', async () => {
     const deadPredator = makeAnimal({ speciesId: 'cat', hunger: 90, health: 0, x: 0, y: 0 });
     const prey = makeAnimal({ speciesId: 'cow', x: 5, y: 0 });
 
@@ -168,7 +168,7 @@ describe('PredatorPreyEcologySystem', () => {
     expect(prey.state).toBe('idle'); // Dead predator should not trigger flee
   });
 
-  it('system has correct id and priority', () => {
+  it('system has correct id and priority', async () => {
     expect(system.id).toBe('predator_prey_ecology');
     expect(system.priority).toBe(64);
   });
