@@ -12,6 +12,7 @@ export interface Particle {
   lifetime: number; // milliseconds
   active: boolean; // For object pooling
   alphaEase: 'linear' | 'late'; // 'linear' = fade from start; 'late' = hold then fade
+  trail: boolean; // If true, render as a velocity-aligned streak instead of a circle
 }
 
 // Static color palettes — allocated once, never recreated
@@ -34,6 +35,20 @@ const SMOKE_COLORS: readonly string[] = Object.freeze([
   'rgba(160, 160, 155, 0.40)', // Warm grey
   'rgba(200, 195, 185, 0.35)', // Off-white
   'rgba(140, 140, 140, 0.50)', // Mid grey
+]);
+
+const BLOOD_COLORS: readonly string[] = Object.freeze([
+  'rgba(180, 20, 20, 0.95)',  // Dark crimson
+  'rgba(220, 40, 40, 0.90)',  // Bright red
+  'rgba(140, 10, 10, 0.88)',  // Deep maroon
+  'rgba(200, 55, 30, 0.82)',  // Red-brown
+]);
+
+const HEAL_COLORS: readonly string[] = Object.freeze([
+  'rgba(80, 255, 120, 0.95)',  // Bright green
+  'rgba(180, 255, 200, 0.90)', // Pale mint
+  'rgba(255, 255, 210, 0.85)', // Warm white
+  'rgba(140, 220, 180, 0.80)', // Seafoam
 ]);
 
 // Magic palettes indexed by color name for variety
@@ -88,7 +103,7 @@ export class ParticleRenderer {
       x: 0, y: 0, vx: 0, vy: 0,
       color: '', size: 0, endSize: 0,
       startTime: 0, lifetime: 0,
-      active: true, alphaEase: 'linear',
+      active: true, alphaEase: 'linear', trail: false,
     };
   }
 
@@ -120,6 +135,7 @@ export class ParticleRenderer {
       particle.startTime = now;
       particle.lifetime = 700 + Math.random() * 500;
       particle.alphaEase = 'linear';
+      particle.trail = false;
 
       this.particles.push(particle);
     }
@@ -150,6 +166,69 @@ export class ParticleRenderer {
       particle.startTime = now;
       particle.lifetime = 300 + Math.random() * 300; // Short-lived
       particle.alphaEase = 'linear';
+      particle.trail = true; // Sparks render as streaks for realism
+
+      this.particles.push(particle);
+    }
+    this.activeCount = this.particles.length;
+  }
+
+  /**
+   * Blood splatter — for melee hits, wounds, creature death.
+   * Dark reds that arc outward, affected by gravity.
+   */
+  createBloodSplatter(worldX: number, worldY: number, count: number = 10): void {
+    const now = Date.now();
+    const colorCount = BLOOD_COLORS.length;
+
+    for (let i = 0; i < count; i++) {
+      const particle = this.acquireParticle();
+      // Bias spray upward/outward from impact like struck flesh
+      const angle = -Math.PI / 2 + (Math.random() - 0.5) * Math.PI * 1.4;
+      const speed = 0.6 + Math.random() * 1.2;
+
+      particle.x = worldX + (Math.random() - 0.5) * 6;
+      particle.y = worldY + (Math.random() - 0.5) * 6;
+      particle.vx = Math.cos(angle) * speed;
+      particle.vy = Math.sin(angle) * speed - 0.2;
+      particle.color = BLOOD_COLORS[Math.floor(Math.random() * colorCount)]!;
+      particle.size = 1.5 + Math.random() * 2.5;
+      particle.endSize = 0.3;
+      particle.startTime = now;
+      particle.lifetime = 400 + Math.random() * 400;
+      particle.alphaEase = 'late'; // Hold color, then fade
+      particle.trail = true; // Droplets streak as they fly
+
+      this.particles.push(particle);
+    }
+    this.activeCount = this.particles.length;
+  }
+
+  /**
+   * Heal sparkle — for potions, bandages, divine healing, resting recovery.
+   * Rising green/white motes that drift upward and twinkle out.
+   */
+  createHealSparkle(worldX: number, worldY: number, count: number = 10): void {
+    const now = Date.now();
+    const colorCount = HEAL_COLORS.length;
+
+    for (let i = 0; i < count; i++) {
+      const particle = this.acquireParticle();
+      // Drift upward with gentle horizontal wander
+      const angle = -Math.PI / 2 + (Math.random() - 0.5) * Math.PI * 0.6;
+      const speed = 0.08 + Math.random() * 0.18;
+
+      particle.x = worldX + (Math.random() - 0.5) * 18;
+      particle.y = worldY + (Math.random() - 0.5) * 10;
+      particle.vx = Math.cos(angle) * speed;
+      particle.vy = Math.sin(angle) * speed - 0.12; // Upward bias
+      particle.color = HEAL_COLORS[Math.floor(Math.random() * colorCount)]!;
+      particle.size = 2 + Math.random() * 2.5;
+      particle.endSize = 0; // Twinkle to nothing
+      particle.startTime = now + Math.random() * 250; // Staggered appearance
+      particle.lifetime = 700 + Math.random() * 500;
+      particle.alphaEase = 'late'; // Hold then fade
+      particle.trail = false;
 
       this.particles.push(particle);
     }
@@ -179,6 +258,7 @@ export class ParticleRenderer {
       particle.startTime = now;
       particle.lifetime = 1200 + Math.random() * 800; // Linger
       particle.alphaEase = 'late'; // Hold opacity then fade out
+      particle.trail = false;
 
       this.particles.push(particle);
     }
@@ -215,6 +295,7 @@ export class ParticleRenderer {
       particle.startTime = now + Math.random() * 200; // Stagger appearance
       particle.lifetime = 600 + Math.random() * 600;
       particle.alphaEase = 'late';
+      particle.trail = false;
 
       this.particles.push(particle);
     }
@@ -285,10 +366,35 @@ export class ParticleRenderer {
 
       const prevAlpha = ctx.globalAlpha;
       ctx.globalAlpha = alpha;
-      ctx.fillStyle = particle.color;
-      ctx.beginPath();
-      ctx.arc(screenX, screenY, currentSize * zoom, 0, ParticleRenderer.TWO_PI);
-      ctx.fill();
+
+      if (particle.trail) {
+        // Streak: draw a short line opposite to velocity direction
+        const spd = Math.sqrt(particle.vx * particle.vx + particle.vy * particle.vy);
+        if (spd > 0.01) {
+          const nx = particle.vx / spd;
+          const ny = particle.vy / spd;
+          const trailLen = Math.min(currentSize * 5, 9) * zoom;
+          ctx.strokeStyle = particle.color;
+          ctx.lineWidth = currentSize * zoom * 1.1;
+          ctx.lineCap = 'round';
+          ctx.beginPath();
+          ctx.moveTo(screenX - nx * trailLen, screenY - ny * trailLen);
+          ctx.lineTo(screenX, screenY);
+          ctx.stroke();
+          ctx.lineCap = 'butt'; // Restore default
+        } else {
+          ctx.fillStyle = particle.color;
+          ctx.beginPath();
+          ctx.arc(screenX, screenY, currentSize * zoom, 0, ParticleRenderer.TWO_PI);
+          ctx.fill();
+        }
+      } else {
+        ctx.fillStyle = particle.color;
+        ctx.beginPath();
+        ctx.arc(screenX, screenY, currentSize * zoom, 0, ParticleRenderer.TWO_PI);
+        ctx.fill();
+      }
+
       ctx.globalAlpha = prevAlpha;
     }
 

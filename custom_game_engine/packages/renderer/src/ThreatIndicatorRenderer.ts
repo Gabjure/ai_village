@@ -201,8 +201,8 @@ export class ThreatIndicatorRenderer {
       this.ctx.globalAlpha = (1 - ringPhase) * 0.55;
       this.ctx.strokeStyle = color;
       this.ctx.lineWidth = severity === 'critical' ? 2.5 : 1.5;
-      (this.ctx as any).shadowColor = glowColor;
-      (this.ctx as any).shadowBlur = 10;
+      this.ctx.shadowColor = glowColor;
+      this.ctx.shadowBlur = 10;
       this.ctx.beginPath();
       this.ctx.arc(0, 0, ringRadius, 0, Math.PI * 2);
       this.ctx.stroke();
@@ -211,8 +211,8 @@ export class ThreatIndicatorRenderer {
     // Soft glow halo behind main circle
     this.ctx.globalAlpha = 0.28;
     this.ctx.fillStyle = color;
-    (this.ctx as any).shadowColor = glowColor;
-    (this.ctx as any).shadowBlur = 14;
+    this.ctx.shadowColor = glowColor;
+    this.ctx.shadowBlur = 14;
     this.ctx.beginPath();
     this.ctx.arc(0, 0, size / 2 + 5, 0, Math.PI * 2);
     this.ctx.fill();
@@ -220,14 +220,14 @@ export class ThreatIndicatorRenderer {
     // Main circle
     this.ctx.globalAlpha = 0.88;
     this.ctx.fillStyle = color;
-    (this.ctx as any).shadowColor = glowColor;
-    (this.ctx as any).shadowBlur = 5;
+    this.ctx.shadowColor = glowColor;
+    this.ctx.shadowBlur = 5;
     this.ctx.beginPath();
     this.ctx.arc(0, 0, size / 2, 0, Math.PI * 2);
     this.ctx.fill();
 
     // Icon — critical gets '✕', all others get '!'
-    (this.ctx as any).shadowBlur = 0;
+    this.ctx.shadowBlur = 0;
     this.ctx.globalAlpha = 1.0;
     this.ctx.fillStyle = '#FFFFFF';
     this.ctx.font = `bold ${size}px Arial`;
@@ -368,8 +368,8 @@ export class ThreatIndicatorRenderer {
     // Base disc — anchors the arrow to the edge
     this.ctx.globalAlpha = pulseAlpha * 0.45;
     this.ctx.fillStyle = color;
-    (this.ctx as any).shadowColor = glowColor;
-    (this.ctx as any).shadowBlur = 10;
+    this.ctx.shadowColor = glowColor;
+    this.ctx.shadowBlur = 10;
     this.ctx.beginPath();
     this.ctx.arc(0, 0, this.ARROW_SIZE * 0.85, 0, Math.PI * 2);
     this.ctx.fill();
@@ -379,8 +379,8 @@ export class ThreatIndicatorRenderer {
     // Arrow shape
     this.ctx.globalAlpha = pulseAlpha;
     this.ctx.fillStyle = color;
-    (this.ctx as any).shadowColor = glowColor;
-    (this.ctx as any).shadowBlur = 8;
+    this.ctx.shadowColor = glowColor;
+    this.ctx.shadowBlur = 8;
     this.ctx.beginPath();
     this.ctx.moveTo(this.ARROW_SIZE, 0);
     this.ctx.lineTo(-this.ARROW_SIZE / 2, -this.ARROW_SIZE / 2);
@@ -389,7 +389,7 @@ export class ThreatIndicatorRenderer {
     this.ctx.fill();
 
     // Dark outline for contrast
-    (this.ctx as any).shadowBlur = 0;
+    this.ctx.shadowBlur = 0;
     this.ctx.strokeStyle = 'rgba(0,0,0,0.6)';
     this.ctx.lineWidth = 1.5;
     this.ctx.stroke();
