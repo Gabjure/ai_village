@@ -4303,6 +4303,10 @@ async function main() {
           const camera = renderer.getCamera();
           camera.x = pos.x * 16;
           camera.y = pos.y * 16;
+          // Adjust Z-depth focus so interior entities are visible
+          if (pos.z !== undefined && pos.z !== 0) {
+            camera.setFocusDepth(pos.z);
+          }
         }
       }
     }
@@ -4332,6 +4336,10 @@ async function main() {
           const camera = renderer.getCamera();
           camera.x = pos.x * 16;
           camera.y = pos.y * 16;
+          // Adjust Z-depth focus so interior entities are visible
+          if (pos.z !== undefined && pos.z !== 0) {
+            camera.setFocusDepth(pos.z);
+          }
         }
       }
     }

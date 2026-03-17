@@ -1029,6 +1029,11 @@ export class Renderer {
     // Update 2D camera
     this.camera.setPosition(worldX * this.tileSize, worldY * this.tileSize);
 
+    // Adjust focus depth for interior entities
+    if (elevation !== 0 || isIndoor) {
+      this.camera.setFocusDepth(elevation);
+    }
+
     // Also update 3D camera if in 3D mode
     if (this.was3DActive && this.renderer3D) {
       this.renderer3D.setCameraFromWorld(worldX, worldY, elevation, isIndoor);

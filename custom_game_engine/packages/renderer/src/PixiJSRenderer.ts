@@ -670,26 +670,20 @@ export class PixiJSRenderer implements IRenderer {
       cssHeight = window.innerHeight;
     }
 
-    // Scale to physical pixels so PixiJS fills the full canvas buffer (fix black bands on retina)
-    const dpr = window.devicePixelRatio || 1;
-    const physWidth = Math.round(cssWidth * dpr);
-    const physHeight = Math.round(cssHeight * dpr);
-
-    // Only resize if dimensions have actually changed (compare physical pixels)
+    // Use CSS dimensions directly — PixiJS resolution=1 means coordinates are in CSS px.
+    // Canvas content scales to fill display via CSS; pixel art benefits from integer scaling.
     if (
-      Math.abs(this._canvas.width - physWidth) > 1 ||
-      Math.abs(this._canvas.height - physHeight) > 1
+      Math.abs(this._canvas.width - cssWidth) > 1 ||
+      Math.abs(this._canvas.height - cssHeight) > 1
     ) {
-      this._canvas.width = physWidth;
-      this._canvas.height = physHeight;
-      this.app.renderer.resize(physWidth, physHeight);
-      // Camera viewport in CSS pixels so world coordinates remain stable across DPR changes
+      this._canvas.width = cssWidth;
+      this._canvas.height = cssHeight;
+      this.app.renderer.resize(cssWidth, cssHeight);
       this._camera.setViewportSize(cssWidth, cssHeight);
 
-      // Also resize the overlay canvas to physical pixels
       if (this._overlayCanvas) {
-        this._overlayCanvas.width = physWidth;
-        this._overlayCanvas.height = physHeight;
+        this._overlayCanvas.width = cssWidth;
+        this._overlayCanvas.height = cssHeight;
       }
     }
   };
@@ -720,6 +714,21 @@ export class PixiJSRenderer implements IRenderer {
 
   getCamera(): Camera {
     return this._camera;
+  }
+
+  /**
+   * Center camera on world position with Z-depth adjustment for interior entities.
+   * @param worldX World X coordinate (in tile units)
+   * @param worldY World Y coordinate (in tile units)
+   * @param elevation Optional elevation/z-coordinate (defaults to 0)
+   * @param isIndoor Whether the target is inside a building
+   */
+  centerCameraOnWorldPosition(worldX: number, worldY: number, elevation: number = 0, isIndoor: boolean = false): void {
+    this._camera.setPosition(worldX * this._tileSize, worldY * this._tileSize);
+
+    if (elevation !== 0 || isIndoor) {
+      this._camera.setFocusDepth(elevation);
+    }
   }
 
   /**

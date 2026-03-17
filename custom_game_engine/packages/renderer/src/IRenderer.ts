@@ -184,6 +184,15 @@ export interface IRenderer {
   getEntityAt?(screenX: number, screenY: number, world: World): Entity | null;
 
   // ============================================================================
+  // Camera Positioning (Optional)
+  // ============================================================================
+
+  /**
+   * Center camera on world position with Z-depth adjustment for interior entities.
+   */
+  centerCameraOnWorldPosition?(worldX: number, worldY: number, elevation?: number, isIndoor?: boolean): void;
+
+  // ============================================================================
   // Debug (Optional)
   // ============================================================================
 
