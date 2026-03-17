@@ -1,0 +1,6 @@
+{
+  "totalTests": 12021,
+  "passedTests": 10365,
+  "updatedAt": "2026-03-17",
+  "note": "Baseline from MUL-1403 audit. 12021 total, 10365 passing. Regression gate fires if total drops below 10819 (90%)."
+}

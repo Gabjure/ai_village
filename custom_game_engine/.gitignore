@@ -37,3 +37,6 @@ metrics-data/
 
 # Save files (test saves, checkpoints)
 saves/
+
+# CI test runner output (transient)
+test-results.json
