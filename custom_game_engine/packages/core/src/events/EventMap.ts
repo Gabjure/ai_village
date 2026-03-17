@@ -35,6 +35,7 @@ import type { MiscEvents } from './domains/misc.events.js';
 import type { GovernanceEvents } from './domains/governance.events.js';
 import type { ExplorationEvents } from './domains/exploration.events.js';
 import type { AvatarEvents } from './domains/avatar.events.js';
+import type { PlayerEvents } from './domains/player.events.js';
 
 /**
  * Unified map of all event types to their data payloads.
@@ -75,7 +76,8 @@ export interface GameEventMap extends
   MiscEvents,
   GovernanceEvents,
   ExplorationEvents,
-  AvatarEvents {}
+  AvatarEvents,
+  PlayerEvents {}
 
 /**
  * Union type of all valid event type strings.

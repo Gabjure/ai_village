@@ -263,6 +263,7 @@ import { PlayerActionSystem } from './PlayerActionSystem.js';
 // Player Avatar System (jack-in/jack-out)
 import { AvatarManagementSystem } from './AvatarManagementSystem.js';
 import { AvatarRespawnSystem } from './AvatarRespawnSystem.js';
+import { MortalPawnSystem } from './MortalPawnSystem.js';
 
 // Divinity - Advanced Theology
 import { SchismSystem } from './SchismSystem.js';
@@ -927,6 +928,7 @@ export function registerAllSystems(
     gameLoop.systemRegistry.register(new PlayerActionSystem());
     gameLoop.systemRegistry.register(new AvatarManagementSystem());
     gameLoop.systemRegistry.register(new AvatarRespawnSystem());
+    gameLoop.systemRegistry.register(new MortalPawnSystem());
   }
 
   // ============================================================================

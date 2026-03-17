@@ -34,6 +34,7 @@ export class PlayerInputSystem extends BaseSystem {
 
   private keysPressed: Set<string> = new Set();
   private mouseClick: { x: number; y: number; button: number } | null = null;
+  private pendingKeyAction: 'interact' | 'jack_out' | null = null;
 
   /**
    * Register keyboard event listeners
@@ -42,6 +43,11 @@ export class PlayerInputSystem extends BaseSystem {
   public registerKeyboardListeners(window: Window): void {
     window.addEventListener('keydown', (e) => {
       this.keysPressed.add(e.key.toLowerCase());
+      if (e.key.toLowerCase() === 'e') {
+        this.pendingKeyAction = 'interact';
+      } else if (e.key === 'Escape') {
+        this.pendingKeyAction = 'jack_out';
+      }
     });
 
     window.addEventListener('keyup', (e) => {
@@ -114,6 +120,30 @@ export class PlayerInputSystem extends BaseSystem {
     if (this.mouseClick) {
       this.mouseClick = null;
     }
+
+    // Process key actions (E = interact, Escape = jack-out)
+    if (this.pendingKeyAction === 'interact') {
+      // Create an interact interaction at the possessed agent's current position
+      // (PlayerActionSystem will find the nearest NPC)
+      if (!pendingInteraction) {
+        // Set interaction type to 'interact' with no specific target location
+        // PlayerActionSystem handles finding the nearest interactable
+        (playerEntity as EntityImpl).updateComponent('player_control', (current: PlayerControlComponent) => ({
+          ...current,
+          pendingInteraction: {
+            type: 'interact' as const,
+            queuedTick: currentTick,
+          },
+        }));
+      }
+      this.pendingKeyAction = null;
+    } else if (this.pendingKeyAction === 'jack_out') {
+      // Emit jack-out request event - MortalPawnSystem or PossessionSystem will handle it
+      this.events.emit('player:jack_out_request', {
+        tick: currentTick,
+      }, 'system');
+      this.pendingKeyAction = null;
+    }
   }
 
   /**
@@ -166,5 +196,6 @@ export class PlayerInputSystem extends BaseSystem {
   public clearInput(): void {
     this.keysPressed.clear();
     this.mouseClick = null;
+    this.pendingKeyAction = null;
   }
 }

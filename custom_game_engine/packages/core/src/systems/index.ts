@@ -324,6 +324,9 @@ export { AvatarManagementSystem } from './AvatarManagementSystem.js';
 export * from './AvatarRespawnSystem.js';
 export { AvatarRespawnSystem } from './AvatarRespawnSystem.js';
 
+// Mortal Pawn System (player inhabiting a regular agent)
+export { MortalPawnSystem } from './MortalPawnSystem.js';
+
 // Centralized system registration
 export {
   registerAllSystems,

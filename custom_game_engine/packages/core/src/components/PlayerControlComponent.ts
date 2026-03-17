@@ -44,6 +44,13 @@ export interface PlayerControlComponent extends Component {
   inputMode: 'god' | 'possessed';
 
   /**
+   * Possession mode: how the player is possessing the agent
+   * - 'deity': God possession via PossessionSystem (costs belief, time-limited)
+   * - 'mortal': Mortal pawn mode via MortalPawnSystem (no belief cost, no time limit)
+   */
+  possessionMode: 'deity' | 'mortal';
+
+  /**
    * Last tick when player input was received
    * Used to detect idle state and reduce belief drain
    */
@@ -128,6 +135,7 @@ export function createPlayerControlComponent(): PlayerControlComponent {
     beliefCostPerTick: 0.1, // Base cost: 0.1 belief per tick
     totalBeliefSpent: 0,
     inputMode: 'god',
+    possessionMode: 'deity',
     lastInputTick: 0,
     movementCommand: null,
     pendingInteraction: null,

@@ -5,10 +5,13 @@ import { EntityImpl } from '../ecs/Entity.js';
 import type {
   PlayerControlComponent,
   MovementDirection,
+  PendingInteraction,
 } from '../components/PlayerControlComponent.js';
 import type { VelocityComponentData } from '../components/VelocityComponent.js';
 import { VelocityComponent, createVelocityComponent } from '../components/VelocityComponent.js';
 import type { PositionComponent } from '../components/PositionComponent.js';
+import type { AgentComponent } from '../components/index.js';
+import type { MagicComponent } from '../components/MagicComponent.js';
 
 /**
  * PlayerActionSystem - Translates player movement commands into entity velocity
@@ -31,6 +34,9 @@ export class PlayerActionSystem extends BaseSystem {
 
   /** Player movement speed in tiles/second */
   private readonly playerSpeed = 3.0;
+
+  /** Interaction range in tiles for nearby agent detection */
+  private readonly interactionRange = 3.0; // tiles
 
   /** Direction vectors for movement commands */
   private static readonly DIRECTION_VECTORS: Record<MovementDirection, { vx: number; vy: number }> = {
@@ -77,6 +83,103 @@ export class PlayerActionSystem extends BaseSystem {
     } else {
       // No movement command - stop
       this.setEntityVelocity(possessedEntity, 0, 0);
+    }
+
+    // Process pending interaction if present
+    if (playerControl.pendingInteraction) {
+      this.handleInteraction(playerControl, playerEntity, possessedEntity, world);
+    }
+  }
+
+  private handleInteraction(
+    playerControl: PlayerControlComponent,
+    playerEntity: Entity,
+    possessedEntity: Entity,
+    world: World
+  ): void {
+    const interaction = playerControl.pendingInteraction;
+    if (!interaction) return;
+
+    // Clear the interaction immediately so it is processed only once
+    (playerEntity as EntityImpl).updateComponent<PlayerControlComponent>('player_control', (c) => ({
+      ...c,
+      pendingInteraction: null,
+    }));
+
+    const possessedPos = possessedEntity.getComponent<PositionComponent>('position');
+
+    if (interaction.type === 'interact') {
+      if (!possessedPos) return;
+
+      // Find nearest agent within interactionRange tiles (using squared distance)
+      const rangeSquared = this.interactionRange * this.interactionRange;
+      const agentEntities = world
+        .query()
+        .with('agent', 'position')
+        .executeEntities();
+
+      let nearestAgent: Entity | null = null;
+      let nearestDistSq = Infinity;
+
+      for (const candidate of agentEntities) {
+        if (candidate.id === possessedEntity.id) continue;
+
+        const candidatePos = candidate.getComponent<PositionComponent>('position');
+        if (!candidatePos) continue;
+
+        const dx = candidatePos.x - possessedPos.x;
+        const dy = candidatePos.y - possessedPos.y;
+        const distSq = dx * dx + dy * dy;
+
+        if (distSq <= rangeSquared && distSq < nearestDistSq) {
+          nearestDistSq = distSq;
+          nearestAgent = candidate;
+        }
+      }
+
+      if (!nearestAgent) return;
+
+      // Set possessed agent's behavior to talk
+      (possessedEntity as EntityImpl).updateComponent<AgentComponent>('agent', (c) => ({
+        ...c,
+        behavior: 'talk',
+        behaviorState: {
+          partnerId: nearestAgent!.id,
+          returnToPlayerControl: true,
+        },
+      }));
+
+      this.events.emit('mortal_pawn:interact', {
+        agentId: possessedEntity.id,
+        targetId: nearestAgent.id,
+        type: 'talk',
+      });
+
+    } else if (interaction.type === 'use') {
+      const magic = possessedEntity.getComponent<MagicComponent>('magic');
+      if (!magic || !magic.knownSpells || magic.knownSpells.length === 0) return;
+
+      const firstSpell = magic.knownSpells[0]!.spellId;
+      const targetX = interaction.targetX ?? possessedPos?.x ?? 0;
+      const targetY = interaction.targetY ?? possessedPos?.y ?? 0;
+
+      // Set possessed agent's behavior to cast_spell
+      (possessedEntity as EntityImpl).updateComponent<AgentComponent>('agent', (c) => ({
+        ...c,
+        behavior: 'cast_spell',
+        behaviorState: {
+          spellId: firstSpell,
+          targetX,
+          targetY,
+          returnToPlayerControl: true,
+        },
+      }));
+
+      this.events.emit('mortal_pawn:interact', {
+        agentId: possessedEntity.id,
+        type: 'cast_spell',
+        spellId: firstSpell,
+      });
     }
   }
 

@@ -264,6 +264,7 @@ export const PlayerControlSchema = autoRegister(
       beliefCostPerTick: 0.1,
       totalBeliefSpent: 0,
       inputMode: 'god',
+      possessionMode: 'deity',
       lastInputTick: 0,
       movementCommand: null,
       pendingInteraction: null,
