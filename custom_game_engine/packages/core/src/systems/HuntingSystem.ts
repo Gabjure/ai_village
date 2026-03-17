@@ -59,6 +59,7 @@ export class HuntingSystem extends BaseSystem {
   protected readonly throttleInterval = 20; // NORMAL - 1 second
 
   private llmProvider?: (prompt: any) => Promise<{ narrative: string }>;
+  private environmentEntityId: string | null = null;
 
   constructor(llmProvider?: (prompt: any) => Promise<{ narrative: string }>) {
     super();
@@ -67,6 +68,20 @@ export class HuntingSystem extends BaseSystem {
 
   setLLMProvider(provider: (prompt: any) => Promise<{ narrative: string }>): void {
     this.llmProvider = provider;
+  }
+
+  private getEnvironmentEntity(world: World): Entity | null {
+    if (this.environmentEntityId) {
+      const entity = world.getEntity(this.environmentEntityId);
+      if (entity && world.hasComponent(entity.id, 'environment')) return entity;
+      this.environmentEntityId = null;
+    }
+    const entities = world.query().with('environment').executeEntities();
+    if (entities.length > 0 && entities[0]) {
+      this.environmentEntityId = entities[0].id;
+      return entities[0];
+    }
+    return null;
   }
 
   protected onUpdate(ctx: SystemContext): void {
@@ -194,26 +209,23 @@ export class HuntingSystem extends BaseSystem {
     let timeBonus = 0;
 
     // Look for environment component on any entity (typically a singleton)
-    const envEntities = world.query().with('environment').executeEntities();
-    if (envEntities.length > 0) {
-      const firstEnvEntity = envEntities[0];
-      if (firstEnvEntity) {
-        const env = world.getComponent<EnvironmentComponent>(firstEnvEntity.id, 'environment');
-        if (env) {
-          // Terrain bonuses
-          if (env.terrain === 'forest') terrainBonus = 2;
-          if (env.terrain === 'plains') terrainBonus = -1;
-          if (env.terrain === 'mountains') terrainBonus = 1;
+    const envEntity = this.getEnvironmentEntity(world);
+    if (envEntity) {
+      const env = world.getComponent<EnvironmentComponent>(envEntity.id, 'environment');
+      if (env) {
+        // Terrain bonuses
+        if (env.terrain === 'forest') terrainBonus = 2;
+        if (env.terrain === 'plains') terrainBonus = -1;
+        if (env.terrain === 'mountains') terrainBonus = 1;
 
-          // Weather bonuses
-          if (env.weather === 'rain') weatherBonus = 1; // Masks scent
-          if (env.weather === 'clear') weatherBonus = 0;
+        // Weather bonuses
+        if (env.weather === 'rain') weatherBonus = 1; // Masks scent
+        if (env.weather === 'clear') weatherBonus = 0;
 
-          // Time bonuses
-          if (env.timeOfDay === 'dawn') timeBonus = 1;
-          if (env.timeOfDay === 'dusk') timeBonus = 1;
-          if (env.timeOfDay === 'noon') timeBonus = -1;
-        }
+        // Time bonuses
+        if (env.timeOfDay === 'dawn') timeBonus = 1;
+        if (env.timeOfDay === 'dusk') timeBonus = 1;
+        if (env.timeOfDay === 'noon') timeBonus = -1;
       }
     }
 
@@ -316,16 +328,18 @@ export class HuntingSystem extends BaseSystem {
     inventory: InventoryComponent | null
   ): void {
     // Generate resources
-    if (inventory) {
-      const meat = { type: 'meat', quantity: Math.max(1, Math.floor(animal.danger / 2)) };
-      const hide = { type: 'hide', quantity: 1 };
-      const bones = { type: 'bones', quantity: 1 };
-
-      hunter.updateComponent<InventoryComponent>(CT.Inventory, (inv) => ({
-        ...inv,
-        items: [...inv.items, meat, hide, bones],
-      }));
+    if (!inventory) {
+      throw new Error('Hunter missing required component: inventory');
     }
+
+    const meat = { type: 'meat', quantity: Math.max(1, Math.floor(animal.danger / 2)) };
+    const hide = { type: 'hide', quantity: 1 };
+    const bones = { type: 'bones', quantity: 1 };
+
+    hunter.updateComponent<InventoryComponent>(CT.Inventory, (inv) => ({
+      ...inv,
+      items: [...inv.items, meat, hide, bones],
+    }));
 
     // Grant hunting skill XP
     hunter.updateComponent<CombatStatsComponent>(CT.CombatStats, (stats) => ({

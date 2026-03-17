@@ -86,6 +86,8 @@ export class AgentCombatSystem extends BaseSystem {
   protected readonly throttleInterval = 0; // EVERY_TICK - critical responsiveness
 
   private llmProvider?: LLMProvider;
+  private environmentEntityId: string | null = null;
+  private lawsEntityId: string | null = null;
 
   /**
    * Sigmoid lookup table for performance optimization.
@@ -119,6 +121,34 @@ export class AgentCombatSystem extends BaseSystem {
 
     // Fallback for extreme values (rare, e.g. god vs peasant)
     return 1 / (1 + Math.exp(-0.2 * powerDiff));
+  }
+
+  private getEnvironmentEntity(world: World): Entity | null {
+    if (this.environmentEntityId) {
+      const entity = world.getEntity(this.environmentEntityId);
+      if (entity && world.hasComponent(entity.id, 'environment')) return entity;
+      this.environmentEntityId = null;
+    }
+    const entities = world.query().with('environment').executeEntities();
+    if (entities.length > 0 && entities[0]) {
+      this.environmentEntityId = entities[0].id;
+      return entities[0];
+    }
+    return null;
+  }
+
+  private getLawsEntity(world: World): Entity | null {
+    if (this.lawsEntityId) {
+      const entity = world.getEntity(this.lawsEntityId);
+      if (entity && world.hasComponent(entity.id, 'laws')) return entity;
+      this.lawsEntityId = null;
+    }
+    const entities = world.query().with('laws').executeEntities();
+    if (entities.length > 0 && entities[0]) {
+      this.lawsEntityId = entities[0].id;
+      return entities[0];
+    }
+    return null;
   }
 
   constructor(llmProvider?: LLMProvider) {
@@ -404,16 +434,13 @@ export class AgentCombatSystem extends BaseSystem {
     }
 
     // Terrain modifier
-    const envEntities = world.query().with('environment').executeEntities();
-    if (envEntities.length > 0) {
-      const firstEnvEntity = envEntities[0];
-      if (firstEnvEntity) {
-        const env = world.getComponent<EnvironmentComponent>(firstEnvEntity.id, 'environment');
-        if (env?.terrain) {
-          const terrainMod = this.getTerrainModifier(env.terrain);
-          attackerPower += terrainMod;
-          modifiers.push({ type: 'terrain', value: terrainMod });
-        }
+    const envEntity = this.getEnvironmentEntity(world);
+    if (envEntity) {
+      const env = world.getComponent<EnvironmentComponent>(envEntity.id, 'environment');
+      if (env?.terrain) {
+        const terrainMod = this.getTerrainModifier(env.terrain);
+        attackerPower += terrainMod;
+        modifiers.push({ type: 'terrain', value: terrainMod });
       }
     }
 
@@ -700,14 +727,6 @@ export class AgentCombatSystem extends BaseSystem {
     // TODO: Narrative generation not yet implemented in canonical LLMProvider
     // The generateNarrative method needs to be added to the LLMProvider interface
     // or combat narratives should be generated via the standard generate() method
-    try {
-      // Placeholder for future narrative generation
-      // await this.llmProvider.generate({
-      //   prompt: `Generate combat narrative for ${attackerAgent?.name} vs ${defenderAgent?.name}...`
-      // });
-    } catch (error) {
-      console.error('[AgentCombatSystem] LLM narrative generation failed:', error);
-    }
   }
 
   private applySocialConsequences(
@@ -812,13 +831,10 @@ export class AgentCombatSystem extends BaseSystem {
     conflict: ConflictComponent
   ): void {
     // Check if laws exist
-    const lawEntities = world.query().with('laws').executeEntities();
-    if (lawEntities.length === 0) return;
+    const lawEntity = this.getLawsEntity(world);
+    if (!lawEntity) return;
 
-    const firstLawEntity = lawEntities[0];
-    if (!firstLawEntity) return;
-
-    const laws = world.getComponent<LawsComponent>(firstLawEntity.id, 'laws');
+    const laws = world.getComponent<LawsComponent>(lawEntity.id, 'laws');
     if (!laws) return;
 
     // Skip if self-defense
@@ -897,16 +913,6 @@ export class AgentCombatSystem extends BaseSystem {
     // Neutral souls (alignment 0): +0% luck
     // Cursed souls (alignment -1.0): -10% luck (anti-luck!)
     luckModifier *= soulIdentity.cosmicAlignment;
-
-    // Explicit saturation at ±20% (game balance limit)
-    if (luckModifier > 0.2) {
-      console.warn(`[Combat] Luck modifier ${luckModifier} exceeds cap, saturating to 0.2`);
-      return 0.2;
-    }
-    if (luckModifier < -0.2) {
-      console.warn(`[Combat] Luck modifier ${luckModifier} below floor, saturating to -0.2`);
-      return -0.2;
-    }
 
     return luckModifier;
   }
