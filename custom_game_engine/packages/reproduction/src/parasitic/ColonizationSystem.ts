@@ -135,13 +135,18 @@ export class ColonizationSystem extends BaseSystem {
   protected onUpdate(ctx: SystemContext): void {
     const currentTick = ctx.tick;
 
+    // Cache queries before the entity loop to avoid O(N²) query-per-entity
+    const colonizedEntities = ctx.world.query().with(CT.ParasiticColonization).with(CT.Position).executeEntities();
+    const collectiveEntities = ctx.world.query().with(CT.CollectiveMind).executeEntities();
+    const agentEntities = ctx.world.query().with(CT.Agent).executeEntities();
+
     for (const entity of ctx.activeEntities) {
       const colonization = entity.getComponent<ParasiticColonizationComponent>('parasitic_colonization');
 
       if (!colonization) continue;
 
       if (colonization.isColonized) {
-        this.processColonizedHost(ctx.world, entity, colonization, currentTick);
+        this.processColonizedHost(ctx.world, entity, colonization, currentTick, colonizedEntities, collectiveEntities, agentEntities);
       } else if (colonization.previouslyColonized) {
         this.processRecoveringHost(colonization);
       }
@@ -157,9 +162,12 @@ export class ColonizationSystem extends BaseSystem {
     entity: Entity,
     colonization: ParasiticColonizationComponent,
     currentTick: Tick,
+    colonizedEntities: ReadonlyArray<Entity>,
+    collectiveEntities: ReadonlyArray<Entity>,
+    agentEntities: ReadonlyArray<Entity>,
   ): void {
     // Update hive pressure from nearby colonized entities
-    this.updateHivePressure(world, entity, colonization);
+    this.updateHivePressure(entity, colonization, colonizedEntities);
 
     // Update integration progress
     if (colonization.integration && !colonization.integration.integrationStalled) {
@@ -173,7 +181,7 @@ export class ColonizationSystem extends BaseSystem {
 
     // Process detection chances
     if (colonization.camouflageLevel < 0.5) {
-      this.processDetectionRisk(world, entity, colonization, currentTick);
+      this.processDetectionRisk(entity, colonization, currentTick, agentEntities);
     }
   }
 
@@ -198,17 +206,17 @@ export class ColonizationSystem extends BaseSystem {
   }
 
   private processDetectionRisk(
-    world: World,
     entity: Entity,
     colonization: ParasiticColonizationComponent,
     _currentTick: Tick,
+    agentEntities: ReadonlyArray<Entity>,
   ): void {
     // Check if any nearby entities might detect the colonization
     const detectionRisk = this.config.detectionChance * (1 - colonization.camouflageLevel);
 
     if (Math.random() < detectionRisk) {
       // Find a nearby entity to potentially detect this
-      const nearbyEntity = this.findNearbyUncolonizedEntity(world, entity.id);
+      const nearbyEntity = this.findNearbyUncolonizedEntity(entity.id, agentEntities);
       if (nearbyEntity) {
         colonization.detectedBy.push(nearbyEntity.id);
         colonization.camouflageLevel = Math.max(0, colonization.camouflageLevel - 0.1);
@@ -244,9 +252,9 @@ export class ColonizationSystem extends BaseSystem {
    * The more colonized entities nearby, the harder it is to resist.
    */
   private updateHivePressure(
-    world: World,
     entity: Entity,
     colonization: ParasiticColonizationComponent,
+    colonizedEntities: ReadonlyArray<Entity>,
   ): void {
     const impl = entity as EntityImpl;
     const position = impl.getComponent<PositionComponent>(CT.Position);
@@ -262,8 +270,8 @@ export class ColonizationSystem extends BaseSystem {
     // PERFORMANCE: Use squared distance to avoid Math.sqrt
     const hivePressureRadiusSquared = this.config.hivePressureRadius * this.config.hivePressureRadius;
 
-    // PERFORMANCE: Query only entities with parasitic_colonization and position
-    for (const otherEntity of world.query().with(CT.ParasiticColonization).with(CT.Position).executeEntities()) {
+    // PERFORMANCE: Use pre-cached colonizedEntities instead of querying per entity
+    for (const otherEntity of colonizedEntities) {
       if (otherEntity.id === entity.id) continue;
 
       const otherImpl = otherEntity as EntityImpl;
@@ -341,7 +349,7 @@ export class ColonizationSystem extends BaseSystem {
 
     if (success) {
       // Find collective to get lineage
-      const collectiveEntity = this.findCollective(world, collectiveId);
+      const collectiveEntity = this.findCollective(world.query().with(CT.CollectiveMind).executeEntities(), collectiveId);
       const collectiveImpl = collectiveEntity ? collectiveEntity as EntityImpl : undefined;
       const collective = collectiveImpl?.getComponent<CollectiveMindComponent>('collective_mind');
 
@@ -391,7 +399,7 @@ export class ColonizationSystem extends BaseSystem {
 
     if (colonization.isColonized) return false;
 
-    const collectiveEntity = this.findCollective(world, collectiveId);
+    const collectiveEntity = this.findCollective(world.query().with(CT.CollectiveMind).executeEntities(), collectiveId);
     const collectiveImpl = collectiveEntity ? collectiveEntity as EntityImpl : undefined;
     const collective = collectiveImpl?.getComponent<CollectiveMindComponent>('collective_mind');
 
@@ -430,7 +438,7 @@ export class ColonizationSystem extends BaseSystem {
     const collectiveId = colonization.parasite?.collectiveId ?? 'unknown';
 
     // Remove from collective
-    const collectiveEntity = this.findCollective(world, collectiveId);
+    const collectiveEntity = this.findCollective(world.query().with(CT.CollectiveMind).executeEntities(), collectiveId);
     if (collectiveEntity) {
       const collectiveImpl = collectiveEntity as EntityImpl;
       const collective = collectiveImpl.getComponent<CollectiveMindComponent>('collective_mind');
@@ -462,9 +470,8 @@ export class ColonizationSystem extends BaseSystem {
     return modifiers[method] ?? 1.0;
   }
 
-  private findCollective(world: World, collectiveId: string): Entity | null {
-    // PERFORMANCE: Query only entities with collective_mind component
-    for (const entity of world.query().with(CT.CollectiveMind).executeEntities()) {
+  private findCollective(collectiveEntities: ReadonlyArray<Entity>, collectiveId: string): Entity | null {
+    for (const entity of collectiveEntities) {
       const impl = entity as EntityImpl;
       const collective = impl.getComponent<CollectiveMindComponent>('collective_mind');
       if (collective?.collectiveId === collectiveId) return entity;
@@ -472,9 +479,8 @@ export class ColonizationSystem extends BaseSystem {
     return null;
   }
 
-  private findNearbyUncolonizedEntity(world: World, excludeId: EntityId): Entity | null {
-    // PERFORMANCE: Query all agents - check for absence of colonization or uncolonized status
-    for (const entity of world.query().with(CT.Agent).executeEntities()) {
+  private findNearbyUncolonizedEntity(excludeId: EntityId, agentEntities: ReadonlyArray<Entity>): Entity | null {
+    for (const entity of agentEntities) {
       if (entity.id === excludeId) continue;
 
       const impl = entity as EntityImpl;

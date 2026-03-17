@@ -1,4 +1,5 @@
 import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
+import type { Entity } from '../ecs/index.js';
 import type { SystemId, ComponentType } from '../types.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import {
@@ -26,6 +27,9 @@ export class AnimalGroupSystem extends BaseSystem {
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [CT.AnimalGroup];
   protected readonly throttleInterval = 40; // Every 2 seconds — slow-changing social state
 
+  private allAnimalsCacheTick = -1;
+  private allAnimalsCache: ReadonlyArray<Entity> = [];
+
   protected onUpdate(ctx: SystemContext): void {
     // Build a set of all living animal entity IDs for fast membership checks
     const livingAnimalIds = new Set<string>();
@@ -40,7 +44,11 @@ export class AnimalGroupSystem extends BaseSystem {
     }
 
     // Also scan all animal entities (not just active ones) using a cached query
-    const allAnimals = ctx.world.query().with(CT.Animal).executeEntities();
+    if (ctx.world.tick !== this.allAnimalsCacheTick) {
+      this.allAnimalsCache = ctx.world.query().with(CT.Animal).executeEntities();
+      this.allAnimalsCacheTick = ctx.world.tick;
+    }
+    const allAnimals = this.allAnimalsCache;
     for (const entity of allAnimals) {
       const animal = entity.getComponent<AnimalComponent>('animal');
       if (animal && !animalEntityMap.has(entity.id)) {
@@ -94,13 +102,14 @@ export class AnimalGroupSystem extends BaseSystem {
     const cy = positions.reduce((sum, p) => sum + p.y, 0) / positions.length;
 
     // Estimate territory radius as the max distance from centroid + buffer
-    let maxDist = 0;
+    let maxDistSquared = 0;
     for (const p of positions) {
       const dx = p.x - cx;
       const dy = p.y - cy;
-      const dist = Math.sqrt(dx * dx + dy * dy);
-      if (dist > maxDist) maxDist = dist;
+      const distSq = dx * dx + dy * dy;
+      if (distSq > maxDistSquared) maxDistSquared = distSq;
     }
+    const maxDist = Math.sqrt(maxDistSquared);
 
     group.territory = {
       x: cx,
@@ -139,11 +148,15 @@ export class AnimalGroupSystem extends BaseSystem {
    */
   public joinGroup(
     group: AnimalGroupComponent,
-    _groupEntityId: string,
+    groupEntityId: string,
     animal: AnimalComponent,
     tick: number
   ): boolean {
-    return addMemberToGroup(group, animal.id, tick);
+    const added = addMemberToGroup(group, animal.id, tick);
+    if (added) {
+      animal.groupId = groupEntityId;
+    }
+    return added;
   }
 
   /**
@@ -153,6 +166,9 @@ export class AnimalGroupSystem extends BaseSystem {
     group: AnimalGroupComponent,
     animal: AnimalComponent
   ): void {
-    removeMemberFromGroup(group, animal.id);
+    const removed = removeMemberFromGroup(group, animal.id);
+    if (removed) {
+      animal.groupId = undefined;
+    }
   }
 }

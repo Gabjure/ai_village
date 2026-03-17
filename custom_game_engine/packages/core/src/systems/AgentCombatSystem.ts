@@ -330,11 +330,14 @@ export class AgentCombatSystem extends BaseSystem {
     // Apply injuries
     this.applyInjuries(world, attacker, defender, outcome, attackerPower, defenderPower);
 
+    // Cache nearby agents query once for both generateNarrative and applySocialConsequences
+    const cachedNearbyAgents = world.query().with('agent').with('position').executeEntities();
+
     // Generate narrative
-    this.generateNarrative(world, attacker, defender, conflict, outcome);
+    this.generateNarrative(world, attacker, defender, conflict, outcome, cachedNearbyAgents);
 
     // Apply social consequences
-    this.applySocialConsequences(world, attacker, defender, conflict, outcome);
+    this.applySocialConsequences(world, attacker, defender, conflict, outcome, cachedNearbyAgents);
 
     // Apply legal consequences
     this.applyLegalConsequences(world, attacker, conflict);
@@ -687,7 +690,8 @@ export class AgentCombatSystem extends BaseSystem {
     attacker: Entity,
     defender: Entity,
     conflict: ConflictComponent,
-    outcome: ConflictComponent['outcome']
+    outcome: ConflictComponent['outcome'],
+    cachedNearbyAgents: ReadonlyArray<Entity>
   ): Promise<void> {
     if (!this.llmProvider) return;
 
@@ -699,12 +703,7 @@ export class AgentCombatSystem extends BaseSystem {
     const witnesses: Array<{ id: string; name: string }> = [];
 
     if (attackerPos) {
-      const nearbyEntities = world.query()
-        .with('agent')
-        .with('position')
-        .executeEntities();
-
-      for (const entity of nearbyEntities) {
+      for (const entity of cachedNearbyAgents) {
         if (entity.id === attacker.id || entity.id === defender.id) continue;
 
         const pos = world.getComponent<PositionComponent>(entity.id, 'position');
@@ -734,7 +733,8 @@ export class AgentCombatSystem extends BaseSystem {
     attacker: Entity,
     defender: Entity,
     conflict: ConflictComponent,
-    outcome: ConflictComponent['outcome']
+    outcome: ConflictComponent['outcome'],
+    cachedNearbyAgents: ReadonlyArray<Entity>
   ): void {
     const attackerImpl = attacker as EntityImpl;
     const defenderImpl = defender as EntityImpl;
@@ -743,11 +743,8 @@ export class AgentCombatSystem extends BaseSystem {
     const attackerPos = world.getComponent<PositionComponent>(attacker.id, 'position');
     if (!attackerPos) return;
 
-    const nearbyEntities = world.query()
-      .with('agent')
-      .with('position')
-      .with('relationship')
-      .executeEntities();
+    // Filter cached agents to those that also have 'relationship' component
+    const nearbyEntities = cachedNearbyAgents.filter((e) => world.hasComponent(e.id, 'relationship'));
 
     for (const witness of nearbyEntities) {
       if (witness.id === attacker.id || witness.id === defender.id) continue;
