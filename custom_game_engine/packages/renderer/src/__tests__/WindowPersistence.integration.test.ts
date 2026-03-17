@@ -540,12 +540,6 @@ describe('Window Persistence (localStorage)', () => {
     it('should throw when localStorage quota is exceeded', () => {
       windowManager = new WindowManager(mockCanvas);
 
-      // Mock localStorage.setItem directly (works with both native and polyfilled localStorage)
-      const originalSetItem = localStorage.setItem.bind(localStorage);
-      localStorage.setItem = () => {
-        throw new DOMException('QuotaExceededError', 'QuotaExceededError');
-      };
-
       const panel = new MockPanel('quota-test', 'Quota Test');
       windowManager.registerWindow('quota-test', panel, {
         defaultX: 0,
@@ -554,11 +548,16 @@ describe('Window Persistence (localStorage)', () => {
         defaultHeight: 400,
       });
 
+      // Spy on localStorage directly (Storage.prototype may not be used by jsdom)
+      const spy = vi.spyOn(localStorage, 'setItem').mockImplementation(() => {
+        throw new DOMException('QuotaExceededError', 'QuotaExceededError');
+      });
+
       expect(() => {
         windowManager.saveLayout();
       }).toThrow('Failed to save window layout');
 
-      localStorage.setItem = originalSetItem;
+      spy.mockRestore();
     });
 
     it('should not use default values when required fields are missing in saved data', () => {
