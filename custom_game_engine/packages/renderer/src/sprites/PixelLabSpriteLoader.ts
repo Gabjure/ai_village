@@ -161,16 +161,16 @@ export class PixelLabSpriteLoader {
 
       // Load rotation images (check both with and without rotations/ subfolder)
       const rotationPromises = directionNames.map(async (dirName) => {
-        // Try direct path first (newer format)
-        let imgPath = `${folderPath}/${dirName}.png`;
+        // Try rotations/ subdirectory first (standard layout)
+        let imgPath = `${folderPath}/rotations/${dirName}.png`;
         try {
           const img = await this.loadImage(imgPath, metadata.id);
           rotations.set(dirName, img);
           return;
         } catch {
-          // Fall back to rotations/ subdirectory (older format)
+          // Fall back to direct path (flat layout)
           try {
-            imgPath = `${folderPath}/rotations/${dirName}.png`;
+            imgPath = `${folderPath}/${dirName}.png`;
             const img = await this.loadImage(imgPath, metadata.id);
             rotations.set(dirName, img);
           } catch {
