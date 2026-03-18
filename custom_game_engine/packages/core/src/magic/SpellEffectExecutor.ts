@@ -273,7 +273,9 @@ export class SpellEffectExecutor {
         appliedAt: tick,
         expiresAt: tick + effect.duration,
         stacks: 1,
-        appliedValues: result.appliedValues,
+        appliedValues: Object.fromEntries(
+          Object.entries(result.appliedValues).filter((entry): entry is [string, number] => typeof entry[1] === 'number')
+        ),
         paused: false,
         paradigmId: casterMagic.activeParadigmId,
       });

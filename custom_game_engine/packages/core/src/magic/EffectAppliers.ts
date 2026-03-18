@@ -27,6 +27,7 @@ import {
 } from './appliers/ControlEffectApplier.js';
 import { SummonEffectApplier } from './appliers/SummonEffectApplier.js';
 import { TransformEffectApplier } from './appliers/TransformEffectApplier.js';
+import { ParadigmEffectApplier } from './appliers/ParadigmEffectApplier.js';
 
 // ============================================================================
 // Damage Applier
@@ -372,4 +373,5 @@ export function registerStandardAppliers(): void {
   executor.registerApplier(new ControlEffectApplier());
   executor.registerApplier(new SummonEffectApplier());
   executor.registerApplier(new TransformEffectApplier());
+  executor.registerApplier(new ParadigmEffectApplier());
 }

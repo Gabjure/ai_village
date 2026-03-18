@@ -593,7 +593,7 @@ export interface EffectApplicationResult {
   targetId: string;
 
   /** Actual values applied (after scaling, resistances, etc.) */
-  appliedValues: Record<string, number>;
+  appliedValues: Record<string, number | string>;
 
   /** Duration remaining (if applicable) */
   remainingDuration?: number;
