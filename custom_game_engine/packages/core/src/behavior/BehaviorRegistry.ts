@@ -18,6 +18,7 @@
  */
 
 import type { EntityImpl } from '../ecs/Entity.js';
+import type { AgentComponent } from '../components/AgentComponent.js';
 import type { World } from '../ecs/World.js';
 import type { AgentBehavior } from '../components/AgentComponent.js';
 import { createBehaviorContext, type BehaviorContext, type BehaviorResult } from './BehaviorContext.js';
@@ -173,19 +174,33 @@ export class BehaviorRegistry {
     const meta = this.behaviors.get(name);
 
     if (meta) {
-      if (meta.usesContext) {
-        // Modern handler - create context and pass it
-        const ctx = createBehaviorContext(entity, world);
-        const result = (meta.handler as ContextBehaviorHandler)(ctx) as BehaviorResult | undefined;
-        // Safety: ensure result is valid even if handler doesn't return properly
-        if (result !== undefined && result !== null) {
-          return result;
+      try {
+        if (meta.usesContext) {
+          // Modern handler - create context and pass it
+          const ctx = createBehaviorContext(entity, world);
+          const result = (meta.handler as ContextBehaviorHandler)(ctx) as BehaviorResult | undefined;
+          // Safety: ensure result is valid even if handler doesn't return properly
+          if (result !== undefined && result !== null) {
+            return result;
+          }
+          return { complete: false };
+        } else {
+          // Legacy handler - call directly
+          (meta.handler as BehaviorHandler)(entity, world);
+          return { complete: false };
         }
-        return { complete: false };
-      } else {
-        // Legacy handler - call directly
-        (meta.handler as BehaviorHandler)(entity, world);
-        return { complete: false };
+      } catch (error) {
+        // Enrich TypeError with behavior context for production diagnostics
+        if (error instanceof TypeError) {
+          const enriched = new TypeError(
+            `[BehaviorRegistry] ${error.message} in behavior '${name}' ` +
+            `(entity=${entity.id}, tick=${world.tick}, ` +
+            `state=${JSON.stringify(entity.getComponent<AgentComponent>('agent')?.behaviorState ?? {})})`,
+          );
+          enriched.stack = error.stack;
+          throw enriched;
+        }
+        throw error;
       }
     }
 
