@@ -203,8 +203,11 @@ export function calculateFarmingContext(
     }
 
     // Check harvestable
+    // mature/seeding plants always yield at least 1 item (HarvestActionHandler ensures this)
+    // fruiting plants need fruitCount > 0 since they accumulate fruit over time
     if (HARVESTABLE_STAGES.includes(plant.stage)) {
-      if (plant.fruitCount > 0 || plant.seedsProduced > 0) {
+      const isFruitingStage = plant.stage === 'fruiting';
+      if (!isFruitingStage || plant.fruitCount > 0 || plant.seedsProduced > 0) {
         harvestableCount++;
       }
     }

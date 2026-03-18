@@ -141,7 +141,8 @@ export class HarvestActionHandler implements ActionHandler {
     }
 
     // Check plant stage is valid for harvesting
-    const validStages = ['mature', 'seeding'];
+    // 'fruiting' is also valid: fruit trees/bushes accumulate fruitCount at this stage
+    const validStages = ['mature', 'seeding', 'fruiting'];
     if (!validStages.includes(plant.stage)) {
       return {
         valid: false,
@@ -283,7 +284,7 @@ export class HarvestActionHandler implements ActionHandler {
     const seedYield = calculateSeedYield(plant, BASE_SEED_YIELD_HARVEST, farmingSkill);
 
     // Calculate quality for harvested crops (Phase 10)
-    const plantMaturity = plant.stage === 'mature' || plant.stage === 'seeding';
+    const plantMaturity = plant.stage === 'mature' || plant.stage === 'seeding' || plant.stage === 'fruiting';
     const harvestQuality = calculateHarvestQuality(farmingLevel, plant.health, plantMaturity);
 
     const seedItemId = createSeedItemId(plant.speciesId);
