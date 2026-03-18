@@ -227,6 +227,7 @@ import {
   createPrayerPanelFactory,
   createSpriteGalleryPanelFactory,
   DiscoveryNamingModal,
+  OnboardingOverlay,
 } from '@ai-village/renderer';
 import {
   OllamaProvider,
@@ -3518,6 +3519,10 @@ async function main() {
   // - No existing saves OR user explicitly wants to see browser OR hub action specified
   else if (!creationResumeState) {
     console.log(`[Demo] Showing Universe Browser (no saves, ?newGame=true, or hub action: ${hubAction || 'none'})`);
+    if (statusEl) {
+      statusEl.textContent = 'Ready — Choose your universe';
+      statusEl.className = 'status ready';
+    }
     browserResult = await new Promise<UniverseBrowserResult>((resolve) => {
       const browserScreen = new UniverseBrowserScreen();
       browserScreen.show(
@@ -5422,6 +5427,12 @@ async function main() {
         llmProvider: llmProvider,
       });
     }
+  }
+
+  // Show onboarding hints for first-time players (after cinematic, before gameplay)
+  if (!OnboardingOverlay.wasCompleted()) {
+    const onboarding = new OnboardingOverlay();
+    onboarding.show();
   }
 
   // Set up periodic auto-saves every 5 minutes (real time)

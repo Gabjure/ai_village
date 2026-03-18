@@ -92,6 +92,8 @@ export * from './FarmManagementPanel.js';
 export * from './SoulCeremonyModal.js';
 export * from './NotificationModal.js';
 export * from './NotificationHelpers.js';
+export * from './DiscoveryNamingModal.js';
+export * from './OnboardingOverlay.js';
 export * from './AgentCreationCards.js';
 export * from './ResearchLibraryPanel.js';
 export * from './TechTreePanel.js';
@@ -102,6 +104,7 @@ export * from './ui/DragDropSystem.js';
 export * from './ui/InventorySearch.js';
 export * from './ui/ItemTooltip.js';
 export * from './ui/DOMSpeechBubbleOverlay.js';
+export * from './ui/DOMAgentTestHooksOverlay.js';
 
 export * from './CraftingPanelUI.js';
 export * from './RecipeListSection.js';
