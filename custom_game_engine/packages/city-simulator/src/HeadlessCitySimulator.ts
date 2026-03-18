@@ -57,6 +57,7 @@ interface PlantSystemsConfig {
   PlantDiscoverySystem: any;
   PlantDiseaseSystem: any;
   WildPlantPopulationSystem: any;
+  PlantCrossPollinationSystem: any;
 }
 
 // Plant systems from @ai-village/botany (completes the extraction from core)
@@ -65,6 +66,7 @@ import {
   PlantDiscoverySystem,
   PlantDiseaseSystem,
   WildPlantPopulationSystem,
+  PlantCrossPollinationSystem,
 } from '@ai-village/botany';
 
 import { createWanderingAgent, createLLMAgent } from '@ai-village/agents';
@@ -245,6 +247,7 @@ export class HeadlessCitySimulator {
       PlantDiscoverySystem,
       PlantDiseaseSystem,
       WildPlantPopulationSystem,
+      PlantCrossPollinationSystem,
     };
 
     // Use centralized system registration - full game engine, headless

@@ -206,6 +206,14 @@ export interface PlantEvents {
     seedItemId?: string;
   };
 
+  // === Cross-Pollination Events ===
+  'plant:crossPollinated': {
+    plantId: EntityId;
+    partnerId: EntityId;
+    hybridSpeciesId: string;
+    hybridName: string;
+  };
+
   // === Wild Plant Population Events ===
   'wild_plant:spawn': {
     speciesId: string;

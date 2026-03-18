@@ -19,6 +19,7 @@ export {
   type SeedBankEntry,
   type BiomeDistribution,
 } from './systems/WildPlantPopulationSystem.js';
+export { PlantCrossPollinationSystem } from './systems/PlantCrossPollinationSystem.js';
 
 // Data exports
 export {

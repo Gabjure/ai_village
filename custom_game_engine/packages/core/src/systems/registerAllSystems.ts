@@ -444,6 +444,8 @@ export interface PlantSystemsConfig {
   PlantDiseaseSystem: new (config?: any) => System;
   /** WildPlantPopulationSystem class constructor */
   WildPlantPopulationSystem: new (config?: any) => System;
+  /** PlantCrossPollinationSystem class constructor */
+  PlantCrossPollinationSystem: new (eventBus?: EventBus) => System;
 }
 
 /**
@@ -465,9 +467,9 @@ export interface SystemRegistrationConfig extends LLMDependencies {
   /**
    * Plant systems to use. REQUIRED - Import from @ai-village/botany:
    * ```typescript
-   * import { PlantSystem, PlantDiscoverySystem, PlantDiseaseSystem, WildPlantPopulationSystem } from '@ai-village/botany';
+   * import { PlantSystem, PlantDiscoverySystem, PlantDiseaseSystem, WildPlantPopulationSystem, PlantCrossPollinationSystem } from '@ai-village/botany';
    * registerAllSystems(gameLoop, {
-   *   plantSystems: { PlantSystem, PlantDiscoverySystem, PlantDiseaseSystem, WildPlantPopulationSystem }
+   *   plantSystems: { PlantSystem, PlantDiscoverySystem, PlantDiseaseSystem, WildPlantPopulationSystem, PlantCrossPollinationSystem }
    * });
    * ```
    * Throws an error at runtime if not provided.
@@ -525,14 +527,15 @@ export function registerAllSystems(
   if (!plantSystems) {
     throw new Error(
       'plantSystems config is required. Import plant systems from @ai-village/botany:\n' +
-      'import { PlantSystem, PlantDiscoverySystem, PlantDiseaseSystem, WildPlantPopulationSystem } from "@ai-village/botany";\n' +
-      'registerAllSystems(gameLoop, { plantSystems: { PlantSystem, PlantDiscoverySystem, PlantDiseaseSystem, WildPlantPopulationSystem } });'
+      'import { PlantSystem, PlantDiscoverySystem, PlantDiseaseSystem, WildPlantPopulationSystem, PlantCrossPollinationSystem } from "@ai-village/botany";\n' +
+      'registerAllSystems(gameLoop, { plantSystems: { PlantSystem, PlantDiscoverySystem, PlantDiseaseSystem, WildPlantPopulationSystem, PlantCrossPollinationSystem } });'
     );
   }
   const PlantSystemClass = plantSystems.PlantSystem;
   const PlantDiscoverySystemClass = plantSystems.PlantDiscoverySystem;
   const PlantDiseaseSystemClass = plantSystems.PlantDiseaseSystem;
   const WildPlantPopulationSystemClass = plantSystems.WildPlantPopulationSystem;
+  const PlantCrossPollinationSystemClass = plantSystems.PlantCrossPollinationSystem;
   const eventBus = gameLoop.world.eventBus;
 
   // Helper to register a system in disabled state (uses the system's actual id)
@@ -617,6 +620,7 @@ export function registerAllSystems(
     gameLoop.systemRegistry.register(new PlantDiscoverySystemClass());
     gameLoop.systemRegistry.register(new PlantDiseaseSystemClass(eventBus));
     gameLoop.systemRegistry.register(new WildPlantPopulationSystemClass(eventBus));
+    gameLoop.systemRegistry.register(new PlantCrossPollinationSystemClass());
   }
 
   // ============================================================================

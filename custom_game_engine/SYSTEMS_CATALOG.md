@@ -171,6 +171,22 @@ This document catalogs every system in the game engine. Systems are organized by
 
 ---
 
+### PlantCrossPollinationSystem
+**Purpose:** Autonomous cross-pollination between compatible flowering plants
+**Components:** `plant`, `position`
+**Priority:** 42
+**Dependencies:** `PlantSystem`
+**Throttle:** Every 200 ticks (~10 seconds)
+**File:** `packages/botany/src/systems/PlantCrossPollinationSystem.ts`
+
+**Responsibilities:**
+- Detect flowering plants within pollination radius (3 tiles)
+- Match compatible species (same category, different speciesId)
+- Generate hybrid seeds with blended genetics using PlantGenetics
+- Emit plant:crossPollinated events for discovery system
+
+---
+
 ## Animals
 
 ### AnimalSystem
@@ -2055,6 +2071,7 @@ Many systems don't need to run every tick (50ms). Throttled systems use an updat
 | BuildingMaintenanceSystem | 200 ticks | ~10 seconds |
 | WildAnimalSpawningSystem | 200 ticks | ~10 seconds |
 | PlantDiseaseSystem | 50 ticks | ~2.5 seconds |
+| PlantCrossPollinationSystem | 200 ticks | ~10 seconds |
 | AnimalProductionSystem | 100 ticks | ~5 seconds |
 | MarketEventSystem | 500 ticks | ~25 seconds |
 | MemorySystem | 100 ticks | ~5 seconds |

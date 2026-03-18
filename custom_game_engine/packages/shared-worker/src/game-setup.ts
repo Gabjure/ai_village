@@ -37,6 +37,7 @@ import {
   PlantDiscoverySystem,
   PlantDiseaseSystem,
   WildPlantPopulationSystem,
+  PlantCrossPollinationSystem,
 } from '@ai-village/botany';
 
 export interface GameSetupConfig {
@@ -101,6 +102,7 @@ export async function setupGameSystems(
       PlantDiscoverySystem,
       PlantDiseaseSystem,
       WildPlantPopulationSystem,
+      PlantCrossPollinationSystem,
     },
   });
 
