@@ -265,7 +265,8 @@ export interface AgentComponent extends Component {
   thinkInterval: number; // How often to reconsider behavior (in ticks)
   lastThinkTick: number;
   useLLM: boolean; // Whether to use LLM for decision making
-  llmCooldown: number; // Ticks remaining before next LLM call
+  llmCooldown: number; // Ticks remaining before next LLM call (post-decision cooldown)
+  llmRequestInFlight?: boolean; // True while an LLM request is in-flight (before decision received)
   customLLM?: CustomLLMConfig; // Per-agent LLM configuration override
 
   /**

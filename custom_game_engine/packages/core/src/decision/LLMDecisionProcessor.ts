@@ -463,13 +463,12 @@ export class LLMDecisionProcessor {
     // Check if we have a ready decision
     const decision = this.llmDecisionQueue.getDecision(entity.id);
     if (decision) {
-      // Clear behaviorCompleted flag when processing new decision
-      if (agent.behaviorCompleted) {
-        entity.updateComponent<AgentComponent>(ComponentType.Agent, (current) => ({
-          ...current,
-          behaviorCompleted: false,
-        }));
-      }
+      // Clear in-flight flag and behaviorCompleted flag when processing new decision
+      entity.updateComponent<AgentComponent>(ComponentType.Agent, (current) => ({
+        ...current,
+        llmRequestInFlight: false,
+        behaviorCompleted: false,
+      }));
       return this.processDecision(entity, world, decision, getNearbyAgents);
     }
     // Smart LLM calling - only call when needed
@@ -557,6 +556,12 @@ export class LLMDecisionProcessor {
           },
         });
 
+        // Mark request as in-flight so the renderer can show the thinking indicator
+        entity.updateComponent<AgentComponent>(ComponentType.Agent, (current) => ({
+          ...current,
+          llmRequestInFlight: true,
+        }));
+
         // Pass custom LLM config if agent has it configured
         this.llmDecisionQueue.requestDecision(entity.id, prompt, agent.customLLM).catch((err: Error) => {
           console.error(`[LLMDecisionProcessor] LLM decision failed for ${entity.id}:`, err);
@@ -583,9 +588,10 @@ export class LLMDecisionProcessor {
             },
           });
 
-          // On LLM failure, temporarily fall back to scripted behavior
+          // On LLM failure, clear in-flight flag and apply short retry cooldown
           entity.updateComponent<AgentComponent>(ComponentType.Agent, (current) => ({
             ...current,
+            llmRequestInFlight: false,
             llmCooldown: 60, // 3 second cooldown before retry (at 20 TPS)
           }));
         });

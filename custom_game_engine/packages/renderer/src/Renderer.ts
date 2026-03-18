@@ -385,6 +385,9 @@ export class Renderer {
     }
 
     // Clear with solid background for 2D mode
+    // CRITICAL: Reset globalAlpha first - entity rendering may have left it < 1.0
+    // If not reset, the background fill is semi-transparent and previous frame bleeds through
+    this.ctx.globalAlpha = 1.0;
     this.ctx.fillStyle = '#1a1a1a';
     this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
@@ -442,11 +445,7 @@ export class Renderer {
         // This only happens if user scrolls faster than background generation
         // Prevents missing terrain at the cost of a minor lag spike
         if (!chunk.generated) {
-          console.warn(
-            `[Renderer] Emergency chunk generation for visible chunk (${chunkX}, ${chunkY}). ` +
-            `This indicates camera scrolled faster than background generation. ` +
-            `Consider increasing BackgroundChunkGenerator throttle or adding more predictive loading.`
-          );
+          // Generate silently - console.warn in hot path causes FPS drops
           this.terrainGenerator.generateChunk(chunk, world as WorldMutator);
         }
 
@@ -796,6 +795,11 @@ export class Renderer {
         this.agentRenderer.drawReflectionIndicator(screen.x, screen.y, reflection.reflectionType);
       }
 
+      // Draw thinking indicator while an LLM request is actively in-flight
+      if (agent?.useLLM && agent.llmRequestInFlight && !circadian?.isSleeping) {
+        this.agentRenderer.drawThinkingIndicator(screen.x, screen.y);
+      }
+
       // Draw animal state label
       const animal = entity.components.get('animal') as AnimalComponent | undefined;
       if (animal) {
@@ -830,11 +834,20 @@ export class Renderer {
       }
     }
 
-    // Draw agent-building interaction indicators
-    this.interactionOverlay.drawAgentBuildingInteractions(world, this.camera, this.tileSize, selectedEntity);
+    // Draw agent-building interaction indicators (pass cached queries to avoid per-frame world.query())
+    this.interactionOverlay.drawAgentBuildingInteractions(
+      world, this.camera, this.tileSize, selectedEntity,
+      this._cachedAgentEntities, this._cachedBuildingEntities
+    );
 
     // Draw navigation path for selected entity
     this.interactionOverlay.drawNavigationPath(world, this.camera, this.tileSize, selectedEntity);
+
+    // Reset canvas stroke state - InteractionOverlay leaves strokeStyle as cyan (#00CCFF)
+    this.ctx.strokeStyle = '#000000';
+    this.ctx.lineWidth = 1;
+    this.ctx.globalAlpha = 1.0;
+    this.ctx.setLineDash([]);
 
     // Draw city boundaries
     this.debugOverlay.drawCityBoundaries(world, this.camera, this.tileSize);
@@ -1098,7 +1111,12 @@ export class Renderer {
     if (!this.was3DActive) {
       const worldX = this.camera.x / this.tileSize;
       const worldY = this.camera.y / this.tileSize;
-      renderer3D.setCameraFromWorld(worldX, worldY, 0);
+      // Detect if camera is currently over an indoor/interior space
+      const cameraTileX = Math.floor(worldX);
+      const cameraTileY = Math.floor(worldY);
+      const tile = (world as any).getTileAt?.(cameraTileX, cameraTileY);
+      const isIndoorAtCamera = !!(tile?.floor || tile?.roof);
+      renderer3D.setCameraFromWorld(worldX, worldY, 0, isIndoorAtCamera);
 
       // Position 3D canvas behind 2D canvas for UI overlay
       // The 2D canvas stays visible but transparent for UI windows
