@@ -46,12 +46,21 @@ export class ThreatResponseSystem extends BaseSystem {
 
   protected onUpdate(ctx: SystemContext): void {
     this.ctx = ctx; // Store context for helper methods
+    const allAnimals = ctx.world.query().with(CT.Animal).executeEntities();
+    const allProjectiles = ctx.world.query().with(CT.Projectile).executeEntities();
+    const allVillages = ctx.world.query().with(CT.VillageGovernance).executeEntities();
     for (const entity of ctx.activeEntities) {
-      this.processEntity(entity, ctx.world);
+      this.processEntity(entity, ctx.world, allAnimals, allProjectiles, allVillages);
     }
   }
 
-  private processEntity(entity: Entity, world: World): void {
+  private processEntity(
+    entity: Entity,
+    world: World,
+    allAnimals: Entity[],
+    allProjectiles: Entity[],
+    allVillages: Entity[]
+  ): void {
     const threatComp = entity.getComponent<ThreatDetectionComponent>(CT.ThreatDetection);
     const position = entity.getComponent<PositionComponent>(CT.Position);
     const personality = entity.getComponent<PersonalityComponent>(CT.Personality);
@@ -60,7 +69,7 @@ export class ThreatResponseSystem extends BaseSystem {
 
     // Scan for threats if scan interval elapsed
     if (world.tick - threatComp.lastScanTime >= threatComp.scanInterval) {
-      this.scanForThreats(entity, world, threatComp, position);
+      this.scanForThreats(entity, world, threatComp, position, allAnimals, allProjectiles, allVillages);
       threatComp.lastScanTime = world.tick;
     }
 
@@ -87,7 +96,10 @@ export class ThreatResponseSystem extends BaseSystem {
     entity: Entity,
     world: World,
     threatComp: ThreatDetectionComponent,
-    position: PositionComponent
+    position: PositionComponent,
+    allAnimals: Entity[],
+    allProjectiles: Entity[],
+    allVillages: Entity[]
   ): void {
     const threats: DetectedThreat[] = [];
 
@@ -102,7 +114,7 @@ export class ThreatResponseSystem extends BaseSystem {
         if (!otherAgent || otherAgent.id === entity.id) continue;
 
         // Check if hostile (for now, check conflict component or wild animal)
-        const isHostile = this.isHostile(entity, otherAgent);
+        const isHostile = this.isHostile(entity, otherAgent, allVillages);
         if (!isHostile) continue;
 
         const threat = this.createThreatFromAgent(otherAgent, position, world);
@@ -110,8 +122,7 @@ export class ThreatResponseSystem extends BaseSystem {
       }
     }
 
-    // Scan for wild animals
-    const allAnimals = world.query()?.with?.(CT.Animal)?.executeEntities?.() ?? [];
+    // Scan for wild animals (pre-queried once per tick, passed in)
     for (const animal of allAnimals) {
       const animalComp = animal.getComponent<any>(CT.Animal);
       if (!animalComp || animalComp.tamed) continue;
@@ -120,8 +131,7 @@ export class ThreatResponseSystem extends BaseSystem {
       if (threat) threats.push(threat);
     }
 
-    // Scan for incoming projectiles
-    const allProjectiles = world.query()?.with?.(CT.Projectile)?.executeEntities?.() ?? [];
+    // Scan for incoming projectiles (pre-queried once per tick, passed in)
     for (const projectile of allProjectiles) {
       const threat = this.createThreatFromProjectile(projectile, position, entity.id, world);
       if (threat) threats.push(threat);
@@ -170,7 +180,7 @@ export class ThreatResponseSystem extends BaseSystem {
     return Math.min(100, Math.max(0, power));
   }
 
-  private isHostile(agent: Entity, other: Entity): boolean {
+  private isHostile(agent: Entity, other: Entity, allVillages: Entity[]): boolean {
     // Check for conflict component
     const conflict = other.getComponent<any>(CT.Conflict);
     if (conflict?.targetId === agent.id) return true;
@@ -185,8 +195,8 @@ export class ThreatResponseSystem extends BaseSystem {
     // Note: This uses NationComponent.foreignPolicy.diplomaticRelations to determine hostility
     // Agents don't have direct nation membership yet - this will be expanded when citizen
     // components are added to track agent->village->city->province->nation hierarchy
-    const agentNation = this.findAgentNation(agent);
-    const otherNation = this.findAgentNation(other);
+    const agentNation = this.findAgentNation(agent, allVillages);
+    const otherNation = this.findAgentNation(other, allVillages);
 
     if (agentNation && otherNation && agentNation !== otherNation) {
       const relationship = this.getNationRelationship(agentNation, otherNation);
@@ -206,14 +216,13 @@ export class ThreatResponseSystem extends BaseSystem {
    * TODO: Replace this with proper CitizenComponent when implemented
    * Future: agent -> village -> city -> province -> nation hierarchy
    */
-  private findAgentNation(agent: Entity): string | null {
+  private findAgentNation(agent: Entity, allVillages: Entity[]): string | null {
     // For now, check if agent has a position and find nearest governance structure
     const position = agent.getComponent<PositionComponent>(CT.Position);
     if (!position) return null;
 
-    // Check if agent is within a village with nation membership
-    const villages = this.ctx?.world.query()?.with?.(CT.VillageGovernance)?.executeEntities?.() ?? [];
-    for (const village of villages) {
+    // Check if agent is within a village with nation membership (pre-queried once per tick)
+    for (const village of allVillages) {
       const governance = village.getComponent<any>(CT.VillageGovernance);
       const villagePos = village.getComponent<PositionComponent>(CT.Position);
 
