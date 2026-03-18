@@ -3688,7 +3688,14 @@ async function main() {
     // Join an existing universe from the server (possibly on a specific planet)
     console.log(`[Demo] Joining universe ${browserResult.universeId}${browserResult.planetId ? ` on planet ${browserResult.planetId}` : ''}`);
 
-    // Show the PlanetJoinScreen and wait for user to confirm entry
+    // New universe has no server snapshot yet — create a fresh world instead of trying to load one
+    if (browserResult.isNewUniverse) {
+      console.log(`[Demo] New universe created — initializing fresh world for ${browserResult.universeId}`);
+      universeSelection = { type: 'new', magicParadigm: 'classic_fantasy' };
+    }
+
+    // For existing universes, show the PlanetJoinScreen and wait for user to confirm entry
+    if (!browserResult.isNewUniverse) {
     const joinResult = await new Promise<{ success: boolean; snapshot?: any }>((resolve) => {
       const API_BASE = `${API_BASE_URL}/api`;
 
@@ -3856,6 +3863,7 @@ async function main() {
         });
       });
     }
+    } // end if (!browserResult.isNewUniverse)
   } else if (!creationResumeState) {
     // Fallback - shouldn't happen but just in case (only if not resuming)
     universeSelection = await new Promise<{ type: 'new'; magicParadigm: string }>((resolve) => {

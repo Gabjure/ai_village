@@ -27,6 +27,7 @@ export interface UniverseBrowserResult {
   snapshotTick?: number;  // For time travel
   cosmicConfig?: GameStartConfig;  // For cosmic creation flow
   planetId?: string;  // For joining a specific planet
+  isNewUniverse?: boolean;  // True when universe was just created (no server snapshot yet)
 }
 
 interface ServerUniverse {
@@ -459,13 +460,13 @@ export class UniverseBrowserScreen {
     await planetScreen.show(universeId);
   }
 
-  private showLivePlanetCreation(universeId: string, universeName: string): void {
+  private showLivePlanetCreation(universeId: string, universeName: string, isNewUniverse: boolean = false): void {
     const creationScreen = new LivePlanetCreationScreen('live-planet-creation-screen', {
       onPlanetReady: (planetId: string) => {
         creationScreen.hide();
         creationScreen.destroy();
         if (this._onSelect) {
-          this._onSelect({ action: 'join_universe', universeId, planetId });
+          this._onSelect({ action: 'join_universe', universeId, planetId, isNewUniverse });
         }
       },
       onCancel: () => {
@@ -579,8 +580,8 @@ export class UniverseBrowserScreen {
             return;
           }
 
-          // Show LivePlanetCreationScreen with sprites
-          this.showLivePlanetCreation(universeId, universeName);
+          // Show LivePlanetCreationScreen with sprites (new universe has no snapshot yet)
+          this.showLivePlanetCreation(universeId, universeName, true);
         } catch (error) {
           console.error('[UniverseBrowser] Universe creation failed:', error);
           // Fall back to old flow on error
