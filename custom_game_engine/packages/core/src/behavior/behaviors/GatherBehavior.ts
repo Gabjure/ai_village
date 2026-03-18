@@ -770,9 +770,10 @@ export class GatherBehavior extends BaseBehavior {
           const distanceToAgent = this.distance(position, resourcePos);
           if (distanceToAgent > GATHER_MAX_RANGE) continue;
 
-          const distanceToHome = Math.sqrt(resourcePos.x * resourcePos.x + resourcePos.y * resourcePos.y);
+          const distanceToHomeSquared = resourcePos.x * resourcePos.x + resourcePos.y * resourcePos.y;
           let score = distanceToAgent;
-          if (distanceToHome > HOME_RADIUS) {
+          if (distanceToHomeSquared > HOME_RADIUS * HOME_RADIUS) {
+            const distanceToHome = Math.sqrt(distanceToHomeSquared);
             score += (distanceToHome - HOME_RADIUS) * 2.0;
           }
 
@@ -884,13 +885,14 @@ export class GatherBehavior extends BaseBehavior {
         // Only consider resources within max gather range
         if (distanceToAgent > GATHER_MAX_RANGE) continue;
 
-        // Distance from resource to home (0, 0)
-        const distanceToHome = Math.sqrt(resourcePos.x * resourcePos.x + resourcePos.y * resourcePos.y);
+        // Distance from resource to home (0, 0) - use squared for range guard
+        const distanceToHomeSquared = resourcePos.x * resourcePos.x + resourcePos.y * resourcePos.y;
 
         // Scoring: prefer resources near home AND near agent
         let score = distanceToAgent;
-        if (distanceToHome > HOME_RADIUS) {
+        if (distanceToHomeSquared > HOME_RADIUS * HOME_RADIUS) {
           // Penalize resources far from home (add 2x the excess distance)
+          const distanceToHome = Math.sqrt(distanceToHomeSquared);
           score += (distanceToHome - HOME_RADIUS) * 2.0;
         }
 
@@ -927,13 +929,14 @@ export class GatherBehavior extends BaseBehavior {
         // Only consider resources within max gather range
         if (distanceToAgent > GATHER_MAX_RANGE) continue;
 
-        // Distance from resource to home (0, 0)
-        const distanceToHome = Math.sqrt(voxelPos.x * voxelPos.x + voxelPos.y * voxelPos.y);
+        // Distance from resource to home (0, 0) - use squared for range guard
+        const distanceToHomeSquared = voxelPos.x * voxelPos.x + voxelPos.y * voxelPos.y;
 
         // Scoring: prefer resources near home AND near agent
         let score = distanceToAgent;
-        if (distanceToHome > HOME_RADIUS) {
+        if (distanceToHomeSquared > HOME_RADIUS * HOME_RADIUS) {
           // Penalize resources far from home (add 2x the excess distance)
+          const distanceToHome = Math.sqrt(distanceToHomeSquared);
           score += (distanceToHome - HOME_RADIUS) * 2.0;
         }
 
@@ -1029,13 +1032,14 @@ export class GatherBehavior extends BaseBehavior {
           // Only consider plants within max gather range
           if (distanceToAgent > GATHER_MAX_RANGE) continue;
 
-          // Distance from plant to home (0, 0)
-          const distanceToHome = Math.sqrt(plantPos.x * plantPos.x + plantPos.y * plantPos.y);
+          // Distance from plant to home (0, 0) - use squared for range guard
+          const distanceToHomeSquared = plantPos.x * plantPos.x + plantPos.y * plantPos.y;
 
           // Scoring: prefer plants near home AND near agent (same as resources)
           let score = distanceToAgent;
-          if (distanceToHome > HOME_RADIUS) {
+          if (distanceToHomeSquared > HOME_RADIUS * HOME_RADIUS) {
             // Penalize plants far from home (add 2x the excess distance)
+            const distanceToHome = Math.sqrt(distanceToHomeSquared);
             score += (distanceToHome - HOME_RADIUS) * 2.0;
           }
 
@@ -1134,13 +1138,14 @@ export class GatherBehavior extends BaseBehavior {
           // Only consider plants within max gather range
           if (distanceToAgent > GATHER_MAX_RANGE) continue;
 
-          // Distance from plant to home (0, 0)
-          const distanceToHome = Math.sqrt(plantPos.x * plantPos.x + plantPos.y * plantPos.y);
+          // Distance from plant to home (0, 0) - use squared for range guard
+          const distanceToHomeSquared = plantPos.x * plantPos.x + plantPos.y * plantPos.y;
 
           // Scoring: prefer plants near home AND near agent (same as resources)
           let score = distanceToAgent;
-          if (distanceToHome > HOME_RADIUS) {
+          if (distanceToHomeSquared > HOME_RADIUS * HOME_RADIUS) {
             // Penalize plants far from home (add 2x the excess distance)
+            const distanceToHome = Math.sqrt(distanceToHomeSquared);
             score += (distanceToHome - HOME_RADIUS) * 2.0;
           }
 

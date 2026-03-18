@@ -251,8 +251,9 @@ export class UpgradeBehavior extends BaseBehavior {
     if (buildingPos) {
       const dx = buildingPos.x - position.x;
       const dy = buildingPos.y - position.y;
-      const distance = Math.sqrt(dx * dx + dy * dy);
-      if (distance > UPGRADE_CONFIG.UPGRADE_RANGE + 1) {
+      const distanceSquared = dx * dx + dy * dy;
+      const upgradeRangeLimit = UPGRADE_CONFIG.UPGRADE_RANGE + 1;
+      if (distanceSquared > upgradeRangeLimit * upgradeRangeLimit) {
         this.updateState(entity, { phase: 'moving' });
         return;
       }
@@ -356,13 +357,15 @@ export class UpgradeBehavior extends BaseBehavior {
       const cost = this.getUpgradeCost(building.buildingType, targetTier);
       if (!this.hasResources(availableResources, cost)) continue;
 
-      // Calculate distance
+      // Calculate distance - use squared for range guard, sqrt only if in range
       const dx = position.x - agentPos.x;
       const dy = position.y - agentPos.y;
-      const distance = Math.sqrt(dx * dx + dy * dy);
+      const distanceSquared = dx * dx + dy * dy;
 
       // Skip if too far
-      if (distance > UPGRADE_CONFIG.SEARCH_RADIUS) continue;
+      if (distanceSquared > UPGRADE_CONFIG.SEARCH_RADIUS * UPGRADE_CONFIG.SEARCH_RADIUS) continue;
+
+      const distance = Math.sqrt(distanceSquared);
 
       // Score: prioritize lower tier buildings and closer distance
       const tierScore = (UPGRADE_CONFIG.MAX_TIER - building.tier) * 20;
