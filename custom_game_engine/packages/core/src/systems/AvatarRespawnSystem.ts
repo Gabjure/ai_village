@@ -46,6 +46,9 @@ export class AvatarRespawnSystem extends BaseSystem {
       .with('avatar_entity')
       .executeEntities();
 
+    // Hoist roster query outside the avatar entity loop
+    const rosterEntities = world.query().with('avatar_roster').executeEntities();
+
     for (const avatarEntity of avatarEntities) {
       const avatarComp = avatarEntity.getComponent<AvatarComponent>('avatar_entity');
       if (!avatarComp) continue;
@@ -65,8 +68,7 @@ export class AvatarRespawnSystem extends BaseSystem {
       if (currentTick < avatarComp.autoRespawnDeadlineTick) continue;
       if (!avatarComp.pendingRespawnOptions || avatarComp.pendingRespawnOptions.length === 0) continue;
 
-      // Find the owning agent
-      const rosterEntities = world.query().with('avatar_roster').executeEntities();
+      // Find the owning agent from pre-queried roster entities
       for (const rosterEntity of rosterEntities) {
         const roster = rosterEntity.getComponent<AvatarRosterComponent>('avatar_roster');
         if (!roster) continue;

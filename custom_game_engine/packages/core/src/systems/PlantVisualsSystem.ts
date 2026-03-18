@@ -21,7 +21,7 @@ export class PlantVisualsSystem extends BaseSystem {
   readonly requiredComponents = ['plant', 'position'] as const;
   // Only run when plant components exist (O(1) activation check)
   readonly activationComponents = ['plant'] as const;
-  protected readonly throttleInterval = 20; // NORMAL - 1 second
+  protected readonly throttleInterval = 100; // SLOW - 5 seconds (plant visuals change infrequently)
 
   /**
    * Map plant species to sprite IDs
@@ -272,13 +272,7 @@ export class PlantVisualsSystem extends BaseSystem {
   }
 
   protected onUpdate(ctx: SystemContext): void {
-    // Query ALL entities with plant component (including those without renderable)
-    const plantEntities = ctx.world
-      .query()
-      .with('plant')
-      .executeEntities();
-
-    for (const entity of plantEntities) {
+    for (const entity of ctx.activeEntities) {
       const plant = entity.getComponent('plant') as PlantComponent;
 
       if (!plant) {

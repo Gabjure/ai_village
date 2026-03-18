@@ -66,8 +66,8 @@ import type { IdentityComponent } from '../components/IdentityComponent.js';
 export class FriendshipSystem extends BaseSystem {
   public readonly id = 'friendship' as const;
   public readonly priority = 17; // After RelationshipConversationSystem (16)
-  // Only require Agent component - Relationship is lazy-initialized
-  public readonly requiredComponents = [CT.Agent] as const;
+  // Require both Agent and Relationship - only check agents that have formed relationships
+  public readonly requiredComponents = [CT.Agent, CT.Relationship] as const;
 
   // Lazy activation: Skip entire system when no relationship components exist in world
   // This ensures the system only runs when at least one entity has formed relationships

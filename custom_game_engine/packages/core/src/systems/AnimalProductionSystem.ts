@@ -27,7 +27,7 @@ export class AnimalProductionSystem extends BaseSystem {
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [CT.Animal, CT.Position];
   // Only run when animal components exist (O(1) activation check)
   public readonly activationComponents = ['animal'] as const;
-  protected readonly throttleInterval = 20; // NORMAL - 1 second
+  protected readonly throttleInterval = 100; // SLOW - 5 seconds (production accumulates over game-days)
   public readonly dependsOn = ['animal'] as const;
 
   // Track production state for each animal

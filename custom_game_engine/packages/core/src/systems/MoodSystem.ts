@@ -53,7 +53,7 @@ export class MoodSystem extends BaseSystem {
   public readonly activationComponents = [CT.Agent] as const;
 
   /** How often to fully update mood (in ticks) */
-  protected readonly throttleInterval = 60; // Every second at 60 tps
+  protected readonly throttleInterval = 60; // Every 3 seconds at 20 TPS
 
   /** Distance threshold for detecting social meals */
   private readonly SOCIAL_MEAL_DISTANCE = 5;
@@ -64,7 +64,7 @@ export class MoodSystem extends BaseSystem {
   /** Performance: Cache building list with invalidation */
   private buildingCache: ReadonlyArray<Entity> | null = null;
   private buildingCacheValidUntil = 0;
-  private readonly BUILDING_CACHE_DURATION = 60; // 1 second at 60 TPS
+  private readonly BUILDING_CACHE_DURATION = 60; // 3 seconds at 20 TPS
 
   /**
    * Initialize the system.

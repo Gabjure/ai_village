@@ -25,7 +25,7 @@ export class PredatorPreyEcologySystem extends BaseSystem {
   public readonly id: SystemId = 'predator_prey_ecology';
   public readonly priority: number = 64;
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [CT.Animal];
-  protected readonly throttleInterval = 10;
+  protected readonly throttleInterval = 60; // Every 3 seconds (population dynamics are slow-changing)
 
   protected onUpdate(ctx: SystemContext): void {
     const animals = ctx.activeEntities;

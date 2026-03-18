@@ -149,7 +149,7 @@ export class FatesCouncilSystem extends BaseSystem {
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [];
   // Only run when souls or deities exist for the Fates to weave plots for
   public readonly activationComponents = [CT.SoulIdentity, CT.Deity] as const;
-  protected readonly throttleInterval = 1;  // Check every tick for evening
+  protected readonly throttleInterval = 20; // NORMAL - checks time phase once per second (council runs once per evening)
 
   private lastCouncilDay = -1;
   private llmQueue: LLMDecisionQueue | null = null;

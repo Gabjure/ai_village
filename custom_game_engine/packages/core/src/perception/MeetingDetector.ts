@@ -47,6 +47,9 @@ const UNINTERRUPTIBLE_BEHAVIORS = ['forced_sleep', 'seek_sleep', 'call_meeting',
  * ```
  */
 export class MeetingDetector {
+  private cachedAgents: ReadonlyArray<Entity> = [];
+  private cacheValidTick = -1;
+
   /**
    * Process meeting calls for an entity.
    */
@@ -133,7 +136,11 @@ export class MeetingDetector {
    * Find the agent who called the meeting by speaker name.
    */
   private findMeetingCaller(world: World, speakerName: string, selfId: string): Entity | null {
-    const agents = world.query().with(ComponentType.Agent).with(ComponentType.Position).executeEntities();
+    if (this.cacheValidTick !== world.tick) {
+      this.cachedAgents = world.query().with(ComponentType.Agent).with(ComponentType.Position).executeEntities();
+      this.cacheValidTick = world.tick;
+    }
+    const agents = this.cachedAgents;
 
     for (const agent of agents) {
       if (agent.id === selfId) continue;
