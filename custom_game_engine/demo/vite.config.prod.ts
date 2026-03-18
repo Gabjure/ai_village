@@ -68,6 +68,7 @@ export default defineConfig({
   build: {
     outDir: 'dist',
     emptyOutDir: true,
+    sourcemap: 'hidden', // Generate .map files for debugging but don't expose via sourceMappingURL
     target: ['chrome92', 'firefox79', 'safari15'],
     rollupOptions: {
       // Only externalize Node.js-native modules that can't run in the browser.

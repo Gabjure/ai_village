@@ -192,10 +192,15 @@ export class BehaviorRegistry {
       } catch (error) {
         // Enrich TypeError with behavior context for production diagnostics
         if (error instanceof TypeError) {
+          let stateStr: string;
+          try {
+            stateStr = JSON.stringify(entity.getComponent<AgentComponent>('agent')?.behaviorState ?? {});
+          } catch {
+            stateStr = '[unserializable]';
+          }
           const enriched = new TypeError(
             `[BehaviorRegistry] ${error.message} in behavior '${name}' ` +
-            `(entity=${entity.id}, tick=${world.tick}, ` +
-            `state=${JSON.stringify(entity.getComponent<AgentComponent>('agent')?.behaviorState ?? {})})`,
+            `(entity=${entity.id}, tick=${world.tick}, state=${stateStr})`,
           );
           enriched.stack = error.stack;
           throw enriched;
