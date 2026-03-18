@@ -409,11 +409,9 @@ export class GuardDutySystem extends BaseSystem {
     if (!alertingGuardDuty) return;
 
     // Find other guards within response radius
-    for (const entity of world.entities.values()) {
+    const guards = world.query().with('guard_duty').executeEntities();
+    for (const entity of guards) {
       if (entity.id === alertingGuard.id) continue;
-
-      // Check if entity is a guard
-      if (!entity.hasComponent('guard_duty')) continue;
 
       const guardPos = entity.getComponent('position') as PositionComponent | undefined;
       if (!guardPos) continue;
