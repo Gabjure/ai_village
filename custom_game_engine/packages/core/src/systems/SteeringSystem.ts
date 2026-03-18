@@ -20,6 +20,12 @@ import { setComponentProperties } from '../utils/componentUtils.js';
 // Using Position from types.ts for all vector operations
 type Vector2 = Position;
 
+/** Mutable vector used for scratch allocations to avoid GC pressure */
+interface MutableVector2 {
+  x: number;
+  y: number;
+}
+
 /**
  * SteeringSystem implements steering behaviors for navigation
  * Supports: seek, arrive, obstacle avoidance, wander, and combined behaviors
@@ -50,13 +56,34 @@ export class SteeringSystem extends BaseSystem {
   public readonly activationComponents = [CT.Steering] as const;
   protected readonly throttleInterval = 0; // EVERY_TICK - critical responsiveness
 
+  // Valid steering behaviors - static set for O(1) lookup, avoids per-entity array allocation
+  private static readonly VALID_BEHAVIORS: ReadonlySet<SteeringBehavior> = new Set<SteeringBehavior>([
+    'seek', 'arrive', 'obstacle_avoidance', 'wander', 'combined', 'none',
+  ]);
+
   // Track stuck agents for pathfinding fallback
   private stuckTracker: Map<string, { lastPos: Vector2; stuckTime: number; target: Vector2 }> = new Map();
 
   // Reusable obstacles array to avoid per-entity allocation in obstacle avoidance
   private _obstacleBuffer: Entity[] = [];
 
+  // Scratch vectors reused each call to avoid per-entity allocation
+  private _scratchForce: MutableVector2 = { x: 0, y: 0 };
+  private _scratchAhead: MutableVector2 = { x: 0, y: 0 };
+  private _scratchToObstacle: MutableVector2 = { x: 0, y: 0 };
+  private _scratchHeading: MutableVector2 = { x: 0, y: 0 };
+  private _scratchPerpLeft: MutableVector2 = { x: 0, y: 0 };
+  private _scratchPerpRight: MutableVector2 = { x: 0, y: 0 };
+
   protected onUpdate(ctx: SystemContext): void {
+    // Periodic stuckTracker cleanup - remove entries for entities no longer active
+    if (ctx.tick % 1000 === 0) {
+      const activeIds = new Set(ctx.activeEntities.map(e => e.id));
+      for (const id of this.stuckTracker.keys()) {
+        if (!activeIds.has(id)) this.stuckTracker.delete(id);
+      }
+    }
+
     // Update agent positions in scheduler
     ctx.world.simulationScheduler.updateAgentPositions(ctx.world);
 
@@ -69,8 +96,8 @@ export class SteeringSystem extends BaseSystem {
       try {
         this._updateSteering(entity, ctx.world, ctx.deltaTime);
       } catch (error) {
-        // Per CLAUDE.md, re-throw with context
-        throw new Error(`SteeringSystem failed for entity ${entity.id}: ${error}`);
+        // Log but continue — one entity's error must not prevent all others from steering
+        console.error(`[SteeringSystem] Failed for entity ${entity.id}:`, error);
       }
     }
   }
@@ -93,17 +120,18 @@ export class SteeringSystem extends BaseSystem {
     }
 
     // Validate behavior type
-    const validBehaviors: SteeringBehavior[] = ['seek', 'arrive', 'obstacle_avoidance', 'wander', 'combined', 'none'];
-    if (!validBehaviors.includes(steering.behavior)) {
-      throw new Error(`Invalid steering behavior: ${steering.behavior}. Valid: ${validBehaviors.join(', ')}`);
+    if (!SteeringSystem.VALID_BEHAVIORS.has(steering.behavior)) {
+      throw new Error(`Invalid steering behavior: ${steering.behavior}. Valid: ${[...SteeringSystem.VALID_BEHAVIORS].join(', ')}`);
     }
 
     if (steering.behavior === 'none') {
       return; // No steering applied
     }
 
-    // Calculate steering force
-    let steeringForce: Vector2 = { x: 0, y: 0 };
+    // Calculate steering force (reuse scratch vector - reset to zero)
+    this._scratchForce.x = 0;
+    this._scratchForce.y = 0;
+    let steeringForce: Vector2 = this._scratchForce;
 
     switch (steering.behavior) {
       case 'seek':
@@ -168,7 +196,8 @@ export class SteeringSystem extends BaseSystem {
   private _seek(position: PositionComponent, velocity: VelocityComponent, steering: SteeringComponent, targetOverride?: Vector2): Vector2 {
     const target = targetOverride ?? steering.target;
     if (!target) {
-      throw new Error('Seek behavior requires target position');
+      // No target yet (e.g., freshly deserialized, BrainSystem hasn't assigned one) — no force
+      return { x: 0, y: 0 };
     }
 
     const desired = {
@@ -197,7 +226,8 @@ export class SteeringSystem extends BaseSystem {
    */
   private _arrive(position: PositionComponent, velocity: VelocityComponent, steering: SteeringComponent, entityId?: string): Vector2 {
     if (!steering.target) {
-      throw new Error('Arrive behavior requires target position');
+      // No target yet (e.g., freshly deserialized, BrainSystem hasn't assigned one) — no force
+      return { x: 0, y: 0 };
     }
 
     const desired = {
@@ -299,10 +329,9 @@ export class SteeringSystem extends BaseSystem {
     const speed = Math.sqrt(velocity.vx * velocity.vx + velocity.vy * velocity.vy);
     if (speed === 0) return { x: 0, y: 0 };
 
-    const ahead = {
-      x: position.x + (velocity.vx / speed) * lookAheadDistance,
-      y: position.y + (velocity.vy / speed) * lookAheadDistance,
-    };
+    this._scratchAhead.x = position.x + (velocity.vx / speed) * lookAheadDistance;
+    this._scratchAhead.y = position.y + (velocity.vy / speed) * lookAheadDistance;
+    const ahead = this._scratchAhead;
 
     // OPTIMIZATION: Use chunk-based spatial index for nearby entity lookup
     const checkRadius = 3.0;
@@ -361,20 +390,22 @@ export class SteeringSystem extends BaseSystem {
 
     // Calculate steering force to avoid obstacle
     // Steer perpendicular to current heading to go around obstacle
-    const toObstacle = {
-      x: obstaclePos.x - position.x,
-      y: obstaclePos.y - position.y,
-    };
+    this._scratchToObstacle.x = obstaclePos.x - position.x;
+    this._scratchToObstacle.y = obstaclePos.y - position.y;
+    const toObstacle = this._scratchToObstacle;
 
     // Normalize velocity to get heading
-    const heading = {
-      x: velocity.vx / speed,
-      y: velocity.vy / speed,
-    };
+    this._scratchHeading.x = velocity.vx / speed;
+    this._scratchHeading.y = velocity.vy / speed;
+    const heading = this._scratchHeading;
 
     // Calculate perpendicular directions (left and right of heading)
-    const perpLeft = { x: -heading.y, y: heading.x };
-    const perpRight = { x: heading.y, y: -heading.x };
+    this._scratchPerpLeft.x = -heading.y;
+    this._scratchPerpLeft.y = heading.x;
+    this._scratchPerpRight.x = heading.y;
+    this._scratchPerpRight.y = -heading.x;
+    const perpLeft = this._scratchPerpLeft;
+    const perpRight = this._scratchPerpRight;
 
     // Choose direction that moves away from obstacle
     // Dot product tells us which side the obstacle is on

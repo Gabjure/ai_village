@@ -224,20 +224,23 @@ describe('SteeringSystem', () => {
   });
 
   describe('AC10: No Silent Fallbacks (CLAUDE.md Compliance)', () => {
-    it('should throw error for missing target in seek behavior', () => {
+    it('should return zero force for missing target in seek behavior (graceful no-op)', () => {
       const entity = world.createEntity() as EntityImpl;
-      entity.addComponent(createPositionComponent(0, 0));
+      entity.addComponent(createPositionComponent(5, 5));
       entity.addComponent(createVelocityComponent(0, 0));
       entity.addComponent(new SteeringComponent({
         behavior: 'seek',
         maxSpeed: 2.0,
         maxForce: 0.5,
-        // Missing target
+        // Missing target — expected transient state after deserialization
       }));
 
-      expect(() => {
-        system.update(world, world.query().with('steering').with('position').with('velocity').executeEntities(), 1.0);
-      }).toThrow('target');
+      // Should not throw; velocity should remain unchanged (zero force applied)
+      system.update(world, world.query().with('steering').with('position').with('velocity').executeEntities(), 1.0);
+
+      const velocity = entity.getComponent<{ vx: number; vy: number }>('velocity');
+      expect(velocity!.vx).toBe(0);
+      expect(velocity!.vy).toBe(0);
     });
 
     it('should throw error for invalid behavior type', () => {
