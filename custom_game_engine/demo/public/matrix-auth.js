@@ -28,10 +28,27 @@
     try { localStorage.removeItem(key); } catch (_) { /* noop */ }
   }
 
+  // Access token is kept in sessionStorage (cleared on tab/browser close) to
+  // reduce the XSS exfiltration window. It is still readable by JavaScript on
+  // this origin — the preferred long-term fix is HttpOnly session cookies
+  // backed by a server-side auth proxy. Non-sensitive fields (userId, deviceId,
+  // homeserver) remain in localStorage for UX continuity across sessions.
+  function sessionGet(key) {
+    try { return sessionStorage.getItem(key); } catch (_) { return null; }
+  }
+
+  function sessionSet(key, value) {
+    try { sessionStorage.setItem(key, value); } catch (_) { /* noop */ }
+  }
+
+  function sessionRemove(key) {
+    try { sessionStorage.removeItem(key); } catch (_) { /* noop */ }
+  }
+
   // ── Session State ──────────────────────────────────────────
 
   let session = {
-    accessToken: storageGet('mx_access_token'),
+    accessToken: sessionGet('mx_access_token'),
     userId: storageGet('mx_user_id'),
     deviceId: storageGet('mx_device_id'),
     homeserver: storageGet('mx_homeserver') || HOMESERVER,
@@ -43,7 +60,7 @@
     session.userId = data.user_id;
     session.deviceId = data.device_id;
     session.homeserver = HOMESERVER;
-    storageSet('mx_access_token', data.access_token);
+    sessionSet('mx_access_token', data.access_token);
     storageSet('mx_user_id', data.user_id);
     storageSet('mx_device_id', data.device_id);
     storageSet('mx_homeserver', HOMESERVER);
@@ -54,7 +71,7 @@
     session.userId = null;
     session.deviceId = null;
     session.displayName = null;
-    storageRemove('mx_access_token');
+    sessionRemove('mx_access_token');
     storageRemove('mx_user_id');
     storageRemove('mx_device_id');
     storageRemove('mx_homeserver');
@@ -88,7 +105,9 @@
   }
 
   async function apiRegister(username, password, token) {
-    // Synapse UIA is multi-stage: 1) get session, 2) token stage, 3) dummy stage
+    // Synapse UIA is multi-stage. We try m.login.dummy first (matching the
+    // website proxy behavior) and only fall back to m.login.registration_token
+    // if the server requires it.
 
     // Stage 1: Initial request to get session and required flows
     var res1 = await fetch(HOMESERVER + '/_matrix/client/v3/register', {
@@ -105,36 +124,66 @@
 
     var uiaSession = json1.session;
 
-    // Stage 2: Complete registration_token stage
-    var res2 = await fetch(HOMESERVER + '/_matrix/client/v3/register', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        username: username,
-        password: password,
-        auth: { type: 'm.login.registration_token', token: token, session: uiaSession },
-      }),
-    });
-    var json2 = await res2.json();
-    if (res2.ok) return json2; // Completed after token stage
+    // Check if the server requires a registration token by inspecting flows
+    var requiresToken = false;
+    if (json1.flows) {
+      // If every flow includes m.login.registration_token, a token is required
+      requiresToken = json1.flows.every(function(flow) {
+        return flow.stages && flow.stages.indexOf('m.login.registration_token') !== -1;
+      });
+    }
 
-    // Stage 3: Complete dummy stage
-    if (json2.completed && json2.completed.indexOf('m.login.registration_token') !== -1) {
-      var res3 = await fetch(HOMESERVER + '/_matrix/client/v3/register', {
+    if (requiresToken) {
+      // Server requires invite token — use the token-based flow
+      if (!token) {
+        throw new Error('INVITE_TOKEN_REQUIRED');
+      }
+
+      // Stage 2a: Complete registration_token stage
+      var resToken = await fetch(HOMESERVER + '/_matrix/client/v3/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           username: username,
           password: password,
-          auth: { type: 'm.login.dummy', session: uiaSession },
+          auth: { type: 'm.login.registration_token', token: token, session: uiaSession },
         }),
       });
-      var json3 = await res3.json();
-      if (res3.ok) return json3;
-      throw new Error(json3.error || 'Registration failed at final stage');
+      var jsonToken = await resToken.json();
+      if (resToken.ok) return jsonToken;
+
+      // Stage 2b: Complete dummy stage after token
+      if (jsonToken.completed && jsonToken.completed.indexOf('m.login.registration_token') !== -1) {
+        var resDummy2 = await fetch(HOMESERVER + '/_matrix/client/v3/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            username: username,
+            password: password,
+            auth: { type: 'm.login.dummy', session: uiaSession },
+          }),
+        });
+        var jsonDummy2 = await resDummy2.json();
+        if (resDummy2.ok) return jsonDummy2;
+        throw new Error(jsonDummy2.error || 'Registration failed at final stage');
+      }
+
+      throw new Error(jsonToken.error || 'Invalid invite token');
     }
 
-    throw new Error(json2.error || 'Invalid invite token');
+    // Stage 2: Try m.login.dummy (no token needed — matches website proxy)
+    var resDummy = await fetch(HOMESERVER + '/_matrix/client/v3/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        username: username,
+        password: password,
+        auth: { type: 'm.login.dummy', session: uiaSession },
+      }),
+    });
+    var jsonDummy = await resDummy.json();
+    if (resDummy.ok) return jsonDummy;
+    throw new Error(jsonDummy.error || 'Registration failed');
   }
 
   async function apiWhoami() {
@@ -220,7 +269,7 @@
 #mx-auth-overlay {
   position: fixed;
   inset: 0;
-  z-index: 10000;
+  z-index: 100000;
   background: rgba(5,5,8,0.85);
   backdrop-filter: blur(6px);
   display: flex;
@@ -422,7 +471,7 @@
   pointer-events: none;
   transform: translateY(-4px);
   transition: opacity 0.15s, transform 0.15s;
-  z-index: 10001;
+  z-index: 100001;
 }
 #mx-auth-nav-user.open #mx-auth-dropdown {
   opacity: 1;
@@ -465,7 +514,7 @@
   font-family: var(--font-mono, monospace);
   font-size: 12px;
   padding: 8px 16px;
-  z-index: 10002;
+  z-index: 100002;
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.2s, transform 0.2s;
@@ -569,7 +618,8 @@
       t.classList.toggle('active', t.dataset.tab === tab);
     });
     elConfirmField.style.display = tab === 'register' ? '' : 'none';
-    elTokenField.style.display = tab === 'register' ? '' : 'none';
+    // Token field is hidden by default — shown only if server requires it
+    elTokenField.style.display = 'none';
     elSubmit.textContent = tab === 'login' ? 'Sign In' : 'Create Account';
     elPassword.autocomplete = tab === 'login' ? 'current-password' : 'new-password';
     elError.classList.remove('visible');
@@ -609,11 +659,7 @@
         showError('Password must be at least 8 characters.');
         return;
       }
-      var token = elToken.value.trim();
-      if (!token) {
-        showError('An invite token is required to create an account.');
-        return;
-      }
+      var token = elToken.value.trim() || undefined;
     }
 
     elSubmit.disabled = true;
@@ -628,7 +674,14 @@
       hideModal();
       showToast('Signed in as ' + escapeHtml(session.displayName || session.userId));
     } catch (err) {
-      showError(err.message || 'Authentication failed.');
+      if (err.message === 'INVITE_TOKEN_REQUIRED') {
+        // Server requires an invite token — show the field and ask user
+        elTokenField.style.display = '';
+        showError('This server requires an invite token to create an account.');
+        elToken.focus();
+      } else {
+        showError(err.message || 'Authentication failed.');
+      }
     } finally {
       elSubmit.disabled = false;
       elSubmit.textContent = activeTab === 'login' ? 'Sign In' : 'Create Account';
@@ -787,10 +840,14 @@
 
   // ── Public API ─────────────────────────────────────────────
 
+  // NOTE: getAccessToken() is intentionally absent from the public API.
+  // Exposing the raw Matrix token to any script on the page widens the XSS
+  // exfiltration surface. Use getOpenIdToken() for delegated auth instead.
+  // If you need authenticated Matrix API calls from game code, add a dedicated
+  // method here that proxies the specific call without leaking the token.
   window.matrixAuth = {
     isLoggedIn: function() { return !!(session.accessToken && session.userId); },
     getUserId: function() { return session.userId; },
-    getAccessToken: function() { return session.accessToken; },
     getOpenIdToken: function() { return getOpenIdToken(); },
     login: function(user, pass) { return login(user, pass); },
     logout: function() { return logout(); },
