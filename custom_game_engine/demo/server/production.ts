@@ -37,11 +37,11 @@ function isAllowedLLMUrl(urlStr: string): boolean {
 // Resolve LLM API key for a given provider base URL
 function getLLMApiKey(baseUrl: string): string {
   if (baseUrl.includes('groq.com')) {
-    return process.env.GROQ_API_KEY || process.env.VITE_GROQ_API_KEY || '';
+    return process.env.GROQ_API_KEY || '';
   } else if (baseUrl.includes('cerebras.ai')) {
-    return process.env.CEREBRAS_API_KEY || process.env.VITE_CEREBRAS_API_KEY || '';
+    return process.env.CEREBRAS_API_KEY || '';
   } else if (baseUrl.includes('api.openai.com')) {
-    return process.env.OPENAI_API_KEY || process.env.VITE_OPENAI_API_KEY || '';
+    return process.env.OPENAI_API_KEY || '';
   }
   return '';
 }

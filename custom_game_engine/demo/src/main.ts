@@ -22,6 +22,10 @@ import {
   createWeatherComponent,
   createInventoryComponent,
   createNamedLandmarksComponent,
+  DiscoveryNamingComponent,
+  DISCOVERY_NAMING_PROMPTS,
+  DISCOVERY_CATEGORY_LABELS,
+  type DiscoveryCategory,
   createProtoRealityComponent,
   EntityImpl,
   createEntityId,
@@ -119,6 +123,11 @@ import {
   InventoryUI,
   CraftingPanelUI,
   DOMSpeechBubbleOverlay,
+  DOMAgentTestHooksOverlay,
+  dispatchAgentSelectedEvent,
+  dispatchAgentDeselectedEvent,
+  dispatchAgentInfoPanelShownEvent,
+  dispatchAgentInfoPanelHiddenEvent,
   ControlsPanel,
   TimeControlsPanel,
   UniverseManagerPanel,
@@ -217,12 +226,14 @@ import {
   createAngelManagementPanelFactory,
   createPrayerPanelFactory,
   createSpriteGalleryPanelFactory,
+  DiscoveryNamingModal,
 } from '@ai-village/renderer';
 import {
   OllamaProvider,
   OpenAICompatProvider,
   ProxyLLMProvider,
   FallbackProvider,
+  SameOriginChatProxy,
   LLMDecisionQueue,
   GovernorPromptBuilder,
   StructuredPromptBuilder,
@@ -2503,6 +2514,9 @@ function handleMouseClick(
         windowManager.showWindow('agent-info');
         windowManager.hideWindow('animal-info');
         windowManager.hideWindow('plant-info');
+        const identityComp = entity.components.get('identity') as any;
+        dispatchAgentSelectedEvent(entity.id, identityComp?.name ?? '');
+        dispatchAgentInfoPanelShownEvent(entity.id);
         return true;
       } else if (hasAnimal) {
         animalInfoPanel.setSelectedEntity(entity);
@@ -2517,6 +2531,8 @@ function handleMouseClick(
         windowManager.showWindow('animal-info');
         windowManager.hideWindow('agent-info');
         windowManager.hideWindow('plant-info');
+        dispatchAgentDeselectedEvent();
+        dispatchAgentInfoPanelHiddenEvent();
         return true;
       } else if (hasPlant) {
         plantInfoPanel.setSelectedEntity(entity);
@@ -2531,6 +2547,8 @@ function handleMouseClick(
         windowManager.showWindow('plant-info');
         windowManager.hideWindow('agent-info');
         windowManager.hideWindow('animal-info');
+        dispatchAgentDeselectedEvent();
+        dispatchAgentInfoPanelHiddenEvent();
         return true;
       } else if (hasResource) {
         agentInfoPanel.setSelectedEntity(null);
@@ -2545,6 +2563,8 @@ function handleMouseClick(
         windowManager.hideWindow('agent-info');
         windowManager.hideWindow('animal-info');
         windowManager.hideWindow('plant-info');
+        dispatchAgentDeselectedEvent();
+        dispatchAgentInfoPanelHiddenEvent();
         return true;
       }
     } else {
@@ -2561,6 +2581,8 @@ function handleMouseClick(
       windowManager.hideWindow('agent-info');
       windowManager.hideWindow('animal-info');
       windowManager.hideWindow('plant-info');
+      dispatchAgentDeselectedEvent();
+      dispatchAgentInfoPanelHiddenEvent();
     }
   }
 
@@ -3093,6 +3115,14 @@ async function main() {
     throw new Error('Canvas element not found');
   }
 
+  // Hidden element for automated test access to TPS/FPS metrics
+  const metricsEl = document.createElement('div');
+  metricsEl.id = 'game-metrics';
+  metricsEl.style.display = 'none';
+  metricsEl.setAttribute('data-tps', '0');
+  metricsEl.setAttribute('data-fps', '0');
+  document.body.appendChild(metricsEl);
+
   // Track intervals for cleanup to prevent memory leaks
   const intervalIds: ReturnType<typeof setInterval>[] = [];
 
@@ -3156,73 +3186,30 @@ async function main() {
   if (useProxy) {
     // ProxyLLMProvider for server-side API calls with automatic fallback
     llmProvider = new ProxyLLMProvider(LLM_PROXY_URL);
+  } else if (settings.llm.provider === 'ollama') {
+    // Local Ollama — direct client-side calls (no API key needed)
+    llmProvider = new OllamaProvider(settings.llm.model, settings.llm.baseUrl);
+  } else if (settings.llm.provider === 'openai-compat-direct' && settings.llm.apiKey) {
+    // Explicit direct mode with user-provided key in settings UI
+    llmProvider = new OpenAICompatProvider(
+      settings.llm.model,
+      settings.llm.baseUrl,
+      settings.llm.apiKey
+    );
   } else {
-    // Legacy mode: Direct client-side API calls (for local Ollama or explicit settings)
-    const providers: LLMProvider[] = [];
-
-    // Check for API keys in .env file (legacy client-side mode)
-    const groqApiKey = import.meta.env.VITE_GROQ_API_KEY || import.meta.env.GROQ_API_KEY;
-    const cerebrasApiKey = import.meta.env.VITE_CEREBRAS_API_KEY || import.meta.env.CEREBRAS_API_KEY;
-
-    // 1. Primary: Groq with GPT-OSS-120B
-    if (groqApiKey) {
-      providers.push(new OpenAICompatProvider(
-        'openai/gpt-oss-120b',
-        'https://api.groq.com/openai/v1',
-        groqApiKey
-      ));
-    }
-
-    // 2. Secondary: Cerebras with GPT-OSS-120B
-    if (cerebrasApiKey) {
-      providers.push(new OpenAICompatProvider(
-        'gpt-oss-120b',
-        'https://api.cerebras.ai/v1',
-        cerebrasApiKey
-      ));
-    }
-
-    // 3. Tertiary: Cerebras with Qwen 3-32B
-    if (cerebrasApiKey) {
-      providers.push(new OpenAICompatProvider(
-        'qwen-3-32b',
-        'https://api.cerebras.ai/v1',
-        cerebrasApiKey
-      ));
-    }
-
-    // 4. Quaternary: Groq with Qwen 3-32B (last resort)
-    if (groqApiKey) {
-      providers.push(new OpenAICompatProvider(
-        'qwen/qwen3-32b',
-        'https://api.groq.com/openai/v1',
-        groqApiKey
-      ));
-    }
-
-    // Fallback to settings-based provider if no env keys
-    if (providers.length === 0) {
-      if (settings.llm.provider === 'openai-compat' || settings.llm.provider === 'openai-compat-direct') {
-        providers.push(new OpenAICompatProvider(
-          settings.llm.model,
-          settings.llm.baseUrl,
-          settings.llm.apiKey
-        ));
-      } else {
-        providers.push(new OllamaProvider(settings.llm.model, settings.llm.baseUrl));
-      }
-    }
-
-    // Use FallbackProvider if we have multiple providers, otherwise use single provider
-    if (providers.length > 1) {
-      llmProvider = new FallbackProvider(providers, {
-        retryAfterMs: 60000,        // Retry failed provider after 1 minute
-        maxConsecutiveFailures: 3,   // Disable after 3 consecutive failures
-        logFallbacks: true,
-      });
-    } else {
-      llmProvider = providers[0];
-    }
+    // Default: use same-origin /api/llm/chat proxy (keys stay server-side)
+    // In production the game is served at /mvee/, so proxy endpoints are at /mvee/api/llm/*
+    const basePath = (import.meta.env.BASE_URL || '/').replace(/\/$/, '');
+    const providers: LLMProvider[] = [
+      new SameOriginChatProxy('qwen-3-235b-a22b-instruct-2507', 'https://api.cerebras.ai/v1', basePath),
+      new SameOriginChatProxy('llama3.1-8b', 'https://api.cerebras.ai/v1', basePath),
+      new SameOriginChatProxy('openai/gpt-oss-120b', 'https://api.groq.com/openai/v1', basePath),
+    ];
+    llmProvider = new FallbackProvider(providers, {
+      retryAfterMs: 60000,
+      maxConsecutiveFailures: 3,
+      logFallbacks: true,
+    });
   }
 
   // Check LLM availability with timeout
@@ -3244,53 +3231,25 @@ async function main() {
 
   let isLLMAvailable = await checkAvailability(llmProvider);
 
-  // If proxy mode failed, fall back to direct mode with configured API keys
+  // If proxy mode failed, fall back to same-origin /api/llm/chat proxy (no embedded keys)
   if (!isLLMAvailable && useProxy) {
-    console.warn('[DEMO] Proxy server unavailable, falling back to direct LLM mode...');
+    console.warn('[DEMO] Proxy server unavailable, falling back to same-origin LLM proxy...');
 
-    // Try direct providers with env API keys
-    const groqApiKey = import.meta.env.VITE_GROQ_API_KEY || import.meta.env.GROQ_API_KEY;
-    const cerebrasApiKey = import.meta.env.VITE_CEREBRAS_API_KEY || import.meta.env.CEREBRAS_API_KEY;
+    const fallbackBasePath = (import.meta.env.BASE_URL || '/').replace(/\/$/, '');
+    const sameOriginProviders: LLMProvider[] = [
+      new SameOriginChatProxy('qwen-3-235b-a22b-instruct-2507', 'https://api.cerebras.ai/v1', fallbackBasePath),
+      new SameOriginChatProxy('openai/gpt-oss-120b', 'https://api.groq.com/openai/v1', fallbackBasePath),
+    ];
 
-    const directProviders: LLMProvider[] = [];
+    llmProvider = new FallbackProvider(sameOriginProviders, {
+      retryAfterMs: 60000,
+      maxConsecutiveFailures: 3,
+      logFallbacks: true,
+    });
 
-    if (groqApiKey) {
-      directProviders.push(new OpenAICompatProvider(
-        'openai/gpt-oss-120b',
-        'https://api.groq.com/openai/v1',
-        groqApiKey
-      ));
-    }
-    if (cerebrasApiKey) {
-      directProviders.push(new OpenAICompatProvider(
-        'gpt-oss-120b',
-        'https://api.cerebras.ai/v1',
-        cerebrasApiKey
-      ));
-    }
-
-    // Also try settings-based provider
-    if (directProviders.length === 0 && settings.llm.apiKey) {
-      directProviders.push(new OpenAICompatProvider(
-        settings.llm.model,
-        settings.llm.baseUrl,
-        settings.llm.apiKey
-      ));
-    }
-
-    if (directProviders.length > 0) {
-      llmProvider = directProviders.length > 1
-        ? new FallbackProvider(directProviders, {
-            retryAfterMs: 60000,
-            maxConsecutiveFailures: 3,
-            logFallbacks: true,
-          })
-        : directProviders[0];
-
-      isLLMAvailable = await checkAvailability(llmProvider);
-      if (isLLMAvailable) {
-        console.log('[DEMO] Direct LLM mode available, continuing with fallback provider');
-      }
+    isLLMAvailable = await checkAvailability(llmProvider);
+    if (isLLMAvailable) {
+      console.log('[DEMO] Same-origin LLM proxy available');
     }
   }
 
@@ -4296,7 +4255,7 @@ async function main() {
       if (pos) {
         if ('centerCameraOnWorldPosition' in renderer) {
           const tile = gameLoop.world.getTileAt?.(Math.floor(pos.x), Math.floor(pos.y));
-          const isIndoor = !!(tile?.floor);
+          const isIndoor = !!(tile?.floor || tile?.roof);
           (renderer as any).centerCameraOnWorldPosition(pos.x, pos.y, pos.z || 0, isIndoor);
         } else {
           // Fallback: directly set camera position
@@ -4329,7 +4288,7 @@ async function main() {
       if (pos) {
         if ('centerCameraOnWorldPosition' in renderer) {
           const tile = gameLoop.world.getTileAt?.(Math.floor(pos.x), Math.floor(pos.y));
-          const isIndoor = !!(tile?.floor);
+          const isIndoor = !!(tile?.floor || tile?.roof);
           (renderer as any).centerCameraOnWorldPosition(pos.x, pos.y, pos.z || 0, isIndoor);
         } else {
           // Fallback: directly set camera position
@@ -4408,6 +4367,7 @@ async function main() {
     throw new Error('Canvas parent element not found');
   }
   const speechBubbleOverlay = new DOMSpeechBubbleOverlay(mainElement);
+  const agentTestHooksOverlay = new DOMAgentTestHooksOverlay(mainElement);
   const speechToAlienTokensService = getSpeechToAlienTokensService();
 
   // Set language registry for alien text translation
@@ -4563,6 +4523,31 @@ async function main() {
         return { x: screenPos.x, y: screenPos.y - 40 };
       });
 
+      // Update agent test hook DOM markers (throttled — every 3 frames is enough)
+      if (renderFrameCount % 3 === 0) {
+        const selectedAgentId = panels.agentInfoPanel.getSelectedEntityId();
+        const agentEntities = gameLoop.world.query().with('agent').with('position').with('identity').executeEntities();
+        const camera = renderer.getCamera();
+        const agentHookData = [];
+        for (const entity of agentEntities) {
+          const position = entity.components.get('position') as any;
+          const identity = entity.components.get('identity') as any;
+          if (!position || !identity) continue;
+          const screenPos = camera.worldToScreen(position.x, position.y, position.z || 0);
+          // Skip agents that are well outside the viewport
+          if (screenPos.x < -50 || screenPos.x > canvas.width + 50) continue;
+          if (screenPos.y < -50 || screenPos.y > canvas.height + 50) continue;
+          agentHookData.push({
+            id: entity.id,
+            name: identity.name as string,
+            screenX: screenPos.x,
+            screenY: screenPos.y,
+            selected: entity.id === selectedAgentId,
+          });
+        }
+        agentTestHooksOverlay.updateAgents(agentHookData);
+      }
+
       if (!renderLoopStarted) {
         renderLoopStarted = true;
         console.log('[RenderLoop] Started successfully');
@@ -4594,6 +4579,11 @@ async function main() {
 
     statusEl.textContent = `Running - Tick ${stats.currentTick} - Avg: ${stats.avgTickTimeMs.toFixed(2)}ms${timeDisplay}`;
     statusEl.className = 'status running';
+
+    // Keep hidden metrics element in sync for automated tests
+    const tps = stats.avgTickTimeMs > 0 ? 1000 / stats.avgTickTimeMs : 20;
+    metricsEl.setAttribute('data-tps', tps.toFixed(1));
+    metricsEl.setAttribute('data-fps', String(renderer.getStats().fps));
   }
 
   intervalIds.push(setInterval(updateStatus, 100));
@@ -5280,6 +5270,47 @@ async function main() {
     devPanel, agentDebugManager, skillTreePanel,
     systemsResult.fatesCouncilSystem
   );
+
+  // === Discovery Naming Modal (Drive 4: Ownership) ===
+  // Shows a text input overlay when world-first events occur, letting the player name them.
+  const discoveryNamingModal = new DiscoveryNamingModal();
+  let discoveryModalShownForCategory: string | null = null;
+
+  discoveryNamingModal.onName((category: string, name: string) => {
+    const world = gameLoop.world;
+    const entities = world.query().with('discovery_naming' as any).executeEntities();
+    if (entities.length === 0) return;
+    const comp = entities[0]!.getComponent('discovery_naming') as DiscoveryNamingComponent | undefined;
+    if (!comp) return;
+    const discovery = comp.nameDiscovery(category as DiscoveryCategory, name, Number(world.tick));
+    if (discovery) {
+      world.eventBus.emit({
+        type: 'discovery:named',
+        data: {
+          category,
+          name,
+          description: discovery.description,
+          eventDay: discovery.eventDay,
+        },
+        source: 'discovery_naming_modal',
+      });
+    }
+    discoveryModalShownForCategory = null;
+  });
+
+  gameLoop.world.eventBus.subscribe('discovery:naming_prompt', (event: any) => {
+    const { category, description, eventDay } = event.data;
+    // Don't re-show if already showing for this category
+    if (discoveryNamingModal.visible && discoveryModalShownForCategory === category) return;
+    const promptText = DISCOVERY_NAMING_PROMPTS[category as DiscoveryCategory] ?? 'Name this moment.';
+    discoveryModalShownForCategory = category;
+    discoveryNamingModal.show({
+      category,
+      description,
+      promptText,
+      eventDay,
+    });
+  });
 
   // Game loop already started before soul creation
 

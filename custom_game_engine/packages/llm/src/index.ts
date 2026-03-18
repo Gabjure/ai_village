@@ -151,6 +151,7 @@ export * from './OpenAICompatProvider';
 export * from './ProxyLLMProvider';
 export * from './LoadBalancingProvider';
 export * from './FallbackProvider';
+export * from './SameOriginChatProxy';
 
 // ============================================================================
 // Prompt Builders
