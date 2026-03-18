@@ -57,9 +57,9 @@ export class ThreatResponseSystem extends BaseSystem {
   private processEntity(
     entity: Entity,
     world: World,
-    allAnimals: Entity[],
-    allProjectiles: Entity[],
-    allVillages: Entity[]
+    allAnimals: readonly Entity[],
+    allProjectiles: readonly Entity[],
+    allVillages: readonly Entity[]
   ): void {
     const threatComp = entity.getComponent<ThreatDetectionComponent>(CT.ThreatDetection);
     const position = entity.getComponent<PositionComponent>(CT.Position);
@@ -97,9 +97,9 @@ export class ThreatResponseSystem extends BaseSystem {
     world: World,
     threatComp: ThreatDetectionComponent,
     position: PositionComponent,
-    allAnimals: Entity[],
-    allProjectiles: Entity[],
-    allVillages: Entity[]
+    allAnimals: readonly Entity[],
+    allProjectiles: readonly Entity[],
+    allVillages: readonly Entity[]
   ): void {
     const threats: DetectedThreat[] = [];
 
@@ -180,7 +180,7 @@ export class ThreatResponseSystem extends BaseSystem {
     return Math.min(100, Math.max(0, power));
   }
 
-  private isHostile(agent: Entity, other: Entity, allVillages: Entity[]): boolean {
+  private isHostile(agent: Entity, other: Entity, allVillages: ReadonlyArray<Entity>): boolean {
     // Check for conflict component
     const conflict = other.getComponent<any>(CT.Conflict);
     if (conflict?.targetId === agent.id) return true;
@@ -216,7 +216,7 @@ export class ThreatResponseSystem extends BaseSystem {
    * TODO: Replace this with proper CitizenComponent when implemented
    * Future: agent -> village -> city -> province -> nation hierarchy
    */
-  private findAgentNation(agent: Entity, allVillages: Entity[]): string | null {
+  private findAgentNation(agent: Entity, allVillages: ReadonlyArray<Entity>): string | null {
     // For now, check if agent has a position and find nearest governance structure
     const position = agent.getComponent<PositionComponent>(CT.Position);
     if (!position) return null;
