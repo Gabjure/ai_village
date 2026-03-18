@@ -237,6 +237,12 @@ export interface MiscEvents {
     attackersRepelled: number;
   };
 
+  // === Ecology Events ===
+  'ecology:weather_temperature': {
+    /** Ambient air temperature (°C) derived from weather type and modifiers */
+    temperature: number;
+  };
+
   // === Weather Events ===
   // Note: Village governance events moved to governance.events.ts
   'weather:changed': {

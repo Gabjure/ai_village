@@ -152,6 +152,14 @@ export class PlantSystem extends BaseSystem {
       // Temperature updates come from weather:frost event
     });
 
+    this.events.subscribe('ecology:weather_temperature', (event: unknown) => {
+      const e = event as { data?: { temperature?: number } };
+      const temperature = e.data?.temperature;
+      if (temperature !== undefined) {
+        this.weatherTemperature = temperature;
+      }
+    });
+
     // Soil events
     this.events.subscribe('soil:moistureChanged', (event: unknown) => {
       const e = event as { data: { x: number; y: number; newMoisture: number } };
@@ -549,6 +557,11 @@ export class PlantSystem extends BaseSystem {
         case 'wetland':
           temperature += 2; // Slightly warmer due to moisture
           break;
+        case 'volcanic':
+        case 'lava_fields':
+        case 'caldera':
+          temperature += 20; // Extreme volcanic heat — only heat-adapted species thrive here
+          break;
         // forest, plains, grassland use default temperature
       }
     }
@@ -802,7 +815,12 @@ export class PlantSystem extends BaseSystem {
     const moistureModifier = this.calculateMoistureModifier(plant, environment.moisture);
     const nutritionModifier = plant.nutrition / 100;
 
-    progress *= tempModifier * moistureModifier * nutritionModifier;
+    // Rain directly boosts growth — photosynthesis and hydration synergy
+    const rainGrowthBoost = this.weatherRainIntensity === 'heavy' ? 1.3 :
+                            this.weatherRainIntensity === 'moderate' ? 1.2 :
+                            this.weatherRainIntensity === 'light' ? 1.1 : 1.0;
+
+    progress *= tempModifier * moistureModifier * nutritionModifier * rainGrowthBoost;
 
     // Health affects growth
     const healthModifier = plant.health / 100;

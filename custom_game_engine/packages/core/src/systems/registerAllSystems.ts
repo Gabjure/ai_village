@@ -34,6 +34,7 @@ import { TimeCompressionSystem } from './TimeCompressionSystem.js';
 import { TimeThrottleCoordinator } from './TimeThrottleCoordinator.js';
 import { StatisticalModeManager } from './StatisticalModeManager.js';
 import { WeatherSystem } from './WeatherSystem.js';
+import { WeatherEcologySystem } from './WeatherEcologySystem.js';
 import { TemperatureSystem } from './TemperatureSystem.js';
 import { FireSpreadSystem } from './FireSpreadSystem.js';
 import { SoilSystem } from './SoilSystem.js';
@@ -256,6 +257,7 @@ import { AvatarSystem } from './AvatarSystem.js';
 import { AngelSystem } from './AngelSystem.js';
 import { AdminAngelSystem } from './AdminAngelSystem.js';
 import { MilestoneSystem } from './MilestoneSystem.js';
+import { DiscoveryNamingSystem } from './DiscoveryNamingSystem.js';
 import { PossessionSystem } from './PossessionSystem.js';
 import { PlayerInputSystem } from './PlayerInputSystem.js';
 import { PlayerActionSystem } from './PlayerActionSystem.js';
@@ -551,6 +553,7 @@ export function registerAllSystems(
   }
   if (flags.environment) {
     gameLoop.systemRegistry.register(new WeatherSystem());
+    gameLoop.systemRegistry.register(new WeatherEcologySystem());
     soilSystem = new SoilSystem();
     gameLoop.systemRegistry.register(soilSystem);
   }
@@ -940,6 +943,7 @@ export function registerAllSystems(
       gameLoop.systemRegistry.register(new CivilizationalLegendsSystem(llmQueue));
     }
     gameLoop.systemRegistry.register(new MilestoneSystem());
+    gameLoop.systemRegistry.register(new DiscoveryNamingSystem());
 
     // Advanced theology
     registerDisabled(new SchismSystem());
