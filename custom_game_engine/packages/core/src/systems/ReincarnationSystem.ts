@@ -170,15 +170,22 @@ export class ReincarnationSystem extends BaseSystem {
   protected readonly throttleInterval = 200; // VERY_SLOW - 10 seconds // Event-driven, doesn't need entity iteration
 
   private queuedSouls: Map<string, QueuedSoul> = new Map();
+  private unsubscribeReincarnationQueued: (() => void) | null = null;
 
   /**
    * Initialize event listener
    */
   protected onInitialize(world: World): void {
-    world.eventBus.subscribe(
+    this.unsubscribeReincarnationQueued = world.eventBus.subscribe(
       'soul:reincarnation_queued',
       (event) => this.handleReincarnationQueued(world, event)
     );
+  }
+
+  protected onCleanup(): void {
+    this.unsubscribeReincarnationQueued?.();
+    this.unsubscribeReincarnationQueued = null;
+    this.queuedSouls.clear();
   }
 
   /**
