@@ -1013,27 +1013,17 @@ export class WorldImpl implements WorldMutator {
 
   // Mutator methods
 
-  createEntity(archetype?: string): Entity {
-    const id = createEntityId();
-    const entity = new EntityImpl(id, this._tick);
-
-    // Apply archetype configuration if specified
-    if (archetype) {
-      const archetypeDef = ENTITY_ARCHETYPES[archetype];
-      if (!archetypeDef) {
-        throw new Error(
-          `Unknown archetype '${archetype}'. Valid archetypes: ${Object.keys(ENTITY_ARCHETYPES).join(', ')}`
-        );
-      }
-      archetypeDef.apply(entity);
-    }
-
-    // Add test helper methods to entity
-    // Type-safe: We're adding methods to EntityImpl, which is the concrete type
-    const entityImpl = entity as EntityImpl;
-
+  /**
+   * Apply enhanced addComponent/getComponent methods to an entity.
+   * These methods add string-based component lookup, PascalCase-to-snake_case
+   * conversion, and component registry integration.
+   *
+   * Must be called on every entity entering the world — both newly created
+   * and deserialized from saves.
+   */
+  private _enhanceEntity(entity: EntityImpl): void {
     // Store original addComponent from EntityImpl
-    const originalAddComponent = entityImpl.addComponent.bind(entity);
+    const originalAddComponent = entity.addComponent.bind(entity);
 
     // Create the enhanced addComponent function
     const enhancedAddComponent = (ComponentClassOrInstance: ComponentClassOrString, data?: Record<string, unknown>): Component => {
@@ -1105,17 +1095,36 @@ export class WorldImpl implements WorldMutator {
 
     // Use Object.defineProperty to bypass TypeScript's signature checking
     // This is safe because we're augmenting the object with compatible behavior
-    Object.defineProperty(entityImpl, 'addComponent', {
+    Object.defineProperty(entity, 'addComponent', {
       value: enhancedAddComponent,
       writable: true,
       configurable: true,
     });
 
-    Object.defineProperty(entityImpl, 'getComponent', {
+    Object.defineProperty(entity, 'getComponent', {
       value: enhancedGetComponent,
       writable: true,
       configurable: true,
     });
+  }
+
+  createEntity(archetype?: string): Entity {
+    const id = createEntityId();
+    const entity = new EntityImpl(id, this._tick);
+
+    // Apply archetype configuration if specified
+    if (archetype) {
+      const archetypeDef = ENTITY_ARCHETYPES[archetype];
+      if (!archetypeDef) {
+        throw new Error(
+          `Unknown archetype '${archetype}'. Valid archetypes: ${Object.keys(ENTITY_ARCHETYPES).join(', ')}`
+        );
+      }
+      archetypeDef.apply(entity);
+    }
+
+    // Apply enhanced methods for string-based component access
+    this._enhanceEntity(entity as EntityImpl);
 
     this._entities.set(id, entity);
     this._archetypeVersion++; // Invalidate query cache
@@ -1364,6 +1373,10 @@ export class WorldImpl implements WorldMutator {
       throw new Error(`Entity ${entity.id} already exists in the world`);
     }
 
+    // Apply enhanced methods (string-based component access, PascalCase conversion)
+    // Critical for deserialized entities which bypass createEntity()
+    this._enhanceEntity(entity as EntityImpl);
+
     this._entities.set(entity.id, entity);
     this._archetypeVersion++; // Invalidate query cache
 
@@ -1406,7 +1419,8 @@ export class WorldImpl implements WorldMutator {
     if (!this._entities.has(entity.id)) {
       this.addEntity(entity);
     } else {
-      // Legacy behavior: silently overwrite
+      // Legacy behavior: silently overwrite, but still enhance
+      this._enhanceEntity(entity as EntityImpl);
       this._entities.set(entity.id, entity);
     }
   }
