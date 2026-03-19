@@ -2595,6 +2595,19 @@ function handleMouseClick(
     }
   }
 
+  // Right click - tile inspector
+  if (button === 2) {
+    const tileData = tileInspectorPanel.findTileAtScreenPosition(screenX, screenY, gameLoop.world);
+    if (tileData) {
+      tileInspectorPanel.setSelectedTile(tileData.tile, tileData.x, tileData.y);
+      windowManager.showWindow('tile-inspector');
+    } else {
+      tileInspectorPanel.setSelectedTile(null);
+      windowManager.hideWindow('tile-inspector');
+    }
+    return true;
+  }
+
   return false;
 }
 
