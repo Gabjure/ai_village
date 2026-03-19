@@ -10,6 +10,12 @@ export interface SocialEvents {
     reason: string;
     amount: number;
   };
+  'greeting:exchanged': {
+    agent1: EntityId;
+    agent2: EntityId;
+    greetingType: 'nod' | 'wave' | 'warm_greeting';
+    tick: number;
+  };
   'friendship:formed': {
     agent1: EntityId;
     agent2: EntityId;

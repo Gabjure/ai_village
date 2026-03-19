@@ -1405,6 +1405,13 @@ export {
   type SleepComponent,
 } from './SleepComponent.js';
 
+// Greeting State Component (Social cooldown tracking)
+export * from './GreetingStateComponent.js';
+export {
+  createGreetingStateComponent,
+  type GreetingStateComponent,
+} from './GreetingStateComponent.js';
+
 // Settlement Component (Multi-player groups on shared planets)
 export * from './SettlementComponent.js';
 export {

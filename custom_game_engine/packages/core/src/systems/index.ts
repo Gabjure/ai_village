@@ -112,6 +112,7 @@ export * from './InterestsSystem.js';
 // Phase 6: Emergent Social Dynamics - RE-ENABLED
 export * from './RelationshipConversationSystem.js';
 export * from './FriendshipSystem.js';
+export * from './GreetingSystem.js';
 // Deep Conversation System - Phase 7.1
 export * from './InterestEvolutionSystem.js';
 // Cooking System

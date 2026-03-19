@@ -61,6 +61,7 @@ export enum ComponentType {
   Conversation = 'conversation',
   Meeting = 'meeting',
   Interests = 'interests',
+  GreetingState = 'greeting_state',
 
   // Exploration
   ExplorationState = 'exploration_state',

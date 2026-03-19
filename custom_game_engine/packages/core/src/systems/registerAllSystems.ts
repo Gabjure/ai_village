@@ -102,6 +102,7 @@ import { InterestsSystem } from './InterestsSystem.js';
 // Phase 6: Emergent Social Dynamics - RE-ENABLED
 import { RelationshipConversationSystem } from './RelationshipConversationSystem.js';
 // import { FriendshipSystem } from './FriendshipSystem.js'; // TODO: Enable after RelationshipConversationSystem tested
+import { GreetingSystem } from './GreetingSystem.js';
 import { InterestEvolutionSystem } from './InterestEvolutionSystem.js';
 import { CrossRealmPhoneSystem } from './CrossRealmPhoneSystem.js';
 import { CellPhoneSystem } from '../communication/CellPhoneSystem.js';
@@ -708,6 +709,7 @@ export function registerAllSystems(
     gameLoop.systemRegistry.register(new InterestsSystem());
     gameLoop.systemRegistry.register(new RelationshipConversationSystem());
     gameLoop.systemRegistry.register(new InterestEvolutionSystem());
+    gameLoop.systemRegistry.register(new GreetingSystem());
   }
 
   if (flags.advancedComms) {
