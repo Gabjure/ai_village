@@ -71,39 +71,33 @@ jobs:
           name: mvee-dist
           path: artifacts
 
-      - name: Deploy to Hetzner
-        uses: appleboy/ssh-action@v1
-        with:
-          host: 37.27.36.108
-          username: root
-          key: ${{ secrets.HETZNER_SSH_KEY }}
-          script: |
-            # Backup current dist for rollback
-            if [ -d /opt/mvee/demo/dist ]; then
-              rm -rf /opt/mvee/demo/dist.backup
-              cp -a /opt/mvee/demo/dist /opt/mvee/demo/dist.backup
-            fi
-
-      - name: Sync build artifacts
+      - name: Sync build artifacts to Hetzner
         uses: appleboy/scp-action@v0.1.7
         with:
-          host: 37.27.36.108
-          username: root
+          host: ${{ secrets.HETZNER_HOST }}
+          username: ${{ secrets.HETZNER_USER }}
           key: ${{ secrets.HETZNER_SSH_KEY }}
           source: "artifacts/custom_game_engine/demo/dist/*,artifacts/custom_game_engine/demo/server/*,artifacts/custom_game_engine/Dockerfile.prebuilt,artifacts/custom_game_engine/docker-compose.prod.yml,artifacts/custom_game_engine/package.json,artifacts/custom_game_engine/package-lock.json"
-          target: /opt/mvee/
+          target: /opt/mvee/_staging/
           strip_components: 2
+          overwrite: true
 
-      - name: Rebuild and restart container
+      - name: Run server-side deploy script
         uses: appleboy/ssh-action@v1
         with:
-          host: 37.27.36.108
-          username: root
+          host: ${{ secrets.HETZNER_HOST }}
+          username: ${{ secrets.HETZNER_USER }}
           key: ${{ secrets.HETZNER_SSH_KEY }}
           script: |
-            cd /opt/mvee
-            docker compose -f docker-compose.prod.yml build
-            docker compose -f docker-compose.prod.yml up -d
+            # Move staged artifacts into place and deploy
+            cp -a /opt/mvee/_staging/demo/dist/* /opt/mvee/demo/dist/ 2>/dev/null || true
+            cp -a /opt/mvee/_staging/demo/server/* /opt/mvee/demo/server/ 2>/dev/null || true
+            cp -f /opt/mvee/_staging/Dockerfile.prebuilt /opt/mvee/ 2>/dev/null || true
+            cp -f /opt/mvee/_staging/docker-compose.prod.yml /opt/mvee/ 2>/dev/null || true
+            cp -f /opt/mvee/_staging/package.json /opt/mvee/ 2>/dev/null || true
+            cp -f /opt/mvee/_staging/package-lock.json /opt/mvee/ 2>/dev/null || true
+            rm -rf /opt/mvee/_staging
+            /opt/mvee/deploy.sh
 
   verify:
     name: Verify Production
@@ -140,25 +134,13 @@ jobs:
     if: failure()
     runs-on: ubuntu-latest
     steps:
-      - name: Restore previous dist
+      - name: Run server-side rollback
         uses: appleboy/ssh-action@v1
         with:
-          host: 37.27.36.108
-          username: root
+          host: ${{ secrets.HETZNER_HOST }}
+          username: ${{ secrets.HETZNER_USER }}
           key: ${{ secrets.HETZNER_SSH_KEY }}
-          script: |
-            if [ -d /opt/mvee/demo/dist.backup ]; then
-              echo "Rolling back to previous dist..."
-              rm -rf /opt/mvee/demo/dist
-              mv /opt/mvee/demo/dist.backup /opt/mvee/demo/dist
-              cd /opt/mvee
-              docker compose -f docker-compose.prod.yml build
-              docker compose -f docker-compose.prod.yml up -d
-              echo "Rollback complete."
-            else
-              echo "No backup found — cannot rollback"
-              exit 1
-            fi
+          script: /opt/mvee/deploy.sh rollback
 
   notify:
     name: Notify Paperclip
