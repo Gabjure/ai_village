@@ -80,6 +80,7 @@ custom_game_engine/test-*.sh
 *.d.ts.map
 !*.config.js
 !vite.config.ts
+!custom_game_engine/env.d.ts
 *.tsbuildinfo
 
 # Temporary files
