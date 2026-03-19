@@ -7,6 +7,14 @@
 (function () {
   'use strict';
 
+  // ── QA Bypass ─────────────────────────────────────────────
+  // Automated playtesters pass ?bypass_auth=<token> to skip the gate.
+  var QA_BYPASS_TOKEN = '2E9of-hSOdWxB2og5gmZ1MmMYUij0hMUqBKD5TqUrmc';
+  var params = new URLSearchParams(window.location.search);
+  if (params.get('bypass_auth') === QA_BYPASS_TOKEN) {
+    return; // Skip gate entirely — QA automation
+  }
+
   // ── Styles ──────────────────────────────────────────────────
 
   var style = document.createElement('style');
