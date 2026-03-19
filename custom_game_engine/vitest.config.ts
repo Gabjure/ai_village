@@ -18,7 +18,7 @@ export default defineConfig({
       '**/*.spec.ts', // Exclude spec files (future work)
       '**/*.perf.test.ts', // Perf tests excluded from default run (use test:perf)
       '**/performance/*.test.ts', // Perf regression suite excluded (use test:perf)
-      '**/PerformanceOptimizations.integration.test.ts', // Timing-dependent perf test (use test:perf)
+      '**/RealLLM.integration.test.ts', // Hits real Groq/Cerebras APIs (non-deterministic, run manually)
     ],
     // Override to use node environment for specific tests that need file system
     environmentMatchGlobs: [
