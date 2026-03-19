@@ -5464,6 +5464,10 @@ async function main() {
     onboarding.show();
   }
 
+  // In-game support prompt (shows after 10 minutes of active play)
+  const { initSupportPrompt } = await import('./ui/supportPrompt');
+  initSupportPrompt();
+
   // Set up periodic auto-saves every 5 minutes (real time)
   // Note: AutoSaveSystem also saves daily at midnight (game time) with canon events
   const AUTOSAVE_INTERVAL_MS = 300000; // 5 minutes
