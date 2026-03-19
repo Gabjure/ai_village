@@ -649,16 +649,11 @@ export class AgentBrainSystem extends BaseSystem {
       return { behavior: decisionResult.behavior, execute: true };
     }
 
-    // Handle default/fallback behaviors differently for LLM vs scripted agents:
-    // - LLM agents: Wait for decisions - don't execute wander/idle (execute: false)
-    // - Scripted agents: Execute wander as fallback to keep them moving (execute: true)
+    // Handle default/fallback behaviors: execute wander to keep agents moving.
+    // LLM agents wander while waiting for LLM decisions (prevents freeze when LLM is slow/unavailable).
+    // When the LLM response arrives, it overrides the behavior on the next tick.
     const defaultBehaviors = ['idle', 'wander', 'explore', 'explore_frontier', 'explore_spiral', 'rest'];
     if (defaultBehaviors.includes(agent.behavior) && !decisionResult.changed) {
-      if (agent.useLLM) {
-        // LLM agents wait for decisions
-        return { behavior: agent.behavior, execute: false };
-      }
-      // Scripted agents: switch to wander and execute it to keep them moving
       if (agent.behavior === 'idle') {
         entity.updateComponent<AgentComponent>(CT.Agent, (current) => ({
           ...current,
