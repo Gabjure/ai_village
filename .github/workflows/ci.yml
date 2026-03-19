@@ -69,6 +69,7 @@ jobs:
     if: always()
     steps:
       - name: Check required jobs
+        working-directory: .
         run: |
           if [[ "${{ needs.typecheck.result }}" != "success" ]]; then
             echo "::error::Type check failed — fix build errors before merging"
