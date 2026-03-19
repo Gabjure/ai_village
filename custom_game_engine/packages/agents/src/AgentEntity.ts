@@ -2,6 +2,7 @@ import {
   EntityImpl,
   createEntityId,
   type WorldMutator,
+  ComponentType,
   createPositionComponent,
   createPhysicsComponent,
   createRenderableComponent,
@@ -325,8 +326,8 @@ export function createWanderingAgent(
   world.addEntity(entity);
 
   // Emit agent:birth event for metrics tracking
-  const identity = entity.getComponent('identity') as { name: string } | undefined;
-  const needs = entity.getComponent('needs') as { health: number; hunger: number; energy: number } | undefined;
+  const identity = entity.getComponent(ComponentType.Identity);
+  const needs = entity.getComponent(ComponentType.Needs);
   world.eventBus.emit({
     type: 'agent:birth',
     source: entity.id,
@@ -567,8 +568,8 @@ export function createLLMAgent(
   world.addEntity(entity);
 
   // Emit agent:birth event for metrics tracking
-  const identity = entity.getComponent('identity') as { name: string } | undefined;
-  const needs = entity.getComponent('needs') as { health: number; hunger: number; energy: number } | undefined;
+  const identity = entity.getComponent(ComponentType.Identity);
+  const needs = entity.getComponent(ComponentType.Needs);
   world.eventBus.emit({
     type: 'agent:birth',
     source: entity.id,

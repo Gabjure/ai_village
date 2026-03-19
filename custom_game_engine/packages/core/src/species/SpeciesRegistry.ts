@@ -45,6 +45,12 @@ export interface SpeciesTemplate {
 
   // Language (Phase 4D integration)
   nativeLanguageId?: string; // Reference to species' native language
+
+  // Cross-game compatibility (multi-game species)
+  traveler_epithet?: string; // Lore description for inter-game migration
+  cross_game_compatible?: boolean; // Whether this species can migrate between games
+  native_game?: string; // Origin game identifier (e.g. 'mvee', 'precursors', 'both')
+  genome_flags?: Record<string, unknown>; // Species-specific heritable parameters
 }
 
 // ============================================================================
