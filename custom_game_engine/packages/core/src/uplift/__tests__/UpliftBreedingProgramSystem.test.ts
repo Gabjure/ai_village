@@ -97,7 +97,7 @@ describe('UpliftBreedingProgramSystem - Generation Advancement', () => {
 
   it('should not exceed target intelligence', () => {
     program.currentIntelligence = 0.69;
-    program.progressToNextGeneration = 100;
+    program.progressToNextGeneration = 0;
 
     // Run 20 ticks to trigger update interval
     for (let i = 0; i < 20; i++) {

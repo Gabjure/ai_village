@@ -229,3 +229,10 @@ export { HarmonyContextBuilder } from './prompt-builders/HarmonyContextBuilder';
 
 export * from './PersonalityPromptTemplates';
 export * from './PersonalityVariationsLibrary';
+
+// ============================================================================
+// Spell Sandbox
+// ============================================================================
+
+export * from './SpellSandboxPromptBuilder';
+export * from './SpellSandboxService';

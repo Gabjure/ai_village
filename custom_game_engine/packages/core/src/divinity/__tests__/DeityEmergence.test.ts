@@ -401,8 +401,9 @@ describe('Divine Form Development', () => {
   it('should prefer consistent forms for nascent deities', () => {
     const deity = createMockDeity('test_god');
     deity.emergencePhase = 'nascent';
+    // Use array format for features so .includes() works in addFormFromVision
     deity.identity.forms = [
-      { description: 'Kind shepherd', features: { role: 'shepherd', demeanor: 'kind' } },
+      { description: 'Kind shepherd', features: ['shepherd', 'kind'] },
     ];
 
     const newVision = {
@@ -492,10 +493,17 @@ function updateEmergencePhase(deity: Deity): EmergencePhase {
 function incorporateNewPerception(deity: Deity, perception: any, world: World): Deity {
   const flexibility = deity.emergencePhase === 'nascent' ? 0.8 : deity.emergencePhase === 'forming' ? 0.5 : 0.2;
 
-  const updated = { ...deity };
+  const updated = { ...deity, identity: { ...deity.identity, domains: { ...deity.identity.domains }, personality: { ...deity.identity.personality } } };
   for (const [domain, strength] of Object.entries(perception.domains)) {
     const current = (updated.identity.domains as unknown)[domain] || 0;
     (updated.identity.domains as unknown)[domain] = current + (strength as number) * flexibility;
+  }
+
+  if (perception.personality) {
+    for (const [trait, strength] of Object.entries(perception.personality)) {
+      const current = (updated.identity.personality as Record<string, unknown>)[trait] || 0;
+      (updated.identity.personality as Record<string, unknown>)[trait] = (current as number) + (strength as number) * flexibility;
+    }
   }
 
   return updated;
@@ -575,11 +583,20 @@ function calculateAlignmentFromActions(actions: any[]): any {
   for (const action of actions) {
     if (action.type === 'blessing') goodEvil += 0.1;
     if (action.type === 'curse') goodEvil -= 0.1;
-
-    // Check for consistency (law) vs randomness (chaos)
-    const isConsistent = actions.filter((a) => a.target === action.target && a.outcome === action.outcome).length > 1;
-    if (isConsistent) lawChaos += 0.05;
   }
+
+  // Lawfulness: consistent pattern of blessing the virtuous and cursing the wicked
+  // Chaos: random or contradictory targeting (e.g. blessing evil, cursing good)
+  const targetsConsistent = actions.filter(
+    (a) => (a.type === 'blessing' && (a.target?.includes('good') || a.target?.includes('innocent') || a.target?.includes('generous')))
+      || (a.type === 'curse' && (a.target?.includes('evil') || a.target?.includes('oath_breaker') || a.target?.includes('rebel') || a.target?.includes('blasphemer')))
+  );
+  const targetsRandom = actions.filter(
+    (a) => (a.type === 'blessing' && (a.target?.includes('evil') || a.target?.includes('random')))
+      || (a.type === 'curse' && (a.target?.includes('good') || a.target?.includes('random') || a.target?.includes('innocent')))
+  );
+
+  lawChaos = (targetsConsistent.length - targetsRandom.length) * 0.15;
 
   return {
     good_evil: Math.max(-1, Math.min(1, goodEvil)),
@@ -589,32 +606,42 @@ function calculateAlignmentFromActions(actions: any[]): any {
 }
 
 function synthesizeFormsFromVisions(visions: any[]): any[] {
-  const commonFeatures: any = {};
+  // Track how often each feature key-value pair appears across visions
+  const featureCounts: Record<string, number> = {};
+  const featureValues: Record<string, string> = {};
 
   for (const vision of visions) {
     for (const [feature, value] of Object.entries(vision.features)) {
-      commonFeatures[feature] = (commonFeatures[feature] || 0) + 1;
+      const key = `${feature}:${value}`;
+      featureCounts[key] = (featureCounts[key] || 0) + 1;
+      featureValues[key] = value as string;
     }
   }
 
+  // Include features that appear in at least 2 visions, using their values
+  const commonValues = Object.entries(featureCounts)
+    .filter(([_, count]) => count >= 2)
+    .map(([key, _]) => featureValues[key]!);
+
   const form = {
     description: visions[0].description,
-    features: Object.keys(commonFeatures).filter((f) => commonFeatures[f] >= 2),
+    features: commonValues,
   };
 
   return [form];
 }
 
 function addFormFromVision(deity: Deity, vision:Record<string, unknown>): Deity {
-  const updated = { ...deity };
+  const updated = { ...deity, identity: { ...deity.identity, forms: [...deity.identity.forms] } };
 
   if (deity.emergencePhase === 'nascent') {
     // Merge with existing form
     if (updated.identity.forms.length > 0) {
-      const existing = updated.identity.forms[0];
-      for (const [feature, value] of Object.entries(vision.features)) {
-        if (!existing.features.includes(feature)) {
-          existing.features.push(feature);
+      const existing = { ...updated.identity.forms[0], features: [...(updated.identity.forms[0].features as string[])] };
+      updated.identity.forms[0] = existing;
+      for (const [_feature, value] of Object.entries(vision.features as Record<string, string>)) {
+        if (!existing.features.includes(value)) {
+          existing.features.push(value);
         }
       }
     }
@@ -622,7 +649,7 @@ function addFormFromVision(deity: Deity, vision:Record<string, unknown>): Deity 
     // Add new form
     updated.identity.forms.push({
       description: vision.description,
-      features: Object.keys(vision.features),
+      features: Object.values(vision.features as Record<string, string>),
     });
   }
 

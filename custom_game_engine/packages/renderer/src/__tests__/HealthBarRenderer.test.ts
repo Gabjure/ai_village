@@ -24,8 +24,14 @@ const createMockContext = () => ({
   fillStyle: '',
   strokeStyle: '',
   lineWidth: 0,
+  font: '',
+  textAlign: '',
+  textBaseline: '',
   fillRect: vi.fn(),
   strokeRect: vi.fn(),
+  fillText: vi.fn(),
+  save: vi.fn(),
+  restore: vi.fn(),
 });
 
 // Helper to create a needs component with health value

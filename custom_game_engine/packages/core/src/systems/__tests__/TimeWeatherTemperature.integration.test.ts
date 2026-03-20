@@ -142,29 +142,32 @@ describe('TimeSystem + WeatherSystem + TemperatureSystem Integration', () => {
     await tempSystem.initialize(harness.world, harness.eventBus);
     harness.registerSystem('TemperatureSystem', tempSystem);
 
-    // Record temperature at dawn (6 AM)
-    harness.setGameHour(6);
-    const entities = Array.from(harness.world.entities.values());
-    tempSystem.update(harness.world, entities, 1.0);
-    const dawnTemp = agent.getComponent(ComponentType.Temperature).currentTemp;
+    // Note: The world starts at day 1 (early year). Seasonal variation in a temperate biome
+    // is -amplitude * cos(2π * day/360). At day 1, cos ≈ 1, so seasonal ≈ -12°C.
+    // This means the world ambient temperature (~6°C at dawn) is dominated by seasonal cooling,
+    // not daily variation (±4°C). As a result, body temperature approaches the cold ambient
+    // regardless of time of day, with midnight being coldest and noon being slightly warmer.
 
-    // Record temperature at noon (12 PM)
+    // Record temperature at noon (12 PM) — should be the warmest time of day
     harness.setGameHour(12);
+    const entities = Array.from(harness.world.entities.values());
     for (let i = 0; i < 10; i++) {
       tempSystem.update(harness.world, entities, 1.0);
     }
     const noonTemp = agent.getComponent(ComponentType.Temperature).currentTemp;
 
-    // Record temperature at night (midnight)
+    // Record temperature at midnight (0 / 24) — should be the coldest time of day
     harness.setGameHour(0);
     for (let i = 0; i < 10; i++) {
       tempSystem.update(harness.world, entities, 1.0);
     }
-    const nightTemp = agent.getComponent(ComponentType.Temperature).currentTemp;
+    const midnightTemp = agent.getComponent(ComponentType.Temperature).currentTemp;
 
-    // Noon should be warmer than dawn, night should be cooler
-    expect(noonTemp).toBeGreaterThanOrEqual(dawnTemp - 1); // Allow small margin
-    expect(nightTemp).toBeLessThanOrEqual(dawnTemp + 1);
+    // The daily cycle should produce some temperature variation:
+    // noon ambient = BASE + 4 (peak) - 12 (seasonal) = 10°C
+    // midnight ambient = BASE - 4 (trough) - 12 (seasonal) = 2°C
+    // With thermal inertia, agent temp at noon should be warmer than at midnight.
+    expect(noonTemp).toBeGreaterThan(midnightTemp);
   });
 
   it('should weather transitions affect temperature over time', async () => {
@@ -317,11 +320,13 @@ describe('TimeSystem + WeatherSystem + TemperatureSystem Integration', () => {
 
     // Create agent with temperature
     const agent = harness.createTestAgent({ x: 10, y: 10 });
+    // Start at 20°C which is well above the winter ambient (~6°C at day 1 dawn).
+    // Thermal inertia means it should move toward ambient gradually, not instantly.
     agent.addComponent({
       type: ComponentType.Temperature,
       version: 1,
-      currentTemp: 10, // Start cold
-      state: 'cold',
+      currentTemp: 20, // Start warm
+      state: 'comfortable',
     });
 
     const tempSystem = new TemperatureSystem();
@@ -330,14 +335,18 @@ describe('TimeSystem + WeatherSystem + TemperatureSystem Integration', () => {
 
     const entities = Array.from(harness.world.entities.values());
 
+    // Record temp before any updates
+    const initialTemp = agent.getComponent(ComponentType.Temperature).currentTemp;
+
     // Update once (should move toward ambient but not instantly)
     tempSystem.update(harness.world, entities, 1.0);
 
     const afterOneUpdate = agent.getComponent(ComponentType.Temperature).currentTemp;
 
-    // Temperature should have changed slightly but not jumped to 20°C
-    expect(afterOneUpdate).toBeGreaterThanOrEqual(10);
-    expect(afterOneUpdate).toBeLessThanOrEqual(20);
+    // Temperature should have changed slightly (moved toward ambient) but not jumped there
+    // THERMAL_RATE = 0.15 so after 1s: change = (ambient - 20) * 0.15 ≈ 14 * 0.15 = ~2°C max
+    expect(Math.abs(afterOneUpdate - initialTemp)).toBeLessThan(5); // Small change per step
+    expect(Math.abs(afterOneUpdate - initialTemp)).toBeGreaterThan(0); // But some change
 
     // Update many times (should approach ambient temperature)
     for (let i = 0; i < 20; i++) {
@@ -346,7 +355,7 @@ describe('TimeSystem + WeatherSystem + TemperatureSystem Integration', () => {
 
     const afterManyUpdates = agent.getComponent(ComponentType.Temperature).currentTemp;
 
-    // Should be much closer to ambient now
-    expect(afterManyUpdates).toBeGreaterThan(afterOneUpdate);
+    // After many updates, temp should be further from initial (converging toward ambient)
+    expect(Math.abs(afterManyUpdates - initialTemp)).toBeGreaterThan(Math.abs(afterOneUpdate - initialTemp));
   });
 });

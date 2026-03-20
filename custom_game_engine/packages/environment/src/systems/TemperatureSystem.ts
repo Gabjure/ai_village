@@ -39,6 +39,7 @@ const WALL_INSULATION: Record<string, number> = {
 /** Extended world interface with tile access */
 interface WorldWithTiles {
   getTileAt(x: number, y: number): ITile | undefined;
+  getChunkManager?(): ChunkManager | undefined;
 }
 
 /** Interface for chunk manager access */
@@ -429,14 +430,7 @@ export class TemperatureSystem extends BaseSystem {
     }
 
     // Performance: Skip if chunk not generated to avoid expensive terrain generation
-    const worldWithChunks = world as unknown as {
-      getChunkManager?: () => {
-        getChunk: (x: number, y: number) => { generated?: boolean } | undefined;
-      } | undefined;
-    };
-    const chunkManager = typeof worldWithChunks.getChunkManager === 'function'
-      ? worldWithChunks.getChunkManager()
-      : undefined;
+    const chunkManager = world.getChunkManager?.();
     if (chunkManager) {
       const CHUNK_SIZE = 32;
       const chunkX = Math.floor(tileX / CHUNK_SIZE);

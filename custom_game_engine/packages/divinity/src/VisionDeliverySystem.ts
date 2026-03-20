@@ -180,14 +180,6 @@ export class VisionDeliverySystem {
   }
 
   /**
-   * Emit an event through the world's event bus
-   */
-  private emitEvent(type: string, source: string, data: Record<string, unknown>): void {
-    (this.world.eventBus as unknown as { emit: (event: Record<string, unknown>) => void }).emit({ type, source, data });
-  }
-
-
-  /**
    * Calculate the cost of sending a vision
    */
   calculateVisionCost(
