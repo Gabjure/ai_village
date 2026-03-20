@@ -382,7 +382,6 @@ export class MenuBar {
     const settingsWindows = windows.filter(w =>
       w.config.showInWindowList !== false &&
       w.config.menuCategory === 'settings' &&
-      w.panel !== null &&
       this.isWindowAvailable(w)
     );
 
@@ -392,7 +391,7 @@ export class MenuBar {
     for (const window of settingsWindows) {
       items.push({
         type: 'window',
-        label: window.panel?.getTitle() || window.id,
+        label: window.panel?.getTitle() || window.config.title || window.id,
         windowId: window.id,
         shortcut: window.config.keyboardShortcut,
       });
@@ -418,7 +417,6 @@ export class MenuBar {
     const agentWindows = windows.filter(w =>
       w.config.showInWindowList !== false &&
       (w.config.menuCategory === 'info' || w.config.menuCategory === 'social') &&
-      w.panel !== null &&
       this.isWindowAvailable(w)
     );
 
@@ -458,7 +456,7 @@ export class MenuBar {
       for (const window of categoryWindows) {
         items.push({
           type: 'window',
-          label: window.panel?.getTitle() || window.id,
+          label: window.panel?.getTitle() || window.config.title || window.id,
           windowId: window.id,
           shortcut: window.config.keyboardShortcut,
         });
@@ -486,7 +484,6 @@ export class MenuBar {
     const economyWindows = windows.filter(w =>
       w.config.showInWindowList !== false &&
       w.config.menuCategory === 'economy' &&
-      w.panel !== null &&
       this.isWindowAvailable(w)
     );
 
@@ -495,7 +492,7 @@ export class MenuBar {
     for (const window of economyWindows) {
       items.push({
         type: 'window',
-        label: window.panel?.getTitle() || window.id,
+        label: window.panel?.getTitle() || window.config.title || window.id,
         windowId: window.id,
         shortcut: window.config.keyboardShortcut,
       });
@@ -524,7 +521,6 @@ export class MenuBar {
     const farmingWindows = windows.filter(w =>
       w.config.showInWindowList !== false &&
       w.config.menuCategory === 'farming' &&
-      w.panel !== null &&
       this.isWindowAvailable(w)
     );
 
@@ -533,7 +529,7 @@ export class MenuBar {
     for (const window of farmingWindows) {
       items.push({
         type: 'window',
-        label: window.panel?.getTitle() || window.id,
+        label: window.panel?.getTitle() || window.config.title || window.id,
         windowId: window.id,
         shortcut: window.config.keyboardShortcut,
       });
@@ -562,7 +558,6 @@ export class MenuBar {
     const animalWindows = windows.filter(w =>
       w.config.showInWindowList !== false &&
       w.config.menuCategory === 'animals' &&
-      w.panel !== null &&
       this.isWindowAvailable(w)
     );
 
@@ -571,7 +566,7 @@ export class MenuBar {
     for (const window of animalWindows) {
       items.push({
         type: 'window',
-        label: window.panel?.getTitle() || window.id,
+        label: window.panel?.getTitle() || window.config.title || window.id,
         windowId: window.id,
         shortcut: window.config.keyboardShortcut,
       });
@@ -600,7 +595,6 @@ export class MenuBar {
     const researchWindows = windows.filter(w =>
       w.config.showInWindowList !== false &&
       w.config.menuCategory === 'research' &&
-      w.panel !== null &&
       this.isWindowAvailable(w)
     );
 
@@ -609,7 +603,7 @@ export class MenuBar {
     for (const window of researchWindows) {
       items.push({
         type: 'window',
-        label: window.panel?.getTitle() || window.id,
+        label: window.panel?.getTitle() || window.config.title || window.id,
         windowId: window.id,
         shortcut: window.config.keyboardShortcut,
       });
@@ -638,7 +632,6 @@ export class MenuBar {
     const magicWindows = windows.filter(w =>
       w.config.showInWindowList !== false &&
       w.config.menuCategory === 'magic' &&
-      w.panel !== null &&
       this.isWindowAvailable(w)
     );
 
@@ -647,7 +640,7 @@ export class MenuBar {
     for (const window of magicWindows) {
       items.push({
         type: 'window',
-        label: window.panel?.getTitle() || window.id,
+        label: window.panel?.getTitle() || window.config.title || window.id,
         windowId: window.id,
         shortcut: window.config.keyboardShortcut,
       });
@@ -676,7 +669,6 @@ export class MenuBar {
     const divinityWindows = windows.filter(w =>
       w.config.showInWindowList !== false &&
       w.config.menuCategory === 'divinity' &&
-      w.panel !== null &&
       this.isWindowAvailable(w)
     );
 
@@ -686,7 +678,7 @@ export class MenuBar {
     for (const window of divinityWindows) {
       items.push({
         type: 'window',
-        label: window.panel?.getTitle() || window.id,
+        label: window.panel?.getTitle() || window.config.title || window.id,
         windowId: window.id,
         shortcut: window.config.keyboardShortcut,
       });
@@ -716,7 +708,6 @@ export class MenuBar {
     const devWindows = windows.filter(w =>
       w.config.showInWindowList !== false &&
       w.config.menuCategory === 'dev' &&
-      w.panel !== null &&
       this.isWindowAvailable(w)
     );
 
@@ -726,7 +717,7 @@ export class MenuBar {
     for (const window of devWindows) {
       items.push({
         type: 'window',
-        label: window.panel?.getTitle() || window.id,
+        label: window.panel?.getTitle() || window.config.title || window.id,
         windowId: window.id,
         shortcut: window.config.keyboardShortcut,
       });

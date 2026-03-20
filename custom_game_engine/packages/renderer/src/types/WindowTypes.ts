@@ -155,6 +155,9 @@ export interface WindowConfig {
   /** Menu category for organizing windows (defaults to 'default') */
   menuCategory?: WindowMenuCategory;
 
+  /** Display title for the window (used in menus, especially for lazy-loaded panels) */
+  title?: string;
+
   /** Optional factory function to create panel lazily on first show */
   factory?: () => IWindowPanel;
 

@@ -220,6 +220,8 @@ import {
   createUniverseManagerPanelFactory,
   createMagicSystemsPanelFactory,
   createSpellbookPanelFactory,
+  createSpellSandboxPanelFactory,
+  createCivilizationChroniclePanelFactory,
   createDivinePowersPanelFactory,
   createVisionComposerPanelFactory,
   createDivineAnalyticsPanelFactory,
@@ -607,6 +609,29 @@ function createUIPanels(
     renderer.camera.setPosition(worldX, worldY);
   });
 
+  // Drive 4: Patron Binding UI — wire bind/unbind callbacks into AgentInfoPanel
+  // PatronBindingService is built by Game Systems Dev (Moss); this wires up the renderer side.
+  // We keep a local state for current patron until the real service is available.
+  let currentPatronId: string | null = null;
+
+  agentInfoPanel.setPatronBindingCallbacks(
+    (agentId: string) => {
+      currentPatronId = agentId;
+      const entity = gameLoop.world.getEntity(agentId);
+      const identity = entity?.components.get('identity') as { name?: string } | undefined;
+      const patronName = identity?.name ?? 'Unknown';
+      renderer.patronWidget.setPatron({ id: agentId, name: patronName });
+      showNotification(`⭐ ${patronName} bound as patron`, '#B47AFF');
+    },
+    () => {
+      const prevName = renderer.patronWidget.getPatron()?.name ?? 'Patron';
+      currentPatronId = null;
+      renderer.patronWidget.setPatron(null);
+      showNotification(`✦ ${prevName} unbound`, '#9060CC');
+    },
+    () => currentPatronId
+  );
+
   const agentRosterPanel = new AgentRosterPanel(renderer.pixelLabLoader);
 
   const animalInfoPanel = new AnimalInfoPanel();
@@ -965,7 +990,6 @@ function setupWindowManager(
     isDraggable: true,
     isResizable: false,
     showInWindowList: true,
-    keyboardShortcut: 'C',
     menuCategory: 'social',
   });
 
@@ -1102,6 +1126,7 @@ function setupWindowManager(
     minHeight: 350,
     showInWindowList: true,
     menuCategory: 'magic',
+    title: 'Magic Systems',
     factory: createMagicSystemsPanelFactory(),
     requiredSystems: ['magic'],
   });
@@ -1119,7 +1144,41 @@ function setupWindowManager(
     factory: createSpellbookPanelFactory(),
     showInWindowList: true,
     menuCategory: 'magic',
+    title: 'Spellbook',
     requiredSystems: ['magic'],
+  });
+
+  // Research Casting Circle (Spell Sandbox) - LAZY
+  windowManager.registerWindow('spell-sandbox', null, {
+    defaultX: 80,
+    defaultY: 100,
+    defaultWidth: 440,
+    defaultHeight: 640,
+    isDraggable: true,
+    isResizable: true,
+    minWidth: 380,
+    minHeight: 500,
+    factory: createSpellSandboxPanelFactory(),
+    showInWindowList: true,
+    menuCategory: 'magic',
+    title: 'Research Casting Circle',
+    keyboardShortcut: 'X',
+  });
+
+  // Civilization Chronicle Panel — LAZY (subscribes to civilization:* events)
+  windowManager.registerWindow('civilization-chronicle', null, {
+    defaultX: 120,
+    defaultY: 80,
+    defaultWidth: 420,
+    defaultHeight: 580,
+    isDraggable: true,
+    isResizable: true,
+    minWidth: 360,
+    minHeight: 400,
+    factory: createCivilizationChroniclePanelFactory(gameLoop.world.eventBus),
+    showInWindowList: true,
+    menuCategory: 'social',
+    keyboardShortcut: 'Z',
   });
 
   // Skill Tree Panel
@@ -2015,6 +2074,52 @@ function setupVisualEventHandlers(
     const { position } = event.data;
     floatingTextRenderer?.add('💀 Died', position.x * 16, position.y * 16, '#888888', 2000);
   });
+
+  // Drive 4: Patron Binding — subscribe to EventBus events from PatronBindingService
+  // These events will be emitted by Game Systems Dev's PatronBindingService when implemented.
+  const patronWidget = 'patronWidget' in renderer ? (renderer as any).patronWidget : null;
+  const patronToast = 'patronToast' in renderer ? (renderer as any).patronToast : null;
+
+  if (patronWidget && patronToast) {
+    gameLoop.world.eventBus.subscribe('PATRON_BOUND', (event: any) => {
+      const { agentId, agentName } = event.data ?? {};
+      if (agentId && agentName) {
+        patronWidget.setPatron({ id: agentId, name: agentName });
+      }
+    });
+
+    gameLoop.world.eventBus.subscribe('PATRON_UNBOUND', (_event: any) => {
+      patronWidget.setPatron(null);
+    });
+
+    gameLoop.world.eventBus.subscribe('PATRON_EVENT', (event: any) => {
+      const { type, agentName, summary } = event.data ?? {};
+      if (type && agentName && summary) {
+        patronToast.show({ type, agentName, summary });
+        patronWidget.triggerPulse();
+      }
+    });
+  }
+
+  // Drive 2: Civilization Chronicle — subscribe to civilization:* events for toast notifications
+  const civChronicleToast = 'civChronicleToast' in renderer ? renderer.civChronicleToast : null;
+
+  if (civChronicleToast) {
+    for (const evtType of [
+      'civilization:biome_discovered',
+      'civilization:biome_settled',
+      'civilization:biome_explored',
+      'civilization:terrain_transformed',
+      'civilization:resource_extracted',
+    ] as const) {
+      gameLoop.world.eventBus.subscribe(evtType, (event: any) => {
+        const { agentName, summary } = event.data ?? {};
+        if (summary) {
+          civChronicleToast.show({ type: evtType, agentName, summary });
+        }
+      });
+    }
+  }
 }
 
 // ============================================================================
