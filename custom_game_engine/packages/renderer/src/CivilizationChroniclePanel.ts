@@ -36,6 +36,36 @@ const MILESTONE_ICONS: Record<string, string> = {
   'civilization:biome_explored':      '🧭',
   'civilization:terrain_transformed': '🌍',
   'civilization:resource_extracted':  '⛏️',
+  // Agent/social milestones (from MilestoneSystem)
+  'milestone:first_local_trade':          '🤝',
+  'milestone:first_inter_village_trade':  '🏘️',
+  'milestone:first_temporal_trade':       '⏳',
+  'milestone:first_cross_universe_trade': '🌌',
+  'milestone:first_cross_multiverse_trade':'✨',
+  'milestone:first_agent_death_witnessed':'💀',
+  'milestone:first_building_completed':   '🏠',
+  'milestone:first_research_completed':   '📚',
+  'milestone:first_magic_learned':        '🔮',
+  'milestone:first_spaceship_launched':   '🚀',
+  'milestone:angel_bond_formed':          '👼',
+  'milestone:post_temporal_multiversal':  '🌀',
+  'milestone:the_revelation':             '👁️',
+};
+
+const MILESTONE_SUMMARIES: Record<string, string> = {
+  'first_local_trade':          'The first trade between agents was completed.',
+  'first_inter_village_trade':  'Villages established their first inter-settlement trade route.',
+  'first_temporal_trade':       'A trade was made with the past — crossing timelines.',
+  'first_cross_universe_trade': 'Commerce reached across the boundary between universes.',
+  'first_cross_multiverse_trade':'Trade now spans the multiverse itself.',
+  'first_agent_death_witnessed':'The first death was witnessed. Life is fleeting.',
+  'first_building_completed':   'The first structure was raised — civilization takes root.',
+  'first_research_completed':   'Knowledge was won through research. A new age begins.',
+  'first_magic_learned':        'An agent touched the arcane for the first time.',
+  'first_spaceship_launched':   'A vessel was launched beyond the sky.',
+  'angel_bond_formed':          'A deep bond formed between player and angel.',
+  'post_temporal_multiversal':  'Post-temporal multiversal status achieved — angel bifurcation unlocked.',
+  'the_revelation':             'The populated multiverse was revealed.',
 };
 
 const C = {
@@ -61,7 +91,7 @@ const PAD = 12;
 // ============================================================================
 
 function formatMilestoneType(type: string): string {
-  return type.replace('civilization:', '').replace(/_/g, ' ');
+  return type.replace('civilization:', '').replace('milestone:', '').replace(/_/g, ' ');
 }
 
 function wrapText(ctx: CanvasRenderingContext2D, text: string, maxWidth: number): string[] {
@@ -172,6 +202,19 @@ export class CivilizationChroniclePanel implements IWindowPanel {
         type: 'civilization:resource_extracted',
         agentName: d.agentName,
         summary: d.summary ?? '',
+        tick: d.tick ?? 0,
+        timestamp: Date.now(),
+      });
+    });
+
+    // Agent/social milestones from MilestoneSystem
+    eventBus.subscribe('milestone:achieved', (event: any) => {
+      const d = event.data ?? {};
+      const milestoneId: string = d.milestoneId ?? '';
+      const summary = MILESTONE_SUMMARIES[milestoneId] ?? `Milestone achieved: ${milestoneId.replace(/_/g, ' ')}`;
+      addEntry({
+        type: `milestone:${milestoneId}`,
+        summary,
         tick: d.tick ?? 0,
         timestamp: Date.now(),
       });
