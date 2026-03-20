@@ -342,6 +342,14 @@ export type {
   SpatialQueryOptions,
 } from './services/SpatialQueryService.js';
 
+export {
+  civilizationChronicleService,
+  CivilizationChronicleService,
+  type ChronicleEntry,
+  type CivilizationChronicleComponent,
+  createCivilizationChronicleComponent,
+} from './services/CivilizationChronicleService.js';
+
 // Note: MovementAPI, TargetingAPI, InteractionAPI are re-exported
 // with conflicts from components. Import from @ai-village/core/services
 // if you need those specific APIs.

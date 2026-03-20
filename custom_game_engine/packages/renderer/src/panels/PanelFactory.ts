@@ -26,6 +26,7 @@ import { TimeControlsPanel } from '../TimeControlsPanel';
 import { UniverseManagerPanel } from '../UniverseManagerPanel';
 import { MagicSystemsPanel } from '../MagicSystemsPanel';
 import { SpellbookPanel } from '../SpellbookPanel';
+import { CivilizationChroniclePanel } from '../CivilizationChroniclePanel';
 import { DivinePowersPanel } from '../DivinePowersPanel';
 import { VisionComposerPanel } from '../VisionComposerPanel';
 import { DivineAnalyticsPanel } from '../divine/DivineAnalyticsPanel';
@@ -361,6 +362,18 @@ export function createPrayerPanelFactory(): () => IWindowPanel {
       }
     );
     return createPrayerPanelAdapter(panel);
+  };
+}
+
+/**
+ * Factory for CivilizationChroniclePanel
+ * Requires EventBus to subscribe to civilization milestone events
+ */
+export function createCivilizationChroniclePanelFactory(eventBus: EventBus): () => IWindowPanel {
+  return () => {
+    const panel = new CivilizationChroniclePanel();
+    panel.connect(eventBus);
+    return panel;
   };
 }
 

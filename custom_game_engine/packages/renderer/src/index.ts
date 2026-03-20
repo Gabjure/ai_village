@@ -100,6 +100,8 @@ export * from './AgentCreationCards.js';
 export * from './ResearchLibraryPanel.js';
 export * from './TechTreePanel.js';
 export * from './SpriteGalleryPanel.js';
+export * from './CivilizationChroniclePanel.js';
+export * from './CivChronicleToastRenderer.js';
 
 export * from './ui/InventoryUI.js';
 export * from './ui/DragDropSystem.js';

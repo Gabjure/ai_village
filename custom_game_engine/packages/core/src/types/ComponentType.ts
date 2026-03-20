@@ -330,4 +330,7 @@ export enum ComponentType {
 
   // Patron Binding (Drive 4: Ownership — guardian spirit)
   PatronBinding = 'patron_binding',
+
+  // Civilization Chronicle (Drive 2: Accomplishment)
+  CivilizationChronicle = 'civilization_chronicle',
 }

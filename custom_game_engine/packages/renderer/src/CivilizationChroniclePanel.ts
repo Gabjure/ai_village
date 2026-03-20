@@ -221,6 +221,26 @@ export class CivilizationChroniclePanel implements IWindowPanel {
     });
   }
 
+  /**
+   * Load persisted milestone entries (e.g. from CivilizationChronicleService after save/load).
+   * Merges with any live entries already captured, deduplicating by type+tick.
+   */
+  loadEntries(entries: ReadonlyArray<MilestoneEntry>): void {
+    const existing = new Set(this.milestones.map(m => `${m.type}:${m.tick}`));
+    for (const entry of entries) {
+      const key = `${entry.type}:${entry.tick}`;
+      if (!existing.has(key)) {
+        this.milestones.push(entry);
+        existing.add(key);
+      }
+    }
+    // Sort newest first
+    this.milestones.sort((a, b) => b.tick - a.tick);
+    if (this.milestones.length > MAX_ENTRIES) {
+      this.milestones.length = MAX_ENTRIES;
+    }
+  }
+
   // ── IWindowPanel ──────────────────────────────────────────────────────────
 
   getId(): string { return 'civilization-chronicle'; }
