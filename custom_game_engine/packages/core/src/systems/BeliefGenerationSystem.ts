@@ -155,6 +155,20 @@ export class BeliefGenerationSystem extends BaseSystem {
         believers: believers.length,
         currentBelief: deityComp.belief.currentBelief,
       });
+
+      // Cross-game lore export event (see cross-game-lore-bridge-spec-v1.md)
+      this.events.emitGeneric('lore:belief_emerged', {
+        sourceGame: 'mvee',
+        deityId: deityEntity.id,
+        deityName: deityComp.identity.primaryName,
+        epithets: deityComp.identity.epithets,
+        domain: deityComp.identity.domain,
+        beliefAmount: totalBeliefGenerated,
+        believerCount: believers.length,
+        currentBeliefTotal: deityComp.belief.currentBelief,
+        peakBeliefRate: deityComp.belief.peakBeliefRate,
+        timestamp: currentTick,
+      });
     }
   }
 

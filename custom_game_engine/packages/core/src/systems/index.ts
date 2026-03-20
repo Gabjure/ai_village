@@ -63,6 +63,10 @@ export * from './PrayerSystem.js';
 export * from './PrayerAnsweringSystem.js';
 export * from './MythGenerationSystem.js';
 export * from './SpatialMemoryQuerySystem.js';
+// Lore Export Collector (Cross-game wiki data pipeline for Leaky Game ARG)
+export * from './LoreExportCollector.js';
+export { LoreExportCollector } from './LoreExportCollector.js';
+export type { WikiLoreEntry, WikiLoreCategory, LoreExportSnapshot } from './LoreExportCollector.js';
 // Metrics & Analytics
 export * from './MetricsCollectionSystem.js';
 // Governance & Information Infrastructure

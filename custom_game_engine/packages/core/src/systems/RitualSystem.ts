@@ -159,6 +159,19 @@ export class RitualSystem extends BaseSystem {
       deity.addBelief(ritual.beliefGenerated, currentTick);
       ritual.lastPerformed = currentTick;
 
+      // Cross-game lore export event (see cross-game-lore-bridge-spec-v1.md)
+      this.events.emitGeneric('lore:ritual_performed', {
+        sourceGame: 'mvee',
+        ritualId: ritual.id,
+        name: ritual.name,
+        deityId: ritual.deityId,
+        type: ritual.type,
+        beliefGenerated: ritual.beliefGenerated,
+        requiredParticipants: ritual.requiredParticipants,
+        duration: ritual.duration,
+        timestamp: currentTick,
+      });
+
       // Reschedule based on type (use lookup table)
       const interval = this.ritualIntervalLookup.get(ritual.type) ?? 0;
       if (interval > 0) {
