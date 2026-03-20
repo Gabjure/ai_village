@@ -208,7 +208,9 @@ describe('UpliftBreedingProgramSystem - Stage Transitions', () => {
   it('should transition to neural_enhancement at 0.6 intelligence', () => {
     program.currentIntelligence = 0.6;
     program.currentGeneration = 3;
-    program.progressToNextGeneration = 100;
+    // Keep progress at 0 so no generation advances during this check,
+    // allowing checkStageTransitions to evaluate the current intelligence directly.
+    program.progressToNextGeneration = 0;
 
     // Run 20 ticks to trigger update interval
     for (let i = 0; i < 20; i++) {

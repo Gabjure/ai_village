@@ -158,7 +158,24 @@ export class ProtoSapienceObservationSystem extends BaseSystem {
     // Proto-language emergence
     if (!proto.hasProtocolanguage && proto.intelligence >= EMERGENCE_THRESHOLDS.PROTO_LANGUAGE) {
       proto.hasProtocolanguage = true;
-      proto.vocabularySize = 5; // Start with 5 basic "words"
+
+      // Initialize with the first observed communication patterns (5 basic "words")
+      const initialPatterns = [
+        { pattern: 'low-pitched howl', meaning: 'food nearby' },
+        { pattern: 'high-pitched bark', meaning: 'danger' },
+        { pattern: 'rhythmic yip', meaning: 'play invitation' },
+        { pattern: 'sustained whine', meaning: 'need help' },
+        { pattern: 'short bark series', meaning: 'come here' },
+      ];
+      for (const p of initialPatterns) {
+        proto.communicationPatterns.push({
+          pattern: p.pattern,
+          meaning: p.meaning,
+          consistency: 0.3,
+          sharedBy: [animal.id],
+        });
+      }
+      proto.vocabularySize = proto.communicationPatterns.length;
 
       this.events.emit('proto_sapience_milestone', {
         entityId: animal.id,
