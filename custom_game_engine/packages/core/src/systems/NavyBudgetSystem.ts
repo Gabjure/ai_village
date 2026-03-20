@@ -21,7 +21,7 @@ import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { SystemId, ComponentType } from '../types.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import type { World } from '../ecs/World.js';
-import { EntityImpl } from '../ecs/Entity.js';
+import { EntityImpl, type Entity } from '../ecs/Entity.js';
 import type { NavyComponent } from '../components/NavyComponent.js';
 import type { FleetComponent } from '../components/FleetComponent.js';
 import type { SquadronComponent } from '../components/SquadronComponent.js';
@@ -81,6 +81,10 @@ export class NavyBudgetSystem extends BaseSystem {
   protected onUpdate(ctx: SystemContext): void {
     const tick = ctx.tick;
 
+    // PERF: Cache fleet and squadron queries — avoid repeated world.query() in helpers
+    const allFleets = ctx.world.query().with(CT.Fleet).executeEntities();
+    const allSquadrons = ctx.world.query().with(CT.Squadron).executeEntities();
+
     // Process each navy
     for (const navyEntity of ctx.activeEntities) {
       const navy = navyEntity.getComponent<NavyComponent>(CT.Navy);
@@ -92,7 +96,7 @@ export class NavyBudgetSystem extends BaseSystem {
 
       // Annual budget = every 6000 ticks (5 minutes at 20 TPS)
       if (timeSinceLastProcess >= this.throttleInterval) {
-        this.processNavyBudget(ctx.world, navyEntity as EntityImpl, tick);
+        this.processNavyBudget(ctx.world, navyEntity as EntityImpl, tick, allFleets, allSquadrons);
         this.lastBudgetProcessTick.set(navy.navyId, tick);
       }
     }
@@ -112,7 +116,7 @@ export class NavyBudgetSystem extends BaseSystem {
    * - Pay crew
    * - Fund R&D
    */
-  private processNavyBudget(world: World, navyEntity: EntityImpl, tick: number): void {
+  private processNavyBudget(world: World, navyEntity: EntityImpl, tick: number, allFleets: ReadonlyArray<Entity>, allSquadrons: ReadonlyArray<Entity>): void {
     const navy = navyEntity.getComponent<NavyComponent>(CT.Navy);
     if (!navy) return;
 
@@ -149,14 +153,14 @@ export class NavyBudgetSystem extends BaseSystem {
     // ========================================================================
 
     const maintenanceBudget = budget * allocation.maintenance;
-    const shipsMaintained = this.processMaintenance(world, navyEntity, maintenanceBudget, warnings);
+    const shipsMaintained = this.processMaintenance(world, navyEntity, maintenanceBudget, warnings, allFleets, allSquadrons);
 
     // ========================================================================
     // 3. Personnel
     // ========================================================================
 
     const personnelBudget = budget * allocation.personnel;
-    const crewPaid = this.processPersonnel(world, navyEntity, personnelBudget, warnings);
+    const crewPaid = this.processPersonnel(world, navyEntity, personnelBudget, warnings, allFleets);
 
     // ========================================================================
     // 4. R&D (Research & Development)
@@ -287,7 +291,9 @@ export class NavyBudgetSystem extends BaseSystem {
     world: World,
     navyEntity: EntityImpl,
     maintenanceBudget: number,
-    warnings: string[]
+    warnings: string[],
+    allFleets: ReadonlyArray<Entity>,
+    allSquadrons: ReadonlyArray<Entity>
   ): number {
     const navy = navyEntity.getComponent<NavyComponent>(CT.Navy);
     if (!navy) return 0;
@@ -313,7 +319,7 @@ export class NavyBudgetSystem extends BaseSystem {
       });
 
       // Degrade ship hull integrity
-      this.degradeShipHulls(world, navy.navyId, degradedShips);
+      this.degradeShipHulls(world, navy.navyId, degradedShips, allFleets, allSquadrons);
     }
 
     return shipsCanMaintain;
@@ -334,7 +340,8 @@ export class NavyBudgetSystem extends BaseSystem {
     world: World,
     navyEntity: EntityImpl,
     personnelBudget: number,
-    warnings: string[]
+    warnings: string[],
+    allFleets: ReadonlyArray<Entity>
   ): number {
     const navy = navyEntity.getComponent<NavyComponent>(CT.Navy);
     if (!navy) return 0;
@@ -360,7 +367,7 @@ export class NavyBudgetSystem extends BaseSystem {
       });
 
       // Reduce fleet morale
-      this.reduceFleetMorale(world, navy.navyId, unpaidCrew, navy.assets.totalCrew);
+      this.reduceFleetMorale(world, navy.navyId, unpaidCrew, navy.assets.totalCrew, allFleets);
     }
 
     return crewCanPay;
@@ -449,9 +456,9 @@ export class NavyBudgetSystem extends BaseSystem {
    *
    * Finds all fleets belonging to this navy and degrades their ships
    */
-  private degradeShipHulls(world: World, navyId: string, degradedShipCount: number): void {
-    // Query all fleets (they don't have navy reference, so we check all)
-    const fleetEntities = world.query().with(CT.Fleet).executeEntities();
+  private degradeShipHulls(world: World, navyId: string, degradedShipCount: number, allFleets: ReadonlyArray<Entity>, allSquadrons: ReadonlyArray<Entity>): void {
+    // Use pre-queried fleet entities (they don't have navy reference, so we check all)
+    const fleetEntities = allFleets;
 
     let shipsProcessed = 0;
     const degradationPerShip = 0.1; // 10% hull integrity loss
@@ -462,15 +469,11 @@ export class NavyBudgetSystem extends BaseSystem {
       const fleet = fleetEntity.getComponent<FleetComponent>(CT.Fleet);
       if (!fleet) continue;
 
-      // Query squadrons in this fleet
-      const squadronEntities = world
-        .query()
-        .with(CT.Squadron)
-        .executeEntities()
-        .filter((e) => {
-          const squadron = e.getComponent<SquadronComponent>(CT.Squadron);
-          return squadron && fleet.squadrons.squadronIds.includes(squadron.squadronId);
-        });
+      // Filter pre-queried squadrons for this fleet
+      const squadronEntities = allSquadrons.filter((e) => {
+        const squadron = e.getComponent<SquadronComponent>(CT.Squadron);
+        return squadron && fleet.squadrons.squadronIds.includes(squadron.squadronId);
+      });
 
       for (const squadronEntity of squadronEntities) {
         if (shipsProcessed >= degradedShipCount) break;
@@ -504,9 +507,10 @@ export class NavyBudgetSystem extends BaseSystem {
     world: World,
     navyId: string,
     unpaidCrew: number,
-    totalCrew: number
+    totalCrew: number,
+    allFleets: ReadonlyArray<Entity>
   ): void {
-    const fleetEntities = world.query().with(CT.Fleet).executeEntities();
+    const fleetEntities = allFleets;
 
     const unpaidPercentage = unpaidCrew / totalCrew;
     const moraleReduction = unpaidPercentage * 0.5; // Up to 50% readiness loss

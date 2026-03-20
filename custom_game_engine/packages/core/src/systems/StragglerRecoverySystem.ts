@@ -62,7 +62,7 @@ interface RescueAssignmentResult {
 export class StragglerRecoverySystem extends BaseSystem {
   public readonly id: SystemId = 'straggler_recovery' as SystemId;
   public readonly priority: number = 430;
-  public readonly requiredComponents: ReadonlyArray<ComponentType> = [CT.Straggler];
+  public readonly requiredComponents: ReadonlyArray<ComponentType> = [CT.Straggler, CT.Spaceship];
   public readonly activationComponents = ['straggler'] as const;
   public readonly metadata = {
     category: 'combat',

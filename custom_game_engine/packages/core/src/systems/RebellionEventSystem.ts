@@ -48,7 +48,7 @@ export class RebellionEventSystem extends BaseSystem {
     const world = ctx.world;
 
     // Find rebellion threshold tracker (singleton)
-    for (const entity of world.query().with(CT.RebellionThreshold).executeEntities()) {
+    for (const entity of ctx.activeEntities) {
       const threshold = entity.components.get(CT.RebellionThreshold) as RebellionThresholdComponent;
 
       // Update rebellion readiness

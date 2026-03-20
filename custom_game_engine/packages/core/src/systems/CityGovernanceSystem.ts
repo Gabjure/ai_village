@@ -54,14 +54,14 @@ export class CityGovernanceSystem extends BaseSystem {
    * Update all city governance entities
    */
   protected onUpdate(ctx: SystemContext): void {
-    const cities = ctx.world
-      .query()
-      .with(CT.CityGovernance)
-      .executeEntities();
+    const cities = ctx.activeEntities;
 
     if (cities.length === 0) {
       return; // Early exit if no cities
     }
+
+    // Hoist village query once before the city loop to avoid per-city queries
+    const villages = ctx.world.query().with(CT.VillageGovernance).executeEntities();
 
     for (const entity of cities) {
       const impl = entity as EntityImpl;
@@ -72,7 +72,7 @@ export class CityGovernanceSystem extends BaseSystem {
       }
 
       // Aggregate data from member villages
-      this.aggregateVillageData(ctx.world, impl, governance);
+      this.aggregateVillageData(ctx.world, impl, governance, villages);
 
       // Update department efficiencies
       this.updateDepartmentEfficiencies(ctx.world, impl, governance);
@@ -91,13 +91,11 @@ export class CityGovernanceSystem extends BaseSystem {
   private aggregateVillageData(
     world: World,
     entity: EntityImpl,
-    governance: CityGovernanceComponent
+    governance: CityGovernanceComponent,
+    villages: ReadonlyArray<import('../ecs/Entity.js').Entity>
   ): void {
     let totalPopulation = 0;
     const totalReserves = new Map<string, number>();
-
-    // Query all villages with governance
-    const villages = world.query().with(CT.VillageGovernance).executeEntities();
 
     for (const villageEntity of villages) {
       const villageImpl = villageEntity as EntityImpl;

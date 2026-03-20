@@ -41,10 +41,7 @@ export class NewsPropagationSystem extends BaseSystem {
   private nextNewsId: number = 1;
 
   protected onUpdate(ctx: SystemContext): void {
-    const villageEntities = ctx.world
-      .query()
-      .with(CT.Village as ComponentType)
-      .executeEntities();
+    const villageEntities = ctx.activeEntities;
 
     if (villageEntities.length === 0) {
       return;
@@ -96,6 +93,13 @@ export class NewsPropagationSystem extends BaseSystem {
   }
 
   private propagateNews(ctx: SystemContext, villageEntities: ReadonlyArray<Entity>): void {
+    // PERF: Build village lookup map to avoid O(N) scan per (news, village) pair
+    const villageMap = new Map<string, VillageComponent>();
+    for (const entity of villageEntities) {
+      const v = entity.getComponent<VillageComponent>('village');
+      if (v) villageMap.set(v.villageId, v);
+    }
+
     for (const [, newsItem] of this.newsItems) {
       for (const villageEntity of villageEntities) {
         const village = villageEntity.getComponent<VillageComponent>('village');
@@ -114,20 +118,23 @@ export class NewsPropagationSystem extends BaseSystem {
         }
 
         // Find the source village to compute distance
-        const sourceVillage = this.findVillageById(villageEntities, newsItem.sourceVillageId);
+        const sourceVillage = villageMap.get(newsItem.sourceVillageId) ?? null;
         if (!sourceVillage) {
           continue;
         }
 
         const dx = village.position.x - sourceVillage.position.x;
         const dy = village.position.y - sourceVillage.position.y;
-        const distance = Math.sqrt(dx * dx + dy * dy);
+        const distanceSq = dx * dx + dy * dy;
+        const radiusSq = newsItem.propagationRadius * newsItem.propagationRadius;
 
-        // Only propagate within radius
-        if (distance > newsItem.propagationRadius) {
+        // Only propagate within radius (squared comparison avoids sqrt)
+        if (distanceSq > radiusSq) {
           continue;
         }
 
+        // Only compute sqrt when actually needed for delay calculation
+        const distance = Math.sqrt(distanceSq);
         // Check if enough ticks have elapsed for this distance
         const delayTicks = Math.round(distance * TICKS_PER_TILE_DELAY);
         const learnableTick = newsItem.createdTick + delayTicks;

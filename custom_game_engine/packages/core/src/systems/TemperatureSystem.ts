@@ -471,10 +471,9 @@ export class TemperatureSystem extends BaseSystem {
         const radiusSquared = buildingComp.heatRadius * buildingComp.heatRadius;
 
         if (distanceSquared <= radiusSquared) {
-          // Heat effect diminishes with distance: heatAmount * (1 - distance / radius)
-          // Note: Still need actual distance for falloff calculation
-          const distance = Math.sqrt(distanceSquared);
-          const heatEffect = buildingComp.heatAmount * (1 - distance / buildingComp.heatRadius);
+          // PERF: Quadratic falloff avoids sqrt — close enough for heat bonus
+          const falloff = 1 - distanceSquared / radiusSquared;
+          const heatEffect = buildingComp.heatAmount * falloff;
           totalHeat += heatEffect;
         }
       }

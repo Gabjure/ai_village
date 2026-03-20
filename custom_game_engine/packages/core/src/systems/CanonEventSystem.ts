@@ -57,9 +57,7 @@ export class CanonEventSystem extends BaseSystem {
    * Update canon events: check occurrence and attempt convergence
    */
   protected onUpdate(ctx: SystemContext): void {
-    const entities = ctx.world.query()
-      .with(CT.CanonEvent)
-      .executeEntities();
+    const entities = ctx.activeEntities;
 
     // PERF: Convert tick to bigint once
     this.cachedCurrentTick = BigInt(ctx.world.tick);
