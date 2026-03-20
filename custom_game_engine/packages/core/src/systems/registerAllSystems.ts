@@ -259,6 +259,7 @@ import { AngelSystem } from './AngelSystem.js';
 import { AdminAngelSystem } from './AdminAngelSystem.js';
 import { MilestoneSystem } from './MilestoneSystem.js';
 import { DiscoveryNamingSystem } from './DiscoveryNamingSystem.js';
+import { PatronBindingSystem } from './PatronBindingSystem.js';
 import { PossessionSystem } from './PossessionSystem.js';
 import { PlayerInputSystem } from './PlayerInputSystem.js';
 import { PlayerActionSystem } from './PlayerActionSystem.js';
@@ -938,6 +939,7 @@ export function registerAllSystems(
     gameLoop.systemRegistry.register(new AvatarManagementSystem());
     gameLoop.systemRegistry.register(new AvatarRespawnSystem());
     gameLoop.systemRegistry.register(new MortalPawnSystem());
+    gameLoop.systemRegistry.register(new PatronBindingSystem());
   }
 
   // ============================================================================

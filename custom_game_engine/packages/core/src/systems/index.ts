@@ -54,6 +54,7 @@ export * from './AgeTrackingSystem.js';
 export * from './ExplorationSystem.js';
 export * from './LandmarkNamingSystem.js';
 export * from './DiscoveryNamingSystem.js';
+export * from './PatronBindingSystem.js';
 export * from './CivilizationalLegendsSystem.js';
 export * from './VerificationSystem.js';
 export * from './SocialGradientSystem.js';

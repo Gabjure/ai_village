@@ -327,4 +327,7 @@ export enum ComponentType {
 
   // Player Discovery Naming (Drive 4: Ownership)
   DiscoveryNaming = 'discovery_naming',       // Player-named world firsts (milestone events)
+
+  // Patron Binding (Drive 4: Ownership — guardian spirit)
+  PatronBinding = 'patron_binding',
 }

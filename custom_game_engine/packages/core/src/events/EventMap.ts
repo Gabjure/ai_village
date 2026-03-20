@@ -35,6 +35,7 @@ import type { MiscEvents } from './domains/misc.events.js';
 import type { GovernanceEvents } from './domains/governance.events.js';
 import type { ExplorationEvents } from './domains/exploration.events.js';
 import type { AvatarEvents } from './domains/avatar.events.js';
+import type { PatronEvents } from './domains/patron.events.js';
 import type { PlayerEvents } from './domains/player.events.js';
 import type { CivilizationEvents } from './domains/civilization.events.js';
 
@@ -78,6 +79,7 @@ export interface GameEventMap extends
   GovernanceEvents,
   ExplorationEvents,
   AvatarEvents,
+  PatronEvents,
   PlayerEvents,
   CivilizationEvents {}
 
@@ -114,4 +116,5 @@ export type {
   WorkEvents,
   ActionEvents,
   MiscEvents,
+  PatronEvents,
 };

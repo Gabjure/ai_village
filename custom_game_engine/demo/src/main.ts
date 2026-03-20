@@ -610,8 +610,7 @@ function createUIPanels(
   });
 
   // Drive 4: Patron Binding UI — wire bind/unbind callbacks into AgentInfoPanel
-  // PatronBindingService is built by Game Systems Dev (Moss); this wires up the renderer side.
-  // We keep a local state for current patron until the real service is available.
+  // Emits patron:bound / patron:unbound events for PatronBindingSystem to handle.
   let currentPatronId: string | null = null;
 
   agentInfoPanel.setPatronBindingCallbacks(
@@ -622,12 +621,27 @@ function createUIPanels(
       const patronName = identity?.name ?? 'Unknown';
       renderer.patronWidget.setPatron({ id: agentId, name: patronName });
       showNotification(`⭐ ${patronName} bound as patron`, '#B47AFF');
+      // Notify PatronBindingSystem via EventBus
+      gameLoop.world.eventBus.emit({
+        type: 'patron:bound' as any,
+        source: agentId,
+        data: { agentId, agentName: patronName },
+      });
     },
     () => {
+      const prevPatronId = currentPatronId;
       const prevName = renderer.patronWidget.getPatron()?.name ?? 'Patron';
       currentPatronId = null;
       renderer.patronWidget.setPatron(null);
       showNotification(`✦ ${prevName} unbound`, '#9060CC');
+      // Notify PatronBindingSystem via EventBus
+      if (prevPatronId) {
+        gameLoop.world.eventBus.emit({
+          type: 'patron:unbound' as any,
+          source: prevPatronId,
+          data: { agentId: prevPatronId, agentName: prevName },
+        });
+      }
     },
     () => currentPatronId
   );
@@ -2075,27 +2089,23 @@ function setupVisualEventHandlers(
     floatingTextRenderer?.add('💀 Died', position.x * 16, position.y * 16, '#888888', 2000);
   });
 
-  // Drive 4: Patron Binding — subscribe to EventBus events from PatronBindingService
-  // These events will be emitted by Game Systems Dev's PatronBindingService when implemented.
+  // Drive 4: Patron Binding — subscribe to typed patron events from PatronBindingSystem
   const patronWidget = 'patronWidget' in renderer ? (renderer as any).patronWidget : null;
   const patronToast = 'patronToast' in renderer ? (renderer as any).patronToast : null;
 
   if (patronWidget && patronToast) {
-    gameLoop.world.eventBus.subscribe('PATRON_BOUND', (event: any) => {
-      const { agentId, agentName } = event.data ?? {};
-      if (agentId && agentName) {
-        patronWidget.setPatron({ id: agentId, name: agentName });
+    gameLoop.world.eventBus.subscribe('patron:event_triggered' as any, (event: any) => {
+      const { eventType, agentName, summary } = event.data ?? {};
+      if (eventType && agentName && summary) {
+        patronToast.show({ type: eventType, agentName, summary });
+        patronWidget.triggerPulse();
       }
     });
 
-    gameLoop.world.eventBus.subscribe('PATRON_UNBOUND', (_event: any) => {
-      patronWidget.setPatron(null);
-    });
-
-    gameLoop.world.eventBus.subscribe('PATRON_EVENT', (event: any) => {
-      const { type, agentName, summary } = event.data ?? {};
-      if (type && agentName && summary) {
-        patronToast.show({ type, agentName, summary });
+    gameLoop.world.eventBus.subscribe('patron:death_farewell' as any, (event: any) => {
+      const { agentName, causeOfDeath } = event.data ?? {};
+      if (agentName) {
+        patronToast.show({ type: 'death', agentName, summary: `${agentName} has departed — ${causeOfDeath}` });
         patronWidget.triggerPulse();
       }
     });
