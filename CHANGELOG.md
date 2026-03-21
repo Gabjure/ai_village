@@ -6,6 +6,16 @@ Format: [Semantic Versioning](https://semver.org/). Newest first.
 
 ---
 
+## v0.1.5 — 2026-03-21
+
+### Performance
+- Fixed query-in-loop and `Math.sqrt` hot paths in 3 additional systems — reduces per-tick cost in those systems
+
+### Fixes
+- Removed `as unknown as World` type assertion escape hatches — replaced with proper type guards, improving type safety across affected files
+
+---
+
 ## v0.1.4 — 2026-03-21
 
 ### Fixes
