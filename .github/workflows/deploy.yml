@@ -85,9 +85,9 @@ jobs:
           host: ${{ secrets.HETZNER_HOST }}
           username: ${{ secrets.HETZNER_USER }}
           key: ${{ secrets.HETZNER_SSH_KEY }}
-          source: "artifacts/custom_game_engine/demo/dist,artifacts/custom_game_engine/demo/server,artifacts/custom_game_engine/Dockerfile.prebuilt,artifacts/custom_game_engine/docker-compose.prod.yml,artifacts/custom_game_engine/package.json,artifacts/custom_game_engine/package-lock.json"
+          source: "artifacts/demo/dist,artifacts/demo/server,artifacts/Dockerfile.prebuilt,artifacts/docker-compose.prod.yml,artifacts/package.json,artifacts/package-lock.json"
           target: /opt/mvee/_staging/
-          strip_components: 2
+          strip_components: 1
           overwrite: true
 
       - name: Run server-side deploy script
