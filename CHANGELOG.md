@@ -6,6 +6,13 @@ Format: [Semantic Versioning](https://semver.org/). Newest first.
 
 ---
 
+## v0.1.6 — 2026-03-21
+
+### Fixes
+- Added missing `createSpellSandboxPanelFactory` adapter and factory — `build:prod` was failing because `demo/src/main.ts` imported this factory but it was never defined. Follows existing SpellbookPanel pattern. Unblocks production builds.
+
+---
+
 ## v0.1.5 — 2026-03-21
 
 ### Performance
