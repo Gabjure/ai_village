@@ -61,6 +61,9 @@ import type { BuildingComponent } from '../components/BuildingComponent.js';
 
 // === Plants & Nature ===
 import type { PlantComponent } from '../components/PlantComponent.js';
+import type { SeedComponent } from '../components/SeedComponent.js';
+import type { PlantKnowledgeComponent } from '../components/PlantKnowledgeComponent.js';
+import type { WildSeedBankComponent } from '../components/WildSeedBankComponent.js';
 
 // === Divinity ===
 import type { DeityComponent } from '../components/DeityComponent.js';
@@ -69,6 +72,9 @@ import type { SpiritualComponent } from '../components/SpiritualComponent.js';
 // === Relationships & Social ===
 import type { RelationshipComponent } from '../components/RelationshipComponent.js';
 import type { ParentingComponent } from '../components/ParentingComponent.js';
+
+// === Combat ===
+import type { ProjectileComponent } from '../components/ProjectileComponent.js';
 
 /**
  * Maps ComponentType enum values to their corresponding component interfaces.
@@ -117,8 +123,11 @@ export interface ComponentTypeMap {
   // Buildings
   [ComponentType.Building]: BuildingComponent;
 
-  // Plants
+  // Plants & Nature
   [ComponentType.Plant]: PlantComponent;
+  [ComponentType.Seed]: SeedComponent;
+  [ComponentType.PlantKnowledge]: PlantKnowledgeComponent;
+  [ComponentType.WildSeedBank]: WildSeedBankComponent;
 
   // Divinity
   [ComponentType.Deity]: DeityComponent;
@@ -127,6 +136,9 @@ export interface ComponentTypeMap {
   // Relationships & Social
   [ComponentType.Relationship]: RelationshipComponent;
   [ComponentType.Parenting]: ParentingComponent;
+
+  // Combat
+  [ComponentType.Projectile]: ProjectileComponent;
 }
 
 /**

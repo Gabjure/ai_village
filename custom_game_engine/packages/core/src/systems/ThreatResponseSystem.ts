@@ -429,7 +429,7 @@ export class ThreatResponseSystem extends BaseSystem {
     const powerLevel = Math.min(100, (projectileComp.damage ?? 20) * 2);
 
     // Determine attack type from projectile type
-    const attackType = projectileComp.type === 'spell' ? 'magic' : 'ranged';
+    const attackType = projectileComp.projectileType === 'spell' ? 'magic' : 'ranged';
 
     return {
       threatId: projectile.id,
