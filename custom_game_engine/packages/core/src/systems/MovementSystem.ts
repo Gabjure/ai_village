@@ -175,7 +175,7 @@ export class MovementSystem extends BaseSystem {
     const posArrays = positionSoA.getArrays();
     const velArrays = velocitySoA.getArrays();
 
-    const deltaTime = ctx.deltaTime / 1000; // Convert ms to seconds
+    const deltaTime = ctx.deltaTime; // Already in seconds (GameLoop passes msPerTick / 1000)
     const speedFactor = deltaTime * timeSpeedMultiplier;
 
     // Working arrays for SIMD operations (reuse to avoid allocations)
