@@ -15,8 +15,17 @@ import { createTree } from '../entities/TreeEntity.js';
 import { createRock } from '../entities/RockEntity.js';
 import { createMountain } from '../entities/MountainEntity.js';
 import { createLeafPile } from '../entities/LeafPileEntity.js';
-import { createFiberPlant } from '../entities/FiberPlantEntity.js';
 import { createBerryBush } from '../entities/BerryBushEntity.js';
+import {
+  createMushroom,
+  createFern,
+  createMoss,
+  createWildflower,
+  createGrass,
+  createWildHerb,
+  createClover,
+  createThistle,
+} from '../entities/WildPlantEntity.js';
 import {
   createIronDeposit,
   createCoalDeposit,
@@ -545,10 +554,10 @@ export class TerrainGenerator {
             // Understory plants
             else if (Math.random() < 0.5) {
               // 50% chance for mushrooms
-              createLeafPile(world, worldX, worldY); // Placeholder - mushrooms not yet implemented
+              createMushroom(world, worldX, worldY);
             } else if (Math.random() < 0.4) {
               // 40% chance for ferns
-              createLeafPile(world, worldX, worldY); // Placeholder - ferns not yet implemented
+              createFern(world, worldX, worldY);
             }
             // Moss - 60% chance
             if (Math.random() < 0.6) {
@@ -588,7 +597,7 @@ export class TerrainGenerator {
             }
             // Understory - 30% mushrooms, 30% ferns, 40% moss
             else if (Math.random() < 0.3) {
-              createLeafPile(world, worldX, worldY); // Mushroom placeholder
+              createMushroom(world, worldX, worldY);
             }
             // Leaf piles - 30% chance
             if (Math.random() < 0.3) {
@@ -640,11 +649,11 @@ export class TerrainGenerator {
           else if (forestDensity === 'clearing') {
             // No trees, wildflowers and grass
             if (Math.random() < 0.6) {
-              createFiberPlant(world, worldX, worldY); // Wildflower placeholder
+              createWildflower(world, worldX, worldY);
             }
             // Grass - 40% chance
             if (Math.random() < 0.4) {
-              createFiberPlant(world, worldX, worldY); // Grass placeholder
+              createGrass(world, worldX, worldY);
             }
             // Berry bushes - 35% chance (high in clearings - good foraging areas!)
             if (Math.random() < 0.35) {
@@ -656,7 +665,7 @@ export class TerrainGenerator {
             }
             // Wild garlic, herbs - 25% chance
             if (Math.random() < 0.25) {
-              createFiberPlant(world, worldX, worldY); // Wild garlic/herbs placeholder
+              createWildHerb(world, worldX, worldY);
             }
           }
           // Forest edge/ecotone
@@ -695,19 +704,19 @@ export class TerrainGenerator {
           if (isRockyPatch) {
             // Grass - 50% chance
             if (Math.random() < 0.5) {
-              createFiberPlant(world, worldX, worldY); // Grass placeholder
+              createGrass(world, worldX, worldY);
             }
             // Sage - 30% chance
             if (Math.random() < 0.3) {
-              createFiberPlant(world, worldX, worldY); // Sage placeholder
+              createWildHerb(world, worldX, worldY);
             }
             // Yarrow - 20% chance
             if (Math.random() < 0.2) {
-              createFiberPlant(world, worldX, worldY); // Yarrow placeholder
+              createWildHerb(world, worldX, worldY);
             }
             // Thistle - 40% chance
             if (Math.random() < 0.4) {
-              createFiberPlant(world, worldX, worldY); // Thistle placeholder
+              createThistle(world, worldX, worldY);
             }
             // Rocks - higher density (10-15%)
             if (placementValue < -0.2 && Math.random() < 0.12) {
@@ -718,42 +727,42 @@ export class TerrainGenerator {
           else if (isMeadowFlowery && placementValue > -0.1) {
             // Wildflowers - 60% chance
             if (Math.random() < 0.6) {
-              createFiberPlant(world, worldX, worldY); // Wildflower placeholder
+              createWildflower(world, worldX, worldY);
             }
             // Clover - 40% chance
             if (Math.random() < 0.4) {
-              createFiberPlant(world, worldX, worldY); // Clover placeholder
+              createClover(world, worldX, worldY);
             }
             // Yarrow - 20% chance
             if (Math.random() < 0.2) {
-              createFiberPlant(world, worldX, worldY); // Yarrow placeholder
+              createWildHerb(world, worldX, worldY);
             }
             // Sage - 15% chance
             if (Math.random() < 0.15) {
-              createFiberPlant(world, worldX, worldY); // Sage placeholder
+              createWildHerb(world, worldX, worldY);
             }
             // Grass - 30% chance
             if (Math.random() < 0.3) {
-              createFiberPlant(world, worldX, worldY); // Grass placeholder
+              createGrass(world, worldX, worldY);
             }
           }
           // Grassland (grass-heavy)
           else if (isMeadowGrassy && placementValue > 0.0) {
             // Grass - 70% chance
             if (Math.random() < 0.7) {
-              createFiberPlant(world, worldX, worldY); // Grass placeholder
+              createGrass(world, worldX, worldY);
             }
             // Clover - 30% chance
             if (Math.random() < 0.3) {
-              createFiberPlant(world, worldX, worldY); // Clover placeholder
+              createClover(world, worldX, worldY);
             }
             // Wild onion - 10% chance
             if (Math.random() < 0.1) {
-              createFiberPlant(world, worldX, worldY); // Wild onion placeholder
+              createWildHerb(world, worldX, worldY);
             }
             // Thistle - 10% chance
             if (Math.random() < 0.1) {
-              createFiberPlant(world, worldX, worldY); // Thistle placeholder
+              createThistle(world, worldX, worldY);
             }
             // Scattered trees - 5% chance
             if (placementValue > 0.3 && Math.random() < 0.05) {
@@ -780,9 +789,13 @@ export class TerrainGenerator {
             createLeafPile(world, worldX, worldY);
           }
 
-          // Fiber plants: 20% chance
+          // Ground cover: 20% chance (forest-floor herbs and clover)
           if (Math.random() < 0.20) {
-            createFiberPlant(world, worldX, worldY);
+            if (Math.random() < 0.5) {
+              createClover(world, worldX, worldY);
+            } else {
+              createWildHerb(world, worldX, worldY);
+            }
           }
         }
 
@@ -796,7 +809,7 @@ export class TerrainGenerator {
 
           // High vegetation density (marsh plants, reeds, etc.)
           if (Math.random() < 0.50) {
-            createFiberPlant(world, worldX, worldY); // Wetland plants placeholder
+            createFern(world, worldX, worldY); // Wetland plants (ferns, sedges)
           }
         }
 
@@ -810,16 +823,24 @@ export class TerrainGenerator {
 
           // Grass and hardy plants: 35% chance
           if (Math.random() < 0.35) {
-            createFiberPlant(world, worldX, worldY);
+            if (Math.random() < 0.6) {
+              createGrass(world, worldX, worldY);
+            } else {
+              createThistle(world, worldX, worldY);
+            }
           }
         }
 
         // === SCRUBLAND PLANT PLACEMENT (desert → plains transition) ===
         else if (tile.biome === 'scrubland') {
           // Scrubland: sparse vegetation
-          // Fiber plants (desert shrubs): 10% chance
+          // Desert shrubs: 10% chance
           if (Math.random() < 0.10) {
-            createFiberPlant(world, worldX, worldY);
+            if (Math.random() < 0.5) {
+              createThistle(world, worldX, worldY);
+            } else {
+              createGrass(world, worldX, worldY);
+            }
           }
 
           // Rocks: 15-20% density
@@ -863,7 +884,7 @@ export class TerrainGenerator {
 
           // Sparse tundra vegetation (lichen, moss, hardy shrubs) - 15% chance
           if (Math.random() < 0.15) {
-            createFiberPlant(world, worldX, worldY); // Arctic moss/lichen placeholder
+            createMoss(world, worldX, worldY); // Arctic moss/lichen
           }
 
           // Very rare stunted trees in sheltered areas - 2% chance
@@ -919,7 +940,7 @@ export class TerrainGenerator {
             }
             // Understory plants - 25% chance
             if (Math.random() < 0.25) {
-              createFiberPlant(world, worldX, worldY); // Ferns, moss
+              createFern(world, worldX, worldY); // Ferns, moss
             }
             // Berry bushes (lingonberries, cloudberries) - 20% chance
             if (Math.random() < 0.20) {
@@ -938,7 +959,7 @@ export class TerrainGenerator {
             }
             // Sphagnum moss and sedges - 50% chance
             if (Math.random() < 0.50) {
-              createFiberPlant(world, worldX, worldY);
+              createMoss(world, worldX, worldY);
             }
             // Cloudberries in bogs - 25% chance
             if (Math.random() < 0.25) {
@@ -952,7 +973,7 @@ export class TerrainGenerator {
             }
             // Hardy plants in rock crevices - 10% chance
             if (Math.random() < 0.10) {
-              createFiberPlant(world, worldX, worldY);
+              createMoss(world, worldX, worldY);
             }
           } else {
             // Open taiga grassland
@@ -963,7 +984,11 @@ export class TerrainGenerator {
             }
             // Ground cover - 40% chance
             if (Math.random() < 0.40) {
-              createFiberPlant(world, worldX, worldY);
+              if (Math.random() < 0.6) {
+                createGrass(world, worldX, worldY);
+              } else {
+                createWildHerb(world, worldX, worldY);
+              }
             }
           }
         }
@@ -1003,9 +1028,9 @@ export class TerrainGenerator {
 
           if (isCanopyGap) {
             // Canopy gaps - dense understory, no tall trees
-            // Dense shrubs and vines - 70% chance
+            // Dense understory ferns - 70% chance
             if (Math.random() < 0.70) {
-              createFiberPlant(world, worldX, worldY);
+              createFern(world, worldX, worldY);
             }
             // Young trees competing for light - 40% chance
             if (Math.random() < 0.40) {
@@ -1023,9 +1048,9 @@ export class TerrainGenerator {
               const treeHeight = 3 + Math.floor(Math.random() * 5);
               createTree(world, worldX, worldY, treeHeight, { speciesId: 'willow' });
             }
-            // Aquatic plants - 60% chance
+            // Aquatic/marginal plants - 60% chance
             if (Math.random() < 0.60) {
-              createFiberPlant(world, worldX, worldY);
+              createMoss(world, worldX, worldY);
             }
           } else if (isFloodplain) {
             // Floodplain - tall trees with buttress roots
@@ -1034,9 +1059,9 @@ export class TerrainGenerator {
               const treeHeight = 10 + Math.floor(Math.random() * 10);
               createTree(world, worldX, worldY, treeHeight, { speciesId: 'willow' });
             }
-            // Dense undergrowth - 55% chance
+            // Dense undergrowth ferns - 55% chance
             if (Math.random() < 0.55) {
-              createFiberPlant(world, worldX, worldY);
+              createFern(world, worldX, worldY);
             }
           } else {
             // Dense primary jungle
@@ -1052,7 +1077,11 @@ export class TerrainGenerator {
             }
             // Dense understory - 80% chance
             if (Math.random() < 0.80) {
-              createFiberPlant(world, worldX, worldY);
+              if (Math.random() < 0.6) {
+                createFern(world, worldX, worldY);
+              } else {
+                createWildflower(world, worldX, worldY);
+              }
             }
             // Leaf litter - 50% chance
             if (Math.random() < 0.50) {
