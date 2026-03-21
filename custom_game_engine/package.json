@@ -64,6 +64,7 @@
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.71.2",
+    "@sentry/browser": "^10.45.0",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
     "concurrently": "^9.2.1",
