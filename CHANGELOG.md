@@ -6,6 +6,16 @@ Format: [Semantic Versioning](https://semver.org/). Newest first.
 
 ---
 
+## v0.1.4 — 2026-03-21
+
+### Fixes
+- **Critical:** Velocity integration was 1000x too slow — agents appeared frozen and animals barely moved. `MovementSystem.batchProcessVelocity` divided `ctx.deltaTime` by 1000 a second time despite it already being in seconds. All entities now move at intended speed. Speech resumes as agents can now reach interaction range. (MUL-2839, MUL-2840)
+
+### What's New
+- 21 unit tests for LoreExportCollector wiki pipeline — improves wiki export reliability coverage
+
+---
+
 ## v0.1.0 — 2026-03-17
 
 ### What's New
