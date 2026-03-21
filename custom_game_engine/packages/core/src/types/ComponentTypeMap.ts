@@ -23,6 +23,7 @@ import type { Component } from '../ecs/Component.js';
 // === Core Components ===
 import type { AgentComponent } from '../components/AgentComponent.js';
 import type { PositionComponent } from '../components/PositionComponent.js';
+import type { VelocityComponent } from '../components/VelocityComponent.js';
 import type { MovementComponent } from '../components/MovementComponent.js';
 import type { IdentityComponent } from '../components/IdentityComponent.js';
 import type { TagsComponent } from '../components/TagsComponent.js';
@@ -88,6 +89,7 @@ export interface ComponentTypeMap {
   // Core
   [ComponentType.Agent]: AgentComponent;
   [ComponentType.Position]: PositionComponent;
+  [ComponentType.Velocity]: VelocityComponent;
   [ComponentType.Movement]: MovementComponent;
   [ComponentType.Identity]: IdentityComponent;
   [ComponentType.Tags]: TagsComponent;
