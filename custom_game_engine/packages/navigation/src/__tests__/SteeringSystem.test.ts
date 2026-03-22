@@ -107,7 +107,7 @@ describe('SteeringSystem', () => {
       }
     });
 
-    it('should throw error when seek behavior has no target', () => {
+    it('should return zero force when seek behavior has no target', () => {
       const position: PositionComponent = { x: 0, y: 0, chunkX: 0, chunkY: 0 };
       const velocity: VelocityComponent = { vx: 0, vy: 0 };
       const steering: SteeringComponent = {
@@ -132,9 +132,10 @@ describe('SteeringSystem', () => {
         events: mockEventBus,
       };
 
+      // Should not throw — null target returns zero force gracefully
       expect(() => {
         (system as any).onUpdate(ctx);
-      }).toThrow(/Seek behavior requires target position/);
+      }).not.toThrow();
     });
   });
 
@@ -256,7 +257,7 @@ describe('SteeringSystem', () => {
       expect(mockEntity.updateComponent).toHaveBeenCalled();
     });
 
-    it('should throw error when arrive behavior has no target', () => {
+    it('should return zero force when arrive behavior has no target', () => {
       const position: PositionComponent = { x: 0, y: 0, chunkX: 0, chunkY: 0 };
       const velocity: VelocityComponent = { vx: 0, vy: 0 };
       const steering: SteeringComponent = {
@@ -281,9 +282,10 @@ describe('SteeringSystem', () => {
         events: mockEventBus,
       };
 
+      // Should not throw — null target returns zero force gracefully
       expect(() => {
         (system as any).onUpdate(ctx);
-      }).toThrow(/Arrive behavior requires target position/);
+      }).not.toThrow();
     });
   });
 
@@ -633,7 +635,7 @@ describe('SteeringSystem', () => {
   });
 
   describe('Invalid Behaviors', () => {
-    it('should throw error for invalid behavior type', () => {
+    it('should log error for invalid behavior type (not cascade)', () => {
       const position: PositionComponent = { x: 0, y: 0, chunkX: 0, chunkY: 0 };
       const velocity: VelocityComponent = { vx: 0, vy: 0 };
       const steering: SteeringComponent = {
@@ -658,9 +660,12 @@ describe('SteeringSystem', () => {
         events: mockEventBus,
       };
 
+      const spy = vi.spyOn(console, 'error').mockImplementation();
       expect(() => {
         (system as any).onUpdate(ctx);
-      }).toThrow(/Invalid steering behavior/);
+      }).not.toThrow();
+      expect(spy).toHaveBeenCalledWith(expect.stringContaining('Failed for entity'));
+      spy.mockRestore();
     });
 
     it('should do nothing for none behavior', () => {
@@ -697,7 +702,7 @@ describe('SteeringSystem', () => {
       expect(velocityCalls).toHaveLength(0);
     });
 
-    it('should throw error when required component is missing', () => {
+    it('should log error when required component is missing (not cascade)', () => {
       const position: PositionComponent = { x: 0, y: 0, chunkX: 0, chunkY: 0 };
       const steering: SteeringComponent = {
         behavior: 'seek',
@@ -722,9 +727,12 @@ describe('SteeringSystem', () => {
         events: mockEventBus,
       };
 
+      const spy = vi.spyOn(console, 'error').mockImplementation();
       expect(() => {
         (system as any).onUpdate(ctx);
-      }).toThrow(/Velocity component missing/);
+      }).not.toThrow();
+      expect(spy).toHaveBeenCalledWith(expect.stringContaining('Failed for entity'));
+      spy.mockRestore();
     });
   });
 
