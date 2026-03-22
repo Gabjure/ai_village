@@ -15,6 +15,7 @@ import type { ResourceComponent } from '../components/ResourceComponent.js';
 import type { NeedsComponent } from '../components/NeedsComponent.js';
 import type { PositionComponent } from '../components/PositionComponent.js';
 import type { GatheringStatsComponent } from '../components/GatheringStatsComponent.js';
+import type { DroppedItemComponent } from '../components/DroppedItemComponent.js';
 import { addToInventory } from '../components/InventoryComponent.js';
 import { recordGathered, recordDeposited } from '../components/GatheringStatsComponent.js';
 import { ComponentType } from '../types/ComponentType.js';
@@ -558,15 +559,14 @@ export class InteractionAPI {
     }
 
     const itemImpl = itemEntity as EntityImpl;
-    interface ItemData { itemId: string; quantity?: number }
-    const item = itemImpl.getComponent(ComponentType.Item) as unknown as ItemData | undefined;
+    const item = itemImpl.getComponent<DroppedItemComponent>(ComponentType.Item);
     if (!item) {
       return { success: false, message: 'Target is not an item' };
     }
 
     // Try to add to inventory
     try {
-      const result = addToInventory(inventory, item.itemId, item.quantity || 1);
+      const result = addToInventory(inventory, item.itemType, item.quantity || 1);
       agent.updateComponent<InventoryComponent>(ComponentType.Inventory, () => result.inventory);
 
       // Remove item from world (use WorldMutator for entity destruction)
@@ -579,15 +579,15 @@ export class InteractionAPI {
         data: {
           entityId: agent.id,
           agentId: agent.id,
-          changes: [{ itemId: item.itemId, delta: result.amountAdded }],
+          changes: [{ itemId: item.itemType, delta: result.amountAdded }],
         },
       });
 
       return {
         success: true,
-        message: `Picked up ${item.itemId}`,
+        message: `Picked up ${item.itemType}`,
         data: {
-          itemId: item.itemId,
+          itemId: item.itemType,
           quantity: result.amountAdded,
         },
       };
