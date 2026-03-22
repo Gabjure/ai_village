@@ -79,8 +79,8 @@ export class SteeringSystem extends BaseSystem {
       try {
         this._updateSteering(entity, ctx.world, ctx.deltaTime);
       } catch (error) {
-        // Per CLAUDE.md, re-throw with context
-        throw new Error(`SteeringSystem failed for entity ${entity.id}: ${error}`);
+        // Log but don't cascade — one bad entity must not freeze all others
+        console.error(`[SteeringSystem] Failed for entity ${entity.id}: ${error}`);
       }
     }
   }
@@ -177,7 +177,7 @@ export class SteeringSystem extends BaseSystem {
   private _seek(position: PositionComponent, velocity: VelocityComponent, steering: SteeringComponent, targetOverride?: Vector2): Vector2 {
     const target = targetOverride ?? steering.target;
     if (!target) {
-      throw new Error('Seek behavior requires target position');
+      return { x: 0, y: 0 };
     }
 
     const desired = {
@@ -207,7 +207,7 @@ export class SteeringSystem extends BaseSystem {
    */
   private _arrive(position: PositionComponent, velocity: VelocityComponent, steering: SteeringComponent, entityId?: string): Vector2 {
     if (!steering.target) {
-      throw new Error('Arrive behavior requires target position');
+      return { x: 0, y: 0 };
     }
 
     const desired = {

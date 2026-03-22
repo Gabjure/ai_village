@@ -9,8 +9,9 @@ import { EntityImpl } from '../ecs/Entity.js';
  * SoASyncSystem - Synchronizes Structure-of-Arrays storage with component changes.
  *
  * This system keeps world.positionSoA and world.velocitySoA in sync with
- * Position and Velocity components. It runs early in the frame (priority 10)
- * to ensure SoA data is up-to-date before systems use it.
+ * Position and Velocity components. It runs after SteeringSystem (priority 15)
+ * but before MovementSystem (priority 20) to ensure SoA data reflects
+ * THIS tick's velocity updates, not last tick's.
  *
  * Performance:
  * - Uses DirtyTracker to only sync CHANGED entities (not all entities)
@@ -24,7 +25,7 @@ import { EntityImpl } from '../ecs/Entity.js';
  */
 export class SoASyncSystem extends BaseSystem {
   public readonly id: SystemId = 'soa_sync';
-  public readonly priority: number = 10; // Early infrastructure (after Time)
+  public readonly priority: number = 17; // After SteeringSystem (15), before MovementSystem (20)
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [];
   protected readonly throttleInterval = 0; // EVERY_TICK - must stay in sync
   // PERF: Skip system entirely when no positioned/moving entities exist
