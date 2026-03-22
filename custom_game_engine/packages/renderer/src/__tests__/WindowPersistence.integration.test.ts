@@ -548,16 +548,27 @@ describe('Window Persistence (localStorage)', () => {
         defaultHeight: 400,
       });
 
-      // Spy on localStorage directly (Storage.prototype may not be used by jsdom)
-      const spy = vi.spyOn(localStorage, 'setItem').mockImplementation(() => {
-        throw new DOMException('QuotaExceededError', 'QuotaExceededError');
-      });
+      // jsdom's localStorage doesn't reliably proxy through Storage.prototype,
+      // so replace the global entirely to simulate quota exceeded
+      const original = globalThis.localStorage;
+      const fakeStorage = {
+        ...original,
+        getItem: original.getItem.bind(original),
+        setItem: () => {
+          throw new DOMException('QuotaExceededError', 'QuotaExceededError');
+        },
+        removeItem: original.removeItem.bind(original),
+        clear: original.clear.bind(original),
+        key: original.key.bind(original),
+        get length() { return original.length; },
+      };
+      Object.defineProperty(globalThis, 'localStorage', { value: fakeStorage, writable: true, configurable: true });
 
       expect(() => {
         windowManager.saveLayout();
       }).toThrow('Failed to save window layout');
 
-      spy.mockRestore();
+      Object.defineProperty(globalThis, 'localStorage', { value: original, writable: true, configurable: true });
     });
 
     it('should not use default values when required fields are missing in saved data', () => {
