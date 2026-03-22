@@ -114,7 +114,7 @@ export class AchievementService extends BaseSystem {
 
     const win = typeof window !== 'undefined' ? window : undefined;
     const metricsUrl = win ? (win as Window & { __METRICS_URL?: string }).__METRICS_URL : undefined;
-    const baseUrl = metricsUrl ?? 'http://localhost:8766';
+    const baseUrl = metricsUrl ?? (import.meta.env?.VITE_PLANET_SERVER_URL as string) ?? 'http://localhost:8766';
 
     await fetch(`${baseUrl}/api/achievements/unlock`, {
       method: 'POST',

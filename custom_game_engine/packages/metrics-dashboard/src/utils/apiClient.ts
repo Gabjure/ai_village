@@ -1,4 +1,4 @@
-const API_BASE_URL = 'http://localhost:8766';
+const API_BASE_URL = (import.meta.env?.VITE_PLANET_SERVER_URL as string) || 'http://localhost:8766';
 
 export class APIError extends Error {
   constructor(
