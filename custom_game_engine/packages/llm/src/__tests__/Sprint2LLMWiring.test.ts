@@ -63,6 +63,7 @@ const createMockWorld = () => ({
   query: vi.fn().mockReturnValue({
     with: vi.fn().mockReturnThis(),
     without: vi.fn().mockReturnThis(),
+    execute: vi.fn().mockReturnValue([]),
     executeEntities: vi.fn().mockReturnValue([]),
   }),
   spatialQuery: {

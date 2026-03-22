@@ -33,6 +33,7 @@ import { StructuredPromptBuilder } from './StructuredPromptBuilder.js';
 import { TalkerPromptBuilder } from './TalkerPromptBuilder.js';
 import { ExecutorPromptBuilder } from './ExecutorPromptBuilder.js';
 import type { LLMDecisionQueue } from './LLMDecisionQueue.js';
+import { mveePolicy, IDENTITY_TO_POLICY_SPECIES } from './MVEEPolicyInference.js';
 
 /**
  * Decision layer type
@@ -414,6 +415,32 @@ export class LLMScheduler {
     // (cooldown starts when we decide to invoke, not when LLM responds)
     const state = this.getAgentState(agent.id);
     state.lastInvocation[selection.layer] = Date.now();
+
+    // -----------------------------------------------------------------------
+    // SYSTEM 1 FAST PATH: Try species-specific NN before LLM queue.
+    // If the NN is confident, synthesize a response and skip the LLM call.
+    // This implements the Talker-Reasoner dual-process pattern.
+    // -----------------------------------------------------------------------
+    if (mveePolicy.isEnabled() && mveePolicy.hasSpeciesModels() && selection.layer !== 'autonomic') {
+      const identity = agent.components.get('identity') as { species?: string } | undefined;
+      const policySpecies = identity?.species ? IDENTITY_TO_POLICY_SPECIES[identity.species] : undefined;
+
+      if (policySpecies && mveePolicy.hasSpeciesModel(policySpecies)) {
+        const prompt = this.buildPrompt(selection.layer, agent, world);
+        const nnResult = mveePolicy.inferSpecies(prompt, policySpecies);
+
+        if (nnResult) {
+          this.metrics.successfulCalls++;
+          // Synthesize a JSON response matching the format parseLLMResponse expects
+          const syntheticResponse = JSON.stringify({ action: { type: nnResult.action } });
+          return {
+            layer: selection.layer,
+            response: syntheticResponse,
+            reason: `${selection.reason} [NN:${policySpecies} conf=${nnResult.confidence.toFixed(2)}]`,
+          };
+        }
+      }
+    }
 
     // LAZY PROMPT BUILDING: Pass a builder function instead of a built prompt.
     // The prompt will be built at send-time (when request reaches front of queue),

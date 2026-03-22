@@ -242,3 +242,9 @@ export * from './SpellSandboxService';
 
 export * from './OpusPromptBuilder';
 export * from './OpusGeneratorService';
+
+// ============================================================================
+// Policy NN Inference (Species-specific distilled NNs — System 1 fast path)
+// ============================================================================
+
+export * from './MVEEPolicyInference';

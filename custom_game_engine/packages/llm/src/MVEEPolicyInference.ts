@@ -54,13 +54,28 @@ export const EXECUTOR_ACTIONS = [
   'wander',
 ] as const;
 
+/** Unified action list for species policy NNs (talker + executor combined). */
+export const SPECIES_ACTIONS = [
+  ...TALKER_ACTIONS,
+  ...EXECUTOR_ACTIONS,
+] as const;
+
 export type TalkerAction = typeof TALKER_ACTIONS[number];
 export type ExecutorAction = typeof EXECUTOR_ACTIONS[number];
+export type SpeciesAction = typeof SPECIES_ACTIONS[number];
+
+/** Maps IdentityComponent.species to trained policy species name. */
+export const IDENTITY_TO_POLICY_SPECIES: Record<string, string> = {
+  human: 'norn',
+  dwarf: 'dvergar',
+  elf: 'valkyr',
+  animal: 'grendel',
+};
 
 export interface NNInferenceResult {
   action: string;
   confidence: number;
-  layer: 'talker' | 'executor';
+  layer: 'talker' | 'executor' | 'species';
 }
 
 // ---------------------------------------------------------------------------
@@ -298,6 +313,14 @@ interface ExecutorScratch {
   out13: Float32Array;   // 13
 }
 
+interface SpeciesScratch {
+  input: Float32Array;   // 40
+  h128a: Float32Array;   // 128
+  h256: Float32Array;    // 256
+  h128b: Float32Array;   // 128
+  out19: Float32Array;   // 19
+}
+
 // ---------------------------------------------------------------------------
 // Forward passes
 // ---------------------------------------------------------------------------
@@ -346,6 +369,28 @@ function executorForward(input: Float32Array, w: Record<string, number[] | numbe
   return { actionIdx: maxIdx, confidence };
 }
 
+/** SpeciesNN: 40 → 128 → 256 → 128 → 19. Same layer structure as TalkerNN. */
+function speciesForward(input: Float32Array, w: Record<string, number[] | number[][]>, s: SpeciesScratch): { actionIdx: number; confidence: number } {
+  // net.0: Linear(40→128), net.1: LayerNorm(128), GELU
+  linearInPlace(input, w, 0, s.h128a);
+  layerNormInPlace(s.h128a, w, 1, s.h128a);
+  geluInPlace(s.h128a, 128);
+  // net.3: Linear(128→256), net.4: LayerNorm(256), GELU, Dropout(skip)
+  linearInPlace(s.h128a, w, 3, s.h256);
+  layerNormInPlace(s.h256, w, 4, s.h256);
+  geluInPlace(s.h256, 256);
+  // net.7: Linear(256→128), net.8: LayerNorm(128), GELU
+  linearInPlace(s.h256, w, 7, s.h128b);
+  layerNormInPlace(s.h128b, w, 8, s.h128b);
+  geluInPlace(s.h128b, 128);
+  // net.10: Linear(128→19), Softmax
+  linearInPlace(s.h128b, w, 10, s.out19);
+  const confidence = softmaxInPlace(s.out19, 19);
+  let maxIdx = 0;
+  for (let i = 1; i < 19; i++) if (f(s.out19, i) > f(s.out19, maxIdx)) maxIdx = i;
+  return { actionIdx: maxIdx, confidence };
+}
+
 // ---------------------------------------------------------------------------
 // Public API
 // ---------------------------------------------------------------------------
@@ -356,6 +401,10 @@ export class MVEEPolicyInference {
   private executorWeights: Record<string, number[] | number[][]> | null = null;
   private executorActions: string[] = [];
   private enabled = false;
+
+  /** Per-species unified policy weights keyed by species name (norn, dvergar, etc.). */
+  private speciesWeights: Map<string, Record<string, number[] | number[][]>> = new Map();
+  private speciesActions: Map<string, string[]> = new Map();
 
   /** Pre-allocated scratch buffers — one set per layer, reused every inference call. */
   private readonly _talkerScratch: TalkerScratch = {
@@ -374,6 +423,14 @@ export class MVEEPolicyInference {
     out13: new Float32Array(13),
   };
 
+  private readonly _speciesScratch: SpeciesScratch = {
+    input: new Float32Array(FEATURE_DIM),
+    h128a: new Float32Array(128),
+    h256: new Float32Array(256),
+    h128b: new Float32Array(128),
+    out19: new Float32Array(19),
+  };
+
   /** LLM calls saved by NN (for metrics). */
   private _calls = { nnServed: 0, llmFallback: 0 };
 
@@ -387,7 +444,7 @@ export class MVEEPolicyInference {
     }
     this.talkerWeights = weights.weights;
     this.talkerActions = weights.actions;
-    console.log(`[MVEEPolicy] Loaded TalkerNN (${weights.output_dim} classes)`);
+    console.warn(`[MVEEPolicy] Loaded TalkerNN (${weights.output_dim} classes)`);
   }
 
   /**
@@ -399,7 +456,7 @@ export class MVEEPolicyInference {
     }
     this.executorWeights = weights.weights;
     this.executorActions = weights.actions;
-    console.log(`[MVEEPolicy] Loaded ExecutorNN (${weights.output_dim} classes)`);
+    console.warn(`[MVEEPolicy] Loaded ExecutorNN (${weights.output_dim} classes)`);
   }
 
   async loadFromURL(talkerUrl: string, executorUrl: string): Promise<void> {
@@ -410,15 +467,58 @@ export class MVEEPolicyInference {
     this.loadExecutorModel(await executorResp.json() as ModelWeights);
   }
 
+  /**
+   * Load a species-specific unified policy NN (40→128→256→128→19).
+   * Species name should match training output: norn, dvergar, grendel, valkyr.
+   */
+  loadSpeciesModel(species: string, weights: ModelWeights): void {
+    if (weights.input_dim !== FEATURE_DIM) {
+      throw new Error(`MVEEPolicy: species ${species} model input_dim=${weights.input_dim} but expected ${FEATURE_DIM}`);
+    }
+    this.speciesWeights.set(species, weights.weights);
+    this.speciesActions.set(species, weights.actions);
+    console.warn(`[MVEEPolicy] Loaded species policy: ${species} (${weights.output_dim} actions)`);
+  }
+
+  /**
+   * Load all 4 species policy weights from URLs.
+   * URLs should point to JSON files matching training/weights/species/{species}_policy.json.
+   */
+  async loadSpeciesFromURLs(speciesUrls: Record<string, string>): Promise<void> {
+    const entries = Object.entries(speciesUrls);
+    const responses = await Promise.all(entries.map(([, url]) => fetch(url)));
+    for (let i = 0; i < entries.length; i++) {
+      const [species] = entries[i]!;
+      const resp = responses[i]!;
+      if (!resp.ok) throw new Error(`Failed to load species policy for ${species} from ${entries[i]![1]}`);
+      this.loadSpeciesModel(species, await resp.json() as ModelWeights);
+    }
+  }
+
+  /** Check if a species policy is loaded. */
+  hasSpeciesModel(species: string): boolean {
+    return this.speciesWeights.has(species);
+  }
+
+  /** Get list of loaded species. */
+  getLoadedSpecies(): string[] {
+    return Array.from(this.speciesWeights.keys());
+  }
+
   setEnabled(on: boolean): void {
     this.enabled = on;
-    console.log(`[MVEEPolicy] ${on ? 'Enabled' : 'Disabled'}`);
+    console.warn(`[MVEEPolicy] ${on ? 'Enabled' : 'Disabled'}`);
   }
 
   isEnabled(): boolean { return this.enabled; }
 
   hasModels(): boolean {
     return this.talkerWeights !== null && this.executorWeights !== null;
+  }
+
+  /** Check if species policies are loaded and ready. */
+  hasSpeciesModels(): boolean {
+    return this.speciesWeights.size > 0;
   }
 
   /**
@@ -461,6 +561,38 @@ export class MVEEPolicyInference {
       return null;
     }
 
+    return null;
+  }
+
+  /**
+   * Attempt species-specific NN inference.
+   *
+   * Uses the unified 19-action policy NN for the given species.
+   * The species name should be the policy species (norn, dvergar, grendel, valkyr),
+   * not the IdentityComponent species. Use IDENTITY_TO_POLICY_SPECIES to map.
+   *
+   * Returns null if disabled, no model loaded, or confidence < threshold.
+   */
+  inferSpecies(prompt: string, species: string): NNInferenceResult | null {
+    if (!this.enabled) return null;
+
+    const weights = this.speciesWeights.get(species);
+    const actions = this.speciesActions.get(species);
+    if (!weights || !actions) return null;
+
+    const features = extractFeatures(prompt);
+    features.forEach((v, i) => { this._speciesScratch.input[i] = v; });
+    const { actionIdx, confidence } = speciesForward(this._speciesScratch.input, weights, this._speciesScratch);
+    const action = actions[actionIdx] ?? 'idle';
+
+    if (confidence >= NN_CONFIDENCE_THRESHOLD) {
+      this._calls.nnServed++;
+      // Determine effective layer based on which action set the action belongs to
+      const isTalkerAction = (TALKER_ACTIONS as readonly string[]).includes(action);
+      return { action, confidence, layer: isTalkerAction ? 'talker' : 'executor' };
+    }
+
+    this._calls.llmFallback++;
     return null;
   }
 

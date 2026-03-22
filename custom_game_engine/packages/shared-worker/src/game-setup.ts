@@ -30,7 +30,7 @@ import {
 
 import type { LLMDecisionQueue } from '@ai-village/llm';
 import type { StructuredPromptBuilder } from '@ai-village/llm';
-import { TalkerPromptBuilder, ExecutorPromptBuilder } from '@ai-village/llm';
+import { TalkerPromptBuilder, ExecutorPromptBuilder, mveePolicy } from '@ai-village/llm';
 import { getPlantSpecies } from '@ai-village/world';
 import {
   PlantSystem,
@@ -58,6 +58,13 @@ export interface GameSetupConfig {
 
   /** Enable auto-save (disable for headless/worker) */
   enableAutoSave?: boolean;
+
+  /**
+   * Base URL for species policy NN weight files.
+   * Weight files are expected at: {speciesPolicyBaseUrl}/{species}_policy.json
+   * If provided, enables NN-based System 1 fast path for agent decisions.
+   */
+  speciesPolicyBaseUrl?: string;
 }
 
 export interface GameSetupResult {
@@ -147,6 +154,25 @@ export async function setupGameSystems(
       liveEntityAPI.setExecutorPromptBuilder(executorPromptBuilder);
       liveEntityAPI.attach(streamClient);
     }
+  }
+
+  // 8. Load species policy NNs for System 1 fast path (non-blocking)
+  if (config.speciesPolicyBaseUrl) {
+    const baseUrl = config.speciesPolicyBaseUrl.replace(/\/$/, '');
+    const speciesUrls: Record<string, string> = {
+      norn: `${baseUrl}/norn_policy.json`,
+      dvergar: `${baseUrl}/dvergar_policy.json`,
+      grendel: `${baseUrl}/grendel_policy.json`,
+      valkyr: `${baseUrl}/valkyr_policy.json`,
+    };
+    mveePolicy.loadSpeciesFromURLs(speciesUrls)
+      .then(() => {
+        mveePolicy.setEnabled(true);
+        console.warn(`[GameSetup] Species policy NNs loaded (${mveePolicy.getLoadedSpecies().join(', ')})`);
+      })
+      .catch((err) => {
+        console.error('[GameSetup] Failed to load species policy NNs:', err);
+      });
   }
 
   return {
