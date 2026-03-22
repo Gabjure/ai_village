@@ -150,6 +150,9 @@ export function findSpriteWithFallback(traits: SpriteTraits): SpriteLookupResult
     }
   }
 
+  if (!bestMatch) {
+    console.error(`[SpriteRegistry] No sprite match for species="${traits.species}" gender="${traits.gender ?? 'undefined'}" — falling back to 'villager'. Add a mapping for this species.`);
+  }
   const folderId = bestMatch?.folderId || 'villager';
 
   // Build the ideal folder ID for generation if not an exact match
@@ -226,14 +229,22 @@ export function getSpritesForSpecies(species: string): string[] {
  * Normalize hair color names to match sprite naming
  */
 export function normalizeHairColor(color: string): string {
-  return hairColorMap[color.toLowerCase()] || 'brown';
+  const normalized = hairColorMap[color.toLowerCase()];
+  if (!normalized) {
+    console.error(`[SpriteRegistry] Unknown hair color "${color}" — no mapping exists. Falling back to 'brown'.`);
+  }
+  return normalized || 'brown';
 }
 
 /**
  * Normalize skin tone names to match sprite naming
  */
 export function normalizeSkinTone(tone: string): string {
-  return skinToneMap[tone.toLowerCase()] || 'medium';
+  const normalized = skinToneMap[tone.toLowerCase()];
+  if (!normalized) {
+    console.error(`[SpriteRegistry] Unknown skin tone "${tone}" — no mapping exists. Falling back to 'medium'.`);
+  }
+  return normalized || 'medium';
 }
 
 /**

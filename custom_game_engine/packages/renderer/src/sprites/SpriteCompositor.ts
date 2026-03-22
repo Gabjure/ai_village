@@ -179,7 +179,7 @@ export class SpriteCompositor {
         frameRect.x + frameRect.width > part.def.sheetWidth ||
         frameRect.y + frameRect.height > part.def.sheetHeight
       ) {
-        // Frame doesn't exist in this sheet, skip
+        console.error(`[SpriteCompositor] Frame overflow for part "${part.def.id}" anim="${animation}" dir=${direction} frame=${frameIndex}: rect(${frameRect.x},${frameRect.y},${frameRect.width},${frameRect.height}) exceeds sheet(${part.def.sheetWidth},${part.def.sheetHeight})`);
         continue;
       }
 
@@ -230,6 +230,7 @@ export class SpriteCompositor {
         frameRect.x + frameRect.width > part.def.sheetWidth ||
         frameRect.y + frameRect.height > part.def.sheetHeight
       ) {
+        console.error(`[SpriteCompositor] Frame overflow for part "${part.def.id}" anim="${animation}" dir=${direction} frame=${frameIndex}: rect(${frameRect.x},${frameRect.y},${frameRect.width},${frameRect.height}) exceeds sheet(${part.def.sheetWidth},${part.def.sheetHeight})`);
         continue;
       }
 

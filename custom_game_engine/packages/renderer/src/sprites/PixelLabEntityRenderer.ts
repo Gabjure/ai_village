@@ -40,25 +40,14 @@ export class PixelLabEntityRenderer {
    * Render a simple placeholder for entities while their sprite loads.
    */
   private renderPlaceholder(x: number, y: number, size: number, type: 'agent' | 'animal'): void {
-    const centerX = x + size / 2;
-    const centerY = y + size / 2;
-
-    if (type === 'agent') {
-      // Simple humanoid silhouette
-      this.ctx.fillStyle = '#6b8ba8'; // Grayish blue
-      // Head
-      this.ctx.beginPath();
-      this.ctx.arc(centerX, centerY - size * 0.25, size * 0.15, 0, Math.PI * 2);
-      this.ctx.fill();
-      // Body
-      this.ctx.fillRect(centerX - size * 0.15, centerY - size * 0.1, size * 0.3, size * 0.4);
-    } else {
-      // Simple animal shape
-      this.ctx.fillStyle = '#8b6f47'; // Brown
-      this.ctx.beginPath();
-      this.ctx.ellipse(centerX, centerY, size * 0.4, size * 0.25, 0, 0, Math.PI * 2);
-      this.ctx.fill();
-    }
+    // Bright magenta placeholder — missing sprites must be visually obvious
+    this.ctx.fillStyle = '#FF00FF';
+    this.ctx.fillRect(x, y, size, size);
+    // Label
+    this.ctx.fillStyle = '#000000';
+    this.ctx.font = `${Math.max(8, size * 0.2)}px monospace`;
+    this.ctx.textAlign = 'center';
+    this.ctx.fillText(type === 'agent' ? 'NO SPRITE' : 'NO ANIMAL', x + size / 2, y + size / 2 + 4);
   }
 
   /**
@@ -120,7 +109,9 @@ export class PixelLabEntityRenderer {
       if (failedTime !== undefined) {
         const timeSinceFailure = Date.now() - failedTime;
         if (timeSinceFailure < this.SPRITE_RETRY_DELAY_MS) {
-          return false; // Too soon to retry, use fallback
+          // Render magenta placeholder so missing sprite is visible
+          this.renderPlaceholder(x, y, size, animal ? 'animal' : 'agent');
+          return true;
         }
         // Enough time has passed, clear the failure and allow retry
         this.failedSprites.delete(spriteFolderId);
@@ -144,15 +135,9 @@ export class PixelLabEntityRenderer {
           });
       }
 
-      // Render blurred placeholder while loading
-      this.ctx.save();
-      this.ctx.filter = 'blur(4px)';
-      this.ctx.globalAlpha = 0.6;
+      // Render magenta placeholder while loading — missing sprites must be visible
       this.renderPlaceholder(x, y, size, animal ? 'animal' : 'agent');
-      this.ctx.filter = 'none';
-      this.ctx.globalAlpha = 1.0;
-      this.ctx.restore();
-      return true; // We rendered a placeholder
+      return true;
     }
 
     // Get or create instance for this entity
@@ -160,7 +145,11 @@ export class PixelLabEntityRenderer {
     if (!instanceId) {
       instanceId = `entity_${entity.id}`;
       const instance = this.pixelLabLoader.createInstance(instanceId, spriteFolderId);
-      if (!instance) return false;
+      if (!instance) {
+        console.error(`[PixelLabEntityRenderer] Failed to create sprite instance for entity ${entity.id}, folder "${spriteFolderId}"`);
+        this.renderPlaceholder(x, y, size, animal ? 'animal' : 'agent');
+        return true;
+      }
       this.entitySpriteInstances.set(entity.id, instanceId);
     }
 
