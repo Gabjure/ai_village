@@ -1277,13 +1277,13 @@ export class PixiJSRenderer implements IRenderer {
     }
 
     // Check for agent speech and show speech bubble
-    const agent = entity.getComponent('agent') as { recentSpeech?: string } | undefined;
+    const agent = entity.getComponent('agent') as { recentSpeech?: string; speechSource?: string } | undefined;
     if (agent?.recentSpeech) {
       const lastShown = this.shownSpeech.get(entity.id);
       // Only show if it's a new speech (different from last shown)
       if (lastShown !== agent.recentSpeech) {
         this.shownSpeech.set(entity.id, agent.recentSpeech);
-        this.showSpeechBubble(entity.id, agent.recentSpeech);
+        this.showSpeechBubble(entity.id, agent.recentSpeech, agent.speechSource === 'fallback' ? 1500 : 3000);
       }
     }
   }

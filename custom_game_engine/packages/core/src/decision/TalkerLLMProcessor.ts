@@ -384,6 +384,7 @@ export class TalkerLLMProcessor {
           ...current,
           personalGoal: typedAction.goal,
           recentSpeech: speaking,
+          speechSource: 'llm',
           lastThought: thinking,
         }));
 
@@ -411,6 +412,7 @@ export class TalkerLLMProcessor {
           ...current,
           mediumTermGoal: typedAction.goal,
           recentSpeech: speaking,
+          speechSource: 'llm',
           lastThought: thinking,
         }));
 
@@ -438,6 +440,7 @@ export class TalkerLLMProcessor {
           ...current,
           groupGoal: typedAction.goal,
           recentSpeech: speaking,
+          speechSource: 'llm',
           lastThought: thinking,
         }));
 
@@ -491,6 +494,7 @@ export class TalkerLLMProcessor {
         entity.updateComponent<AgentComponent>(ComponentType.Agent, (current) => ({
           ...current,
           recentSpeech: speaking,
+          speechSource: 'llm',
           lastThought: thinking || `I've named this place "${locationName}"`,
         }));
 
@@ -523,6 +527,7 @@ export class TalkerLLMProcessor {
             behavior: selectedBehavior.behavior,
             behaviorState: selectedBehavior.behaviorState,
             recentSpeech: speaking,
+            speechSource: 'llm',
             lastThought: thinking,
           }));
 
@@ -554,6 +559,7 @@ export class TalkerLLMProcessor {
           ...current,
           priorities,
           recentSpeech: speaking,
+          speechSource: 'llm',
           lastThought: thinking,
         }));
 
@@ -586,6 +592,7 @@ export class TalkerLLMProcessor {
           // DO NOT change behavior - talking happens alongside current activity
           behaviorState: { ...current.behaviorState, conversationPartnerId: partnerId },
           recentSpeech: speaking,
+          speechSource: 'llm',
           lastThought: thinking,
         }));
 
@@ -620,6 +627,7 @@ export class TalkerLLMProcessor {
           behavior: 'follow_agent',
           behaviorState: { targetId },
           recentSpeech: speaking,
+          speechSource: 'llm',
           lastThought: thinking,
         }));
 
@@ -651,6 +659,7 @@ export class TalkerLLMProcessor {
       entity.updateComponent<AgentComponent>(ComponentType.Agent, (current) => ({
         ...current,
         recentSpeech: speaking,
+        speechSource: 'llm',
         lastThought: thinking,
       }));
     }

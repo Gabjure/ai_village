@@ -815,7 +815,7 @@ export class Renderer {
 
       // Register agent speech for speech bubble rendering
       if (agent?.recentSpeech) {
-        this.getSpeechBubbleRenderer().registerSpeech(entity.id, agent.recentSpeech);
+        this.getSpeechBubbleRenderer().registerSpeech(entity.id, agent.recentSpeech, agent.speechSource === 'fallback');
       }
 
       // Draw Z's above sleeping agents

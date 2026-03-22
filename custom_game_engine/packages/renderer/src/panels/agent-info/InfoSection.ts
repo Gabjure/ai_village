@@ -619,12 +619,14 @@ export class InfoSection {
       renderSeparator(ctx, x, currentY, this.panelWidth, padding);
       currentY += 10;
 
+      const isFallbackSpeech = agent.speechSource === 'fallback';
       ctx.fillStyle = '#FFFFFF';
       ctx.font = 'bold 14px monospace';
-      ctx.fillText('💬 Said', x + padding, currentY);
+      const speechLabel = isFallbackSpeech ? '💬 Said (fallback)' : '💬 Said';
+      ctx.fillText(speechLabel, x + padding, currentY);
       currentY += lineHeight + 5;
 
-      ctx.fillStyle = '#AADDFF';
+      ctx.fillStyle = isFallbackSpeech ? '#888888' : '#AADDFF';
       ctx.font = '11px monospace';
       currentY = renderWrappedText(ctx, `"${agent.recentSpeech}"`, x, currentY, padding, lineHeight, this.panelWidth - padding * 2, 2);
     }

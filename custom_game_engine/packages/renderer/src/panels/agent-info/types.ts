@@ -42,6 +42,7 @@ export interface AgentComponentData {
     customHeaders?: Record<string, string>;
   };
   recentSpeech?: string;
+  speechSource?: 'llm' | 'fallback';
   lastThought?: string;
   speechHistory?: Array<{ text: string; tick: number }>;
   personalGoal?: string;

@@ -977,6 +977,7 @@ export class LLMDecisionProcessor {
         currentQueueIndex: behaviorQueue ? 0 : undefined,
         llmCooldown: 1200, // 1 minute cooldown at 20 TPS
         recentSpeech: speaking, // Store speech for nearby agents to hear
+        speechSource: 'llm',
         lastThought: thinking, // Store thinking for UI display
       }));
 
@@ -1058,6 +1059,8 @@ export class LLMDecisionProcessor {
             ...current,
             behavior: 'gather',
             behaviorState: { resourceType: preferredType },
+            speechSource: 'fallback',
+            recentSpeech: undefined,
           }));
           return {
             changed: true,

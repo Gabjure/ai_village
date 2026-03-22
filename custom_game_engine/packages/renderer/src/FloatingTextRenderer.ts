@@ -8,6 +8,7 @@ export interface FloatingText {
   startTime: number;
   duration: number;
   active: boolean; // For object pooling
+  driftX: number;  // Horizontal drift in pixels for organic rise effect
 }
 
 /**
@@ -40,6 +41,7 @@ export class FloatingTextRenderer {
       startTime: 0,
       duration: 0,
       active: true,
+      driftX: 0,
     };
   }
 
@@ -62,6 +64,8 @@ export class FloatingTextRenderer {
     ft.color = color;
     ft.startTime = Date.now();
     ft.duration = duration;
+    // Small random horizontal drift (±10px) so simultaneous popups don't stack identically
+    ft.driftX = (Math.random() - 0.5) * 20;
     this.texts.push(ft);
   }
 
@@ -113,13 +117,38 @@ export class FloatingTextRenderer {
       const screenX = (ft.worldX - cameraX) * zoom + halfWidth;
       const screenY = (ft.worldY - cameraY) * zoom + halfHeight;
 
-      // Float upward over time
-      const offsetY = -progress * FloatingTextRenderer.RISE_DISTANCE;
+      // Float upward and drift sideways over time (ease-out for natural deceleration)
+      const ease = 1 - (1 - progress) * (1 - progress);
+      const offsetY = -ease * FloatingTextRenderer.RISE_DISTANCE;
+      const offsetX = ft.driftX * ease;
 
-      // Fade out over time
-      ctx.globalAlpha = 1 - progress;
+      // Pop-in scale: 1.4 → 1.0 during first 15%, then hold at 1.0
+      const POP_IN_END = 0.15;
+      const scale = progress < POP_IN_END
+        ? 1.4 - 0.4 * (progress / POP_IN_END)
+        : 1.0;
+
+      // Hold full opacity during pop-in, then fade out
+      ctx.globalAlpha = progress < POP_IN_END ? 1 : 1 - (progress - POP_IN_END) / (1 - POP_IN_END);
       ctx.fillStyle = ft.color;
-      ctx.fillText(ft.text, screenX, screenY + offsetY);
+
+      const drawX = screenX + offsetX;
+      const drawY = screenY + offsetY;
+
+      if (scale !== 1.0) {
+        ctx.save();
+        ctx.translate(drawX, drawY);
+        ctx.scale(scale, scale);
+        ctx.fillText(ft.text, 0, 0);
+        ctx.restore();
+        // Restore shadow settings cleared by ctx.save/restore
+        ctx.shadowColor = 'rgba(0, 0, 0, 0.8)';
+        ctx.shadowBlur = 4;
+        ctx.shadowOffsetX = 1;
+        ctx.shadowOffsetY = 1;
+      } else {
+        ctx.fillText(ft.text, drawX, drawY);
+      }
     }
 
     ctx.restore();

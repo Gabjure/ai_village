@@ -157,6 +157,7 @@ export class ScheduledDecisionProcessor {
           entity.updateComponent<AgentComponent>('agent', (current) => ({
             ...current,
             recentSpeech: parsed.speaking,
+            speechSource: 'llm',
           }));
         }
         // Return unchanged - agent stays in current behavior
@@ -169,6 +170,7 @@ export class ScheduledDecisionProcessor {
         behavior: parsed.behavior!,
         behaviorState: parsed.behaviorState || {},
         recentSpeech: parsed.speaking, // Set speech for bubble renderer
+        speechSource: 'llm',
       }));
 
       return {
@@ -295,6 +297,7 @@ export class ScheduledDecisionProcessor {
           entity.updateComponent<AgentComponent>('agent', (current) => ({
             ...current,
             recentSpeech: parsed.speaking,
+            speechSource: 'llm',
           }));
         }
         // Return unchanged - agent stays in current behavior
@@ -307,6 +310,7 @@ export class ScheduledDecisionProcessor {
         behavior: parsed.behavior!,
         behaviorState: parsed.behaviorState || {},
         recentSpeech: parsed.speaking, // Set speech for bubble renderer
+        speechSource: 'llm',
       }));
 
       return {

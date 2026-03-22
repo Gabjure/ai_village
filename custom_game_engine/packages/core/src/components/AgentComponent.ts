@@ -291,6 +291,7 @@ export interface AgentComponent extends Component {
    */
   interactionLLMStartTick?: number;
   recentSpeech?: string; // What the agent recently said (for nearby agents to hear)
+  speechSource?: 'llm' | 'fallback'; // Source of recentSpeech: real LLM output or fallback behavior
   lastThought?: string; // The agent's most recent internal thought/reasoning
   speechHistory?: SpeechHistoryEntry[]; // History of what the agent has said
   personalGoal?: string; // Short-term personal goal

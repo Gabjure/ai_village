@@ -657,6 +657,7 @@ export class ExecutorLLMProcessor {
         behaviorQueue,
         currentQueueIndex: behaviorQueue ? 0 : undefined,
         recentSpeech: speaking,
+        speechSource: 'llm',
         lastThought: thinking,
       }));
 
@@ -1098,6 +1099,8 @@ export class ExecutorLLMProcessor {
             ...current,
             behavior: 'gather',
             behaviorState: { resourceType: preferredType },
+            speechSource: 'fallback',
+            recentSpeech: undefined,
           }));
           return {
             changed: true,

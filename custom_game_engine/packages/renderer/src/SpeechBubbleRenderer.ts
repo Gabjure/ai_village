@@ -2,7 +2,7 @@
  * Renders speech bubbles above agents when they speak
  */
 export class SpeechBubbleRenderer {
-  private activeSpeech: Map<string, { text: string; timestamp: number; lines?: string[] }> = new Map();
+  private activeSpeech: Map<string, { text: string; timestamp: number; lines?: string[]; isFallback?: boolean }> = new Map();
   private readonly DISPLAY_DURATION = 5000; // 5 seconds
   private readonly MAX_WIDTH = 200;
   private readonly PADDING = 8;
@@ -14,12 +14,13 @@ export class SpeechBubbleRenderer {
   /**
    * Register speech from an agent
    */
-  registerSpeech(agentId: string, text: string): void {
+  registerSpeech(agentId: string, text: string, isFallback?: boolean): void {
     if (!text || text.trim() === '') return;
 
     this.activeSpeech.set(agentId, {
       text: text.trim(),
-      timestamp: Date.now()
+      timestamp: Date.now(),
+      isFallback,
     });
   }
 
@@ -47,28 +48,49 @@ export class SpeechBubbleRenderer {
   ): void {
     ctx.save();
 
+    const now = Date.now();
     for (const agent of agents) {
       const speech = this.activeSpeech.get(agent.id);
       if (!speech) continue;
 
-      this.renderBubble(ctx, agent.x, agent.y, speech.text, agent.name);
+      this.renderBubble(ctx, agent.x, agent.y, speech.text, speech.timestamp, now, agent.name, speech.isFallback);
     }
 
     ctx.restore();
   }
 
   /**
-   * Render a single speech bubble
+   * Render a single speech bubble with fade-in/fade-out.
+   * Fades in over the first 200ms and out over the last 1000ms.
    */
   private renderBubble(
     ctx: CanvasRenderingContext2D,
     x: number,
     y: number,
     text: string,
-    agentName?: string
+    timestamp: number,
+    now: number,
+    agentName?: string,
+    isFallback?: boolean
   ): void {
+    // Compute opacity: fade in 0→1 over 200ms, hold, fade out 1→0 over last 1000ms
+    const age = now - timestamp;
+    const FADE_IN = 200;
+    const FADE_OUT_START = this.DISPLAY_DURATION - 1000;
+    let alpha: number;
+    if (age < FADE_IN) {
+      alpha = age / FADE_IN;
+    } else if (age > FADE_OUT_START) {
+      alpha = 1 - (age - FADE_OUT_START) / 1000;
+    } else {
+      alpha = 1;
+    }
+    alpha = Math.max(0, Math.min(1, alpha));
+    ctx.globalAlpha = alpha;
+    // For fallback speech, prepend "..." to indicate it's not real LLM output
+    const displayText = isFallback ? `...${text}` : text;
     // Measure text and wrap if needed
-    const lines = this.wrapText(ctx, text, this.MAX_WIDTH - this.PADDING * 2);
+    const lines = this.wrapText(ctx, displayText, this.MAX_WIDTH - this.PADDING * 2);
 
     // Calculate bubble dimensions
     const lineHeight = 16;
@@ -80,9 +102,9 @@ export class SpeechBubbleRenderer {
     const bubbleX = x - bubbleWidth / 2;
     const bubbleY = y + this.BUBBLE_OFFSET_Y - bubbleHeight;
 
-    // Draw bubble background
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
-    ctx.strokeStyle = 'rgba(100, 100, 100, 0.8)';
+    // Draw bubble background — dimmed for fallback speech
+    ctx.fillStyle = isFallback ? 'rgba(80, 80, 80, 0.7)' : 'rgba(255, 255, 255, 0.95)';
+    ctx.strokeStyle = isFallback ? 'rgba(120, 120, 120, 0.6)' : 'rgba(100, 100, 100, 0.8)';
     ctx.lineWidth = 2;
 
     this.drawRoundedRect(
@@ -114,8 +136,8 @@ export class SpeechBubbleRenderer {
       textStartY += nameHeight;
     }
 
-    // Draw text
-    ctx.fillStyle = '#000';
+    // Draw text — dimmed color for fallback speech
+    ctx.fillStyle = isFallback ? 'rgba(180, 180, 180, 0.8)' : '#000';
     ctx.font = '13px sans-serif';
     lines.forEach((line, i) => {
       ctx.fillText(
@@ -124,6 +146,9 @@ export class SpeechBubbleRenderer {
         textStartY + (i + 1) * lineHeight
       );
     });
+
+    // Restore alpha so other renderers are unaffected
+    ctx.globalAlpha = 1;
   }
 
   /**
