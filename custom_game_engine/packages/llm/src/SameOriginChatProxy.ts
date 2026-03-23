@@ -1,5 +1,9 @@
 import type { LLMProvider, LLMRequest, LLMResponse, ProviderPricing } from './LLMProvider.js';
 
+const JSON_FORMAT_SUFFIX = `\n\nIMPORTANT: You MUST respond with a JSON object in this exact format (no other text outside the JSON):
+{"thinking": "your internal thoughts about what to do", "speaking": "what you say out loud (empty string if silent)", "action": "one of the available actions listed above"}
+If you want to set a goal, add: "goal": {"type": "personal"|"medium_term"|"group", "description": "the goal"}`;
+
 /**
  * Lightweight LLM provider that routes requests through the same-origin
  * `/api/llm/chat` endpoint instead of calling LLM APIs directly from the
@@ -36,7 +40,7 @@ export class SameOriginChatProxy implements LLMProvider {
         body: JSON.stringify({
           baseUrl: this.baseUrl,
           model: this.model,
-          messages: [{ role: 'user', content: request.prompt }],
+          messages: [{ role: 'user', content: request.prompt + JSON_FORMAT_SUFFIX }],
           max_tokens: request.maxTokens,
           temperature: request.temperature,
         }),

@@ -20,6 +20,10 @@ export interface ProxyLLMRequest extends LLMRequest {
   tier?: string;
 }
 
+const JSON_FORMAT_SUFFIX = `\n\nIMPORTANT: You MUST respond with a JSON object in this exact format (no other text outside the JSON):
+{"thinking": "your internal thoughts about what to do", "speaking": "what you say out loud (empty string if silent)", "action": "one of the available actions listed above"}
+If you want to set a goal, add: "goal": {"type": "personal"|"medium_term"|"group", "description": "the goal"}`;
+
 export class ProxyLLMProvider implements LLMProvider {
   private readonly proxyUrl: string;
   private readonly timeout = 60000;
@@ -46,7 +50,7 @@ export class ProxyLLMProvider implements LLMProvider {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          messages: [{ role: 'user', content: request.prompt }],
+          messages: [{ role: 'user', content: request.prompt + JSON_FORMAT_SUFFIX }],
           max_tokens: request.maxTokens ?? 256,
           temperature: request.temperature ?? 0.7,
           stripThinkTags: true,
