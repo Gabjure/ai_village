@@ -14,6 +14,7 @@
  */
 
 import type { LLMProvider, LLMRequest, LLMResponse, ProviderPricing } from './LLMProvider.js';
+import { LLMAuthError } from './OpenAICompatProvider.js';
 
 export interface FallbackProviderOptions {
   /**
@@ -189,7 +190,21 @@ export class FallbackProvider implements LLMProvider {
         return response;
       } catch (error) {
         lastError = error instanceof Error ? error : new Error(String(error));
-        this.markFailure(state, lastError);
+
+        // Auth errors (401/403): immediately disable the provider — retrying
+        // with the same bad credentials is pointless, skip to next provider
+        if (error instanceof LLMAuthError) {
+          state.disabled = true;
+          state.failureCount = this.maxConsecutiveFailures;
+          state.lastFailure = Date.now();
+          if (this.logFallbacks) {
+            console.warn(
+              `[FallbackProvider] Auth failure on ${state.provider.getProviderId()}, immediately disabling. ${lastError.message}`
+            );
+          }
+        } else {
+          this.markFailure(state, lastError);
+        }
 
         if (this.logFallbacks && i < this.providers.length - 1) {
           console.warn(

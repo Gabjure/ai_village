@@ -3,6 +3,23 @@ import { LLMRequestFileLogger } from './LLMRequestFileLogger.js';
 import { modelProfileRegistry, ModelProfile } from './ModelProfileRegistry.js';
 import { modelCapabilityDiscovery, DiscoveredCapabilities } from './ModelCapabilityDiscovery.js';
 
+/**
+ * Error thrown when an LLM provider returns a 401 Unauthorized response.
+ * Used by FallbackProvider to immediately skip to the next provider
+ * instead of wasting retries on a provider with bad credentials.
+ */
+export class LLMAuthError extends Error {
+  public readonly statusCode: number;
+  public readonly providerId: string;
+
+  constructor(providerId: string, statusCode: number, detail: string) {
+    super(`[${providerId}] Authentication failed (${statusCode}): ${detail}`);
+    this.name = 'LLMAuthError';
+    this.statusCode = statusCode;
+    this.providerId = providerId;
+  }
+}
+
 // Valid actions that can be extracted from text
 // const VALID_ACTIONS = [
 //   'wander', 'idle', 'seek_food', 'follow_agent', 'talk', 'gather',
@@ -639,6 +656,13 @@ Keep speech brief and natural.`
       if (!response.ok) {
         const errorText = await response.text();
 
+        // 401/403: Authentication failure — throw LLMAuthError so FallbackProvider
+        // can immediately skip to the next provider instead of wasting retries
+        if (response.status === 401 || response.status === 403) {
+          console.error(`[OpenAICompatProvider] Auth failure for ${this.getProviderId()} (${response.status}): ${errorText.substring(0, 200)}`);
+          throw new LLMAuthError(this.getProviderId(), response.status, errorText.substring(0, 200));
+        }
+
         // Check if this is a 400 error (usually tool calling issues) - fall back to text parsing
         if (response.status === 400) {
           console.warn(`[OpenAICompatProvider] Tool calling failed for ${this.model} (400 error), falling back to text-based parsing`);
@@ -881,6 +905,13 @@ Be brief and natural.`
 
     if (!response.ok) {
       const errorText = await response.text();
+
+      // 401/403: Authentication failure — throw LLMAuthError for immediate provider switch
+      if (response.status === 401 || response.status === 403) {
+        console.error(`[OpenAICompatProvider] Auth failure for ${this.getProviderId()} (${response.status}): ${errorText.substring(0, 200)}`);
+        throw new LLMAuthError(this.getProviderId(), response.status, errorText.substring(0, 200));
+      }
+
       console.error('[OpenAICompatProvider] Text-based request failed:', response.status, errorText);
       throw new Error(`API error: ${response.status} ${response.statusText} - ${errorText}`);
     }
