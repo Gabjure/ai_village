@@ -152,7 +152,7 @@ export class DeathTransitionSystem extends BaseSystem {
   private processedDeaths: Set<string> = new Set();
   private deathBargainSystem?: DeathBargainSystem;
   private knowledgeLossEntityId: string | null = null; // Cache singleton entity ID
-  private cachedHiveCombatEntities: Entity[] = [];
+  private cachedHiveCombatEntities: ReadonlyArray<Entity> = [];
 
   /**
    * Set the death bargain system for hero resurrection challenges

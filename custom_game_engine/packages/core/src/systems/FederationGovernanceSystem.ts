@@ -100,9 +100,9 @@ export class FederationGovernanceSystem extends BaseSystem {
   // Last update tick per federation
   private federationLastUpdateTick: Map<string, number> = new Map();
 
-  private _cachedEmpires: Entity[] = [];
-  private _cachedNations: Entity[] = [];
-  private _cachedNavies: Entity[] = [];
+  private _cachedEmpires: ReadonlyArray<Entity> = [];
+  private _cachedNations: ReadonlyArray<Entity> = [];
+  private _cachedNavies: ReadonlyArray<Entity> = [];
 
   // ========================================================================
   // Main Update Loop
