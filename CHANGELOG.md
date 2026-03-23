@@ -6,6 +6,27 @@ Format: [Semantic Versioning](https://semver.org/). Newest first.
 
 ---
 
+## v0.1.9 — 2026-03-23
+
+### What's New
+- Species PolicyNN integrated into game loop — neural network drives species behavior decisions (MUL-2920)
+- LLM fallback responses now tagged with `speechSource` field for transparency (MUL-3012)
+
+### Performance
+- Eliminated ~18 redundant `world.query()` calls per tick across systems (MUL-3167)
+- Dead plants and caravans now destroyed to prevent unbounded entity growth — was reaching 90k+ entities in 2 min (MUL-3118)
+- ReadonlyArray for cached query results prevents accidental mutation (MUL-3167)
+
+### Fixes
+- **Critical:** SoA sync ordering fixed — agents now get current-tick velocity instead of stale data (MUL-3028)
+- Production URL config fixed — no more hardcoded localhost in PlanetClient and MultiverseClient
+- Notification rate limits and startup grace period prevent notification spam (MUL-3283)
+- ProxyLLMProvider wired to game-proxy /api/llm/think endpoint
+- Removed llama3.1-8b from LLM fallback chain (board directive)
+- Multiple build and type fixes for `import.meta.env` across packages
+
+---
+
 ## v0.1.8 — 2026-03-21
 
 ### What's New
