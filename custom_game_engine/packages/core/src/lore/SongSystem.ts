@@ -20,7 +20,6 @@
 import { BaseSystem } from '../ecs/SystemContext.js';
 import type { SystemContext } from '../ecs/SystemContext.js';
 import type { SystemId } from '../types.js';
-import { ProceduralAudioEngine } from './ProceduralAudioEngine.js';
 
 // ============================================================================
 // Song Catalogue
@@ -112,12 +111,6 @@ export class SongSystem extends BaseSystem {
   private audioUnlocked = false;
   /** Queued crossfade request if one arrives while fading */
   private queuedCrossfade: { url: string; occasion: SongOccasion } | null = null;
-  /** Procedural audio engine — used when song catalogue is empty */
-  private proceduralEngine: ProceduralAudioEngine | null = null;
-  /** Whether we're using procedural audio (empty catalogue) */
-  private readonly useProceduralAudio: boolean;
-  /** Fade timer for procedural audio gain ramps */
-  private proceduralFadeTimer: ReturnType<typeof setInterval> | null = null;
   /** Bound handler so we can remove it after first gesture */
   private readonly onUserGesture = (): void => {
     this.audioUnlocked = true;
@@ -133,7 +126,6 @@ export class SongSystem extends BaseSystem {
     super();
     this.audioBasePath = config?.audioBasePath ?? DEFAULT_AUDIO_BASE_PATH;
     this.songCatalogue = config?.songCatalogue ?? NORN_SONG_CATALOGUE;
-    this.useProceduralAudio = this.songCatalogue.length === 0;
   }
 
   protected onInitialize(): void {
@@ -142,11 +134,7 @@ export class SongSystem extends BaseSystem {
       return;
     }
 
-    if (this.useProceduralAudio) {
-      this.proceduralEngine = new ProceduralAudioEngine();
-    } else {
-      this.buildOccasionIndex();
-    }
+    this.buildOccasionIndex();
     this.loadPlayHistory();
     this.subscribeToEvents();
     this.addGestureListeners();
@@ -158,9 +146,7 @@ export class SongSystem extends BaseSystem {
 
     // Check ambient timer: if no event-triggered song for AMBIENT_IDLE_MS, play ambient
     const now = Date.now();
-    const isPlaying = this.useProceduralAudio
-      ? this.proceduralEngine?.isPlaying() ?? false
-      : this.currentAudio !== null && !this.currentAudio.paused;
+    const isPlaying = this.currentAudio !== null && !this.currentAudio.paused;
 
     if (
       this.currentOccasion !== 'ambient' &&
@@ -241,11 +227,6 @@ export class SongSystem extends BaseSystem {
   }
 
   private playSongForOccasion(occasion: SongOccasion): void {
-    if (this.useProceduralAudio && this.proceduralEngine) {
-      this.playProceduralOccasion(occasion);
-      return;
-    }
-
     const pool = this.songsByOccasion.get(occasion);
     if (!pool || pool.length === 0) return;
 
@@ -373,109 +354,15 @@ export class SongSystem extends BaseSystem {
     }, FADE_INTERVAL_MS);
   }
 
-  // ============================================================================
-  // Procedural Audio Playback
-  // ============================================================================
-
-  private playProceduralOccasion(occasion: SongOccasion): void {
-    if (!this.proceduralEngine) return;
-
-    // If same occasion is already playing, skip
-    if (this.proceduralEngine.getCurrentOccasion() === occasion && this.proceduralEngine.isPlaying()) {
-      return;
-    }
-
-    // Crossfade: fade out current, start new
-    if (this.proceduralEngine.isPlaying()) {
-      this.proceduralCrossfadeTo(occasion);
-    } else {
-      this.proceduralStartFresh(occasion);
-    }
-  }
-
-  private proceduralStartFresh(occasion: SongOccasion): void {
-    this.proceduralEngine!.stop();
-    this.proceduralEngine!.play(occasion).then(started => {
-      if (!started) return;
-      this.currentOccasion = occasion;
-      this.lastSwitchTime = Date.now();
-      // Fade in
-      const gainNode = this.proceduralEngine!.getGainNode();
-      if (gainNode) {
-        this.proceduralFadeGain(gainNode, 0, MAX_VOLUME, FADE_DURATION_MS);
-      }
-    }).catch(() => {
-      // Tone.js failed to start — likely autoplay blocked, store pending
-      this.pendingOccasion = occasion;
-    });
-  }
-
-  private proceduralCrossfadeTo(occasion: SongOccasion): void {
-    if (this.isFading) return;
-    this.isFading = true;
-
-    const oldGain = this.proceduralEngine!.getGainNode();
-
-    // Fade out old scene
-    if (oldGain) {
-      this.proceduralFadeGain(oldGain, oldGain.gain.value, 0, FADE_DURATION_MS);
-    }
-
-    // After fade-out, stop old and start new
-    setTimeout(() => {
-      this.proceduralEngine!.stop();
-      this.proceduralEngine!.play(occasion).then(started => {
-        this.isFading = false;
-        if (!started) return;
-        this.currentOccasion = occasion;
-        this.lastSwitchTime = Date.now();
-        const newGain = this.proceduralEngine!.getGainNode();
-        if (newGain) {
-          this.proceduralFadeGain(newGain, 0, MAX_VOLUME, FADE_DURATION_MS);
-        }
-      }).catch(() => {
-        this.isFading = false;
-      });
-    }, FADE_DURATION_MS);
-  }
-
-  private proceduralFadeGain(gainNode: GainNode, from: number, to: number, durationMs: number): void {
-    if (this.proceduralFadeTimer !== null) {
-      clearInterval(this.proceduralFadeTimer);
-    }
-    const steps = durationMs / FADE_INTERVAL_MS;
-    let step = 0;
-    gainNode.gain.value = from;
-    this.proceduralFadeTimer = setInterval(() => {
-      step++;
-      const progress = step / steps;
-      gainNode.gain.value = from + (to - from) * progress;
-      if (step >= steps) {
-        gainNode.gain.value = to;
-        if (this.proceduralFadeTimer !== null) {
-          clearInterval(this.proceduralFadeTimer);
-          this.proceduralFadeTimer = null;
-        }
-      }
-    }, FADE_INTERVAL_MS);
-  }
-
   private stopCurrent(): void {
     if (this.fadeTimer !== null) {
       clearInterval(this.fadeTimer);
       this.fadeTimer = null;
     }
-    if (this.proceduralFadeTimer !== null) {
-      clearInterval(this.proceduralFadeTimer);
-      this.proceduralFadeTimer = null;
-    }
     if (this.currentAudio) {
       this.currentAudio.pause();
       this.currentAudio.src = '';
       this.currentAudio = null;
-    }
-    if (this.proceduralEngine?.isPlaying()) {
-      this.proceduralEngine.stop();
     }
     this.currentOccasion = null;
     this.isFading = false;
