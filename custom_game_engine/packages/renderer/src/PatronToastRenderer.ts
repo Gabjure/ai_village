@@ -24,6 +24,8 @@ interface ActiveToast extends PatronToastPayload {
 const TOAST_DURATION_MS = 3500;
 const FADE_IN_MS = 300;
 const FADE_OUT_MS = 500;
+const COOLDOWN_MS = 4000;
+const MAX_QUEUE = 5;
 const TOAST_W = 280;
 const TOAST_H = 68;
 const TOAST_MARGIN_RIGHT = 104; // to the left of the patron portrait widget
@@ -41,6 +43,7 @@ export class PatronToastRenderer {
   private ctx: CanvasRenderingContext2D;
   private active: ActiveToast | null = null;
   private queue: PatronToastPayload[] = [];
+  private lastShownByType: Map<string, number> = new Map();
 
   constructor(ctx: CanvasRenderingContext2D) {
     this.ctx = ctx;
@@ -51,11 +54,16 @@ export class PatronToastRenderer {
   // ---------------------------------------------------------------------------
 
   show(payload: PatronToastPayload): void {
+    const now = performance.now();
+    const lastShown = this.lastShownByType.get(payload.type) ?? 0;
+    if (now - lastShown < COOLDOWN_MS) return;
+
     if (!this.active) {
-      this.active = { ...payload, startMs: performance.now() };
+      this.active = { ...payload, startMs: now };
+      this.lastShownByType.set(payload.type, now);
     } else {
-      // Deduplicate: don't queue the same event type twice
-      if (!this.queue.some((q) => q.type === payload.type && q.agentName === payload.agentName)) {
+      // Deduplicate: don't queue the same event type twice; cap queue size
+      if (this.queue.length < MAX_QUEUE && !this.queue.some((q) => q.type === payload.type && q.agentName === payload.agentName)) {
         this.queue.push(payload);
       }
     }
@@ -78,7 +86,9 @@ export class PatronToastRenderer {
     if (elapsed >= TOAST_DURATION_MS) {
       this.active = null;
       if (this.queue.length > 0) {
-        this.active = { ...this.queue.shift()!, startMs: now };
+        const next = this.queue.shift()!;
+        this.active = { ...next, startMs: now };
+        this.lastShownByType.set(next.type, now);
       }
       return;
     }

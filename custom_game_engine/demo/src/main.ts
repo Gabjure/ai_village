@@ -420,6 +420,23 @@ async function registerAllSystems(
 
     console.log('[Main] Created LLMScheduler with intelligent layer selection (queue+poll pattern)');
     console.log('[Main] Layer cooldowns - Autonomic: 1s, Talker: 5s, Executor: 10s');
+
+    // Load species policy NNs for System 1 fast path (non-blocking)
+    const { mveePolicy } = await import('@ai-village/llm');
+    const speciesBaseUrl = '/weights/species';
+    mveePolicy.loadSpeciesFromURLs({
+      norn: `${speciesBaseUrl}/norn_policy.json`,
+      dvergar: `${speciesBaseUrl}/dvergar_policy.json`,
+      grendel: `${speciesBaseUrl}/grendel_policy.json`,
+      valkyr: `${speciesBaseUrl}/valkyr_policy.json`,
+    })
+      .then(() => {
+        mveePolicy.setEnabled(true);
+        console.warn(`[Main] Species policy NNs loaded (${mveePolicy.getLoadedSpecies().join(', ')})`);
+      })
+      .catch((err: unknown) => {
+        console.error('[Main] Failed to load species policy NNs:', err);
+      });
   }
 
   // Use centralized system registration from @ai-village/core
@@ -2113,12 +2130,18 @@ function setupVisualEventHandlers(
     floatingTextRenderer?.add('💀 Died', position.x * 16, position.y * 16, '#888888', 2000);
   });
 
+  // Startup grace period: suppress non-critical notifications for 10s after load
+  const startupTime = performance.now();
+  const STARTUP_GRACE_MS = 10000;
+  const isStartupGrace = () => performance.now() - startupTime < STARTUP_GRACE_MS;
+
   // Drive 4: Patron Binding — subscribe to typed patron events from PatronBindingSystem
   const patronWidget = 'patronWidget' in renderer ? (renderer as any).patronWidget : null;
   const patronToast = 'patronToast' in renderer ? (renderer as any).patronToast : null;
 
   if (patronWidget && patronToast) {
     gameLoop.world.eventBus.subscribe('patron:event_triggered' as any, (event: any) => {
+      if (isStartupGrace()) return;
       const { eventType, agentName, summary } = event.data ?? {};
       if (eventType && agentName && summary) {
         patronToast.show({ type: eventType, agentName, summary });
@@ -2127,6 +2150,7 @@ function setupVisualEventHandlers(
     });
 
     gameLoop.world.eventBus.subscribe('patron:death_farewell' as any, (event: any) => {
+      if (isStartupGrace()) return;
       const { agentName, causeOfDeath } = event.data ?? {};
       if (agentName) {
         patronToast.show({ type: 'death', agentName, summary: `${agentName} has departed — ${causeOfDeath}` });
@@ -2147,6 +2171,7 @@ function setupVisualEventHandlers(
       'civilization:resource_extracted',
     ] as const) {
       gameLoop.world.eventBus.subscribe(evtType, (event: any) => {
+        if (isStartupGrace()) return;
         const { agentName, summary } = event.data ?? {};
         if (summary) {
           civChronicleToast.show({ type: evtType, agentName, summary });

@@ -23,9 +23,10 @@ interface ActiveToast extends CivChronicleToastPayload {
 const TOAST_DURATION_MS = 4000;
 const FADE_IN_MS = 300;
 const FADE_OUT_MS = 600;
-const COOLDOWN_MS = 2000;
+const COOLDOWN_MS = 5000;
 const TOAST_W = 300;
 const TOAST_H = 72;
+const MAX_QUEUE = 5;
 const TOAST_MARGIN_LEFT = 12;
 const TOAST_MARGIN_BOTTOM = 60;
 
@@ -73,8 +74,8 @@ export class CivChronicleToastRenderer {
       this.active = { ...payload, startMs: now };
       this.lastShownByType.set(payload.type, now);
     } else {
-      // Deduplication: don't queue the same type twice
-      if (!this.queue.some((q) => q.type === payload.type)) {
+      // Deduplication: don't queue the same type twice; cap queue size
+      if (this.queue.length < MAX_QUEUE && !this.queue.some((q) => q.type === payload.type)) {
         this.queue.push(payload);
       }
     }

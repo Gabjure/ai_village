@@ -41,6 +41,9 @@ export interface NotificationSection {
   icon?: string;
 }
 
+const MODAL_COOLDOWN_MS = 7000;
+const MAX_QUEUE = 5;
+
 export class NotificationModal {
   private container: HTMLDivElement;
   private contentArea: HTMLDivElement;
@@ -50,6 +53,7 @@ export class NotificationModal {
   private isDismissing = false;
   private currentTheme: NotificationTheme | null = null;
   private progressBarEl: HTMLDivElement | null = null;
+  private lastShownAt = 0;
 
   constructor() {
     this.container = document.createElement('div');
@@ -143,13 +147,26 @@ export class NotificationModal {
    * Show a notification
    */
   show(notification: NotificationContent): void {
-    // If already showing a notification, queue this one
+    const now = performance.now();
+
+    // If already showing a notification, queue this one (with cap)
     if (this.currentNotification || this.isDismissing) {
-      this.queue.push(notification);
+      if (this.queue.length < MAX_QUEUE) {
+        this.queue.push(notification);
+      }
+      return;
+    }
+
+    // Global cooldown between modals
+    if (now - this.lastShownAt < MODAL_COOLDOWN_MS) {
+      if (this.queue.length < MAX_QUEUE) {
+        this.queue.push(notification);
+      }
       return;
     }
 
     this.currentNotification = notification;
+    this.lastShownAt = now;
     this.container.style.display = 'flex';
     this.container.style.opacity = '1';
 
