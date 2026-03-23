@@ -498,37 +498,40 @@ export class MovementSystem extends BaseSystem {
       }
     }
 
-    // TIER 3/4 OPTIMIZATION: Structure-of-Arrays batch processing with SIMD/WebGPU
-    // Process velocity integration in a tight loop for better cache locality
-    // This handles all entities with Velocity components (steering-based movement)
-    // Note: batchProcessVelocity is async for GPU path, but we fire-and-forget here
-    // since the legacy loop below handles non-VelocityComponent entities synchronously
-    this.batchProcessVelocity(ctx, timeSpeedMultiplier);
+    // NOTE: SoA batch processing (batchProcessVelocity) is disabled because
+    // entity.updateComponent() does not mark the DirtyTracker, so SoASyncSystem
+    // never sees velocity changes after the initial full sync. The SoA arrays
+    // stay frozen at zero, causing the batch path to compute zero deltas.
+    // All entities are now processed by the per-entity loop below.
+    // TODO: Re-enable SoA batch once entity.updateComponent marks dirty tracker.
 
     // Entities already filtered by requiredComponents and SimulationScheduler
     for (const entity of ctx.activeEntities) {
       const impl = entity as EntityImpl;
 
       // Performance: Get all components once at start
-      const movement = impl.getComponent<MovementComponent>(CT.Movement)!;
+      let movement = impl.getComponent<MovementComponent>(CT.Movement)!;
       const position = impl.getComponent<PositionComponent>(CT.Position)!;
       const velocity = impl.getComponent<VelocityComponent>(CT.Velocity);
       const steering = impl.getComponent(CT.Steering) as { behavior?: string } | undefined;
       const circadian = impl.getComponent<CircadianComponent>(CT.Circadian);
       const needs = impl.getComponent<NeedsComponent>(CT.Needs);
 
-      // Skip entities with Velocity components - already processed by SoA batch
-      if (velocity) {
-        // Sync velocity component to movement component (for backward compatibility)
-        const steeringActive = steering && steering.behavior && steering.behavior !== 'none';
-        if (steeringActive && (velocity.vx !== undefined || velocity.vy !== undefined)) {
+      // Sync VelocityComponent → MovementComponent so the per-entity loop uses
+      // the latest velocity set by SteeringSystem or behavior ctx.setVelocity().
+      if (velocity && (velocity.vx !== undefined || velocity.vy !== undefined)) {
+        const hasNonZeroVelocity = (velocity.vx !== 0 || velocity.vy !== 0);
+        const needsSync = hasNonZeroVelocity ||
+          (movement.velocityX !== 0 || movement.velocityY !== 0);
+        if (needsSync) {
           impl.updateComponent<MovementComponent>(CT.Movement, (current) => {
             current.velocityX = velocity.vx ?? current.velocityX;
             current.velocityY = velocity.vy ?? current.velocityY;
             return current;
           });
+          // Re-fetch after update (updateComponent returns new object)
+          movement = impl.getComponent<MovementComponent>(CT.Movement)!;
         }
-        continue; // Skip - already processed in batchProcessVelocity
       }
 
       // Skip if sleeping - agents cannot move while asleep
