@@ -162,8 +162,10 @@ export class MultiverseClient {
     });
 
     if (!response.ok) {
-      const error = await response.json();
-      throw new Error(`Failed to create universe: ${error.error}`);
+      const text = await response.text();
+      let message = `HTTP ${response.status}`;
+      try { message = JSON.parse(text).error || message; } catch { /* non-JSON response */ }
+      throw new Error(`Failed to create universe: ${message}`);
     }
 
     const data = await response.json();
@@ -181,8 +183,10 @@ export class MultiverseClient {
     }
 
     if (!response.ok) {
-      const error = await response.json();
-      throw new Error(`Failed to get universe: ${error.error}`);
+      const text = await response.text();
+      let message = `HTTP ${response.status}`;
+      try { message = JSON.parse(text).error || message; } catch { /* non-JSON response */ }
+      throw new Error(`Failed to get universe: ${message}`);
     }
 
     const data = await response.json();
@@ -207,8 +211,10 @@ export class MultiverseClient {
     const response = await fetch(url);
 
     if (!response.ok) {
-      const error = await response.json();
-      throw new Error(`Failed to list universes: ${error.error}`);
+      const text = await response.text();
+      let message = `HTTP ${response.status}`;
+      try { message = JSON.parse(text).error || message; } catch { /* non-JSON response */ }
+      throw new Error(`Failed to list universes: ${message}`);
     }
 
     const data = await response.json();
@@ -224,8 +230,10 @@ export class MultiverseClient {
     });
 
     if (!response.ok) {
-      const error = await response.json();
-      throw new Error(`Failed to delete universe: ${error.error}`);
+      const text = await response.text();
+      let message = `HTTP ${response.status}`;
+      try { message = JSON.parse(text).error || message; } catch { /* non-JSON response */ }
+      throw new Error(`Failed to delete universe: ${message}`);
     }
   }
 
@@ -323,8 +331,10 @@ export class MultiverseClient {
     }
 
     if (!response.ok) {
-      const error = await response.json();
-      throw new Error(`Failed to download snapshot: ${error.error}`);
+      const text = await response.text();
+      let message = `HTTP ${response.status}`;
+      try { message = JSON.parse(text).error || message; } catch { /* non-JSON response */ }
+      throw new Error(`Failed to download snapshot: ${message}`);
     }
 
     const data = await response.json();
@@ -345,8 +355,10 @@ export class MultiverseClient {
     }
 
     if (!response.ok) {
-      const error = await response.json();
-      throw new Error(`Failed to download latest snapshot: ${error.error}`);
+      const text = await response.text();
+      let message = `HTTP ${response.status}`;
+      try { message = JSON.parse(text).error || message; } catch { /* non-JSON response */ }
+      throw new Error(`Failed to download latest snapshot: ${message}`);
     }
 
     return await response.json();
@@ -359,8 +371,10 @@ export class MultiverseClient {
     const response = await fetch(`${this.baseUrl}/multiverse/universe/${universeId}/snapshots`);
 
     if (!response.ok) {
-      const error = await response.json();
-      throw new Error(`Failed to list snapshots: ${error.error}`);
+      const text = await response.text();
+      let message = `HTTP ${response.status}`;
+      try { message = JSON.parse(text).error || message; } catch { /* non-JSON response */ }
+      throw new Error(`Failed to list snapshots: ${message}`);
     }
 
     const data = await response.json();
@@ -378,8 +392,10 @@ export class MultiverseClient {
     const response = await fetch(url);
 
     if (!response.ok) {
-      const error = await response.json();
-      throw new Error(`Failed to get timeline: ${error.error}`);
+      const text = await response.text();
+      let message = `HTTP ${response.status}`;
+      try { message = JSON.parse(text).error || message; } catch { /* non-JSON response */ }
+      throw new Error(`Failed to get timeline: ${message}`);
     }
 
     const data = await response.json();
@@ -413,8 +429,10 @@ export class MultiverseClient {
     });
 
     if (!response.ok) {
-      const error = await response.json();
-      throw new Error(`Failed to fork universe: ${error.error}`);
+      const text = await response.text();
+      let message = `HTTP ${response.status}`;
+      try { message = JSON.parse(text).error || message; } catch { /* non-JSON response */ }
+      throw new Error(`Failed to fork universe: ${message}`);
     }
 
     const data = await response.json();
@@ -428,8 +446,10 @@ export class MultiverseClient {
     const response = await fetch(`${this.baseUrl}/multiverse/universe/${universeId}/forks`);
 
     if (!response.ok) {
-      const error = await response.json();
-      throw new Error(`Failed to list forks: ${error.error}`);
+      const text = await response.text();
+      let message = `HTTP ${response.status}`;
+      try { message = JSON.parse(text).error || message; } catch { /* non-JSON response */ }
+      throw new Error(`Failed to list forks: ${message}`);
     }
 
     const data = await response.json();
@@ -464,8 +484,10 @@ export class MultiverseClient {
     });
 
     if (!response.ok) {
-      const error = await response.json();
-      throw new Error(`Failed to create passage: ${error.error}`);
+      const text = await response.text();
+      let message = `HTTP ${response.status}`;
+      try { message = JSON.parse(text).error || message; } catch { /* non-JSON response */ }
+      throw new Error(`Failed to create passage: ${message}`);
     }
 
     const data = await response.json();
@@ -483,8 +505,10 @@ export class MultiverseClient {
     }
 
     if (!response.ok) {
-      const error = await response.json();
-      throw new Error(`Failed to get passage: ${error.error}`);
+      const text = await response.text();
+      let message = `HTTP ${response.status}`;
+      try { message = JSON.parse(text).error || message; } catch { /* non-JSON response */ }
+      throw new Error(`Failed to get passage: ${message}`);
     }
 
     const data = await response.json();
@@ -502,8 +526,10 @@ export class MultiverseClient {
     const response = await fetch(url);
 
     if (!response.ok) {
-      const error = await response.json();
-      throw new Error(`Failed to list passages: ${error.error}`);
+      const text = await response.text();
+      let message = `HTTP ${response.status}`;
+      try { message = JSON.parse(text).error || message; } catch { /* non-JSON response */ }
+      throw new Error(`Failed to list passages: ${message}`);
     }
 
     const data = await response.json();
@@ -519,8 +545,10 @@ export class MultiverseClient {
     });
 
     if (!response.ok) {
-      const error = await response.json();
-      throw new Error(`Failed to delete passage: ${error.error}`);
+      const text = await response.text();
+      let message = `HTTP ${response.status}`;
+      try { message = JSON.parse(text).error || message; } catch { /* non-JSON response */ }
+      throw new Error(`Failed to delete passage: ${message}`);
     }
   }
 
@@ -546,8 +574,10 @@ export class MultiverseClient {
     });
 
     if (!response.ok) {
-      const error = await response.json();
-      throw new Error(`Failed to register player: ${error.error}`);
+      const text = await response.text();
+      let message = `HTTP ${response.status}`;
+      try { message = JSON.parse(text).error || message; } catch { /* non-JSON response */ }
+      throw new Error(`Failed to register player: ${message}`);
     }
 
     const data = await response.json();
@@ -565,8 +595,10 @@ export class MultiverseClient {
     }
 
     if (!response.ok) {
-      const error = await response.json();
-      throw new Error(`Failed to get player: ${error.error}`);
+      const text = await response.text();
+      let message = `HTTP ${response.status}`;
+      try { message = JSON.parse(text).error || message; } catch { /* non-JSON response */ }
+      throw new Error(`Failed to get player: ${message}`);
     }
 
     const data = await response.json();
@@ -584,8 +616,10 @@ export class MultiverseClient {
     const response = await fetch(url);
 
     if (!response.ok) {
-      const error = await response.json();
-      throw new Error(`Failed to get player universes: ${error.error}`);
+      const text = await response.text();
+      let message = `HTTP ${response.status}`;
+      try { message = JSON.parse(text).error || message; } catch { /* non-JSON response */ }
+      throw new Error(`Failed to get player universes: ${message}`);
     }
 
     const data = await response.json();
@@ -603,8 +637,10 @@ export class MultiverseClient {
     const response = await fetch(`${this.baseUrl}/multiverse/stats`);
 
     if (!response.ok) {
-      const error = await response.json();
-      throw new Error(`Failed to get stats: ${error.error}`);
+      const text = await response.text();
+      let message = `HTTP ${response.status}`;
+      try { message = JSON.parse(text).error || message; } catch { /* non-JSON response */ }
+      throw new Error(`Failed to get stats: ${message}`);
     }
 
     return await response.json();

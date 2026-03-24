@@ -529,12 +529,29 @@ export class MVEEPolicyInference {
    */
   async loadSpeciesFromURLs(speciesUrls: Record<string, string>): Promise<void> {
     const entries = Object.entries(speciesUrls);
-    const responses = await Promise.all(entries.map(([, url]) => fetch(url)));
+    const results = await Promise.allSettled(entries.map(([, url]) => fetch(url)));
+    let loaded = 0;
     for (let i = 0; i < entries.length; i++) {
       const [species] = entries[i]!;
-      const resp = responses[i]!;
-      if (!resp.ok) throw new Error(`Failed to load species policy for ${species} from ${entries[i]![1]}`);
-      this.loadSpeciesModel(species, await resp.json() as ModelWeights);
+      const result = results[i]!;
+      if (result.status === 'rejected') {
+        console.warn(`[MVEEPolicy] Species policy fetch failed for ${species}: ${result.reason}`);
+        continue;
+      }
+      const resp = result.value;
+      if (!resp.ok) {
+        console.warn(`[MVEEPolicy] Species policy not available for ${species} (HTTP ${resp.status})`);
+        continue;
+      }
+      try {
+        this.loadSpeciesModel(species, await resp.json() as ModelWeights);
+        loaded++;
+      } catch (err) {
+        console.warn(`[MVEEPolicy] Failed to parse species policy for ${species}:`, err);
+      }
+    }
+    if (loaded === 0) {
+      console.warn('[MVEEPolicy] No species policies loaded — NN inference disabled');
     }
   }
 

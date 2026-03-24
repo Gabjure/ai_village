@@ -431,11 +431,16 @@ async function registerAllSystems(
       valkyr: `${speciesBaseUrl}/valkyr_policy.json`,
     })
       .then(() => {
-        mveePolicy.setEnabled(true);
-        console.warn(`[Main] Species policy NNs loaded (${mveePolicy.getLoadedSpecies().join(', ')})`);
+        const loaded = mveePolicy.getLoadedSpecies();
+        if (loaded.length > 0) {
+          mveePolicy.setEnabled(true);
+          console.warn(`[Main] Species policy NNs loaded (${loaded.join(', ')})`);
+        } else {
+          console.warn('[Main] No species policy NNs available — using LLM-only mode');
+        }
       })
       .catch((err: unknown) => {
-        console.error('[Main] Failed to load species policy NNs:', err);
+        console.warn('[Main] Species policy NNs not available — using LLM-only mode');
       });
   }
 

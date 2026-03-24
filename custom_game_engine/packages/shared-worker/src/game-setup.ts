@@ -167,11 +167,16 @@ export async function setupGameSystems(
     };
     mveePolicy.loadSpeciesFromURLs(speciesUrls)
       .then(() => {
-        mveePolicy.setEnabled(true);
-        console.warn(`[GameSetup] Species policy NNs loaded (${mveePolicy.getLoadedSpecies().join(', ')})`);
+        const loaded = mveePolicy.getLoadedSpecies();
+        if (loaded.length > 0) {
+          mveePolicy.setEnabled(true);
+          console.warn(`[GameSetup] Species policy NNs loaded (${loaded.join(', ')})`);
+        } else {
+          console.warn('[GameSetup] No species policy NNs available — using LLM-only mode');
+        }
       })
       .catch((err) => {
-        console.error('[GameSetup] Failed to load species policy NNs:', err);
+        console.warn('[GameSetup] Species policy NNs not available — using LLM-only mode');
       });
   }
 

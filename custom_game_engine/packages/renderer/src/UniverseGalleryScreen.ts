@@ -126,8 +126,8 @@ export class UniverseGalleryScreen {
       // Sort by creation date, newest first
       this.universes.sort((a, b) => b.createdAt - a.createdAt);
     } catch (error) {
-      console.error('[UniverseGallery] Failed to load universes:', error);
-      this.error = (error as Error).message;
+      console.warn('[UniverseGallery] Multiverse server not available:', error);
+      this.error = 'Multiverse server is not available. Your game saves are stored locally.';
       this.universes = [];
     } finally {
       this.loading = false;
@@ -611,10 +611,13 @@ export class UniverseGalleryScreen {
       text-align: center;
     `;
     error.innerHTML = `
-      <div style="font-size: 64px; margin-bottom: 20px;">❌</div>
-      <div style="font-size: 18px; color: #f44336; margin-bottom: 10px;">Failed to Connect</div>
-      <div style="font-size: 14px; color: #666; margin-bottom: 25px; max-width: 400px;">
-        ${this.error || 'Could not connect to the multiverse server'}
+      <div style="font-size: 64px; margin-bottom: 20px;">🌌</div>
+      <div style="font-size: 18px; color: #ffa726; margin-bottom: 10px;">Server Offline</div>
+      <div style="font-size: 14px; color: #888; margin-bottom: 10px; max-width: 400px;">
+        ${this.error || 'The multiverse server is not available right now.'}
+      </div>
+      <div style="font-size: 13px; color: #666; margin-bottom: 25px; max-width: 400px;">
+        Your local saves are safe. The Universe Gallery requires the multiverse server to browse and join shared universes.
       </div>
       <button id="retry-btn" style="
         padding: 12px 24px;
