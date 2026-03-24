@@ -476,6 +476,7 @@ export class MVEEPolicyInference {
   /** LLM calls saved by NN (for metrics). */
   private _calls = { nnServed: 0, llmFallback: 0 };
 
+
   /**
    * Load TalkerNN weights from JSON (fetched from server or bundled).
    * Validates input_dim against FEATURE_DIM.
@@ -646,6 +647,7 @@ export class MVEEPolicyInference {
       nnRate: total > 0 ? this._calls.nnServed / total : 0,
     };
   }
+
 }
 
 /** Singleton instance, shared across the game. */
