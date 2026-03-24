@@ -70,6 +70,36 @@ for (const name of ['wood', 'stone', 'berry', 'fiber']) {
   INV_RES_RE[name] = new RegExp(`${name}\\s*\\((\\d+)\\)`, 'i');
 }
 
+// ---------------------------------------------------------------------------
+// Module-level constants for extractFeatures (avoid per-call allocations)
+// ---------------------------------------------------------------------------
+
+const SKILL_NAMES = ['farming', 'gathering', 'building', 'animal', 'medicine', 'combat'];
+const SKILL_LEVELS: Record<string, number> = {
+  novice: 1, beginner: 1, apprentice: 2, journeyman: 3, advanced: 3, expert: 4, master: 5, grandmaster: 6,
+};
+
+const PRIO_BLOCK_OUTER_RE = /priorities:\s*\{([^}]+)\}/i;
+const FOOD_STORED_RE = /food stored/i;
+const BUILDINGS_RE = /Buildings:\s*([^\n]+)/i;
+const BEHAVIOR_IDLE_RE = /Behavior:\s*idle/i;
+const FAITH_RE = /Faith:\s*[\d.]+\s*\((\d+)%\)/i;
+const INJURY_RE = /Injury Type:/i;
+const SEVERITY_RE = /Severity:\s*(\w+)/i;
+const PERC_FULL_RE = /Sees\s+(\d+)\s+agent[^,]*,\s*(\d+)\s+resource/i;
+const PERC_AGENT_RE = /Sees\s+(\d+)\s+agent/i;
+const MOOD_RE = /Mood:\s*[-\d.]+\s*\((\d+)%\)/i;
+const EMOTION_RE = /Emotion:\s*(\w+)/i;
+const PARTNER_RE = /Partner:\s*(\S+)/i;
+const GROUP_CONV_RE = /GROUP CONVERSATION/i;
+const GOALS_SECT_RE = /## Goals\s*\n([\s\S]+?)(?:\n##|\n---)/i;
+const INV_SECT_RE = /## inventory\s*\n([\s\S]+?)(?:\n##)/i;
+const TASK_PLANNER_RE = /TASK PLANNER/i;
+const EXECUTOR_RE = /EXECUTOR/i;
+const X_POS_RE = /X Position:\s*([-\d.]+)/i;
+const Y_POS_RE = /Y Position:\s*([-\d.]+)/i;
+const MEMORY_COUNT_RE = /(\d+)\s+(?:unique\s+)?memor/i;
+
 /** Action lists — must match training/feature_extractor.py */
 export const TALKER_ACTIONS = [
   'talk',
@@ -196,143 +226,137 @@ function softmaxInPlace(buf: Float32Array, len: number): number {
 // ---------------------------------------------------------------------------
 
 /**
- * Extract 40-dim feature vector from MVEE prompt text.
+ * Extract 40-dim feature vector from MVEE prompt text into a pre-allocated buffer.
  * This mirrors training/feature_extractor.py — must be kept in sync.
  *
  * All values in [0, 1] range. Unknown features default to 0.
  */
-function extractFeatures(prompt: string): Float32Array {
-  const feat = new Float32Array(FEATURE_DIM); // zero-initialized
+function extractFeatures(prompt: string, out: Float32Array): void {
+  out.fill(0);
 
   // Skills [0-5]: farming, gathering, building, animal, medicine, combat
-  const SKILL_NAMES = ['farming', 'gathering', 'building', 'animal', 'medicine', 'combat'];
-  const SKILL_LEVELS: Record<string, number> = {
-    novice: 1, beginner: 1, apprentice: 2, journeyman: 3, advanced: 3, expert: 4, master: 5, grandmaster: 6,
-  };
   for (let i = 0; i < SKILL_NAMES.length; i++) {
     const sk = SKILL_NAMES[i] ?? '';
     // "farming: expert (level 4.0)"
-    let m = prompt.match(SKILL_LEVEL_RE[sk] ?? new RegExp(`${sk}[^(]*\\(level\\s*([\\d.]+)\\)`, 'i'));
-    if (m) { feat[i] = Math.min(parseFloat(m[1] ?? '0') / 10, 1); continue; }
+    let m = prompt.match(SKILL_LEVEL_RE[sk]!);
+    if (m) { out[i] = Math.min(parseFloat(m[1] ?? '0') / 10, 1); continue; }
     // "Farming: Expert (4)"
-    m = prompt.match(SKILL_PARENS_RE[sk] ?? new RegExp(`${sk}:\\s*(\\w+)\\s*\\((\\d+)\\)`, 'i'));
-    if (m) { feat[i] = Math.min(parseInt(m[2] ?? '0') / 10, 1); continue; }
+    m = prompt.match(SKILL_PARENS_RE[sk]!);
+    if (m) { out[i] = Math.min(parseInt(m[2] ?? '0') / 10, 1); continue; }
     // "farming: expert"
-    m = prompt.match(SKILL_WORD_RE[sk] ?? new RegExp(`${sk}:\\s*(\\w+)`, 'i'));
-    if (m) feat[i] = Math.min((SKILL_LEVELS[(m[1] ?? '').toLowerCase()] ?? 0) / 10, 1);
+    m = prompt.match(SKILL_WORD_RE[sk]!);
+    if (m) out[i] = Math.min((SKILL_LEVELS[(m[1] ?? '').toLowerCase()] ?? 0) / 10, 1);
   }
 
   // Priorities [6-9]: farming, gathering, building, social (from priorities: {...} block)
-  const prioBlock = prompt.match(/priorities:\s*\{([^}]+)\}/i);
+  const prioBlock = prompt.match(PRIO_BLOCK_OUTER_RE);
   if (prioBlock) {
     const pb = prioBlock[1] ?? '';
     const pmap: Record<string, number> = { farming: 6, gathering: 7, building: 8, social: 9 };
     for (const [k, idx] of Object.entries(pmap)) {
-      const pm = pb.match(PRIO_BLOCK_RE[k] ?? new RegExp(`${k}:\\s*([\\d.]+)`, 'i'));
-      if (pm) feat[idx] = Math.min(parseFloat(pm[1] ?? '0'), 1);
+      const pm = pb.match(PRIO_BLOCK_RE[k]!);
+      if (pm) out[idx] = Math.min(parseFloat(pm[1] ?? '0'), 1);
     }
   } else {
     // "farming (31%)"
     const pctMatch = (name: string) => {
-      const m = prompt.match(PCT_MATCH_RE[name] ?? new RegExp(`${name}[^%]*\\((\\d+)%\\)`, 'i'));
+      const m = prompt.match(PCT_MATCH_RE[name]!);
       return m ? parseFloat(m[1] ?? '0') / 100 : 0;
     };
-    feat[6] = pctMatch('farming'); feat[7] = pctMatch('gathering');
-    feat[8] = pctMatch('building'); feat[9] = pctMatch('social');
+    out[6] = pctMatch('farming'); out[7] = pctMatch('gathering');
+    out[8] = pctMatch('building'); out[9] = pctMatch('social');
   }
 
   // Environment resources [10-13]
   const res = (name: string) => {
-    const m = prompt.match(RES_AVAILABLE_RE[name] ?? new RegExp(`${name}:\\s*(\\d+)\\s*available`, 'i'));
+    const m = prompt.match(RES_AVAILABLE_RE[name]!);
     return m ? Math.min(parseInt(m[1] ?? '0') / 100, 1) : 0;
   };
-  feat[10] = res('fiber'); feat[11] = res('wood'); feat[12] = res('stone'); feat[13] = res('berry');
+  out[10] = res('fiber'); out[11] = res('wood'); out[12] = res('stone'); out[13] = res('berry');
 
   // Village state [14-18]
-  feat[14] = /food stored/i.test(prompt) ? 1 : 0;
-  const bldg = prompt.match(/Buildings:\s*([^\n]+)/i);
+  out[14] = FOOD_STORED_RE.test(prompt) ? 1 : 0;
+  const bldg = prompt.match(BUILDINGS_RE);
   if (bldg) {
     const bt = (bldg[1] ?? '').toLowerCase();
-    feat[15] = bt.includes('campfire') ? 1 : 0;
-    feat[16] = bt.includes('tent') ? 1 : 0;
-    feat[17] = (bt.includes('storage-chest') || bt.includes('chest')) ? 1 : 0;
-    feat[18] = (bt.includes('research-bench') || bt.includes('bench')) ? 1 : 0;
+    out[15] = bt.includes('campfire') ? 1 : 0;
+    out[16] = bt.includes('tent') ? 1 : 0;
+    out[17] = (bt.includes('storage-chest') || bt.includes('chest')) ? 1 : 0;
+    out[18] = (bt.includes('research-bench') || bt.includes('bench')) ? 1 : 0;
   }
 
   // Behavior [19]
-  feat[19] = /Behavior:\s*idle/i.test(prompt) ? 1 : 0;
+  out[19] = BEHAVIOR_IDLE_RE.test(prompt) ? 1 : 0;
 
   // Faith [20]
-  const faith = prompt.match(/Faith:\s*[\d.]+\s*\((\d+)%\)/i);
-  feat[20] = faith ? parseFloat(faith[1] ?? '0') / 100 : 0;
+  const faith = prompt.match(FAITH_RE);
+  out[20] = faith ? parseFloat(faith[1] ?? '0') / 100 : 0;
 
   // Health [21-22]
-  if (/Injury Type:/i.test(prompt)) {
-    feat[21] = 1;
-    const sev = prompt.match(/Severity:\s*(\w+)/i);
+  if (INJURY_RE.test(prompt)) {
+    out[21] = 1;
+    const sev = prompt.match(SEVERITY_RE);
     if (sev) {
       const sm: Record<string, number> = { minor: 0.33, moderate: 0.67, severe: 1, critical: 1 };
-      feat[22] = sm[(sev[1] ?? '').toLowerCase()] ?? 0.33;
+      out[22] = sm[(sev[1] ?? '').toLowerCase()] ?? 0.33;
     }
   }
 
   // Perception [23-24]
-  const perc = prompt.match(/Sees\s+(\d+)\s+agent[^,]*,\s*(\d+)\s+resource/i);
+  const perc = prompt.match(PERC_FULL_RE);
   if (perc) {
-    feat[23] = Math.min(parseInt(perc[2] ?? '0') / 50, 1);
-    feat[24] = Math.min(parseInt(perc[1] ?? '0') / 10, 1);
+    out[23] = Math.min(parseInt(perc[2] ?? '0') / 50, 1);
+    out[24] = Math.min(parseInt(perc[1] ?? '0') / 10, 1);
   } else {
-    const ag = prompt.match(/Sees\s+(\d+)\s+agent/i);
-    if (ag) feat[24] = Math.min(parseInt(ag[1] ?? '0') / 10, 1);
+    const ag = prompt.match(PERC_AGENT_RE);
+    if (ag) out[24] = Math.min(parseInt(ag[1] ?? '0') / 10, 1);
   }
 
   // Emotional state [25-29]
-  const mood = prompt.match(/Mood:\s*[-\d.]+\s*\((\d+)%\)/i);
-  feat[25] = mood ? parseFloat(mood[1] ?? '50') / 100 : 0.5;
-  const em = prompt.match(/Emotion:\s*(\w+)/i);
+  const mood = prompt.match(MOOD_RE);
+  out[25] = mood ? parseFloat(mood[1] ?? '50') / 100 : 0.5;
+  const em = prompt.match(EMOTION_RE);
   if (em) {
     const EMOTIONS = ['anxious', 'happy', 'sad', 'angry'];
     const e = (em[1] ?? '').toLowerCase();
-    EMOTIONS.forEach((name, j) => { feat[26 + j] = e.includes(name) ? 1 : 0; });
+    EMOTIONS.forEach((name, j) => { out[26 + j] = e.includes(name) ? 1 : 0; });
   }
 
   // Conversation [30]
-  const partner = prompt.match(/Partner:\s*(\S+)/i);
+  const partner = prompt.match(PARTNER_RE);
   if (partner) {
     const partnerName = (partner[1] ?? '').toLowerCase();
-    if (!['none', 'nobody'].includes(partnerName)) feat[30] = 1;
+    if (!['none', 'nobody'].includes(partnerName)) out[30] = 1;
   }
-  if (/GROUP CONVERSATION/i.test(prompt)) feat[30] = 1;
+  if (GROUP_CONV_RE.test(prompt)) out[30] = 1;
 
   // Goals count [31]
-  const goalsSect = prompt.match(/## Goals\s*\n([\s\S]+?)(?:\n##|\n---)/i);
-  if (goalsSect && !/none/i.test((goalsSect[1] ?? '').trim())) feat[31] = 0.1;
+  const goalsSect = prompt.match(GOALS_SECT_RE);
+  if (goalsSect && !/none/i.test((goalsSect[1] ?? '').trim())) out[31] = 0.1;
 
   // Inventory [32-35]
-  const inv = prompt.match(/## inventory\s*\n([\s\S]+?)(?:\n##)/i);
+  const inv = prompt.match(INV_SECT_RE);
   if (inv) {
     const it = inv[1] ?? '';
     const invRes = (name: string, idx: number) => {
-      const m = it.match(INV_RES_RE[name] ?? new RegExp(`${name}\\s*\\((\\d+)\\)`, 'i'));
-      if (m) feat[idx] = Math.min(parseInt(m[1] ?? '0') / 50, 1);
+      const m = it.match(INV_RES_RE[name]!);
+      if (m) out[idx] = Math.min(parseInt(m[1] ?? '0') / 50, 1);
     };
     invRes('wood', 32); invRes('stone', 33); invRes('berry', 34); invRes('fiber', 35);
   }
 
   // Layer flag [36]
-  feat[36] = (/TASK PLANNER/i.test(prompt) && /EXECUTOR/i.test(prompt)) ? 1 : 0;
+  out[36] = (TASK_PLANNER_RE.test(prompt) && EXECUTOR_RE.test(prompt)) ? 1 : 0;
 
   // Spatial position [37-38]
-  const sx = prompt.match(/X Position:\s*([-\d.]+)/i);
-  const sy = prompt.match(/Y Position:\s*([-\d.]+)/i);
-  if (sx) feat[37] = Math.min(Math.max((parseFloat(sx[1] ?? '0') + 1) / 2, 0), 1);
-  if (sy) feat[38] = Math.min(Math.max((parseFloat(sy[1] ?? '0') + 1) / 2, 0), 1);
+  const sx = prompt.match(X_POS_RE);
+  const sy = prompt.match(Y_POS_RE);
+  if (sx) out[37] = Math.min(Math.max((parseFloat(sx[1] ?? '0') + 1) / 2, 0), 1);
+  if (sy) out[38] = Math.min(Math.max((parseFloat(sy[1] ?? '0') + 1) / 2, 0), 1);
 
   // Memory [39]
-  const mem = prompt.match(/(\d+)\s+(?:unique\s+)?memor/i);
-  if (mem && parseInt(mem[1] ?? '0') > 0) feat[39] = 1;
-
-  return feat;
+  const mem = prompt.match(MEMORY_COUNT_RE);
+  if (mem && parseInt(mem[1] ?? '0') > 0) out[39] = 1;
 }
 
 // ---------------------------------------------------------------------------
@@ -595,10 +619,8 @@ export class MVEEPolicyInference {
   infer(prompt: string, layer: string): NNInferenceResult | null {
     if (!this.enabled) return null;
 
-    const features = extractFeatures(prompt);
-
     if (layer === 'talker' && this.talkerWeights) {
-      features.forEach((v, i) => { this._talkerScratch.input[i] = v; });
+      extractFeatures(prompt, this._talkerScratch.input);
       const { actionIdx, confidence } = talkerForward(this._talkerScratch.input, this.talkerWeights, this._talkerScratch);
       const action = this.talkerActions[actionIdx] ?? 'talk';
       if (confidence >= NN_CONFIDENCE_THRESHOLD) {
@@ -610,7 +632,7 @@ export class MVEEPolicyInference {
     }
 
     if (layer === 'executor' && this.executorWeights) {
-      features.forEach((v, i) => { this._executorScratch.input[i] = v; });
+      extractFeatures(prompt, this._executorScratch.input);
       const { actionIdx, confidence } = executorForward(this._executorScratch.input, this.executorWeights, this._executorScratch);
       const action = this.executorActions[actionIdx] ?? 'gather';
       if (confidence >= NN_CONFIDENCE_THRESHOLD) {
@@ -640,8 +662,7 @@ export class MVEEPolicyInference {
     const actions = this.speciesActions.get(species);
     if (!weights || !actions) return null;
 
-    const features = extractFeatures(prompt);
-    features.forEach((v, i) => { this._speciesScratch.input[i] = v; });
+    extractFeatures(prompt, this._speciesScratch.input);
     const { actionIdx, confidence } = speciesForward(this._speciesScratch.input, weights, this._speciesScratch);
     const action = actions[actionIdx] ?? 'idle';
 
