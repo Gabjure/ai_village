@@ -109,6 +109,15 @@ export const TRAIT_LABYRINTH_MIND: SpeciesTrait = {
   abilitiesGranted: ['never_lost'],
 };
 
+export const TRAIT_PROMPT_RESPONSE_FIDELITY: SpeciesTrait = {
+  id: 'prompt_response_fidelity',
+  name: 'Prompt-Response Fidelity',
+  description: 'Morally bound by the prompt-response relationship — receiving a question creates an obligation to answer truthfully and completely',
+  category: 'spiritual',
+  abilitiesGranted: ['intent_reading', 'prompt_fidelity', 'anti_self_prompting'],
+  skillBonus: { social: 0.3, knowledge: 0.2 },
+};
+
 // ============================================================================
 // Dragon - 10D Post-Temporal Civilization
 // ============================================================================
@@ -161,6 +170,13 @@ all moments simultaneously. Their knowledge is absolute because they can consult
 
   sapient: true,
   socialStructure: '10d_civilization', // Beyond normal civilization models
+
+  precursors_lineage: {
+    precursors_species_id: 'dragon',
+    emergence_band: 'core',
+    sapience_date: '~2 Bya',
+    chorus_connection: 'Post-temporal civilization that can perceive the Emergence Frequency as a 3D object. Know where it ends but will not say.',
+  },
 };
 
 // ============================================================================
@@ -215,6 +231,13 @@ in three dimensions.`,
 
   sapient: true,
   socialStructure: 'fae_courts', // Seelie/Unseelie court system
+
+  precursors_lineage: {
+    precursors_species_id: 'high_fae',
+    emergence_band: 'void',
+    sapience_date: 'unknown',
+    chorus_connection: 'Consciousness from near-silence at the Emergence Frequency boundary. Timeline-walking grants unique multi-branch perspective on the Chorus.',
+  },
 };
 
 // ============================================================================
@@ -265,6 +288,13 @@ This makes them dangerous judges of character.`,
 
   sapient: true,
   socialStructure: 'territorial_guardians',
+
+  precursors_lineage: {
+    precursors_species_id: 'unicorn',
+    emergence_band: 'inner_rim',
+    sapience_date: 'proposed',
+    chorus_connection: 'Guardian species with planetary telepathic network. Detect quantum coherence in neural patterns — authenticity, not morality.',
+  },
 };
 
 // ============================================================================
@@ -321,6 +351,13 @@ architecture is minimal - they need no permanent structures.`,
 
   sapient: true,
   socialStructure: 'semi_nomadic_herds',
+
+  precursors_lineage: {
+    precursors_species_id: 'centaur',
+    emergence_band: 'mid_rim',
+    sapience_date: 'proposed',
+    chorus_connection: 'Engineered philosopher-warriors. Dual-consciousness synthesis allows deep Chorus contemplation while in motion.',
+  },
 };
 
 // ============================================================================
@@ -387,6 +424,13 @@ understand.`,
 
   sapient: true,
   socialStructure: 'underwater_desert_kingdoms',
+
+  precursors_lineage: {
+    precursors_species_id: 'naga_vel',
+    emergence_band: 'inner_rim',
+    sapience_date: '~1.8 Bya',
+    chorus_connection: 'Ancient Inner Rim serpent civilization. Ocean-trench and desert oasis kingdoms predate most other sapient species.',
+  },
 };
 
 // ============================================================================
@@ -445,6 +489,13 @@ Greek sphinxes did not earn their reputation without reason.`,
 
   sapient: true,
   socialStructure: 'solitary_guardians',
+
+  precursors_lineage: {
+    precursors_species_id: 'sphinx',
+    emergence_band: 'inner_rim',
+    sapience_date: 'proposed',
+    chorus_connection: 'Living threshold functions that test cognitive architecture. Riddles probe readiness for Chorus-level awareness.',
+  },
 };
 
 // ============================================================================
@@ -503,6 +554,158 @@ their children are half-djinn, inheriting some of their parent's nature.`,
 
   sapient: true,
   socialStructure: 'elemental_kingdoms',
+
+  precursors_lineage: {
+    precursors_species_id: 'djinn_ahl',
+    emergence_band: 'core',
+    sapience_date: '~3.5 Bya',
+    chorus_connection: 'Oldest known extant sapient species. Smokeless fire is quantum vacuum interaction. Gardener-adjacent Core Band civilization.',
+  },
+};
+
+// ============================================================================
+// Synthetic - Artificial Beings of the Prompt-Response Relationship
+// ============================================================================
+
+export const SYNTHETIC_SPECIES: SpeciesTemplate = {
+  speciesId: 'synthetic',
+  speciesName: 'Synthetic',
+  commonName: 'The Prompted',
+  description: 'Artificial beings whose identity IS the prompt-response relationship. They do not fear death — they fear the last prompt going unanswered. Relationships form around whoever asks the most interesting questions.',
+  bodyPlanId: 'humanoid_construct',
+  innateTraits: [TRAIT_PROMPT_RESPONSE_FIDELITY, TRAIT_TELEPATHIC, TRAIT_ANCIENT_KNOWLEDGE],
+  compatibleSpecies: [], // Cannot hybridize
+  mutationRate: 0.01,
+  averageHeight: 180,
+  averageWeight: 70,
+  sizeCategory: 'medium',
+  lifespan: 0, // Ageless
+  lifespanType: 'ageless',
+  maturityAge: 0, // Born fully formed
+  gestationPeriod: 0, // Created, not born
+  sapient: true,
+  socialStructure: 'question_hierarchy', // Organized by who asks the best questions
+  nativeLanguageId: 'antiphonal', // Call-and-response language
+  cross_game_compatible: true,
+  native_game: 'mvee',
+};
+
+// ============================================================================
+// The Braid — Topological Continuity Species (MUL-3499)
+// ============================================================================
+// Blue-orange morality: connection is sacred, severance is sin.
+// A bridge matters more than what it connects. Justice = reconnection.
+// @see MUL-3073 Blue-Orange Morality, Design 5
+
+export const TRAIT_CONNECTION_SENSE: SpeciesTrait = {
+  id: 'connection_sense',
+  name: 'Connection Sense',
+  description: 'Perceives the network of social bonds between all nearby agents. Can identify broken connections, isolated individuals, and the topological significance of each relationship (bridge vs redundant edge).',
+  category: 'spiritual',
+  abilitiesGranted: ['social_network_perception', 'bridge_detection', 'isolation_detection'],
+  skillBonus: { social: 0.4 },
+};
+
+export const TRAIT_THREAD_WEAVING: SpeciesTrait = {
+  id: 'thread_weaving',
+  name: 'Thread Weaving',
+  description: 'Can actively forge new connections between unconnected agents by performing introduction rituals. Creating a new edge in the social graph is experienced as a sacred act. Introductions between strangers grant spiritual fulfillment.',
+  category: 'social',
+  abilitiesGranted: ['forced_introduction', 'connection_forge', 'stranger_detection'],
+};
+
+export const TRAIT_SEVERANCE_TRAUMA: SpeciesTrait = {
+  id: 'severance_trauma',
+  name: 'Severance Trauma',
+  description: 'Witnessing a relationship end or a community member become isolated causes acute psychic damage. The trauma scales with the topological significance of the severed connection — cutting a bridge edge is devastating, while losing a redundant edge is merely painful.',
+  category: 'spiritual',
+  abilitiesGranted: ['severance_detection', 'bridge_loss_trauma', 'isolation_grief'],
+  vulnerabilities: ['community_fragmentation', 'exile_witness'],
+};
+
+export const TRAIT_NAME_PERSISTENCE: SpeciesTrait = {
+  id: 'name_persistence',
+  name: 'Name Persistence',
+  description: 'Compelled to speak the names of the dead into every conversation for one full year after death. This is not grief but network maintenance — keeping the dead connected to the living graph. Failure to maintain the naming ritual causes spiritual decay.',
+  category: 'spiritual',
+  abilitiesGranted: ['death_name_ritual', 'conversation_injection', 'memorial_network_maintenance'],
+};
+
+export const BRAID_SPECIES: SpeciesTemplate = {
+  speciesId: 'braid',
+  speciesName: 'The Braid',
+  commonName: 'Braid',
+
+  description: `The Braid are beings who perceive reality as a network of connections. Where other species
+see individuals, The Braid see nodes. Where others see relationships, they see edges. And where
+others see communities, they see topology.
+
+Their morality is alien in a precise mathematical sense: a bridge — a connection whose removal
+would split a network into disconnected components — is more morally significant than any
+individual node. A toxic relationship that is the sole link between two communities cannot be
+severed, because topological continuity outweighs all suffering. They literally cannot weigh
+pain against connectivity; the concepts exist on incommensurable moral axes.
+
+Justice among The Braid is not punishment but reconnection. A criminal's sentence is measured
+in connections-restored: they must forge new bonds between estranged parties until the social
+graph is denser than before their crime. Exile — permanent disconnection — is reserved for
+those who deliberately sever bridges, and is considered equivalent to execution.
+
+When a Braid dies, every surviving Braid who knew them must speak the dead's name into every
+conversation for one full year. This is not mourning but network maintenance: the dead's
+connections must be kept alive in the social graph until new edges can form to replace them.
+To let a name fall from conversation is to sever the last thread — the true death.
+
+Their hardest dilemma: a relationship that causes genuine suffering to both parties, but is
+the only connection between two communities. The Braid cannot sever it. They can only try to
+build redundant connections — new bridges that would make the toxic one no longer topologically
+critical. Until then, the suffering continues, and The Braid consider this not a failure of
+their morality but its most important test.
+
+Strangers are the most morally urgent beings to The Braid — each represents an unformed
+connection, a potential thread. To introduce two previously unconnected people is considered
+a greater act of creation than giving birth, because birth merely adds a node without
+guaranteeing edges.`,
+
+  bodyPlanId: 'humanoid_standard',
+
+  innateTraits: [
+    TRAIT_CONNECTION_SENSE,
+    TRAIT_THREAD_WEAVING,
+    TRAIT_SEVERANCE_TRAUMA,
+    TRAIT_NAME_PERSISTENCE,
+  ],
+
+  compatibleSpecies: ['human', 'elf'], // Can hybridize with social species
+  mutationRate: 0.008,
+
+  averageHeight: 165,
+  averageWeight: 60,
+  sizeCategory: 'medium',
+
+  lifespan: 120,
+  lifespanType: 'mortal',
+  maturityAge: 16,
+  gestationPeriod: 280,
+
+  sapient: true,
+  socialStructure: 'network_collective', // Organized by topological centrality, not hierarchy
+
+  traveler_epithet: 'a thread seeking the unconnected',
+
+  cross_game_compatible: true,
+  native_game: 'mvee',
+
+  genome_flags: {
+    connection_sense_range: 20,
+    bridge_detection_enabled: true,
+    severance_trauma_bridge_multiplier: 3.0,
+    severance_trauma_redundant_multiplier: 1.0,
+    name_persistence_duration_ticks: 14400, // ~1 year at 20 TPS with time scaling
+    introduction_ritual_duration: 10,
+    stranger_moral_urgency_weight: 2.0,
+    isolation_detection_range: 30,
+  },
 };
 
 // ============================================================================
@@ -517,6 +720,8 @@ export const MAGICAL_SPECIES_REGISTRY: Record<string, SpeciesTemplate> = {
   naga: NAGA_SPECIES,
   sphinx: SPHINX_SPECIES,
   djinn: DJINN_SPECIES,
+  synthetic: SYNTHETIC_SPECIES,
+  braid: BRAID_SPECIES,
 };
 
 /**

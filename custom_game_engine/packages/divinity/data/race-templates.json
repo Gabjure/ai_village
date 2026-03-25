@@ -47,7 +47,8 @@
       "realmBound": false,
       "canSurviveMortalWorld": true,
       "typicalAlignment": "neutral",
-      "societyType": "various"
+      "societyType": "various",
+      "precursorsLineage": {"precursors_species_id": "human", "emergence_band": "outer_rim", "lineage_note": "Urd Prime native or near-system species — Earth origin"}
     },
     "olympian": {
       "id": "olympian",
@@ -84,7 +85,8 @@
       "realmBound": false,
       "canSurviveMortalWorld": true,
       "typicalAlignment": "neutral",
-      "societyType": "divine_court"
+      "societyType": "divine_court",
+      "precursorsLineage": {"precursors_species_id": "shee", "emergence_band": "outer_rim", "lineage_note": "Shee-archetype deities manifested through collective cultural memory"}
     },
     "demigod": {
       "id": "demigod",
@@ -125,7 +127,8 @@
       "realmBound": false,
       "canSurviveMortalWorld": true,
       "typicalAlignment": "neutral",
-      "societyType": "heroic_band"
+      "societyType": "heroic_band",
+      "precursorsLineage": {"precursors_species_id": "shee", "emergence_band": "outer_rim", "lineage_note": "Hybrid offspring of Shee-archetype divinities and mortals"}
     },
     "sidhe": {
       "id": "sidhe",
@@ -156,7 +159,8 @@
       "canSurviveMortalWorld": true,
       "mortalWorldWeakness": "Powers diminished, iron more common",
       "typicalAlignment": "chaotic",
-      "societyType": "feudal_courts"
+      "societyType": "feudal_courts",
+      "precursorsLineage": {"precursors_species_id": "high_fae", "emergence_band": "void", "lineage_note": "Noble Fae — Void Band beings who retained material-interface capability"}
     },
     "aesir": {
       "id": "aesir",
@@ -201,7 +205,8 @@
       "realmBound": false,
       "canSurviveMortalWorld": true,
       "typicalAlignment": "lawful",
-      "societyType": "divine_court"
+      "societyType": "divine_court",
+      "precursorsLineage": {"precursors_species_id": "shee", "emergence_band": "outer_rim", "lineage_note": "Norse divine-architect tradition echoing the Seventh Civilization"}
     },
     "angel": {
       "id": "angel",
@@ -239,7 +244,8 @@
       "realmBound": false,
       "canSurviveMortalWorld": true,
       "typicalAlignment": "lawful",
-      "societyType": "celestial_hierarchy"
+      "societyType": "celestial_hierarchy",
+      "precursorsLineage": {"precursors_species_id": "garuda_vel", "emergence_band": "inner_rim", "lineage_note": "Garuda-Vel lineage as humanoid winged messengers"}
     }
   },
   "notes": [

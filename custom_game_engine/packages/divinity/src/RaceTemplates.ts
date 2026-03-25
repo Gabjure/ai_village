@@ -309,6 +309,13 @@ export interface RaceTemplate {
 
   /** Default society structure */
   societyType?: string;
+
+  /** Precursors lineage origin — maps this race to its Precursors species ancestry */
+  precursorsLineage?: {
+    precursors_species_id: string; // Canonical Precursors species ID
+    emergence_band: 'core' | 'inner_rim' | 'mid_rim' | 'outer_rim' | 'void';
+    lineage_note: string; // How this race relates to its Precursors ancestor
+  };
 }
 
 // ============================================================================
@@ -534,6 +541,11 @@ export const OLYMPIAN_RACE: RaceTemplate = {
   canSurviveMortalWorld: true,
   typicalAlignment: 'neutral',
   societyType: 'divine_court',
+  precursorsLineage: {
+    precursors_species_id: 'shee',
+    emergence_band: 'outer_rim',
+    lineage_note: 'Shee-archetype deities manifested through collective cultural memory. Greek divine-architect tradition echoes the Seventh Civilization.',
+  },
 };
 
 export const DEMIGOD_RACE: RaceTemplate = {
@@ -571,6 +583,11 @@ export const DEMIGOD_RACE: RaceTemplate = {
   canSurviveMortalWorld: true,
   typicalAlignment: 'neutral',
   societyType: 'heroic_band',
+  precursorsLineage: {
+    precursors_species_id: 'shee',
+    emergence_band: 'outer_rim',
+    lineage_note: 'Hybrid offspring of Shee-archetype divinities and mortals. Heroic destiny reflects incomplete Chorus inheritance.',
+  },
 };
 
 export const NYMPH_RACE: RaceTemplate = {
@@ -608,6 +625,11 @@ export const NYMPH_RACE: RaceTemplate = {
   mortalWorldWeakness: 'Weakens if separated from bound location',
   typicalAlignment: 'neutral',
   societyType: 'loose_gathering',
+  precursorsLineage: {
+    precursors_species_id: 'landvaettir',
+    emergence_band: 'outer_rim',
+    lineage_note: 'Location-bound nature spirits. Geological sentinel consciousness expressed through Greek cultural lens.',
+  },
 };
 
 export const SATYR_RACE: RaceTemplate = {
@@ -647,6 +669,11 @@ export const SATYR_RACE: RaceTemplate = {
   canSurviveMortalWorld: true,
   typicalAlignment: 'chaotic',
   societyType: 'revelry_band',
+  precursorsLineage: {
+    precursors_species_id: 'patupaiarehe',
+    emergence_band: 'outer_rim',
+    lineage_note: 'Musical nature spirits. Satyr musical magic parallels Patupaiarehe Chorus-frequency encoding in song.',
+  },
 };
 
 // ----- FAERIE (Wild Realm) -----
@@ -679,6 +706,11 @@ export const SIDHE_RACE: RaceTemplate = {
   mortalWorldWeakness: 'Powers diminished, iron more common',
   typicalAlignment: 'chaotic',
   societyType: 'feudal_courts',
+  precursorsLineage: {
+    precursors_species_id: 'high_fae',
+    emergence_band: 'void',
+    lineage_note: 'The noble Fae — Void Band beings who retained material-interface capability. Celtic Aos Si tradition.',
+  },
 };
 
 export const PIXIE_RACE: RaceTemplate = {
@@ -710,6 +742,11 @@ export const PIXIE_RACE: RaceTemplate = {
   mortalWorldWeakness: 'More vulnerable to iron',
   typicalAlignment: 'chaotic',
   societyType: 'swarm',
+  precursorsLineage: {
+    precursors_species_id: 'high_fae',
+    emergence_band: 'void',
+    lineage_note: 'Lesser Fae sub-lineage. Diminished Void Band presence expressed as tiny winged form.',
+  },
 };
 
 export const REDCAP_RACE: RaceTemplate = {
@@ -747,6 +784,11 @@ export const REDCAP_RACE: RaceTemplate = {
   canSurviveMortalWorld: true,
   typicalAlignment: 'chaotic',
   societyType: 'solitary',
+  precursorsLineage: {
+    precursors_species_id: 'high_fae',
+    emergence_band: 'void',
+    lineage_note: 'Corrupted Fae sub-lineage. Blood requirement reflects degraded Chorus reception in Void Band descendants.',
+  },
 };
 
 // ----- HADES (Greek Underworld) -----
@@ -792,6 +834,11 @@ export const SHADE_RACE: RaceTemplate = {
   mortalWorldWeakness: 'Fades into nothing without underworld energy',
   typicalAlignment: 'neutral',
   societyType: 'wandering_masses',
+  precursorsLineage: {
+    precursors_species_id: 'draugrn',
+    emergence_band: 'outer_rim',
+    lineage_note: 'Memory-faded echoes. Draugrn archival impulse reduced to insubstantial memory fragments.',
+  },
 };
 
 export const FURY_RACE: RaceTemplate = {
@@ -828,6 +875,11 @@ export const FURY_RACE: RaceTemplate = {
   canSurviveMortalWorld: true,
   typicalAlignment: 'lawful',
   societyType: 'trio',
+  precursorsLineage: {
+    precursors_species_id: 'draugrn',
+    emergence_band: 'outer_rim',
+    lineage_note: 'Vengeance-aspect of undying archivists. Enforcer role parallels Draugrn guardianship of knowledge-hoards.',
+  },
 };
 
 // ----- ASGARD (Norse Celestial) -----
@@ -870,6 +922,11 @@ export const AESIR_RACE: RaceTemplate = {
   canSurviveMortalWorld: true,
   typicalAlignment: 'lawful',
   societyType: 'divine_court',
+  precursorsLineage: {
+    precursors_species_id: 'shee',
+    emergence_band: 'outer_rim',
+    lineage_note: 'Norse divine-architect tradition. Shee capabilities mythologized as Aesir godhood — creators who shaped the world.',
+  },
 };
 
 export const VALKYRIE_RACE: RaceTemplate = {
@@ -909,6 +966,11 @@ export const VALKYRIE_RACE: RaceTemplate = {
   canSurviveMortalWorld: true,
   typicalAlignment: 'lawful',
   societyType: 'sisterhood',
+  precursorsLineage: {
+    precursors_species_id: 'valkyr',
+    emergence_band: 'outer_rim',
+    lineage_note: 'Shee-designed lineage monitors. Norse Valkyrie tradition directly encodes Valkyr observation role — choosing who lives and dies.',
+  },
 };
 
 export const EINHERJAR_RACE: RaceTemplate = {
@@ -947,6 +1009,11 @@ export const EINHERJAR_RACE: RaceTemplate = {
   mortalWorldWeakness: 'Cannot revive outside Valhalla',
   typicalAlignment: 'lawful',
   societyType: 'warrior_band',
+  precursorsLineage: {
+    precursors_species_id: 'grendel',
+    emergence_band: 'outer_rim',
+    lineage_note: 'Warrior-spirit tradition. Grendel territorial-warrior lineage mythologized as honored dead who fight eternally.',
+  },
 };
 
 // ----- HEAVEN (Monotheistic Paradise) -----
@@ -995,6 +1062,11 @@ export const SERAPH_RACE: RaceTemplate = {
   canSurviveMortalWorld: true,
   typicalAlignment: 'lawful',
   societyType: 'celestial_choir',
+  precursorsLineage: {
+    precursors_species_id: 'garuda_vel',
+    emergence_band: 'inner_rim',
+    lineage_note: 'Multi-winged divine messengers. Garuda-Vel predator-scholar tradition refracted through Abrahamic angelic hierarchy.',
+  },
 };
 
 export const ANGEL_RACE: RaceTemplate = {
@@ -1030,6 +1102,11 @@ export const ANGEL_RACE: RaceTemplate = {
   canSurviveMortalWorld: true,
   typicalAlignment: 'lawful',
   societyType: 'celestial_hierarchy',
+  precursorsLineage: {
+    precursors_species_id: 'garuda_vel',
+    emergence_band: 'inner_rim',
+    lineage_note: 'Lesser divine servants. Garuda-Vel lineage expressed as humanoid winged messengers in Abrahamic tradition.',
+  },
 };
 
 // ----- THE DREAMING (Dream Realm) -----
@@ -1073,6 +1150,11 @@ export const ONEIROI_RACE: RaceTemplate = {
   mortalWorldWeakness: 'Weakened when no one is dreaming',
   typicalAlignment: 'neutral',
   societyType: 'loose_family',
+  precursorsLineage: {
+    precursors_species_id: 'baku_ma',
+    emergence_band: 'mid_rim',
+    lineage_note: 'Dream-realm entities. Baku-Ma dream-archive keepers encoded in Greek dream-god tradition.',
+  },
 };
 
 export const NIGHTMARE_RACE: RaceTemplate = {
@@ -1107,6 +1189,11 @@ export const NIGHTMARE_RACE: RaceTemplate = {
   canSurviveMortalWorld: true,
   typicalAlignment: 'chaotic',
   societyType: 'solitary',
+  precursorsLineage: {
+    precursors_species_id: 'baku_ma',
+    emergence_band: 'mid_rim',
+    lineage_note: 'Corrupted dream entities. Living dream-states from the Baku-Ma archive that have been running for a million years without waking.',
+  },
 };
 
 // ----- ELEMENTAL PLANES -----
@@ -1151,6 +1238,11 @@ export const EFREET_RACE: RaceTemplate = {
   mortalWorldWeakness: 'Water causes pain',
   typicalAlignment: 'lawful',
   societyType: 'sultanate',
+  precursorsLineage: {
+    precursors_species_id: 'djinn_ahl',
+    emergence_band: 'core',
+    lineage_note: 'Fire-aspect Djinn-Ahl. Oldest extant sapient species — smokeless fire is quantum vacuum interaction. Gardener-adjacent.',
+  },
 };
 
 export const DJINN_RACE: RaceTemplate = {

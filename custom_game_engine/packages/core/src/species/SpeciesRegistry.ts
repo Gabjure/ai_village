@@ -51,6 +51,15 @@ export interface SpeciesTemplate {
   cross_game_compatible?: boolean; // Whether this species can migrate between games
   native_game?: string; // Origin game identifier (e.g. 'mvee', 'precursors', 'both')
   genome_flags?: Record<string, unknown>; // Species-specific heritable parameters
+
+  // Precursors lineage metadata (unified cross-game species mapping)
+  // Reference: games/precursors/docs/SPECIES_LORE_CARDS.md
+  precursors_lineage?: {
+    precursors_species_id: string; // Canonical Precursors species ID (e.g. 'naga_vel', 'djinn_ahl')
+    emergence_band: 'core' | 'inner_rim' | 'mid_rim' | 'outer_rim' | 'void';
+    sapience_date: string; // Approximate date (e.g. '~1.8 Bya', '~3.5 Bya', 'shee_created')
+    chorus_connection: string; // Brief description of species' relationship to the Chorus
+  };
 }
 
 // ============================================================================

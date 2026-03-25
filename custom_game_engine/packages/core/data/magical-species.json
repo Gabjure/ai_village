@@ -39,6 +39,12 @@
         "sacred_texts": ["Quetzalcoatl taught civilization", "Chinese dragons control weather and rivers", "Tiamat shaped the cosmos", "Fafnir guards knowledge"],
         "abilities_in_myth": ["Flight", "Breath weapons", "Shape-changing", "Prophecy", "Immortality", "Vast knowledge"],
         "cultural_significance": "Present in nearly every human culture as beings of ultimate power and wisdom"
+      },
+      "precursors_lineage": {
+        "precursors_species_id": "dragon",
+        "emergence_band": "core",
+        "sapience_date": "~2 Bya",
+        "chorus_connection": "Post-temporal civilization old enough to remember pre-Chorus civilizations. Can perceive the Emergence Frequency as a 3D object rather than a linear signal. Know where it ends but will not say."
       }
     },
 
@@ -81,6 +87,12 @@
         "sacred_texts": ["Cannot lie but truth can deceive", "Bound by oath and contract", "Iron burns them", "Steal children to replace with changelings", "Time moves differently in their realm"],
         "abilities_in_myth": ["Glamour and illusion", "Shape-changing", "Controlling nature", "Granting boons and curses", "Dancing through time"],
         "cultural_significance": "Found across Indo-European cultures as beings both beautiful and terrible, bound by ancient laws"
+      },
+      "precursors_lineage": {
+        "precursors_species_id": "high_fae",
+        "emergence_band": "void",
+        "sapience_date": "unknown",
+        "chorus_connection": "Consciousness from near-silence at the boundary of the Emergence Frequency. May have witnessed the Chorus answer in some branch of the multiverse. Timeline-walking ability gives unique perspective."
       }
     },
 
@@ -123,6 +135,12 @@
         "sacred_texts": ["Only the pure of heart may approach", "Horn purifies poison and heals wounds", "Cannot be tamed, only befriended", "Qilin appears at birth of great sages"],
         "abilities_in_myth": ["Healing touch", "Poison detection", "Empathic sensing", "Forest communication"],
         "cultural_significance": "Universal symbol of purity and wild nature's wisdom"
+      },
+      "precursors_lineage": {
+        "precursors_species_id": "unicorn",
+        "emergence_band": "inner_rim",
+        "sapience_date": "proposed",
+        "chorus_connection": "Guardian species with telepathic network spanning continents. Arrived during the Cambrian explosion, seeding complex life and guiding evolution. Detect quantum coherence in neural patterns."
       }
     },
 
@@ -165,6 +183,12 @@
         "sacred_texts": ["Chiron taught Achilles, Heracles, Jason", "First astronomers and herbalists", "Represent duality of civilized and wild", "Some wise, some savage"],
         "abilities_in_myth": ["Unmatched archery", "Healing knowledge", "Astronomical wisdom", "Philosophical insight"],
         "cultural_significance": "Embody the tension between intellect and instinct, civilization and wilderness"
+      },
+      "precursors_lineage": {
+        "precursors_species_id": "centaur",
+        "emergence_band": "mid_rim",
+        "sapience_date": "proposed",
+        "chorus_connection": "Engineered philosopher-warriors with kinetic cognition. Dual-consciousness synthesis allows deep contemplation while in motion. Greek tradition encodes their astronomical mastery."
       }
     },
 
@@ -207,6 +231,12 @@
         "sacred_texts": ["Guard the underworld and sacred waters", "Can bring rain or drought", "Kings of the serpent realm", "Both benevolent and wrathful"],
         "abilities_in_myth": ["Shape-changing", "Controlling weather", "Guarding treasures", "Granting boons"],
         "cultural_significance": "Central to Hindu-Buddhist cosmology as powerful spirits of water and earth"
+      },
+      "precursors_lineage": {
+        "precursors_species_id": "naga_vel",
+        "emergence_band": "inner_rim",
+        "sapience_date": "~1.8 Bya",
+        "chorus_connection": "Serpent peoples of ocean-trench and desert oasis kingdoms. One of the oldest Inner Rim civilizations. Hindu/Buddhist Naga traditions encode their real presence."
       }
     },
 
@@ -248,6 +278,12 @@
         "sacred_texts": ["Great Sphinx guards the pyramids", "Greek sphinx devours those who fail her riddle", "Guardians of secret knowledge"],
         "abilities_in_myth": ["Posing impossible riddles", "Devouring the unworthy", "Flight", "Prophecy"],
         "cultural_significance": "Represent the test of wisdom required to access sacred knowledge"
+      },
+      "precursors_lineage": {
+        "precursors_species_id": "sphinx",
+        "emergence_band": "inner_rim",
+        "sapience_date": "proposed",
+        "chorus_connection": "Threshold guardians that test cognitive architecture through riddles. Egyptian guardian and Greek riddler traditions both encode real encounters. Living quality-control for reality."
       }
     },
 
@@ -290,6 +326,12 @@
         "sacred_texts": ["Created from smokeless fire", "Have free will like humans", "Can be righteous or wicked", "Live in parallel dimension", "Can marry humans"],
         "abilities_in_myth": ["Invisibility", "Shape-changing", "Elemental control", "Flight", "Vast strength"],
         "cultural_significance": "Islamic doctrine: a parallel creation with full agency and moral responsibility, not servants but equals"
+      },
+      "precursors_lineage": {
+        "precursors_species_id": "djinn_ahl",
+        "emergence_band": "core",
+        "sapience_date": "~3.5 Bya",
+        "chorus_connection": "Oldest known sapient species still extant. Smokeless fire is quantum vacuum interaction. Core Band species with near-perfect Emergence Frequency reception. Gardener-adjacent."
       }
     }
   }

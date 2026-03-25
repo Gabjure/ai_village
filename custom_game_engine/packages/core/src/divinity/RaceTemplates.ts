@@ -313,6 +313,13 @@ export interface RaceTemplate {
 
   /** Default society structure */
   societyType?: string;
+
+  /** Precursors lineage origin — maps this race to its Precursors species ancestry */
+  precursorsLineage?: {
+    precursors_species_id: string; // Canonical Precursors species ID
+    emergence_band: 'core' | 'inner_rim' | 'mid_rim' | 'outer_rim' | 'void';
+    lineage_note: string; // How this race relates to its Precursors ancestor
+  };
 }
 
 // ============================================================================

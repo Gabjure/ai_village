@@ -12,6 +12,8 @@ Sapient species are the intelligent beings that form societies. Different univer
 
 Species defines the **biological constraints**; culture (see `culture-system.md`) defines the **social expressions** within those constraints.
 
+**Cross-game lineage:** Every MVEE species maps to a Precursors-universe origin via `precursorsLineage`. See the unified [Species Lore Cards](../../../../docs/SPECIES_LORE_CARDS.md) and [Galactic Timeline](../../../../docs/GALACTIC_TIMELINE.md) for canonical lineage data.
+
 ---
 
 ## Species Architecture
@@ -48,6 +50,18 @@ interface Species {
   // Appearance
   appearanceTemplate: AppearanceTemplate;
   sizeCategory: SizeCategory;
+
+  // Cross-game lineage (Precursors universe mapping)
+  // See: games/precursors/docs/SPECIES_LORE_CARDS.md
+  // See: games/precursors/docs/GALACTIC_TIMELINE.md Section VII
+  precursorsLineage?: PrecursorsLineage;
+}
+
+interface PrecursorsLineage {
+  precursors_species_id: string;  // Canonical Precursors species ID
+  emergence_band: "core" | "inner_rim" | "mid_rim" | "outer_rim" | "void";
+  sapience_date: string;          // e.g. "~1.8 Bya", "shee_created"
+  chorus_connection: string;      // Species' relationship to the Chorus
 }
 
 type UniverseType = "realistic" | "fantasy" | "scifi" | "surreal" | "dream";

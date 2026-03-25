@@ -209,7 +209,8 @@
       "realmBound": false,
       "canSurviveMortalWorld": true,
       "typicalAlignment": "neutral",
-      "societyType": "divine_court"
+      "societyType": "divine_court",
+      "precursorsLineage": {"precursors_species_id": "shee", "emergence_band": "outer_rim", "lineage_note": "Shee-archetype deities manifested through collective cultural memory"}
     },
     {
       "id": "demigod",
@@ -252,7 +253,8 @@
       "realmBound": false,
       "canSurviveMortalWorld": true,
       "typicalAlignment": "neutral",
-      "societyType": "heroic_band"
+      "societyType": "heroic_band",
+      "precursorsLineage": {"precursors_species_id": "shee", "emergence_band": "outer_rim", "lineage_note": "Hybrid offspring of Shee-archetype divinities and mortals"}
     },
     {
       "id": "nymph",
@@ -295,7 +297,8 @@
       "canSurviveMortalWorld": true,
       "mortalWorldWeakness": "Weakens if separated from bound location",
       "typicalAlignment": "neutral",
-      "societyType": "loose_gathering"
+      "societyType": "loose_gathering",
+      "precursorsLineage": {"precursors_species_id": "landvaettir", "emergence_band": "outer_rim", "lineage_note": "Location-bound geological sentinel consciousness in Greek cultural lens"}
     },
     {
       "id": "satyr",
@@ -339,7 +342,8 @@
       "realmBound": false,
       "canSurviveMortalWorld": true,
       "typicalAlignment": "chaotic",
-      "societyType": "revelry_band"
+      "societyType": "revelry_band",
+      "precursorsLineage": {"precursors_species_id": "patupaiarehe", "emergence_band": "outer_rim", "lineage_note": "Musical nature spirits paralleling Patupaiarehe Chorus-frequency encoding"}
     },
     {
       "id": "sidhe",
@@ -378,7 +382,8 @@
       "canSurviveMortalWorld": true,
       "mortalWorldWeakness": "Powers diminished, iron more common",
       "typicalAlignment": "chaotic",
-      "societyType": "feudal_courts"
+      "societyType": "feudal_courts",
+      "precursorsLineage": {"precursors_species_id": "high_fae", "emergence_band": "void", "lineage_note": "Noble Fae — Void Band beings who retained material-interface capability"}
     },
     {
       "id": "pixie",
@@ -418,7 +423,8 @@
       "canSurviveMortalWorld": true,
       "mortalWorldWeakness": "More vulnerable to iron",
       "typicalAlignment": "chaotic",
-      "societyType": "swarm"
+      "societyType": "swarm",
+      "precursorsLineage": {"precursors_species_id": "high_fae", "emergence_band": "void", "lineage_note": "Lesser Fae sub-lineage with diminished Void Band presence"}
     },
     {
       "id": "redcap",
@@ -459,7 +465,8 @@
       "realmBound": false,
       "canSurviveMortalWorld": true,
       "typicalAlignment": "chaotic",
-      "societyType": "solitary"
+      "societyType": "solitary",
+      "precursorsLineage": {"precursors_species_id": "high_fae", "emergence_band": "void", "lineage_note": "Corrupted Fae sub-lineage with degraded Chorus reception"}
     },
     {
       "id": "shade",
@@ -508,7 +515,8 @@
       "canSurviveMortalWorld": false,
       "mortalWorldWeakness": "Fades into nothing without underworld energy",
       "typicalAlignment": "neutral",
-      "societyType": "wandering_masses"
+      "societyType": "wandering_masses",
+      "precursorsLineage": {"precursors_species_id": "draugrn", "emergence_band": "outer_rim", "lineage_note": "Memory-faded echoes of Draugrn archival impulse"}
     },
     {
       "id": "fury",
@@ -549,7 +557,8 @@
       "realmBound": false,
       "canSurviveMortalWorld": true,
       "typicalAlignment": "lawful",
-      "societyType": "trio"
+      "societyType": "trio",
+      "precursorsLineage": {"precursors_species_id": "draugrn", "emergence_band": "outer_rim", "lineage_note": "Vengeance-aspect of undying archivists — Draugrn guardianship enforcer role"}
     },
     {
       "id": "aesir",
@@ -596,7 +605,8 @@
       "realmBound": false,
       "canSurviveMortalWorld": true,
       "typicalAlignment": "lawful",
-      "societyType": "divine_court"
+      "societyType": "divine_court",
+      "precursorsLineage": {"precursors_species_id": "shee", "emergence_band": "outer_rim", "lineage_note": "Norse divine-architect tradition echoing the Seventh Civilization"}
     },
     {
       "id": "valkyrie",
@@ -640,7 +650,8 @@
       "realmBound": false,
       "canSurviveMortalWorld": true,
       "typicalAlignment": "lawful",
-      "societyType": "sisterhood"
+      "societyType": "sisterhood",
+      "precursorsLineage": {"precursors_species_id": "valkyr", "emergence_band": "outer_rim", "lineage_note": "Shee-designed lineage monitors — Norse Valkyrie tradition encodes Valkyr observation role"}
     },
     {
       "id": "einherjar",
@@ -685,7 +696,8 @@
       "canSurviveMortalWorld": false,
       "mortalWorldWeakness": "Cannot revive outside Valhalla",
       "typicalAlignment": "lawful",
-      "societyType": "warrior_band"
+      "societyType": "warrior_band",
+      "precursorsLineage": {"precursors_species_id": "grendel", "emergence_band": "outer_rim", "lineage_note": "Grendel territorial-warrior lineage mythologized as honored eternal warriors"}
     },
     {
       "id": "seraph",
@@ -736,7 +748,8 @@
       "realmBound": false,
       "canSurviveMortalWorld": true,
       "typicalAlignment": "lawful",
-      "societyType": "celestial_choir"
+      "societyType": "celestial_choir",
+      "precursorsLineage": {"precursors_species_id": "garuda_vel", "emergence_band": "inner_rim", "lineage_note": "Garuda-Vel predator-scholar tradition in Abrahamic angelic hierarchy"}
     },
     {
       "id": "angel",
@@ -780,7 +793,8 @@
       "realmBound": false,
       "canSurviveMortalWorld": true,
       "typicalAlignment": "lawful",
-      "societyType": "celestial_hierarchy"
+      "societyType": "celestial_hierarchy",
+      "precursorsLineage": {"precursors_species_id": "garuda_vel", "emergence_band": "inner_rim", "lineage_note": "Garuda-Vel lineage as humanoid winged messengers"}
     },
     {
       "id": "oneiroi",
@@ -828,7 +842,8 @@
       "canSurviveMortalWorld": true,
       "mortalWorldWeakness": "Weakened when no one is dreaming",
       "typicalAlignment": "neutral",
-      "societyType": "loose_family"
+      "societyType": "loose_family",
+      "precursorsLineage": {"precursors_species_id": "baku_ma", "emergence_band": "mid_rim", "lineage_note": "Baku-Ma dream-archive keepers in Greek dream-god tradition"}
     },
     {
       "id": "nightmare",
@@ -869,7 +884,8 @@
       "realmBound": false,
       "canSurviveMortalWorld": true,
       "typicalAlignment": "chaotic",
-      "societyType": "solitary"
+      "societyType": "solitary",
+      "precursorsLineage": {"precursors_species_id": "baku_ma", "emergence_band": "mid_rim", "lineage_note": "Corrupted Baku-Ma dream-states running for a million years unwaking"}
     },
     {
       "id": "efreet",
@@ -922,7 +938,8 @@
       "canSurviveMortalWorld": true,
       "mortalWorldWeakness": "Water causes pain",
       "typicalAlignment": "lawful",
-      "societyType": "sultanate"
+      "societyType": "sultanate",
+      "precursorsLineage": {"precursors_species_id": "djinn_ahl", "emergence_band": "core", "lineage_note": "Fire-aspect Djinn-Ahl — oldest extant sapient species, Gardener-adjacent"}
     },
     {
       "id": "djinn",
@@ -975,7 +992,8 @@
       "realmBound": false,
       "canSurviveMortalWorld": true,
       "typicalAlignment": "chaotic",
-      "societyType": "loose_tribes"
+      "societyType": "loose_tribes",
+      "precursorsLineage": {"precursors_species_id": "djinn_ahl", "emergence_band": "core", "lineage_note": "Oldest known sapient species — smokeless fire is quantum vacuum interaction"}
     },
     {
       "id": "human",
@@ -1022,7 +1040,8 @@
       "realmBound": false,
       "canSurviveMortalWorld": true,
       "typicalAlignment": "neutral",
-      "societyType": "various"
+      "societyType": "various",
+      "precursorsLineage": {"precursors_species_id": "human", "emergence_band": "outer_rim", "lineage_note": "Urd Prime native or near-system species — Earth origin"}
     }
   ]
 }
