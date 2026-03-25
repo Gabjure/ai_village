@@ -567,6 +567,11 @@ export class MVEEPolicyInference {
         console.warn(`[MVEEPolicy] Species policy not available for ${species} (HTTP ${resp.status})`);
         continue;
       }
+      const contentType = resp.headers.get('content-type') ?? '';
+      if (!contentType.includes('application/json')) {
+        console.warn(`[MVEEPolicy] Species policy for ${species} returned non-JSON content-type: ${contentType} (URL may be misconfigured)`);
+        continue;
+      }
       try {
         this.loadSpeciesModel(species, await resp.json() as ModelWeights);
         loaded++;

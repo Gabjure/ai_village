@@ -428,7 +428,7 @@ async function registerAllSystems(
 
     // Load species policy NNs for System 1 fast path (non-blocking)
     const { mveePolicy } = await import('@ai-village/llm');
-    const speciesBaseUrl = '/weights/species';
+    const speciesBaseUrl = `${import.meta.env.BASE_URL}weights/species`;
     mveePolicy.loadSpeciesFromURLs({
       norn: `${speciesBaseUrl}/norn_policy.json`,
       dvergar: `${speciesBaseUrl}/dvergar_policy.json`,
