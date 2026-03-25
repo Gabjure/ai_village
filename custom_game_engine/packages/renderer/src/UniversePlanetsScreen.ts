@@ -16,7 +16,7 @@ import {
   PLANET_CATEGORIES,
   PLANET_TYPE_INFO,
 } from '@ai-village/world';
-import { LLM_PROXY_URL } from './urlConfig.js';
+import { API_BASE_URL } from './urlConfig.js';
 
 export interface PlanetMetadata {
   id: string;
@@ -55,7 +55,7 @@ export class UniversePlanetsScreen {
   private isLoading: boolean = false;
   private serverAvailable: boolean = false;
 
-  private readonly API_BASE = LLM_PROXY_URL;
+  private readonly API_BASE = API_BASE_URL;
 
   constructor(containerId: string = 'universe-planets-screen') {
     const existing = document.getElementById(containerId);

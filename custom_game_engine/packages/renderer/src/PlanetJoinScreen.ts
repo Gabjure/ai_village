@@ -40,7 +40,8 @@ const BIOME_CONFIG: Record<string, { icon: string; color: string }> = {
   unknown: { icon: '🌍', color: '#666666' },
 };
 
-import { LLM_PROXY_URL } from './urlConfig.js';
+import { API_BASE_URL } from './urlConfig.js';
+import { SPRITE_BASE_PATH } from './sprites/spriteBasePath.js';
 
 export class PlanetJoinScreen {
   private container: HTMLElement;
@@ -53,7 +54,7 @@ export class PlanetJoinScreen {
   private spritesChecked: number = 0;
   private spritesReady: number = 0;
 
-  private readonly METRICS_API = LLM_PROXY_URL;
+  private readonly METRICS_API = API_BASE_URL;
 
   constructor(containerId: string = 'planet-join-screen', callbacks: PlanetJoinCallbacks) {
     this.callbacks = callbacks;
@@ -168,7 +169,7 @@ export class PlanetJoinScreen {
   private async checkSpriteStatus(species: JoinSpecies): Promise<void> {
     try {
       // Try to fetch the sprite directly
-      const spriteUrl = `${this.METRICS_API}/api/sprites/${species.folderId}/south.png`;
+      const spriteUrl = `${SPRITE_BASE_PATH}/${species.folderId}/south.png`;
       const response = await fetch(spriteUrl, { method: 'HEAD' });
 
       if (response.ok) {

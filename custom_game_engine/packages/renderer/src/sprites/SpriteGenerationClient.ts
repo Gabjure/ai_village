@@ -7,6 +7,7 @@
 
 import type { SpriteTraits } from './SpriteRegistry.js';
 import { markSpriteAvailable, markSpriteMissing } from './SpriteService.js';
+import { API_BASE_URL } from '../urlConfig.js';
 
 // Track map object sprites that have been requested to avoid duplicates
 const requestedMapObjects = new Set<string>();
@@ -23,8 +24,8 @@ interface GenerationRequest {
 // Track active generation requests
 const activeRequests = new Map<string, GenerationRequest>();
 
-// Server endpoint for sprite generation
-const GENERATION_ENDPOINT = '/api/sprites/generate';
+// Server endpoint for sprite generation — uses API_BASE_URL so it works behind /mvee base path
+const GENERATION_ENDPOINT = `${API_BASE_URL}/api/sprites/generate`;
 
 /**
  * Request sprite generation from the server
@@ -69,7 +70,11 @@ export async function requestSpriteGeneration(
 
     const result = await response.json();
 
-    if (result.status === 'queued' || result.status === 'generating') {
+    if (result.status === 'failed') {
+      request.status = 'failed';
+      markSpriteMissing(folderId);
+      activeRequests.delete(folderId);
+    } else if (result.status === 'queued' || result.status === 'generating') {
       request.status = 'generating';
       // Poll for completion
       pollGenerationStatus(folderId);

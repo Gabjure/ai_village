@@ -13,9 +13,10 @@ import type { IWindowPanel } from './types/WindowTypes.js';
 import type { PixelLabSpriteLoader } from './sprites/PixelLabSpriteLoader.js';
 
 const DIRECTIONS = ['south', 'southwest', 'west', 'northwest', 'north', 'northeast', 'east', 'southeast'];
-import { LLM_PROXY_URL } from './urlConfig.js';
+import { API_BASE_URL } from './urlConfig.js';
+import { SPRITE_BASE_PATH } from './sprites/spriteBasePath.js';
 
-const METRICS_API = LLM_PROXY_URL;
+const METRICS_API = API_BASE_URL;
 
 interface SpriteInfo {
   id: string;
@@ -433,7 +434,7 @@ export class SpriteGalleryPanel implements IWindowPanel {
     const img = document.querySelector(`#sprite-${CSS.escape(spriteId)} img`) as HTMLImageElement;
     const indicator = document.querySelector(`#sprite-${CSS.escape(spriteId)} .direction-indicator`);
     if (img) {
-      img.src = `${METRICS_API}/api/sprites/${spriteId}/${direction}.png`;
+      img.src = `${SPRITE_BASE_PATH}/${spriteId}/${direction}.png`;
     }
     if (indicator) {
       indicator.textContent = direction;
@@ -518,7 +519,7 @@ export class SpriteGalleryPanel implements IWindowPanel {
         const dirIdx = this.spriteDirections.get(sprite.id) || 0;
         const direction = DIRECTIONS[dirIdx];
         const imgSrc = sprite.hasImage
-          ? `${METRICS_API}/api/sprites/${sprite.id}/${direction}.png`
+          ? `${SPRITE_BASE_PATH}/${sprite.id}/${direction}.png`
           : '';
 
         html += `

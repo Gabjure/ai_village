@@ -6,7 +6,7 @@
  */
 
 import type { Entity, World } from '@ai-village/core';
-import { LLM_PROXY_URL } from '../urlConfig.js';
+import { API_BASE_URL } from '../urlConfig.js';
 import { SPRITE_BASE_PATH } from '../sprites/spriteBasePath.js';
 
 /** Production quality levels */
@@ -487,7 +487,7 @@ export class ProductionRenderer {
 
     // Queue the sprite generation via metrics server API
     try {
-      const response = await fetch(`${LLM_PROXY_URL}/api/sprites/generate`, {
+      const response = await fetch(`${API_BASE_URL}/api/sprites/generate`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

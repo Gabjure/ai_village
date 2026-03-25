@@ -9,7 +9,8 @@
  * - Species appear as they're generated
  */
 
-import { API_BASE_URL, LLM_PROXY_URL } from './urlConfig.js';
+import { API_BASE_URL } from './urlConfig.js';
+import { SPRITE_BASE_PATH } from './sprites/spriteBasePath.js';
 
 export interface ArtStyleConfig {
   preset: string | null;  // null if custom
@@ -699,7 +700,6 @@ export class LivePlanetCreationScreen {
    * Then starts polling for generation completion.
    */
   private async queueSpriteGeneration(species: GeneratedSpecies): Promise<void> {
-    const METRICS_API = LLM_PROXY_URL;
     const folderId = this.sanitizeFolderId(species.name);
     species.folderId = folderId;
 
@@ -711,7 +711,7 @@ export class LivePlanetCreationScreen {
     const description = `${species.name}, ${species.type} from ${species.biome} biome, ${artStyleString}, game sprite`;
 
     try {
-      const response = await fetch(`${METRICS_API}/api/sprites/generate`, {
+      const response = await fetch(`${API_BASE_URL}/api/sprites/generate`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -734,9 +734,20 @@ export class LivePlanetCreationScreen {
         console.warn(`[LivePlanetCreation] Failed to queue sprite for ${species.name}`);
         species.spriteStatus = 'failed';
       } else {
-        species.spriteStatus = 'generating';
-        // Start polling for this species' sprite completion
-        this.pollSpriteStatus(species);
+        const result = await response.json();
+        if (result.status === 'failed') {
+          console.warn(`[LivePlanetCreation] Sprite generation not available: ${result.error || 'unknown'}`);
+          species.spriteStatus = 'failed';
+        } else if (result.status === 'complete') {
+          // Sprite already exists
+          species.spriteUrl = `${SPRITE_BASE_PATH}/${folderId}/south.png`;
+          species.spriteStatus = 'ready';
+          this.addLog(`Sprite ready: ${species.name}`);
+        } else {
+          species.spriteStatus = 'generating';
+          // Start polling for this species' sprite completion
+          this.pollSpriteStatus(species);
+        }
       }
     } catch (error) {
       // Non-fatal - species still appears in local UI even if sprite queue fails
@@ -752,7 +763,6 @@ export class LivePlanetCreationScreen {
    * Uses exponential backoff with a max retry cap to avoid infinite 404 loops.
    */
   private async pollSpriteStatus(species: GeneratedSpecies): Promise<void> {
-    const METRICS_API = LLM_PROXY_URL;
     const folderId = species.folderId;
     if (!folderId) return;
 
@@ -771,7 +781,7 @@ export class LivePlanetCreationScreen {
       attempt++;
 
       try {
-        const response = await fetch(`${METRICS_API}/api/sprites/generate/status/${folderId}`);
+        const response = await fetch(`${API_BASE_URL}/api/sprites/generate/status/${folderId}`);
         if (!response.ok) {
           // Not found yet — backoff and retry
           const delay = BASE_DELAY_MS * Math.pow(1.5, attempt - 1);
@@ -781,7 +791,7 @@ export class LivePlanetCreationScreen {
 
         const status = await response.json();
         if (status.status === 'complete') {
-          species.spriteUrl = `${METRICS_API}/api/sprites/${folderId}/south.png`;
+          species.spriteUrl = `${SPRITE_BASE_PATH}/${folderId}/south.png`;
           species.spriteStatus = 'ready';
           species.otherDirectionsQueued = true;
           this.addLog(`Sprite ready: ${species.name}`);
@@ -811,7 +821,6 @@ export class LivePlanetCreationScreen {
    * Deletes the existing sprite and re-queues generation.
    */
   private async regenerateSprite(species: GeneratedSpecies): Promise<void> {
-    const METRICS_API = LLM_PROXY_URL;
     const folderId = species.folderId || this.sanitizeFolderId(species.name);
 
     // Reset status
@@ -827,7 +836,7 @@ export class LivePlanetCreationScreen {
 
       const description = `${species.name}, ${species.type} from ${species.biome} biome, ${artStyleString}, game sprite`;
 
-      const response = await fetch(`${METRICS_API}/api/sprites/generate`, {
+      const response = await fetch(`${API_BASE_URL}/api/sprites/generate`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -848,9 +857,14 @@ export class LivePlanetCreationScreen {
       });
 
       if (response.ok) {
-        species.spriteStatus = 'generating';
-        this.addLog(`Regenerating sprite: ${species.name}`);
-        this.pollSpriteStatus(species);
+        const result = await response.json();
+        if (result.status === 'failed') {
+          species.spriteStatus = 'failed';
+        } else {
+          species.spriteStatus = 'generating';
+          this.addLog(`Regenerating sprite: ${species.name}`);
+          this.pollSpriteStatus(species);
+        }
       } else {
         species.spriteStatus = 'failed';
       }
