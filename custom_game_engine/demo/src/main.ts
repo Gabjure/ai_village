@@ -236,6 +236,7 @@ import {
   OnboardingOverlay,
   UniversePostcardsGallery,
   LocalStoragePostcardSource,
+  ServerPostcardSource,
 } from '@ai-village/renderer';
 import {
   OllamaProvider,
@@ -5552,11 +5553,12 @@ async function main() {
     });
   });
 
-  // === Universe Postcards Gallery (Drive 5: Social — MUL-3568) ===
+  // === Universe Postcards Gallery (Drive 5: Social — MUL-3568, MUL-3572) ===
   const worldSnapshotService = new WorldSnapshotService();
   worldSnapshotService.initialize(gameLoop.world, gameLoop.world.eventBus);
 
-  const postcardDataSource = new LocalStoragePostcardSource();
+  // Use server-backed source for classmate browsing (MUL-3572), falls back to localStorage
+  const postcardDataSource = new ServerPostcardSource();
   const postcardsGallery = new UniversePostcardsGallery(
     postcardDataSource,
     () => worldSnapshotService.captureSnapshot(gameLoop.world),
