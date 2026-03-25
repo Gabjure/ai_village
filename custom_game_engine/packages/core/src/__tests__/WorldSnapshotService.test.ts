@@ -446,7 +446,7 @@ describe('PostcardSharingService', () => {
       expect(result.dominantBiome).toBe('forest');
     });
 
-    it('truncates title to 60 chars and description to 280 chars', async () => {
+    it('truncates title to 50 chars and description to 200 chars', async () => {
       const longTitle = 'A'.repeat(100);
       const longDesc = 'B'.repeat(500);
       const result = await sharingService.sharePostcard(makePostcard(), {
@@ -455,8 +455,8 @@ describe('PostcardSharingService', () => {
         description: longDesc,
       });
 
-      expect(result.title.length).toBe(60);
-      expect(result.description.length).toBe(280);
+      expect(result.title.length).toBe(50);
+      expect(result.description.length).toBe(200);
     });
 
     it('throws if playerName is empty', async () => {

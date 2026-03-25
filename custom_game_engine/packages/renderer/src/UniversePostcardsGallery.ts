@@ -9,6 +9,7 @@
  */
 
 import type { UniversePostcard } from '@ai-village/core';
+import { PostcardSharingService } from '@ai-village/core';
 
 // ─── Re-export SharedPostcard for consumers ───────────────────────────────────
 
@@ -79,6 +80,45 @@ export class LocalStoragePostcardSource implements PostcardDataSource {
   }
 }
 
+// ─── Server-backed postcard source ────────────────────────────────────────────
+
+export class ServerPostcardSource implements PostcardDataSource {
+  private service: PostcardSharingService;
+
+  constructor(serverBaseUrl?: string) {
+    this.service = new PostcardSharingService(serverBaseUrl);
+  }
+
+  async listPostcards(): Promise<SharedPostcard[]> {
+    try {
+      const postcards = await this.service.listSharedPostcards();
+      return postcards.map((p) => ({
+        ...p,
+        id: (p as SharedPostcard).id ?? crypto.randomUUID(),
+      })) as SharedPostcard[];
+    } catch (err) {
+      console.error('[PostcardGallery] Failed to list postcards from server:', err);
+      return [];
+    }
+  }
+
+  async sharePostcard(
+    postcard: UniversePostcard,
+    title: string,
+    description: string,
+  ): Promise<SharedPostcard> {
+    const result = await this.service.sharePostcard(postcard, {
+      playerName: 'Anonymous Explorer',
+      title,
+      description,
+    });
+    return {
+      ...result,
+      id: (result as SharedPostcard).id ?? crypto.randomUUID(),
+    } as SharedPostcard;
+  }
+}
+
 // ─── Sort options ──────────────────────────────────────────────────────────────
 
 type SortMode = 'newest' | 'oldest' | 'most-agents' | 'world-age';
@@ -93,7 +133,10 @@ export class UniversePostcardsGallery {
   private postcards: SharedPostcard[] = [];
   private sortMode: SortMode = 'newest';
   private shareModalEl: HTMLElement | null = null;
+  private detailModalEl: HTMLElement | null = null;
   private stylesInjected: boolean = false;
+  private biomeFilter: string | null = null;
+  private epochFilter: string | null = null;
 
   // ESC key listener — stored so we can clean up on destroy
   private readonly escListener: (e: KeyboardEvent) => void;
@@ -124,7 +167,9 @@ export class UniversePostcardsGallery {
 
     this.escListener = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
-        if (this.shareModalEl) {
+        if (this.detailModalEl) {
+          this.closeDetailModal();
+        } else if (this.shareModalEl) {
           this.closeShareModal();
         } else {
           this.hide();
@@ -170,7 +215,16 @@ export class UniversePostcardsGallery {
   }
 
   private getSortedPostcards(): SharedPostcard[] {
-    const copy = [...this.postcards];
+    let copy = [...this.postcards];
+
+    // Apply filters
+    if (this.biomeFilter !== null) {
+      copy = copy.filter((p) => p.dominantBiome === this.biomeFilter);
+    }
+    if (this.epochFilter !== null) {
+      copy = copy.filter((p) => p.epochTitle === this.epochFilter);
+    }
+
     switch (this.sortMode) {
       case 'newest':
         return copy.sort((a, b) => b.sharedAt.localeCompare(a.sharedAt));
@@ -303,15 +357,87 @@ export class UniversePostcardsGallery {
       bar.appendChild(btn);
     }
 
+    // Separator
+    const sep = document.createElement('div');
+    sep.style.cssText = 'width: 1px; height: 20px; background: rgba(255,255,255,0.08); margin: 0 6px;';
+    bar.appendChild(sep);
+
+    // Biome filter
+    const uniqueBiomes = [...new Set(this.postcards.map((p) => p.dominantBiome).filter(Boolean))].sort();
+    const biomeSelect = document.createElement('select');
+    biomeSelect.style.cssText = `
+      padding: 7px 12px;
+      font-size: 12px;
+      font-family: monospace;
+      background: rgba(20, 20, 50, 0.8);
+      color: #8fa8ff;
+      border: 1px solid #2a2a4a;
+      border-radius: 6px;
+      cursor: pointer;
+      outline: none;
+    `;
+    const biomeAll = document.createElement('option');
+    biomeAll.value = '';
+    biomeAll.textContent = 'All Biomes';
+    biomeSelect.appendChild(biomeAll);
+    for (const biome of uniqueBiomes) {
+      const opt = document.createElement('option');
+      opt.value = biome;
+      opt.textContent = biome;
+      if (this.biomeFilter === biome) opt.selected = true;
+      biomeSelect.appendChild(opt);
+    }
+    biomeSelect.onchange = () => {
+      this.biomeFilter = biomeSelect.value || null;
+      this.render();
+    };
+    bar.appendChild(biomeSelect);
+
+    // Epoch filter
+    const uniqueEpochs = [...new Set(this.postcards.map((p) => p.epochTitle).filter((e): e is string => !!e))].sort();
+    if (uniqueEpochs.length > 0) {
+      const epochSelect = document.createElement('select');
+      epochSelect.style.cssText = `
+        padding: 7px 12px;
+        font-size: 12px;
+        font-family: monospace;
+        background: rgba(20, 20, 50, 0.8);
+        color: #8fa8ff;
+        border: 1px solid #2a2a4a;
+        border-radius: 6px;
+        cursor: pointer;
+        outline: none;
+      `;
+      const epochAll = document.createElement('option');
+      epochAll.value = '';
+      epochAll.textContent = 'All Epochs';
+      epochSelect.appendChild(epochAll);
+      for (const epoch of uniqueEpochs) {
+        const opt = document.createElement('option');
+        opt.value = epoch;
+        opt.textContent = epoch;
+        if (this.epochFilter === epoch) opt.selected = true;
+        epochSelect.appendChild(opt);
+      }
+      epochSelect.onchange = () => {
+        this.epochFilter = epochSelect.value || null;
+        this.render();
+      };
+      bar.appendChild(epochSelect);
+    }
+
     // Spacer
     const spacer = document.createElement('div');
     spacer.style.cssText = 'flex: 1;';
     bar.appendChild(spacer);
 
-    // Count
+    // Count (show filtered vs total)
     const count = document.createElement('span');
-    const n = this.postcards.length;
-    count.textContent = `${n} postcard${n !== 1 ? 's' : ''}`;
+    const filtered = this.getSortedPostcards().length;
+    const total = this.postcards.length;
+    count.textContent = filtered < total
+      ? `${filtered} of ${total} postcard${total !== 1 ? 's' : ''}`
+      : `${total} postcard${total !== 1 ? 's' : ''}`;
     count.style.cssText = 'font-size: 13px; color: #555;';
     bar.appendChild(count);
 
@@ -431,6 +557,8 @@ export class UniversePostcardsGallery {
       transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
       animation: postcardFloatIn 0.35s ease-out ${Math.min(index * 0.04, 0.5)}s both;
     `;
+    card.style.cursor = 'pointer';
+    card.onclick = () => this.openDetailModal(postcard);
     card.onmouseenter = () => {
       card.style.borderColor = 'rgba(100, 120, 255, 0.5)';
       card.style.transform = 'translateY(-3px)';
@@ -657,6 +785,353 @@ export class UniversePostcardsGallery {
     return wrapper;
   }
 
+  // ─── Detail modal ────────────────────────────────────────────────────────────
+
+  private openDetailModal(postcard: SharedPostcard): void {
+    // Backdrop
+    const backdrop = document.createElement('div');
+    backdrop.style.cssText = `
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.75);
+      z-index: 10004;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      box-sizing: border-box;
+    `;
+
+    const modal = document.createElement('div');
+    modal.style.cssText = `
+      background: linear-gradient(160deg, #0e0e28 0%, #141430 100%);
+      border: 1px solid rgba(100, 120, 255, 0.3);
+      border-radius: 16px;
+      padding: 36px;
+      width: 680px;
+      max-width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7), 0 0 40px rgba(100, 120, 255, 0.1);
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      font-family: monospace;
+      color: #e0e0e0;
+      box-sizing: border-box;
+    `;
+
+    // 1. Title
+    const titleEl = document.createElement('h2');
+    titleEl.textContent = postcard.title;
+    titleEl.style.cssText = `
+      margin: 0;
+      font-size: 24px;
+      font-weight: bold;
+      color: #fff;
+      text-shadow: 0 0 20px rgba(100, 120, 255, 0.4);
+      line-height: 1.3;
+    `;
+    modal.appendChild(titleEl);
+
+    // 2. Shared by + date
+    const metaRow = document.createElement('div');
+    metaRow.textContent = `Shared by ${postcard.playerName} · ${this.relativeDate(postcard.sharedAt)}`;
+    metaRow.style.cssText = 'font-size: 13px; color: #666; margin-top: -8px;';
+    modal.appendChild(metaRow);
+
+    // 3. Epoch badge
+    if (postcard.epochTitle) {
+      const badge = document.createElement('span');
+      badge.textContent = postcard.epochTitle;
+      badge.style.cssText = `
+        display: inline-block;
+        padding: 5px 14px;
+        font-size: 12px;
+        background: linear-gradient(135deg, rgba(155, 89, 182, 0.4) 0%, rgba(102, 126, 234, 0.4) 100%);
+        color: #d0c0f8;
+        border: 1px solid rgba(155, 89, 182, 0.3);
+        border-radius: 12px;
+        align-self: flex-start;
+      `;
+      modal.appendChild(badge);
+    }
+
+    // 4. Full description (no line clamping)
+    if (postcard.description && postcard.description.trim()) {
+      const descEl = document.createElement('div');
+      descEl.textContent = postcard.description;
+      descEl.style.cssText = `
+        font-size: 14px;
+        color: #aaa;
+        font-style: italic;
+        line-height: 1.6;
+        padding: 14px 16px;
+        background: rgba(100, 120, 255, 0.05);
+        border-left: 2px solid rgba(100, 120, 255, 0.3);
+        border-radius: 0 6px 6px 0;
+      `;
+      modal.appendChild(descEl);
+    }
+
+    // 5. Stats grid (bigger)
+    const statsGrid = document.createElement('div');
+    statsGrid.style.cssText = `
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    `;
+    const statItems: Array<{ icon: string; label: string; value: string }> = [
+      { icon: '👥', label: 'Agents', value: String(postcard.agentCount) },
+      { icon: '🌍', label: 'World Age', value: `${postcard.worldAge.toFixed(1)} yrs` },
+      { icon: '🏔', label: 'Dominant Biome', value: postcard.dominantBiome },
+    ];
+    for (const { icon, label, value } of statItems) {
+      const cell = document.createElement('div');
+      cell.style.cssText = `
+        background: rgba(100, 120, 255, 0.07);
+        border: 1px solid rgba(100, 120, 255, 0.15);
+        border-radius: 10px;
+        padding: 14px;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        text-align: center;
+      `;
+      const iconEl = document.createElement('div');
+      iconEl.textContent = icon;
+      iconEl.style.cssText = 'font-size: 22px;';
+      cell.appendChild(iconEl);
+      const valEl = document.createElement('div');
+      valEl.textContent = value;
+      valEl.style.cssText = 'font-size: 16px; color: #c0cfff; font-weight: bold;';
+      cell.appendChild(valEl);
+      const lblEl = document.createElement('div');
+      lblEl.textContent = label;
+      lblEl.style.cssText = 'font-size: 11px; color: #556; text-transform: uppercase; letter-spacing: 1px;';
+      cell.appendChild(lblEl);
+      statsGrid.appendChild(cell);
+    }
+    modal.appendChild(statsGrid);
+
+    // 6. Notable agents (full details)
+    if (postcard.notableAgents.length > 0) {
+      const section = document.createElement('div');
+
+      const heading = document.createElement('div');
+      heading.textContent = 'Notable Agents';
+      heading.style.cssText = 'font-size: 12px; color: #556; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px;';
+      section.appendChild(heading);
+
+      const agentList = document.createElement('div');
+      agentList.style.cssText = 'display: flex; flex-direction: column; gap: 6px;';
+
+      for (const agent of postcard.notableAgents) {
+        const agentEl = document.createElement('div');
+        agentEl.style.cssText = `
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          padding: 8px 12px;
+          background: rgba(200, 168, 64, 0.05);
+          border: 1px solid rgba(200, 168, 64, 0.15);
+          border-radius: 8px;
+          font-size: 13px;
+        `;
+
+        const name = document.createElement('span');
+        name.textContent = `"${agent.name}"`;
+        name.style.cssText = 'color: #c8a840; font-weight: bold;';
+        agentEl.appendChild(name);
+
+        const detail = document.createElement('span');
+        detail.textContent = `${agent.species}, age ${agent.age.toFixed(0)}`;
+        detail.style.cssText = 'color: #777;';
+        agentEl.appendChild(detail);
+
+        if (agent.legendStatus) {
+          const legendBadge = document.createElement('span');
+          legendBadge.textContent = `★ ${agent.legendStatus}`;
+          legendBadge.style.cssText = 'color: #c8a840; font-size: 11px; margin-left: auto;';
+          agentEl.appendChild(legendBadge);
+        }
+
+        agentList.appendChild(agentEl);
+      }
+
+      section.appendChild(agentList);
+      modal.appendChild(section);
+    }
+
+    // 7. Magic paradigms as tags
+    if (postcard.activeMagicParadigms.length > 0) {
+      const section = document.createElement('div');
+
+      const heading = document.createElement('div');
+      heading.textContent = 'Magic Paradigms';
+      heading.style.cssText = 'font-size: 12px; color: #556; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px;';
+      section.appendChild(heading);
+
+      const tagsRow = document.createElement('div');
+      tagsRow.style.cssText = 'display: flex; flex-wrap: wrap; gap: 8px;';
+
+      for (const paradigm of postcard.activeMagicParadigms) {
+        const tag = document.createElement('span');
+        tag.textContent = paradigm;
+        tag.style.cssText = `
+          padding: 5px 12px;
+          font-size: 12px;
+          background: rgba(147, 112, 219, 0.2);
+          color: #b39ddb;
+          border: 1px solid rgba(147, 112, 219, 0.3);
+          border-radius: 12px;
+        `;
+        tagsRow.appendChild(tag);
+      }
+
+      section.appendChild(tagsRow);
+      modal.appendChild(section);
+    }
+
+    // 8. Full species breakdown bar (wider)
+    const speciesEntries = Object.entries(postcard.populationBySpecies);
+    if (speciesEntries.length > 0) {
+      const section = document.createElement('div');
+
+      const heading = document.createElement('div');
+      heading.textContent = 'Species Breakdown';
+      heading.style.cssText = 'font-size: 12px; color: #556; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px;';
+      section.appendChild(heading);
+
+      section.appendChild(this.renderSpeciesBar(postcard.populationBySpecies));
+      modal.appendChild(section);
+    }
+
+    // 9. Recent legends list
+    if (postcard.recentLegends && postcard.recentLegends.length > 0) {
+      const section = document.createElement('div');
+
+      const heading = document.createElement('div');
+      heading.textContent = 'Recent Legends';
+      heading.style.cssText = 'font-size: 12px; color: #556; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px;';
+      section.appendChild(heading);
+
+      const legendList = document.createElement('ul');
+      legendList.style.cssText = 'margin: 0; padding: 0 0 0 18px; display: flex; flex-direction: column; gap: 4px;';
+
+      for (const legend of postcard.recentLegends) {
+        const li = document.createElement('li');
+        li.textContent = legend;
+        li.style.cssText = 'font-size: 13px; color: #8888aa; line-height: 1.5;';
+        legendList.appendChild(li);
+      }
+
+      section.appendChild(legendList);
+      modal.appendChild(section);
+    }
+
+    // 10. Population breakdown table (species → count)
+    if (speciesEntries.length > 0) {
+      const section = document.createElement('div');
+
+      const heading = document.createElement('div');
+      heading.textContent = 'Population Table';
+      heading.style.cssText = 'font-size: 12px; color: #556; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px;';
+      section.appendChild(heading);
+
+      const table = document.createElement('div');
+      table.style.cssText = 'display: flex; flex-direction: column; gap: 4px;';
+
+      const sorted = [...speciesEntries].sort((a, b) => b[1] - a[1]);
+      const total = sorted.reduce((sum, [, n]) => sum + n, 0);
+
+      for (const [species, count] of sorted) {
+        const row = document.createElement('div');
+        row.style.cssText = `
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          padding: 6px 10px;
+          background: rgba(255, 255, 255, 0.02);
+          border-radius: 6px;
+          font-size: 13px;
+        `;
+
+        const dot = document.createElement('span');
+        dot.style.cssText = `
+          display: inline-block;
+          width: 8px;
+          height: 8px;
+          border-radius: 50%;
+          background: ${this.speciesColor(species)};
+          flex-shrink: 0;
+        `;
+        row.appendChild(dot);
+
+        const nameEl = document.createElement('span');
+        nameEl.textContent = species;
+        nameEl.style.cssText = 'color: #ccc; flex: 1;';
+        row.appendChild(nameEl);
+
+        const countEl = document.createElement('span');
+        countEl.textContent = String(count);
+        countEl.style.cssText = 'color: #8fa8ff; min-width: 40px; text-align: right;';
+        row.appendChild(countEl);
+
+        const pctEl = document.createElement('span');
+        pctEl.textContent = `${((count / total) * 100).toFixed(1)}%`;
+        pctEl.style.cssText = 'color: #555; min-width: 50px; text-align: right;';
+        row.appendChild(pctEl);
+
+        table.appendChild(row);
+      }
+
+      section.appendChild(table);
+      modal.appendChild(section);
+    }
+
+    // 11. Close button
+    const closeBtn = document.createElement('button');
+    closeBtn.textContent = 'Close';
+    closeBtn.style.cssText = `
+      padding: 11px 28px;
+      font-size: 14px;
+      font-family: monospace;
+      background: transparent;
+      color: #888;
+      border: 1px solid #3a3a5a;
+      border-radius: 8px;
+      cursor: pointer;
+      align-self: flex-end;
+      transition: all 0.2s;
+      margin-top: 4px;
+    `;
+    closeBtn.onmouseenter = () => { closeBtn.style.borderColor = '#667eea'; closeBtn.style.color = '#fff'; };
+    closeBtn.onmouseleave = () => { closeBtn.style.borderColor = '#3a3a5a'; closeBtn.style.color = '#888'; };
+    closeBtn.onclick = () => this.closeDetailModal();
+    modal.appendChild(closeBtn);
+
+    backdrop.appendChild(modal);
+
+    // Close on backdrop click
+    backdrop.onclick = (e) => {
+      if (e.target === backdrop) this.closeDetailModal();
+    };
+
+    this.detailModalEl = backdrop;
+    document.body.appendChild(backdrop);
+  }
+
+  private closeDetailModal(): void {
+    if (this.detailModalEl) {
+      this.detailModalEl.remove();
+      this.detailModalEl = null;
+    }
+  }
+
   // ─── Share modal ─────────────────────────────────────────────────────────────
 
   private openShareModal(): void {
@@ -755,7 +1230,7 @@ export class UniversePostcardsGallery {
     const titleInput = document.createElement('input');
     titleInput.type = 'text';
     titleInput.placeholder = 'Name your universe...';
-    titleInput.maxLength = 80;
+    titleInput.maxLength = 50;
     titleInput.style.cssText = `
       padding: 11px 14px;
       font-size: 14px;

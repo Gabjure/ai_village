@@ -253,9 +253,9 @@ export class WorldSnapshotService {
 export interface PostcardAnnotations {
   /** Sharer's display name. */
   playerName: string;
-  /** Player-chosen universe title (max 60 chars). */
+  /** Player-chosen universe title (max 50 chars). */
   title: string;
-  /** Short description (max 280 chars). */
+  /** Short description (max 200 chars). */
   description: string;
 }
 
@@ -263,17 +263,17 @@ export interface PostcardAnnotations {
 export interface SharedPostcard extends UniversePostcard {
   /** Sharer's display name. */
   playerName: string;
-  /** Player-chosen universe title (max 60 chars). */
+  /** Player-chosen universe title (max 50 chars). */
   title: string;
-  /** Short description (max 280 chars). */
+  /** Short description (max 200 chars). */
   description: string;
   /** ISO 8601 timestamp when shared. */
   sharedAt: string;
 }
 
 const SHARED_POSTCARDS_STORAGE_KEY = 'mvee_shared_postcards';
-const MAX_TITLE_LENGTH = 60;
-const MAX_DESCRIPTION_LENGTH = 280;
+const MAX_TITLE_LENGTH = 50;
+const MAX_DESCRIPTION_LENGTH = 200;
 
 /**
  * Handles uploading/downloading universe postcards for the shared gallery.
