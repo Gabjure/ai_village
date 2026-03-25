@@ -129,6 +129,7 @@ export class UniversePostcardsGallery {
   private container: HTMLElement;
   private dataSource: PostcardDataSource;
   private onCapturePostcard: () => UniversePostcard;
+  private getUniverseName?: () => string | undefined;
 
   private postcards: SharedPostcard[] = [];
   private sortMode: SortMode = 'newest';
@@ -137,6 +138,7 @@ export class UniversePostcardsGallery {
   private stylesInjected: boolean = false;
   private biomeFilter: string | null = null;
   private epochFilter: string | null = null;
+  private playerSearchQuery: string = '';
 
   // ESC key listener — stored so we can clean up on destroy
   private readonly escListener: (e: KeyboardEvent) => void;
@@ -144,9 +146,11 @@ export class UniversePostcardsGallery {
   constructor(
     dataSource: PostcardDataSource,
     onCapturePostcard: () => UniversePostcard,
+    getUniverseName?: () => string | undefined,
   ) {
     this.dataSource = dataSource;
     this.onCapturePostcard = onCapturePostcard;
+    this.getUniverseName = getUniverseName;
 
     this.container = document.createElement('div');
     this.container.id = 'universe-postcards-gallery';
@@ -218,6 +222,10 @@ export class UniversePostcardsGallery {
     let copy = [...this.postcards];
 
     // Apply filters
+    if (this.playerSearchQuery) {
+      const query = this.playerSearchQuery.toLowerCase();
+      copy = copy.filter((p) => p.playerName.toLowerCase().includes(query));
+    }
     if (this.biomeFilter !== null) {
       copy = copy.filter((p) => p.dominantBiome === this.biomeFilter);
     }
@@ -425,6 +433,34 @@ export class UniversePostcardsGallery {
       };
       bar.appendChild(epochSelect);
     }
+
+    // Player search
+    const playerSearch = document.createElement('input');
+    playerSearch.type = 'text';
+    playerSearch.placeholder = 'Search by player...';
+    playerSearch.value = this.playerSearchQuery;
+    playerSearch.style.cssText = `
+      padding: 7px 12px;
+      font-size: 12px;
+      font-family: monospace;
+      background: rgba(20, 20, 50, 0.8);
+      color: #8fa8ff;
+      border: 1px solid #2a2a4a;
+      border-radius: 6px;
+      outline: none;
+      width: 160px;
+    `;
+    playerSearch.addEventListener('focus', () => {
+      playerSearch.style.borderColor = 'rgba(100, 120, 255, 0.5)';
+    });
+    playerSearch.addEventListener('blur', () => {
+      playerSearch.style.borderColor = '#2a2a4a';
+    });
+    playerSearch.addEventListener('input', () => {
+      this.playerSearchQuery = playerSearch.value;
+      this.render();
+    });
+    bar.appendChild(playerSearch);
 
     // Spacer
     const spacer = document.createElement('div');
@@ -1244,6 +1280,13 @@ export class UniversePostcardsGallery {
     `;
     titleInput.onfocus = () => { titleInput.style.borderColor = '#667eea'; };
     titleInput.onblur = () => { titleInput.style.borderColor = '#3a3a5a'; };
+
+    // Pre-populate with universe name if available
+    const universeName = this.getUniverseName?.();
+    if (universeName) {
+      titleInput.value = universeName.slice(0, 50);
+    }
+
     titleLabel.appendChild(titleInput);
     modal.appendChild(titleLabel);
 
