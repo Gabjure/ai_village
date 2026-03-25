@@ -350,6 +350,12 @@ export {
   createCivilizationChronicleComponent,
 } from './services/CivilizationChronicleService.js';
 
+export {
+  WorldSnapshotService,
+  type UniversePostcard,
+  type SharedPostcard,
+} from './services/WorldSnapshotService.js';
+
 // Note: MovementAPI, TargetingAPI, InteractionAPI are re-exported
 // with conflicts from components. Import from @ai-village/core/services
 // if you need those specific APIs.

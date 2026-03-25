@@ -85,6 +85,8 @@ import {
   getActiveFeatureFlags,
   canSpawnNPC,
   getMaxNPCs,
+  // Universe Postcards (Drive 5: Social)
+  WorldSnapshotService,
 } from '@ai-village/core';
 import { saveLoadService, IndexedDBStorage, migrateLocalSaves, checkMigrationStatus, planetClient, multiverseClient, creationStateManager, EntityPersistenceStream, type PlanetMetadata, type CreationState, type SettlementData } from '@ai-village/persistence';
 import { LiveEntityAPI } from '@ai-village/metrics';
@@ -232,6 +234,8 @@ import {
   createSpriteGalleryPanelFactory,
   DiscoveryNamingModal,
   OnboardingOverlay,
+  UniversePostcardsGallery,
+  LocalStoragePostcardSource,
 } from '@ai-village/renderer';
 import {
   OllamaProvider,
@@ -5548,6 +5552,31 @@ async function main() {
     });
   });
 
+  // === Universe Postcards Gallery (Drive 5: Social — MUL-3568) ===
+  const worldSnapshotService = new WorldSnapshotService();
+  worldSnapshotService.initialize(gameLoop.world, gameLoop.world.eventBus);
+
+  const postcardDataSource = new LocalStoragePostcardSource();
+  const postcardsGallery = new UniversePostcardsGallery(
+    postcardDataSource,
+    () => worldSnapshotService.captureSnapshot(gameLoop.world),
+  );
+
+  // Register keyboard shortcut: P for Postcards
+  keyboardRegistry.register('toggle_postcards', {
+    key: 'P',
+    description: 'Toggle Universe Postcards Gallery',
+    category: 'Windows',
+    handler: () => {
+      if (postcardsGallery.isVisible) {
+        postcardsGallery.hide();
+      } else {
+        postcardsGallery.show();
+      }
+      return true;
+    },
+  });
+
   // === Eternal Return: Glyph trigger (MUL-2543) ===
   // When the first settlement is founded, call Folkfork glyph API and display the glyph.
   const glyphOverlay = 'eternalReturnGlyphOverlay' in renderer
@@ -5701,6 +5730,10 @@ async function main() {
   // In-game support prompt (shows after 10 minutes of active play)
   const { initSupportPrompt } = await import('./ui/supportPrompt');
   initSupportPrompt();
+
+  // Always-visible PWYC heart button
+  const { PWYCButton } = await import('./ui/PWYCButton');
+  new PWYCButton();
 
   // Set up periodic auto-saves every 5 minutes (real time)
   // Note: AutoSaveSystem also saves daily at midnight (game time) with canon events
