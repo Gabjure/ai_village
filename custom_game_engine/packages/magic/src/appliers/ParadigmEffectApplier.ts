@@ -16,7 +16,7 @@ import type {
   EffectApplicationResult,
   ActiveEffect,
 } from '../SpellEffect.js';
-import type { EffectApplier, EffectContext } from '../SpellEffectExecutor.js';
+import type { EffectApplier, SpellEffectContext } from '../SpellEffectExecutor.js';
 import type { ParadigmState, ChannelData, RiskData } from '../types/ComponentTypes.js';
 
 // ============================================================================
@@ -44,7 +44,7 @@ export class ParadigmEffectApplier implements EffectApplier<ParadigmEffect> {
     caster: Entity,
     target: Entity,
     _world: World,
-    context: EffectContext
+    context: SpellEffectContext
   ): EffectApplicationResult {
     // Get target's magic component
     const targetMagic = target.getComponent('magic') as MagicComponent | undefined;
@@ -117,7 +117,7 @@ export class ParadigmEffectApplier implements EffectApplier<ParadigmEffect> {
     effect: ParadigmEffect,
     target: Entity,
     _world: World,
-    context: EffectContext
+    context: SpellEffectContext
   ): void {
     // Check if suppression effect has expired
     const operation = effect.parameters.operation as ParadigmOperation;

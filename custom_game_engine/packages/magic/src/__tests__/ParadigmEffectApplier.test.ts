@@ -12,7 +12,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { ParadigmEffectApplier } from '../appliers/ParadigmEffectApplier.js';
 import type { ParadigmEffect } from '../SpellEffect.js';
-import type { EffectContext } from '../SpellEffectExecutor.js';
+import type { SpellEffectContext } from '../SpellEffectExecutor.js';
 import type { Entity, MagicComponent, World } from '@ai-village/core';
 import { createMockWorld as createSharedMockWorld } from '@ai-village/core/__tests__/createMockWorld.js';
 
@@ -80,7 +80,7 @@ function createMockEntity(id: string, hasMagic: boolean = true): Entity {
   } as Record<string, unknown>;
 }
 
-function createMockContext(tick: number = 1000): EffectContext {
+function createMockContext(tick: number = 1000): SpellEffectContext {
   return {
     tick,
     spell: {
@@ -144,7 +144,7 @@ describe('ParadigmEffectApplier', () => {
   let world: World;
   let caster: Entity;
   let target: Entity;
-  let context: EffectContext;
+  let context: SpellEffectContext;
 
   beforeEach(() => {
     applier = new ParadigmEffectApplier();

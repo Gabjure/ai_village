@@ -17,7 +17,7 @@ import type {
   EffectApplicationResult,
   ActiveEffect,
 } from '../SpellEffect.js';
-import type { EffectApplier, EffectContext } from '../SpellEffectExecutor.js';
+import type { EffectApplier, SpellEffectContext } from '../SpellEffectExecutor.js';
 import { registerEffect } from '../SpellEffectRegistry.js';
 import { createBuffEffect, createDebuffEffect, calculateScaledValue } from '../SpellEffect.js';
 import type { VelocityComponent } from '@ai-village/core';
@@ -74,7 +74,7 @@ export class BuffEffectApplier implements EffectApplier<BuffEffect> {
     caster: Entity,
     target: Entity,
     _world: World,
-    context: EffectContext
+    context: SpellEffectContext
   ): EffectApplicationResult {
     const result: EffectApplicationResult = {
       success: true,
@@ -116,7 +116,7 @@ export class BuffEffectApplier implements EffectApplier<BuffEffect> {
     _effect: BuffEffect,
     _target: Entity,
     _world: World,
-    _context: EffectContext
+    _context: SpellEffectContext
   ): void {
     // Buffs don't have tick behavior (no HoT in buffs)
     // Modifiers are continuously applied while effect is active
@@ -235,7 +235,7 @@ export class DebuffEffectApplier implements EffectApplier<DebuffEffect> {
     caster: Entity,
     target: Entity,
     _world: World,
-    context: EffectContext
+    context: SpellEffectContext
   ): EffectApplicationResult {
     const result: EffectApplicationResult = {
       success: true,
@@ -296,7 +296,7 @@ export class DebuffEffectApplier implements EffectApplier<DebuffEffect> {
     effect: DebuffEffect,
     target: Entity,
     _world: World,
-    context: EffectContext
+    context: SpellEffectContext
   ): void {
     // Process DoT damage
     if (effect.dotDamage && effect.dotType && effect.dotInterval) {
@@ -431,7 +431,7 @@ export class ControlEffectApplier implements EffectApplier<ControlEffect> {
     caster: Entity,
     target: Entity,
     world: World,
-    context: EffectContext
+    context: SpellEffectContext
   ): EffectApplicationResult {
     const result: EffectApplicationResult = {
       success: true,
@@ -533,7 +533,7 @@ export class ControlEffectApplier implements EffectApplier<ControlEffect> {
     effect: ControlEffect,
     target: Entity,
     world: World,
-    _context: EffectContext
+    _context: SpellEffectContext
   ): void {
     const controlState = controlStates.get(target.id);
     if (!controlState) return;

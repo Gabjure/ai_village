@@ -10,7 +10,7 @@ import type { World, WorldMutator } from '@ai-village/core';
 import type { NeedsComponent } from '@ai-village/core';
 import type {
   EffectApplier,
-  EffectContext,
+  SpellEffectContext,
 } from './SpellEffectExecutor.js';
 import { SpellEffectExecutor } from './SpellEffectExecutor.js';
 import type {
@@ -80,7 +80,7 @@ export class DamageEffectApplier implements EffectApplier<DamageEffect> {
     caster: Entity,
     target: Entity,
     _world: World,
-    context: EffectContext
+    context: SpellEffectContext
   ): EffectApplicationResult {
     const damageValue = context.scaledValues.get('damage');
     if (!damageValue) {
@@ -155,7 +155,7 @@ export class HealingEffectApplier implements EffectApplier<HealingEffect> {
     caster: Entity,
     target: Entity,
     _world: World,
-    context: EffectContext
+    context: SpellEffectContext
   ): EffectApplicationResult {
     const healingValue = context.scaledValues.get('healing');
     if (!healingValue) {
@@ -220,7 +220,7 @@ export class HealingEffectApplier implements EffectApplier<HealingEffect> {
     effect: HealingEffect,
     target: Entity,
     _world: World,
-    context: EffectContext
+    context: SpellEffectContext
   ): void {
     if (!effect.overtime) return;
 
@@ -256,7 +256,7 @@ export class ProtectionEffectApplier implements EffectApplier<ProtectionEffect> 
     caster: Entity,
     target: Entity,
     world: World,
-    context: EffectContext
+    context: SpellEffectContext
   ): EffectApplicationResult {
     const absorptionValue = context.scaledValues.get('absorption');
     if (!absorptionValue) {

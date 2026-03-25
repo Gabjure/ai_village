@@ -963,7 +963,7 @@ export {
 
 export type {
   EffectApplier,
-  EffectContext,
+  SpellEffectContext,
 } from './SpellEffectExecutor.js';
 
 export {
@@ -1353,6 +1353,7 @@ export type {
 
 export type {
   // Interpreter types
+  EffectContext,
   EffectResult,
   InterpreterOptions,
 } from './EffectInterpreter.js';

@@ -17,7 +17,7 @@ import type {
   EffectApplicationResult,
   ActiveEffect,
 } from '../SpellEffect.js';
-import type { EffectApplier, EffectContext } from '../SpellEffectExecutor.js';
+import type { EffectApplier, SpellEffectContext } from '../SpellEffectExecutor.js';
 import { createProtectionEffect } from '../SpellEffect.js';
 import { SpellEffectRegistry } from '../SpellEffectRegistry.js';
 
@@ -54,7 +54,7 @@ class ProtectionEffectApplier implements EffectApplier<ProtectionEffect> {
     caster: Entity,
     target: Entity,
     _world: World,
-    context: EffectContext
+    context: SpellEffectContext
   ): EffectApplicationResult {
     const appliedValues: Record<string, number> = {};
 
@@ -124,7 +124,7 @@ class ProtectionEffectApplier implements EffectApplier<ProtectionEffect> {
     _effect: ProtectionEffect,
     _target: Entity,
     _world: World,
-    _context: EffectContext
+    _context: SpellEffectContext
   ): void {
     // Protection effects are typically passive and don't tick
     // However, we could implement shield regeneration or decay here if needed

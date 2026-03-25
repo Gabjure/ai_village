@@ -35,7 +35,7 @@ import type {
   EffectApplicationResult,
   ActiveEffect,
 } from '../SpellEffect.js';
-import type { EffectApplier, EffectContext } from '../SpellEffectExecutor.js';
+import type { EffectApplier, SpellEffectContext } from '../SpellEffectExecutor.js';
 import { registerEffectApplier } from '../SpellEffectExecutor.js';
 import { SpellEffectRegistry } from '../SpellEffectRegistry.js';
 
@@ -91,7 +91,7 @@ export class BodyTransformEffectApplier implements EffectApplier<BodyTransformEf
     caster: Entity,
     target: Entity,
     _world: World,
-    context: EffectContext
+    context: SpellEffectContext
   ): EffectApplicationResult {
     const body = target.components.get('body') as BodyComponent | undefined;
 
@@ -177,7 +177,7 @@ export class BodyTransformEffectApplier implements EffectApplier<BodyTransformEf
     _effect: BodyTransformEffect,
     _target: Entity,
     _world: World,
-    _context: EffectContext
+    _context: SpellEffectContext
   ): void {
     // Transformations don't typically need tick processing
   }

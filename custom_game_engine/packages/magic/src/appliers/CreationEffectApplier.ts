@@ -13,7 +13,7 @@ import type {
   EffectApplicationResult,
   ActiveEffect,
 } from '../SpellEffect.js';
-import type { EffectApplier, EffectContext } from '../SpellEffectExecutor.js';
+import type { EffectApplier, SpellEffectContext } from '../SpellEffectExecutor.js';
 import { createPositionComponent } from '@ai-village/core';
 import type {
   PositionComponentData,
@@ -46,7 +46,7 @@ export class CreationEffectApplier implements EffectApplier<CreationEffect> {
     caster: Entity,
     target: Entity,
     world: World,
-    context: EffectContext
+    context: SpellEffectContext
   ): EffectApplicationResult {
     const appliedValues: Record<string, number> = {};
 
@@ -212,7 +212,7 @@ export class CreationEffectApplier implements EffectApplier<CreationEffect> {
     effect: CreationEffect,
     _target: Entity,
     world: World,
-    context: EffectContext
+    context: SpellEffectContext
   ): void {
     // For creation effects, check if items are still valid
     // If temporary, they should have expiration components that handle cleanup

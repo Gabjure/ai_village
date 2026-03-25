@@ -26,7 +26,7 @@ import type {
   EffectApplicationResult,
   ActiveEffect,
 } from '../SpellEffect.js';
-import type { EffectApplier, EffectContext } from '../SpellEffectExecutor.js';
+import type { EffectApplier, SpellEffectContext } from '../SpellEffectExecutor.js';
 import { registerEffectApplier } from '../SpellEffectExecutor.js';
 import { createHealingEffect } from '../SpellEffect.js';
 import { SpellEffectRegistry } from '../SpellEffectRegistry.js';
@@ -70,7 +70,7 @@ export class BodyHealingEffectApplier implements EffectApplier<BodyHealingEffect
     caster: Entity,
     target: Entity,
     _world: World,
-    context: EffectContext
+    context: SpellEffectContext
   ): EffectApplicationResult {
     const body = target.components.get('body') as BodyComponent | undefined;
     const needs = target.components.get('needs') as NeedsComponent | undefined;
@@ -309,7 +309,7 @@ export class BodyHealingEffectApplier implements EffectApplier<BodyHealingEffect
     effect: BodyHealingEffect,
     target: Entity,
     _world: World,
-    context: EffectContext
+    context: SpellEffectContext
   ): void {
     // For overtime healing, re-apply partial healing each tick
     if (!effect.overtime || !effect.tickInterval) return;

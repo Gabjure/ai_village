@@ -17,7 +17,7 @@ import type {
   EffectApplicationResult,
   ActiveEffect,
 } from '../SpellEffect.js';
-import type { EffectApplier, EffectContext } from '../SpellEffectExecutor.js';
+import type { EffectApplier, SpellEffectContext } from '../SpellEffectExecutor.js';
 import type {
   StatusEffectsComponent,
   TemporalEffectData,
@@ -42,7 +42,7 @@ export class TemporalEffectApplier implements EffectApplier<TemporalEffect> {
     caster: Entity,
     target: Entity,
     world: World,
-    context: EffectContext
+    context: SpellEffectContext
   ): EffectApplicationResult {
     // Route to appropriate handler based on temporal type
     switch (effect.temporalType) {
@@ -80,7 +80,7 @@ export class TemporalEffectApplier implements EffectApplier<TemporalEffect> {
     caster: Entity,
     target: Entity,
     world: World,
-    context: EffectContext
+    context: SpellEffectContext
   ): EffectApplicationResult {
     // Get base time factor
     let baseFactor = effect.timeFactor ?? 1.0;
@@ -94,7 +94,7 @@ export class TemporalEffectApplier implements EffectApplier<TemporalEffect> {
       timeFactor = scaledValue.value;
     } else {
       // Apply proficiency scaling using context values
-      // EffectContext should provide proficiency, but if not available use default
+      // SpellEffectContext should provide proficiency, but if not available use default
       const proficiency = 50; // Default proficiency value
       const proficiencyFactor = proficiency / 50; // 0.0 to 2.0
 
@@ -188,7 +188,7 @@ export class TemporalEffectApplier implements EffectApplier<TemporalEffect> {
     caster: Entity,
     target: Entity,
     world: World,
-    context: EffectContext
+    context: SpellEffectContext
   ): EffectApplicationResult {
     // Check if target is immortal
     const immortal = target.components.get('immortal');
@@ -260,7 +260,7 @@ export class TemporalEffectApplier implements EffectApplier<TemporalEffect> {
     caster: Entity,
     target: Entity,
     world: World,
-    context: EffectContext
+    context: SpellEffectContext
   ): EffectApplicationResult {
     // Get rewind amount from time factor (negative value = ticks to rewind)
     const rewindTicks = Math.abs(effect.timeFactor ?? 60);
@@ -310,7 +310,7 @@ export class TemporalEffectApplier implements EffectApplier<TemporalEffect> {
     effect: TemporalEffect,
     target: Entity,
     world: World,
-    context: EffectContext
+    context: SpellEffectContext
   ): void {
     // Time factor effects are passive - no tick needed
     // Aging is instant - no tick needed

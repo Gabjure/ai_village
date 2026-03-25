@@ -19,7 +19,7 @@ import type {
   ActiveEffect,
   EffectCategory,
 } from '../SpellEffect.js';
-import type { EffectApplier, EffectContext } from '../SpellEffectExecutor.js';
+import type { EffectApplier, SpellEffectContext } from '../SpellEffectExecutor.js';
 import type { ActiveEffectsComponent } from '../types/ComponentTypes.js';
 import type { PositionComponent } from '@ai-village/core';
 
@@ -57,9 +57,9 @@ interface ExtendedDispelEffect extends DispelEffect {
 }
 
 /**
- * Extended EffectContext for counterspell mechanics.
+ * Extended SpellEffectContext for counterspell mechanics.
  */
-interface ExtendedEffectContext extends EffectContext {
+interface ExtendedSpellEffectContext extends SpellEffectContext {
   /** Incoming spell being countered */
   incomingSpell?: {
     power?: number;
@@ -114,7 +114,7 @@ class DispelEffectApplierClass implements EffectApplier<DispelEffect> {
     caster: Entity,
     target: Entity,
     world: World,
-    context: EffectContext
+    context: SpellEffectContext
   ): EffectApplicationResult {
     // Check range (unless self-cast or counterspell)
     const extendedEffect = effect as ExtendedDispelEffect;
@@ -192,7 +192,7 @@ class DispelEffectApplierClass implements EffectApplier<DispelEffect> {
     caster: Entity,
     target: Entity,
     _world: World,
-    context: EffectContext
+    context: SpellEffectContext
   ): EffectApplicationResult {
     const activeEffectsComponent = target.components.get('active_effects');
 
@@ -264,7 +264,7 @@ class DispelEffectApplierClass implements EffectApplier<DispelEffect> {
     caster: Entity,
     target: Entity,
     _world: World,
-    context: EffectContext
+    context: SpellEffectContext
   ): EffectApplicationResult {
     const activeEffectsComponent = target.components.get('active_effects');
 
@@ -318,7 +318,7 @@ class DispelEffectApplierClass implements EffectApplier<DispelEffect> {
     caster: Entity,
     target: Entity,
     _world: World,
-    context: EffectContext
+    context: SpellEffectContext
   ): EffectApplicationResult {
     const activeEffectsComponent = target.components.get('active_effects');
 
@@ -388,7 +388,7 @@ class DispelEffectApplierClass implements EffectApplier<DispelEffect> {
     caster: Entity,
     target: Entity,
     world: World,
-    context: EffectContext
+    context: SpellEffectContext
   ): EffectApplicationResult {
     const activeEffectsComponent = target.components.get('active_effects');
     let activeEffects: ActiveEffectsComponent;
@@ -442,10 +442,10 @@ class DispelEffectApplierClass implements EffectApplier<DispelEffect> {
     caster: Entity,
     target: Entity,
     _world: World,
-    context: EffectContext
+    context: SpellEffectContext
   ): EffectApplicationResult {
     // Check if there's an incoming spell to counter
-    const extendedContext = context as ExtendedEffectContext;
+    const extendedContext = context as ExtendedSpellEffectContext;
     const incomingSpell = extendedContext.incomingSpell;
 
     if (!incomingSpell) {
@@ -528,7 +528,7 @@ class DispelEffectApplierClass implements EffectApplier<DispelEffect> {
     _effect: DispelEffect,
     target: Entity,
     _world: World,
-    context: EffectContext
+    context: SpellEffectContext
   ): void {
     // Check if suppression has expired
     const activeEffectsComponent = target.components.get('active_effects');

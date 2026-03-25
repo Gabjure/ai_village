@@ -51,7 +51,7 @@ export interface EffectApplier<T extends SpellEffect = SpellEffect> {
     caster: Entity,
     target: Entity,
     world: World,
-    context: EffectContext
+    context: SpellEffectContext
   ): EffectApplicationResult;
 
   /**
@@ -63,7 +63,7 @@ export interface EffectApplier<T extends SpellEffect = SpellEffect> {
     effect: T,
     target: Entity,
     world: World,
-    context: EffectContext
+    context: SpellEffectContext
   ): void;
 
   /**
@@ -80,7 +80,7 @@ export interface EffectApplier<T extends SpellEffect = SpellEffect> {
 /**
  * Context passed to effect appliers.
  */
-export interface EffectContext {
+export interface SpellEffectContext {
   /** Current game tick */
   tick: number;
 
@@ -232,7 +232,7 @@ export class SpellEffectExecutor {
     const isCrit = this.rollCrit(effect, casterMagic);
 
     // Build context
-    const context: EffectContext = {
+    const context: SpellEffectContext = {
       tick,
       spell,
       casterMagic,
@@ -324,7 +324,7 @@ export class SpellEffectExecutor {
         const caster = world.getEntity(activeEffect.casterId);
         const casterMagic = caster?.components.get('magic') as MagicComponent | undefined;
 
-        const context: EffectContext = {
+        const context: SpellEffectContext = {
           tick,
           spell: { id: activeEffect.spellId } as SpellDefinition,
           casterMagic: casterMagic ?? {} as MagicComponent,

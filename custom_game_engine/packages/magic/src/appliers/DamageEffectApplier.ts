@@ -18,7 +18,7 @@ import type {
   ActiveEffect,
   DamageType,
 } from '../SpellEffect.js';
-import type { EffectApplier, EffectContext } from '../SpellEffectExecutor.js';
+import type { EffectApplier, SpellEffectContext } from '../SpellEffectExecutor.js';
 import { SpellEffectRegistry } from '../SpellEffectRegistry.js';
 import { createDamageEffect } from '../SpellEffect.js';
 import type { NeedsComponent } from '@ai-village/core';
@@ -41,7 +41,7 @@ class DamageEffectApplierClass implements EffectApplier<DamageEffect> {
     caster: Entity,
     target: Entity,
     world: World,
-    context: EffectContext
+    context: SpellEffectContext
   ): EffectApplicationResult {
 
     // Get scaled damage value
@@ -130,7 +130,7 @@ class DamageEffectApplierClass implements EffectApplier<DamageEffect> {
     _effect: DamageEffect,
     _target: Entity,
     _world: World,
-    _context: EffectContext
+    _context: SpellEffectContext
   ): void {
     // DoT effects would be handled here
     // For now, damage effects are typically instant
@@ -253,7 +253,7 @@ class DamageEffectApplierClass implements EffectApplier<DamageEffect> {
     caster: Entity,
     target: Entity,
     world: World,
-    context: EffectContext
+    context: SpellEffectContext
   ): void {
     const executor = require('../SpellEffectExecutor.js').SpellEffectExecutor.getInstance();
 

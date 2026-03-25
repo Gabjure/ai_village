@@ -17,7 +17,7 @@ import type {
   EffectApplicationResult,
   ActiveEffect,
 } from '../SpellEffect.js';
-import type { EffectApplier, EffectContext } from '../SpellEffectExecutor.js';
+import type { EffectApplier, SpellEffectContext } from '../SpellEffectExecutor.js';
 import { createHealingEffect } from '../SpellEffect.js';
 import { SpellEffectRegistry } from '../SpellEffectRegistry.js';
 
@@ -56,7 +56,7 @@ class HealingEffectApplier implements EffectApplier<HealingEffect> {
     caster: Entity,
     target: Entity,
     _world: World,
-    context: EffectContext
+    context: SpellEffectContext
   ): EffectApplicationResult {
     const needs = target.components.get('needs') as ExtendedNeedsComponent | undefined;
 
@@ -143,7 +143,7 @@ class HealingEffectApplier implements EffectApplier<HealingEffect> {
     effect: HealingEffect,
     target: Entity,
     _world: World,
-    context: EffectContext
+    context: SpellEffectContext
   ): void {
     if (!effect.overtime || !effect.tickInterval) return;
 

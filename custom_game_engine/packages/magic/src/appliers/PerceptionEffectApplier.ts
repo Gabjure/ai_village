@@ -16,7 +16,7 @@ import type {
   EffectApplicationResult,
   ActiveEffect,
 } from '../SpellEffect.js';
-import type { EffectApplier, EffectContext } from '../SpellEffectExecutor.js';
+import type { EffectApplier, SpellEffectContext } from '../SpellEffectExecutor.js';
 
 // ============================================================================
 // Perception State Tracking
@@ -79,7 +79,7 @@ class PerceptionEffectApplier implements EffectApplier<PerceptionEffect> {
     caster: Entity,
     target: Entity,
     _world: World,
-    context: EffectContext
+    context: SpellEffectContext
   ): EffectApplicationResult {
     const appliedValues: Record<string, number> = {};
 
@@ -311,7 +311,7 @@ class PerceptionEffectApplier implements EffectApplier<PerceptionEffect> {
     _effect: PerceptionEffect,
     _target: Entity,
     _world: World,
-    _context: EffectContext
+    _context: SpellEffectContext
   ): void {
     // Perception effects are typically passive
     // Expiration is handled by the SpellEffectExecutor
