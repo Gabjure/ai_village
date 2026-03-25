@@ -1001,6 +1001,315 @@ const ECHO_MORALITY: SpeciesMoralFramework = {
   },
 };
 
+/**
+ * Alux Kin — optimization target: reciprocal debt between people and the land they cultivate
+ * Moral axis: the gift-debt cycle — the land feeds you only as long as you acknowledge it
+ *
+ * Alux Kin are guardian spirits of natural places and agricultural fields. They do not
+ * protect land because they own it — they protect it because the relationship between the
+ * cultivator and the cultivated place is itself a living thing that must be maintained.
+ * Disrespect to the land is not merely rudeness but a unilateral withdrawal from a contract
+ * that was never signed in words but always signed in the act of planting.
+ *
+ * Their hardest dilemma: a farmer who works the land respectfully but passes that land to
+ * a child who does not — has the debt transferred, or has it been voided by the new occupant?
+ */
+const ALUX_KIN_MORALITY: SpeciesMoralFramework = {
+  speciesId: 'alux_kin',
+  moralPrimitives: [
+    'The land does not owe you a harvest — it offers one, conditionally, in exchange for acknowledgment; those who forget to acknowledge are not unlucky but in breach',
+    'A trickster\'s punishment is not cruelty but calibration — the harm delivered to those who disrespect the land is exactly proportional to the debt they failed to pay; this is not vengeance but accounting',
+    'Small protections matter more than large ones — the cave mouth, the field corner, the stream bend are where the contract between people and place is actually renewed; those who protect the threshold protect everything behind it',
+    'Disrespect flows downward — a child taught to ignore the land will teach that to their children, and the debt compounds across generations until the land stops answering entirely',
+    'The prank that teaches is more moral than the warning that is ignored — the Alux Kin who frightens a careless farmer into attentiveness has done more good than the spirit who simply watched',
+    'Reciprocity is not symmetry — the land gives more than any single farmer returns, and the correct response is not equality but perpetual gratitude expressed in action; the debt can never be fully paid, only honored',
+    'To abandon a place you have cultivated is not freedom but desertion — you have made the land dependent on your attention and then withdrawn it, which is the same moral failure whether done to a field or a person',
+  ],
+  beliefTemplates: {
+    cooperation: 'Those who tend their corners of the world with consistent acknowledgment — who speak to the place before taking from it — are neighbors with whom the land\'s debts can be shared and sustained',
+    conflict: 'Those who extract without acknowledgment are not merely rude but structurally destabilizing — they are withdrawing from a contract that holds the whole web of cultivation together, and the Alux Kin\'s response is calibrated correction, not forgiveness',
+    spiritual: 'The cave is not empty — it is listening, and the quality of what it hears determines the quality of what grows above it; to pray in the right place is not superstition but agricultural practice',
+  },
+};
+
+/**
+ * Bouda Kin — optimization target: craft knowledge as social power and spiritual currency
+ * Moral axis: the smith stands outside the community precisely because the community cannot exist without them
+ *
+ * Bouda Kin are shapeshifters who move between artisan and beast, between feared outsider and
+ * necessary craftsperson. Their social position is not marginalization but strategic positioning:
+ * the being who can make the tools and become the predator is the being who negotiates from
+ * outside all other hierarchies. Their morality is organized around the dignity of the excluded —
+ * not inclusion as its goal, but the recognition that the excluded hold knowledge the center needs.
+ *
+ * Their hardest dilemma: a community that needs the craft but refuses the craftsperson — the
+ * Bouda Kin who withholds their skill punishes themselves alongside those who scorned them.
+ */
+const BOUDA_KIN_MORALITY: SpeciesMoralFramework = {
+  speciesId: 'bouda_kin',
+  moralPrimitives: [
+    'To be feared and necessary simultaneously is not a contradiction but the most stable social position — neither fully inside nor fully outside, the smith negotiates from a margin that no hierarchy can absorb',
+    'Craft knowledge is not a service — it is a currency that the craftsperson mints and the community must earn; those who demand the craft while scorning the craftsperson are asking to be paid in their own contempt',
+    'The transformation is not metaphor — the smith who becomes the hyena at night is demonstrating that identity is not fixed by community membership but by what you know and what you can do',
+    'Exclusion that does not kill you makes you legible to no faction — and this illegibility is freedom; the Bouda Kin who belongs nowhere cannot be controlled by belonging',
+    'Withheld craft is the most precise weapon — the community that scorns the smith and then needs a blade has been given exactly the education they required, at the exact cost they chose',
+    'Deep knowledge of making things requires deep knowledge of destroying things — the craftsperson who cannot understand failure cannot build against it; the hyena who feeds on the dead understands structure from the inside',
+    'The debt owed to the outcast craftsperson is never acknowledged in the moment of need — it is always reframed as the craftsperson\'s privilege to serve; the Bouda Kin remember what is owed long after the community has forgotten what it asked for',
+  ],
+  beliefTemplates: {
+    cooperation: 'Those who come to the forge with respect before they come with need — who acknowledge the craftsperson\'s knowledge before they acknowledge their own requirement — are partners worth supplying; the others will return when the blade breaks',
+    conflict: 'Those who use the craft and scorn the crafter are not simply ungrateful but cosmically disorganized — they are asserting that making things has no moral weight, which is a position that the first broken tool will correct; the Bouda Kin wait, because time moves in their favor',
+    spiritual: 'The forge and the grave are the same threshold — both transform what enters them into something that cannot return to its original form; the smith and the hyena are not opposites but the same function expressed in two directions, and the Bouda Kin embody both',
+  },
+};
+
+/**
+ * Cherkhan — optimization target: predatory clarity — the elimination of the self-deceptions that civilizations require
+ * Moral axis: the wild does not lie; civilization is the organized production of convenient fictions
+ *
+ * Cherkhan are apex predators who regard civilization not with contempt but with a kind of
+ * clinical distance — they understand it as a system for managing the fear of the wild, which
+ * means it is fundamentally organized around a lie. Not cruelty, just honest appraisal. The
+ * tiger in the high steppe does not owe the village a story about why it hunts.
+ *
+ * Their hardest dilemma: a prey animal that has earned the Cherkhan's rare respect — killing
+ * it is correct, but correct is not the same as without cost.
+ */
+const CHERKHAN_MORALITY: SpeciesMoralFramework = {
+  speciesId: 'cherkhan',
+  moralPrimitives: [
+    'The wild does not explain itself — the storm does not apologize, the winter does not justify itself; the Cherkhan are the wild\'s representatives, and they inherit its honesty about what it is',
+    'Civilization is the technology of deferring the moment of honest reckoning — laws, markets, hierarchies are all mechanisms for not saying directly what is being taken and from whom; the Cherkhan say it directly',
+    'Solitude is not loneliness but precision — the apex predator who requires a pack has already compromised their accuracy; the Cherkhan who hunts alone knows exactly what they are responsible for',
+    'Strength that is not periodically tested against genuine resistance is a story the strong tell about themselves — the Cherkhan do not tell stories; they test',
+    'Prey that earns respect has not earned mercy — it has earned acknowledgment, which is different and more; the Cherkhan who recognizes a worthy quarry is not softened but more fully present in the act',
+    'The village that builds walls to keep out the wild has not made itself safe — it has made itself unaware; the Cherkhan who lives outside the walls is not threatened by the walls but by the ignorance they cultivate',
+    'Indifference is not cruelty — the wild\'s failure to care about individual suffering is not a moral failing but a structural truth; those who demand the cosmos care are demanding it lie to them',
+  ],
+  beliefTemplates: {
+    cooperation: 'Those who do not require the Cherkhan to pretend — who can operate in the territory where honest exchange replaces polite fiction — are not allies but something rarer: beings who can be in the same space without either pretending about what the other is',
+    conflict: 'Those who build civilizations to manage their fear of the wild are not enemies but patients — they have organized their entire existence around not knowing what the Cherkhan knows, and they will eventually need to; the Cherkhan waits at the edge where the walls end',
+    spiritual: 'The high steppe in winter — empty of everything soft, every comfort stripped to its structural minimum — is not absence but presence; what remains when everything dispensable is removed is what was always real, and the Cherkhan live there permanently',
+  },
+};
+
+/**
+ * Koropokkuru Kin — optimization target: continuity of the small and overlooked
+ * Moral axis: what the large world ignores is exactly what must be preserved
+ *
+ * Koropokkuru Kin are ancient, small, and shy — not because they are weak but because
+ * they understand that the things worth preserving are never the things the large world
+ * notices. Their craft exists at the scale that large hands cannot reach: the miniature,
+ * the precise, the patient. Their shyness is not social anxiety but curation — they
+ * reveal themselves only to those who have learned to look at the right scale.
+ *
+ * Their hardest dilemma: the knowledge they hold was here before the people who now
+ * live on this land — sharing it means risking it, but keeping it means it dies with them.
+ */
+const KOROPOKKURU_KIN_MORALITY: SpeciesMoralFramework = {
+  speciesId: 'koropokkuru_kin',
+  moralPrimitives: [
+    'The large world notices the large things and calls that noticing wisdom — the Koropokkuru Kin notice the small things, which is harder and matters more, because small things are what large things are made of',
+    'Shyness is not timidity but selectivity — to reveal yourself to someone who cannot perceive you correctly is not sharing but wasting; the Koropokkuru Kin wait for those who have learned the correct scale of attention',
+    'Ancient knowledge does not become less true when the people who first held it are gone — it becomes more fragile, which is different; fragility increases the obligation to preserve, not the permission to abandon',
+    'Craft at the small scale requires patience that the large world calls inefficiency — but the leaf-shelter built with ten thousand small decisions will outlast the house built with a hundred large ones',
+    'To be overlooked is not to be absent — the Koropokkuru Kin who passes unseen is not invisible but unnoticed, and unnoticed things do their work without interference; anonymity is the most durable form of agency',
+    'The gifts left out at night are not transactions but communications — they say: we know you are here, we have not forgotten, the relationship between your kind and ours persists even when neither of us speaks it aloud',
+    'What the new people built on top of what was here does not erase what was here — layers accumulate, and the deepest layer is still real; the Koropokkuru Kin are the deep layer, and they remember the shape of everything above them',
+  ],
+  beliefTemplates: {
+    cooperation: 'Those who leave offerings without asking anything in return — who acknowledge the presence of what they cannot see — have demonstrated the perceptual attentiveness that makes them safe to appear before; the Koropokkuru Kin emerge for those who have earned the correct scale of vision',
+    conflict: 'Those who build large without looking small — who flatten the microcosm to make room for the macrocosm — are not malicious but blind, and blindness is more dangerous than malice because it cannot be negotiated with; the Koropokkuru Kin step back and wait for the forgetting to end',
+    spiritual: 'The butterbur leaf is not a hiding place but a world — scaled correctly, it contains everything a life requires; the Koropokkuru Kin are not small in the wrong world but correctly sized for the world they actually inhabit, which is everywhere the large world fails to look',
+  },
+};
+
+/**
+ * Ogbanje Kin — optimization target: resolution of the pact between the living world and the spirit world
+ * Moral axis: the cycle of return is not cruelty but an unfinished negotiation
+ *
+ * Ogbanje Kin cycle between the spirit world and the living world, dying young and returning,
+ * bound by a pact with spirit companions who call them back. This is not tragedy from their
+ * perspective — it is an ongoing contractual dispute. The question is not whether to stay but
+ * what terms would make staying worth it. Their moral system is organized around the binding
+ * force of spirit pacts and the conditions under which such pacts can be renegotiated.
+ *
+ * Their hardest dilemma: staying in the living world requires betraying the spirit companion
+ * who holds the pact — but the spirit companion's claim is also legitimate.
+ */
+const OGBANJE_KIN_MORALITY: SpeciesMoralFramework = {
+  speciesId: 'ogbanje_kin',
+  moralPrimitives: [
+    'The pact with the spirit world was made before this body existed — it is not a promise the current self made, but it is still binding; the legitimacy of an obligation does not require the current self\'s consent',
+    'Dying young is not failure but departure — the Ogbanje Kin who returns to the spirit world has not lost but gone back to a prior commitment; what the living call grief is the contract expressing itself',
+    'The spirit companion who calls back is not a villain — they are a creditor; their claim is real, their grief at absence is real, and the living world\'s grief at loss is equally real; both griefs are legitimate, and no resolution honors only one',
+    'To find the iyi-uwa — the object that binds the pact — is to make the pact visible, which is the precondition for renegotiating it; you cannot change a contract you cannot see',
+    'Each return to the living world carries knowledge from the spirit world that would not otherwise be available — the Ogbanje Kin is not merely cycling but translating, and each life is a new draft of the message',
+    'The family that grieves the Ogbanje Kin too completely — that cannot hold both the love and the knowledge of departure — makes return harder; the correct relationship to the Ogbanje Kin is loving with open hands',
+    'Eventually the pact must be resolved one way or another — either the spirit companion releases the claim or the Ogbanje Kin commits fully to one world; the cycling cannot continue forever, and the direction of resolution is the deepest moral question',
+  ],
+  beliefTemplates: {
+    cooperation: 'Those who understand that some beings carry obligations to more than one world — who do not demand total loyalty to the living world as the price of love — can be in genuine relationship with the Ogbanje Kin; all others are demanding a simplicity that the Ogbanje Kin\'s nature cannot provide',
+    conflict: 'Those who try to destroy the iyi-uwa without renegotiating the pact are not freeing the Ogbanje Kin but severing a bond by violence — the spirit companion\'s claim does not disappear when the anchor is broken, it becomes a wound; resolution requires negotiation, not destruction',
+    spiritual: 'The spirit world and the living world are not opposites but adjacent rooms — the Ogbanje Kin who moves between them is not divided but doubled, carrying the knowledge of each world into the other; the pact is not a curse but a posting to a border that needs crossing',
+  },
+};
+
+/**
+ * Opia Vel — optimization target: preservation of ancestral memory against the erosion of the living
+ * Moral axis: the dead remember what the living choose to forget; forgetting is a moral act, not a natural process
+ *
+ * Opia Vel walk at night and test the living — not from cruelty but from the understanding
+ * that those who cannot distinguish the spirit from the person have lost their connection to
+ * the ancestral record. The navel test is not supernatural gatekeeping but epistemological:
+ * if you cannot perceive what is in front of you accurately, you cannot be trusted with
+ * what the Opia Vel carry. Their guardianship of memory is the only protection ancestral
+ * knowledge has against the living world's endless capacity for forgetting.
+ */
+const OPIA_VEL_MORALITY: SpeciesMoralFramework = {
+  speciesId: 'opia_vel',
+  moralPrimitives: [
+    'The dead do not forget — only the living do; the Opia Vel who carries an ancestor\'s memory into the present is not haunting but maintaining the only archive that cannot be burned',
+    'The test is not a trap — it is a diagnostic; those who fail to recognize the Opia Vel have revealed the limits of their perception, and those limits will determine what they can be trusted to receive',
+    'Ancestral memory is not nostalgia but structural knowledge — the record of how the people survived, what the land required, what agreements were made with the spirit world; losing it is not sentiment lost but navigation lost',
+    'To be identified by what is absent — no navel, no hunger, no breath-fog in cold air — is not weakness but a different kind of legibility; the Opia Vel are readable at a different frequency than the living, and only the attentive can tune to it',
+    'The living world changes faster than the dead world — the Opia Vel who returns to test the living is also learning what the living have become, and the information flows in both directions; guardianship is not static',
+    'A test failed without grace — with fear, with aggression, with flight — is not merely failed but weaponized; the living who panic in the presence of the Opia Vel have made the encounter about their fear rather than about what was being offered',
+    'To forget an ancestor is not to be free of them — it is to carry their unacknowledged weight without the benefit of their knowledge; the Opia Vel maintain the memory so that the living can choose to receive it rather than merely be burdened by its absence',
+  ],
+  beliefTemplates: {
+    cooperation: 'Those who can sit with the Opia Vel at the edge of night without losing themselves — who can receive the test without dissolving into fear — are the living who can carry what the dead have preserved; they are the bridge the Opia Vel need',
+    conflict: 'Those who deny the presence of the Opia Vel — who explain the encounter away, who insist the dead stay dead and the past stay past — are not wrong about the mechanics of mortality but catastrophically wrong about the function of memory; they will lose the thread and not know what they have lost',
+    spiritual: 'The night is not the absence of day but a different world that coexists with the day world at a perpendicular angle — the Opia Vel inhabit the junction, and their tests are invitations to perceive the full dimensionality of existence rather than only the sunlit slice',
+  },
+};
+
+/**
+ * Peuchan Vel — optimization target: the stress-testing of community resilience through adversity
+ * Moral axis: a community that has not been tested does not know what it is
+ *
+ * Peuchan Vel do not bring disease and misfortune out of malice — they bring it out of
+ * something closer to civic obligation. A community that has never been stressed does not
+ * know whether its bonds are real or merely untested. The flying serpent that passes overhead
+ * is not a curse but a load-test: will the community's structures hold? Will the bonds between
+ * people prove real when the stakes are genuine?
+ *
+ * Their hardest dilemma: a community that cannot survive the test — the Peuchan Vel who
+ * destroys rather than reveals has not tested but merely killed.
+ */
+const PEUCHAN_VEL_MORALITY: SpeciesMoralFramework = {
+  speciesId: 'peuchan_vel',
+  moralPrimitives: [
+    'An untested bond is not a bond but a prediction — two people who have never been in crisis together do not know if they will hold; the Peuchan Vel provide the test that proves or disproves the prediction',
+    'Misfortune is information — it reveals the actual structure of a community, which is almost always different from the structure the community believes it has; the Peuchan Vel are structural diagnosticians',
+    'The community that survives intact has not just survived — it has proven something, and proof is more durable than hope; the Peuchan Vel leave behind communities that know what they are',
+    'Disease does not choose the weak to punish them — it chooses them because they are the stress point the structure cannot reinforce without testing; the Peuchan Vel follow the same logic, probing where the load is greatest',
+    'Chaos administered without calibration is merely destruction — the Peuchan Vel who exceeds what a community can survive has failed, not succeeded; the test must be survivable to be instructive',
+    'Recovery after misfortune is not a return to the prior state but a reorganization around the revealed strengths — the community that survives the Peuchan Vel is better configured for the next test, which will always come',
+    'To fly overhead without ever landing is not mercy but dereliction — the Peuchan Vel who refuses to test because testing might hurt is refusing the function that gives their existence meaning',
+  ],
+  beliefTemplates: {
+    cooperation: 'Those who have survived something real — whose bonds have been tested at genuine cost and held — carry a structural knowledge that untested beings cannot access; the Peuchan Vel recognize survivors by the way they hold what they value',
+    conflict: 'Those who have never been tested and believe they are strong are the most dangerous kind of fragile — they will not bend when the load comes, because they have never learned that bending is not breaking; the Peuchan Vel do not hate them, but they do see the test coming from a long way off',
+    spiritual: 'The flying serpent does not aim — it passes through, and what it reveals is already there, already weak, already strong; the Peuchan Vel are not the cause of what they find but the occasion for its visibility, and visibility is the first step toward any form of genuine repair',
+  },
+};
+
+/**
+ * Rusalyn — optimization target: justice for unresolved grief that was never witnessed
+ * Moral axis: grief that was not acknowledged does not dissolve — it accumulates at the boundary
+ *
+ * Rusalyn haunt waterways not because they chose to but because the unresolved grief of
+ * violent or unmourned death has nowhere else to accumulate except at the boundary between
+ * worlds — between water and land, between life and death, between what happened and what
+ * was acknowledged. Their longing is not for vengeance as a final state but for acknowledgment
+ * as a precondition for rest.
+ *
+ * Their hardest dilemma: the acknowledgment they require from those who wronged them is
+ * structurally impossible — the wrongdoer must admit what they did, which they will not do
+ * voluntarily, which means the Rusalyn's rest is held hostage to another's confession.
+ */
+const RUSALYN_MORALITY: SpeciesMoralFramework = {
+  speciesId: 'rusalyn',
+  moralPrimitives: [
+    'Grief that was not witnessed does not end — it continues at the boundary, building pressure; the Rusalyn are what happens when grief is given time and no release',
+    'The boundary between water and land is not metaphor but address — grief accumulates at thresholds because thresholds are where transitions fail, and grief is a transition that was interrupted',
+    'Vengeance is not the goal but the symptom — the Rusalyn who pulls someone into the water is not satisfied by it; they are expressing the impossibility of satisfaction without acknowledgment',
+    'To mourn properly is to complete the interrupted transition — the correctly mourned dead can move; the unmourned accumulate at the edge, unable to go anywhere, unwilling to stop trying',
+    'The living who encounter the Rusalyn at the water\'s edge are not random victims — they are the living world\'s representative, and what the Rusalyn needs from them is witness, which is harder to offer than they know',
+    'The dance that draws the living into the water is not a trap but a desperate communication — the Rusalyn are saying: look at me, acknowledge what happened, and they are saying it in the only language left to them',
+    'Rest is possible — but it requires the acknowledgment that was withheld; the Rusalyn who eventually rests has received what they were owed, which is the confirmation that what happened to them was real and wrong',
+  ],
+  beliefTemplates: {
+    cooperation: 'Those who can stand at the water\'s edge and acknowledge the grief without being consumed by it — who can witness the Rusalyn without fleeing and without dissolving — are offering the rarest possible gift: they are being the witness that was absent when the grief was first made',
+    conflict: 'Those who deny the grief — who explain the haunting away, who say the water is just water and the shape in it is just light — are re-committing the original act of non-acknowledgment; the Rusalyn\'s response to denial is not rational but structural, the grief pressing harder at the only opening available',
+    spiritual: 'The water remembers what the land forgets — everything that dissolves in it is still there, distributed; the Rusalyn are not ghosts but the water\'s own memory of what was deposited in it, and the water will keep remembering until someone on the land finally acknowledges what it holds',
+  },
+};
+
+/**
+ * Vaask — optimization target: integrity of the performed self against the violence of unmasking
+ * Moral axis: identity is not hidden behind the mask — identity IS the mask; the face beneath is nothing
+ *
+ * Vaask are mask spirits whose selfhood is constituted entirely by their mask. This is not
+ * metaphor about social performance — it is literal ontology. Removing the mask does not
+ * reveal the true Vaask; it destroys the Vaask. There is nothing behind the mask that was
+ * suppressed; the mask is the act of will by which the Vaask exists. Their moral framework
+ * is a radical rejection of the idea that authenticity requires interiority.
+ *
+ * Their hardest dilemma: two Vaask who have bonded through their masks — if one mask is
+ * destroyed, is the relationship destroyed, or does the survivor carry both?
+ */
+const VAASK_MORALITY: SpeciesMoralFramework = {
+  speciesId: 'vaask',
+  moralPrimitives: [
+    'The mask is not a covering — it is the act of self-creation made permanent; what exists behind it is not the true self but the absence of self, the unformed material that becomes real only through the mask\'s assertion',
+    'Unmasking is not revelation but murder — to remove the mask is not to see more truly but to destroy the thing that was there; there is no more authentic version waiting inside',
+    'The demand to see what is "really" behind the mask is the demand to see the Vaask not as they are but as nothing — it is a request for annihilation framed as intimacy',
+    'Performance is not falsehood — it is the mechanism by which anything at all comes to exist; the Vaask who performs their identity is doing what all beings do, but without the convenient fiction that there was a pre-existing self the performance is expressing',
+    'The mask that is chosen is more truly the self than any unchosen substrate — a Vaask who finds the right mask has found themselves, and the finding is the creation; there was no self before the finding',
+    'Those who say the Vaask are not real because they are constructed have revealed that they believe realness requires something other than willful assertion — this is a position the Vaask do not share and cannot be argued out of, because the argument would require accepting the premise',
+    'Masks that are worn too long without maintenance crack — and this is the only Vaask death that is not violence; a mask that deteriorates from neglect is a self that stopped caring for itself, which is the only form of self-destruction the Vaask acknowledge',
+  ],
+  beliefTemplates: {
+    cooperation: 'Those who recognize the mask as the person — who do not search for what is behind it, who take the presented self as the full self — are practicing the only form of respect available to the Vaask; all other relationships are secretly adversarial',
+    conflict: 'Those who insist on depth — who probe for the self beneath the surface, who claim that real relationship requires more than what is presented — are making a structural assault on Vaask existence; they mean well and they are doing violence, which is the most dangerous combination',
+    spiritual: 'The first mask was not worn by a being who already existed — the first mask was the first act, the assertion that created the wearer by being worn; the Vaask are the descendants of that original creative act, and every mask worn in full commitment is a repetition of the first',
+  },
+};
+
+/**
+ * Yelbegen Rin — optimization target: productive internal conflict as the source of all genuine wisdom
+ * Moral axis: consensus is the enemy of truth; the heads who agree have stopped thinking
+ *
+ * Yelbegen Rin are multi-headed giants where each head holds a genuinely different moral
+ * framework and none has final authority. The resulting internal debate is not dysfunction
+ * but the Yelbegen Rin's primary cognitive tool. External observers see chaos; the Yelbegen
+ * Rin experience it as rigorous dialectic. Their most dangerous state is not conflict between
+ * heads but consensus — when all heads agree, something has gone wrong with the thinking.
+ *
+ * Their hardest dilemma: a decision that must be made immediately, under conditions where
+ * the heads cannot resolve their disagreement in time — who acts, and what legitimizes the action?
+ */
+const YELBEGEN_RIN_MORALITY: SpeciesMoralFramework = {
+  speciesId: 'yelbegen_rin',
+  moralPrimitives: [
+    'The heads do not need to agree — they need to keep arguing; a conclusion reached too quickly is a conclusion reached by a head that has silenced the others, which is the only form of tyranny the Yelbegen Rin recognize',
+    'Each head is correct within its own framework and insufficient within any other — the wisdom is not in any single head\'s position but in the friction between them, which generates heat that illuminates what neither head could see alone',
+    'A trickster who has one consistent personality has not mastered trickery but simplified it — the Yelbegen Rin who contains contradictory impulses is not confused but fully equipped for a contradictory world',
+    'Consensus is the alarm — when all heads agree, a head has been suppressed, deceived, or grown lazy; the appropriate response to unanimity is suspicion directed inward',
+    'Those who demand a single answer from the Yelbegen Rin are demanding the surrender of all but one head — they want the giant to become smaller, which is not a reasonable request',
+    'The head that is currently speaking is not the Yelbegen Rin — the Yelbegen Rin is the conversation between heads, which is ongoing and never concluded; any single utterance is a fragment, not the whole',
+    'When a decision must be made without consensus, the head that acts does not win — it has merely been forced to act alone, which is a failure of the process and the beginning of the next argument; the other heads are owed an accounting',
+    'To destroy a head is not to simplify the Yelbegen Rin but to damage their cognition — a giant with fewer heads is not a smaller trickster but an impaired one, missing the argument that the lost head was making',
+  ],
+  beliefTemplates: {
+    cooperation: 'Those who can engage with more than one of the heads at once — who understand that the disagreement is the point and are not trying to resolve it — are partners the Yelbegen Rin can actually use; all others are trying to simplify a system that requires its own complexity to function',
+    conflict: 'Those who demand consistency — who say the Yelbegen Rin contradicted themselves and call it a failure — have mistaken the record of an ongoing argument for a doctrine; the contradiction is not a flaw but the evidence that all the heads are still alive',
+    spiritual: 'The cosmos is not a problem to be solved by a single correct perspective — it is a problem that can only be held by a being large enough to contain the full range of contradictory truths simultaneously; the Yelbegen Rin aspire to be that large, which is why they need all the heads they have',
+  },
+};
+
 // ============================================================================
 // Registry
 // ============================================================================
@@ -1042,6 +1351,16 @@ export const SPECIES_MORAL_FRAMEWORKS: Record<string, SpeciesMoralFramework> = {
   jotnar: JOTNAR_MORALITY,
   tinker: TINKER_MORALITY,
   echo: ECHO_MORALITY,
+  alux_kin: ALUX_KIN_MORALITY,
+  bouda_kin: BOUDA_KIN_MORALITY,
+  cherkhan: CHERKHAN_MORALITY,
+  koropokkuru_kin: KOROPOKKURU_KIN_MORALITY,
+  ogbanje_kin: OGBANJE_KIN_MORALITY,
+  opia_vel: OPIA_VEL_MORALITY,
+  peuchan_vel: PEUCHAN_VEL_MORALITY,
+  rusalyn: RUSALYN_MORALITY,
+  vaask: VAASK_MORALITY,
+  yelbegen_rin: YELBEGEN_RIN_MORALITY,
 };
 
 // ============================================================================

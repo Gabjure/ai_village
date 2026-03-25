@@ -147,6 +147,78 @@ export const ALL_DRAGON_BUILDINGS = [
 ];
 
 // =============================================================================
+// NAGAVEL BUILDINGS - Threshold guardian architecture
+// =============================================================================
+
+export const NAGAVEL_GATE_SHRINE: BuildingBlueprint = getBuilding('nagavel_gate_shrine');
+export const NAGAVEL_COIL_HOLD: BuildingBlueprint = getBuilding('nagavel_coil_hold');
+export const NAGAVEL_VENOM_LAB: BuildingBlueprint = getBuilding('nagavel_venom_lab');
+export const NAGAVEL_BORDER_MARKET: BuildingBlueprint = getBuilding('nagavel_border_market');
+export const NAGAVEL_THRESHOLD_SANCTUM: BuildingBlueprint = getBuilding('nagavel_threshold_sanctum');
+
+export const ALL_NAGAVEL_BUILDINGS = [
+  NAGAVEL_GATE_SHRINE,
+  NAGAVEL_COIL_HOLD,
+  NAGAVEL_VENOM_LAB,
+  NAGAVEL_BORDER_MARKET,
+  NAGAVEL_THRESHOLD_SANCTUM,
+];
+
+// =============================================================================
+// KITSURI BUILDINGS - Illusion-based trickster architecture
+// =============================================================================
+
+export const KITSURI_FOX_DEN: BuildingBlueprint = getBuilding('kitsuri_fox_den');
+export const KITSURI_TRICK_WORKSHOP: BuildingBlueprint = getBuilding('kitsuri_trick_workshop');
+export const KITSURI_MIRROR_HALL: BuildingBlueprint = getBuilding('kitsuri_mirror_hall');
+export const KITSURI_RIDDLE_MARKET: BuildingBlueprint = getBuilding('kitsuri_riddle_market');
+export const KITSURI_NINE_TAIL_SHRINE: BuildingBlueprint = getBuilding('kitsuri_nine_tail_shrine');
+
+export const ALL_KITSURI_BUILDINGS = [
+  KITSURI_FOX_DEN,
+  KITSURI_TRICK_WORKSHOP,
+  KITSURI_MIRROR_HALL,
+  KITSURI_RIDDLE_MARKET,
+  KITSURI_NINE_TAIL_SHRINE,
+];
+
+// =============================================================================
+// ANANSIWEB BUILDINGS - Story-weaver architecture
+// =============================================================================
+
+export const ANANSIWEB_STORY_LOOM: BuildingBlueprint = getBuilding('anansiweb_story_loom');
+export const ANANSIWEB_WEB_NEST: BuildingBlueprint = getBuilding('anansiweb_web_nest');
+export const ANANSIWEB_TALE_ARCHIVE: BuildingBlueprint = getBuilding('anansiweb_tale_archive');
+export const ANANSIWEB_RUMOR_MARKET: BuildingBlueprint = getBuilding('anansiweb_rumor_market');
+export const ANANSIWEB_SPINNER_SANCTUM: BuildingBlueprint = getBuilding('anansiweb_spinner_sanctum');
+
+export const ALL_ANANSIWEB_BUILDINGS = [
+  ANANSIWEB_STORY_LOOM,
+  ANANSIWEB_WEB_NEST,
+  ANANSIWEB_TALE_ARCHIVE,
+  ANANSIWEB_RUMOR_MARKET,
+  ANANSIWEB_SPINNER_SANCTUM,
+];
+
+// =============================================================================
+// VALKYR BUILDINGS - Warrior-afterlife architecture
+// =============================================================================
+
+export const VALKYR_MEAD_HALL: BuildingBlueprint = getBuilding('valkyr_mead_hall');
+export const VALKYR_ARMS_FORGE: BuildingBlueprint = getBuilding('valkyr_arms_forge');
+export const VALKYR_SHIELD_WALL: BuildingBlueprint = getBuilding('valkyr_shield_wall');
+export const VALKYR_SOUL_VAULT: BuildingBlueprint = getBuilding('valkyr_soul_vault');
+export const VALKYR_ASCENSION_SPIRE: BuildingBlueprint = getBuilding('valkyr_ascension_spire');
+
+export const ALL_VALKYR_BUILDINGS = [
+  VALKYR_MEAD_HALL,
+  VALKYR_ARMS_FORGE,
+  VALKYR_SHIELD_WALL,
+  VALKYR_SOUL_VAULT,
+  VALKYR_ASCENSION_SPIRE,
+];
+
+// =============================================================================
 // SPECIES COLLECTIONS
 // =============================================================================
 
@@ -161,6 +233,10 @@ export const BUILDINGS_BY_SPECIES = {
   dvergar: ALL_DVERGAR_BUILDINGS,
   jotnar: ALL_JOTNAR_BUILDINGS,
   dragon: ALL_DRAGON_BUILDINGS,
+  nagavel: ALL_NAGAVEL_BUILDINGS,
+  kitsuri: ALL_KITSURI_BUILDINGS,
+  anansiweb: ALL_ANANSIWEB_BUILDINGS,
+  valkyr: ALL_VALKYR_BUILDINGS,
 };
 
 /**
@@ -174,6 +250,10 @@ export const ALL_SPECIES_BUILDINGS = [
   ...ALL_DVERGAR_BUILDINGS,
   ...ALL_JOTNAR_BUILDINGS,
   ...ALL_DRAGON_BUILDINGS,
+  ...ALL_NAGAVEL_BUILDINGS,
+  ...ALL_KITSURI_BUILDINGS,
+  ...ALL_ANANSIWEB_BUILDINGS,
+  ...ALL_VALKYR_BUILDINGS,
 ];
 
 /**
@@ -202,6 +282,18 @@ export function getBuildingsForSpecies(species: string): BuildingBlueprint[] {
   }
   if (normalized.includes('dragon')) {
     return ALL_DRAGON_BUILDINGS;
+  }
+  if (normalized.includes('nagavel') || normalized.includes('naga')) {
+    return ALL_NAGAVEL_BUILDINGS;
+  }
+  if (normalized.includes('kitsuri') || normalized.includes('kitsune')) {
+    return ALL_KITSURI_BUILDINGS;
+  }
+  if (normalized.includes('anansiweb') || normalized.includes('anansi')) {
+    return ALL_ANANSIWEB_BUILDINGS;
+  }
+  if (normalized.includes('valkyr') || normalized.includes('valkyrie')) {
+    return ALL_VALKYR_BUILDINGS;
   }
 
   return [];

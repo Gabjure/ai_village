@@ -2530,6 +2530,926 @@
         "door": "elder_stone"
       },
       "capacity": 6
+    },
+    {
+      "id": "nagavel_gate_shrine",
+      "name": "Gate Shrine",
+      "description": "A gate-temple where passage is judged, with serpentine columns framing a judgment threshold",
+      "category": "spiritual",
+      "tier": 1,
+      "width": 5,
+      "height": 4,
+      "resourceCost": [
+        {
+          "resourceId": "stone",
+          "amountRequired": 35
+        }
+      ],
+      "techRequired": [],
+      "terrainRequired": [],
+      "terrainForbidden": ["water"],
+      "unlocked": true,
+      "buildTime": 30,
+      "functionality": [
+        {
+          "type": "research",
+          "params": {}
+        }
+      ],
+      "canRotate": true,
+      "rotationAngles": [0, 90, 180, 270],
+      "snapToGrid": true,
+      "requiresFoundation": false,
+      "layout": [
+        "#####",
+        "#...#",
+        "#.K.#",
+        "##D##"
+      ],
+      "materials": {
+        "wall": "serpentine_stone",
+        "floor": "threshold_marble",
+        "door": "coiled_brass"
+      },
+      "capacity": 4
+    },
+    {
+      "id": "nagavel_coil_hold",
+      "name": "Coil Hold",
+      "description": "Spiraling residential chambers built around a central pillar, warm and enclosed",
+      "category": "residential",
+      "tier": 1,
+      "width": 5,
+      "height": 4,
+      "resourceCost": [
+        {
+          "resourceId": "stone",
+          "amountRequired": 30
+        },
+        {
+          "resourceId": "wood",
+          "amountRequired": 10
+        }
+      ],
+      "techRequired": [],
+      "terrainRequired": [],
+      "terrainForbidden": ["water"],
+      "unlocked": true,
+      "buildTime": 30,
+      "functionality": [
+        {
+          "type": "sleeping",
+          "params": {}
+        }
+      ],
+      "canRotate": true,
+      "rotationAngles": [0, 90, 180, 270],
+      "snapToGrid": true,
+      "requiresFoundation": false,
+      "layout": [
+        "#####",
+        "#...#",
+        "#.K.#",
+        "##D##"
+      ],
+      "materials": {
+        "wall": "coiled_brass",
+        "floor": "serpentine_stone",
+        "door": "coiled_brass"
+      },
+      "capacity": 4
+    },
+    {
+      "id": "nagavel_venom_lab",
+      "name": "Venom Laboratory",
+      "description": "Research chamber for studying poisons, antidotes, and the properties of liminality",
+      "category": "industrial",
+      "tier": 2,
+      "width": 5,
+      "height": 4,
+      "resourceCost": [
+        {
+          "resourceId": "stone",
+          "amountRequired": 45
+        },
+        {
+          "resourceId": "crystal",
+          "amountRequired": 15
+        }
+      ],
+      "techRequired": [],
+      "terrainRequired": [],
+      "terrainForbidden": ["water"],
+      "unlocked": true,
+      "buildTime": 50,
+      "functionality": [
+        {
+          "type": "research",
+          "params": {}
+        }
+      ],
+      "canRotate": true,
+      "rotationAngles": [0, 90, 180, 270],
+      "snapToGrid": true,
+      "requiresFoundation": false,
+      "layout": [
+        "#####",
+        "#...#",
+        "#.K.#",
+        "##D##"
+      ],
+      "materials": {
+        "wall": "serpentine_stone",
+        "floor": "threshold_marble",
+        "door": "coiled_brass"
+      },
+      "capacity": 4
+    },
+    {
+      "id": "nagavel_border_market",
+      "name": "Border Market",
+      "description": "A market built at crossroads, where trade happens under the guardian's watchful gaze",
+      "category": "commercial",
+      "tier": 2,
+      "width": 5,
+      "height": 4,
+      "resourceCost": [
+        {
+          "resourceId": "stone",
+          "amountRequired": 50
+        },
+        {
+          "resourceId": "wood",
+          "amountRequired": 10
+        }
+      ],
+      "techRequired": [],
+      "terrainRequired": [],
+      "terrainForbidden": ["water"],
+      "unlocked": true,
+      "buildTime": 50,
+      "functionality": [
+        {
+          "type": "shop",
+          "params": {}
+        }
+      ],
+      "canRotate": true,
+      "rotationAngles": [0, 90, 180, 270],
+      "snapToGrid": true,
+      "requiresFoundation": false,
+      "layout": [
+        "#####",
+        "#...#",
+        "#.K.#",
+        "##D##"
+      ],
+      "materials": {
+        "wall": "threshold_marble",
+        "floor": "serpentine_stone",
+        "door": "coiled_brass"
+      },
+      "capacity": 4
+    },
+    {
+      "id": "nagavel_threshold_sanctum",
+      "name": "Threshold Sanctum",
+      "description": "The holiest space: a doorway that leads to nowhere, surrounded by meditation chambers",
+      "category": "spiritual",
+      "tier": 3,
+      "width": 5,
+      "height": 4,
+      "resourceCost": [
+        {
+          "resourceId": "stone",
+          "amountRequired": 70
+        },
+        {
+          "resourceId": "crystal",
+          "amountRequired": 20
+        }
+      ],
+      "techRequired": [],
+      "terrainRequired": [],
+      "terrainForbidden": ["water"],
+      "unlocked": true,
+      "buildTime": 80,
+      "functionality": [
+        {
+          "type": "research",
+          "params": {}
+        }
+      ],
+      "canRotate": true,
+      "rotationAngles": [0, 90, 180, 270],
+      "snapToGrid": true,
+      "requiresFoundation": false,
+      "layout": [
+        "#####",
+        "#...#",
+        "#.K.#",
+        "##D##"
+      ],
+      "materials": {
+        "wall": "threshold_marble",
+        "floor": "threshold_marble",
+        "door": "coiled_brass"
+      },
+      "capacity": 4
+    },
+    {
+      "id": "kitsuri_fox_den",
+      "name": "Fox Den",
+      "description": "Hidden beneath apparent ruins, cozy interior disguised as abandoned space",
+      "category": "residential",
+      "tier": 1,
+      "width": 5,
+      "height": 4,
+      "resourceCost": [
+        {
+          "resourceId": "wood",
+          "amountRequired": 30
+        },
+        {
+          "resourceId": "stone",
+          "amountRequired": 5
+        }
+      ],
+      "techRequired": [],
+      "terrainRequired": [],
+      "terrainForbidden": ["water"],
+      "unlocked": true,
+      "buildTime": 30,
+      "functionality": [
+        {
+          "type": "sleeping",
+          "params": {}
+        }
+      ],
+      "canRotate": true,
+      "rotationAngles": [0, 90, 180, 270],
+      "snapToGrid": true,
+      "requiresFoundation": false,
+      "layout": [
+        "#####",
+        "#...#",
+        "#.K.#",
+        "##D##"
+      ],
+      "materials": {
+        "wall": "illusion_wood",
+        "floor": "fox_paper",
+        "door": "illusion_wood"
+      },
+      "capacity": 4
+    },
+    {
+      "id": "kitsuri_trick_workshop",
+      "name": "Trick Workshop",
+      "description": "Workshop for crafting illusions, traps, and tests of wit",
+      "category": "industrial",
+      "tier": 1,
+      "width": 5,
+      "height": 4,
+      "resourceCost": [
+        {
+          "resourceId": "wood",
+          "amountRequired": 35
+        },
+        {
+          "resourceId": "metal",
+          "amountRequired": 5
+        }
+      ],
+      "techRequired": [],
+      "terrainRequired": [],
+      "terrainForbidden": ["water"],
+      "unlocked": true,
+      "buildTime": 30,
+      "functionality": [
+        {
+          "type": "crafting",
+          "params": {}
+        }
+      ],
+      "canRotate": true,
+      "rotationAngles": [0, 90, 180, 270],
+      "snapToGrid": true,
+      "requiresFoundation": false,
+      "layout": [
+        "#####",
+        "#...#",
+        "#.K.#",
+        "##D##"
+      ],
+      "materials": {
+        "wall": "spirit_lacquer",
+        "floor": "illusion_wood",
+        "door": "fox_paper"
+      },
+      "capacity": 4
+    },
+    {
+      "id": "kitsuri_mirror_hall",
+      "name": "Mirror Hall",
+      "description": "A hall of mirrors that reveals truth through reflected deception",
+      "category": "industrial",
+      "tier": 2,
+      "width": 5,
+      "height": 4,
+      "resourceCost": [
+        {
+          "resourceId": "crystal",
+          "amountRequired": 30
+        },
+        {
+          "resourceId": "wood",
+          "amountRequired": 20
+        }
+      ],
+      "techRequired": [],
+      "terrainRequired": [],
+      "terrainForbidden": ["water"],
+      "unlocked": true,
+      "buildTime": 50,
+      "functionality": [
+        {
+          "type": "research",
+          "params": {}
+        }
+      ],
+      "canRotate": true,
+      "rotationAngles": [0, 90, 180, 270],
+      "snapToGrid": true,
+      "requiresFoundation": false,
+      "layout": [
+        "#####",
+        "#...#",
+        "#.K.#",
+        "##D##"
+      ],
+      "materials": {
+        "wall": "illusion_wood",
+        "floor": "spirit_lacquer",
+        "door": "fox_paper"
+      },
+      "capacity": 4
+    },
+    {
+      "id": "kitsuri_riddle_market",
+      "name": "Riddle Market",
+      "description": "Market where prices are set by riddles; pay what you can puzzle out",
+      "category": "commercial",
+      "tier": 2,
+      "width": 5,
+      "height": 4,
+      "resourceCost": [
+        {
+          "resourceId": "wood",
+          "amountRequired": 45
+        },
+        {
+          "resourceId": "metal",
+          "amountRequired": 10
+        }
+      ],
+      "techRequired": [],
+      "terrainRequired": [],
+      "terrainForbidden": ["water"],
+      "unlocked": true,
+      "buildTime": 50,
+      "functionality": [
+        {
+          "type": "shop",
+          "params": {}
+        }
+      ],
+      "canRotate": true,
+      "rotationAngles": [0, 90, 180, 270],
+      "snapToGrid": true,
+      "requiresFoundation": false,
+      "layout": [
+        "#####",
+        "#...#",
+        "#.K.#",
+        "##D##"
+      ],
+      "materials": {
+        "wall": "fox_paper",
+        "floor": "illusion_wood",
+        "door": "spirit_lacquer"
+      },
+      "capacity": 4
+    },
+    {
+      "id": "kitsuri_nine_tail_shrine",
+      "name": "Nine-Tail Shrine",
+      "description": "Sacred space where the oldest tricksters meditate on the nature of truth and deception",
+      "category": "spiritual",
+      "tier": 3,
+      "width": 5,
+      "height": 4,
+      "resourceCost": [
+        {
+          "resourceId": "crystal",
+          "amountRequired": 45
+        },
+        {
+          "resourceId": "wood",
+          "amountRequired": 35
+        }
+      ],
+      "techRequired": [],
+      "terrainRequired": [],
+      "terrainForbidden": ["water"],
+      "unlocked": true,
+      "buildTime": 80,
+      "functionality": [
+        {
+          "type": "research",
+          "params": {}
+        }
+      ],
+      "canRotate": true,
+      "rotationAngles": [0, 90, 180, 270],
+      "snapToGrid": true,
+      "requiresFoundation": false,
+      "layout": [
+        "#####",
+        "#...#",
+        "#.K.#",
+        "##D##"
+      ],
+      "materials": {
+        "wall": "spirit_lacquer",
+        "floor": "illusion_wood",
+        "door": "fox_paper"
+      },
+      "capacity": 4
+    },
+    {
+      "id": "anansiweb_story_loom",
+      "name": "Story Loom",
+      "description": "Web-strung workshop where stories are literally woven into thread",
+      "category": "industrial",
+      "tier": 1,
+      "width": 5,
+      "height": 4,
+      "resourceCost": [
+        {
+          "resourceId": "wood",
+          "amountRequired": 30
+        },
+        {
+          "resourceId": "crystal",
+          "amountRequired": 5
+        }
+      ],
+      "techRequired": [],
+      "terrainRequired": [],
+      "terrainForbidden": ["water"],
+      "unlocked": true,
+      "buildTime": 30,
+      "functionality": [
+        {
+          "type": "crafting",
+          "params": {}
+        }
+      ],
+      "canRotate": true,
+      "rotationAngles": [0, 90, 180, 270],
+      "snapToGrid": true,
+      "requiresFoundation": false,
+      "layout": [
+        "#####",
+        "#...#",
+        "#.K.#",
+        "##D##"
+      ],
+      "materials": {
+        "wall": "story_wood",
+        "floor": "silk_thread",
+        "door": "story_wood"
+      },
+      "capacity": 4
+    },
+    {
+      "id": "anansiweb_web_nest",
+      "name": "Web Nest",
+      "description": "Hammock-like web dwellings suspended between structures",
+      "category": "residential",
+      "tier": 1,
+      "width": 5,
+      "height": 4,
+      "resourceCost": [
+        {
+          "resourceId": "wood",
+          "amountRequired": 25
+        },
+        {
+          "resourceId": "crystal",
+          "amountRequired": 10
+        }
+      ],
+      "techRequired": [],
+      "terrainRequired": [],
+      "terrainForbidden": ["water"],
+      "unlocked": true,
+      "buildTime": 30,
+      "functionality": [
+        {
+          "type": "sleeping",
+          "params": {}
+        }
+      ],
+      "canRotate": true,
+      "rotationAngles": [0, 90, 180, 270],
+      "snapToGrid": true,
+      "requiresFoundation": false,
+      "layout": [
+        "#####",
+        "#...#",
+        "#.K.#",
+        "##D##"
+      ],
+      "materials": {
+        "wall": "silk_thread",
+        "floor": "story_wood",
+        "door": "silk_thread"
+      },
+      "capacity": 4
+    },
+    {
+      "id": "anansiweb_tale_archive",
+      "name": "Tale Archive",
+      "description": "Library where stories are stored as vibrating threads; read by touch",
+      "category": "industrial",
+      "tier": 2,
+      "width": 5,
+      "height": 4,
+      "resourceCost": [
+        {
+          "resourceId": "wood",
+          "amountRequired": 35
+        },
+        {
+          "resourceId": "crystal",
+          "amountRequired": 25
+        }
+      ],
+      "techRequired": [],
+      "terrainRequired": [],
+      "terrainForbidden": ["water"],
+      "unlocked": true,
+      "buildTime": 50,
+      "functionality": [
+        {
+          "type": "research",
+          "params": {}
+        }
+      ],
+      "canRotate": true,
+      "rotationAngles": [0, 90, 180, 270],
+      "snapToGrid": true,
+      "requiresFoundation": false,
+      "layout": [
+        "#####",
+        "#...#",
+        "#.K.#",
+        "##D##"
+      ],
+      "materials": {
+        "wall": "vibration_crystal",
+        "floor": "story_wood",
+        "door": "silk_thread"
+      },
+      "capacity": 4
+    },
+    {
+      "id": "anansiweb_rumor_market",
+      "name": "Rumor Market",
+      "description": "Market where information and stories are the primary currency",
+      "category": "commercial",
+      "tier": 2,
+      "width": 5,
+      "height": 4,
+      "resourceCost": [
+        {
+          "resourceId": "wood",
+          "amountRequired": 40
+        },
+        {
+          "resourceId": "crystal",
+          "amountRequired": 20
+        }
+      ],
+      "techRequired": [],
+      "terrainRequired": [],
+      "terrainForbidden": ["water"],
+      "unlocked": true,
+      "buildTime": 50,
+      "functionality": [
+        {
+          "type": "shop",
+          "params": {}
+        }
+      ],
+      "canRotate": true,
+      "rotationAngles": [0, 90, 180, 270],
+      "snapToGrid": true,
+      "requiresFoundation": false,
+      "layout": [
+        "#####",
+        "#...#",
+        "#.K.#",
+        "##D##"
+      ],
+      "materials": {
+        "wall": "story_wood",
+        "floor": "silk_thread",
+        "door": "vibration_crystal"
+      },
+      "capacity": 4
+    },
+    {
+      "id": "anansiweb_spinner_sanctum",
+      "name": "Spinner Sanctum",
+      "description": "Sacred loom where the creation stories of all species are woven together",
+      "category": "spiritual",
+      "tier": 3,
+      "width": 5,
+      "height": 4,
+      "resourceCost": [
+        {
+          "resourceId": "crystal",
+          "amountRequired": 50
+        },
+        {
+          "resourceId": "wood",
+          "amountRequired": 30
+        }
+      ],
+      "techRequired": [],
+      "terrainRequired": [],
+      "terrainForbidden": ["water"],
+      "unlocked": true,
+      "buildTime": 80,
+      "functionality": [
+        {
+          "type": "research",
+          "params": {}
+        }
+      ],
+      "canRotate": true,
+      "rotationAngles": [0, 90, 180, 270],
+      "snapToGrid": true,
+      "requiresFoundation": false,
+      "layout": [
+        "#####",
+        "#...#",
+        "#.K.#",
+        "##D##"
+      ],
+      "materials": {
+        "wall": "vibration_crystal",
+        "floor": "silk_thread",
+        "door": "story_wood"
+      },
+      "capacity": 4
+    },
+    {
+      "id": "valkyr_mead_hall",
+      "name": "Mead Hall",
+      "description": "Great feasting hall where warriors tell their stories and honor falls",
+      "category": "commercial",
+      "tier": 1,
+      "width": 5,
+      "height": 4,
+      "resourceCost": [
+        {
+          "resourceId": "stone",
+          "amountRequired": 25
+        },
+        {
+          "resourceId": "wood",
+          "amountRequired": 15
+        }
+      ],
+      "techRequired": [],
+      "terrainRequired": [],
+      "terrainForbidden": ["water"],
+      "unlocked": true,
+      "buildTime": 30,
+      "functionality": [
+        {
+          "type": "shop",
+          "params": {}
+        }
+      ],
+      "canRotate": true,
+      "rotationAngles": [0, 90, 180, 270],
+      "snapToGrid": true,
+      "requiresFoundation": false,
+      "layout": [
+        "#####",
+        "#...#",
+        "#.K.#",
+        "##D##"
+      ],
+      "materials": {
+        "wall": "war_stone",
+        "floor": "war_stone",
+        "door": "valor_steel"
+      },
+      "capacity": 4
+    },
+    {
+      "id": "valkyr_arms_forge",
+      "name": "Arms Forge",
+      "description": "Forge dedicated to weapons and armor, blessed by ancestral spirits",
+      "category": "industrial",
+      "tier": 1,
+      "width": 5,
+      "height": 4,
+      "resourceCost": [
+        {
+          "resourceId": "metal",
+          "amountRequired": 25
+        },
+        {
+          "resourceId": "stone",
+          "amountRequired": 15
+        }
+      ],
+      "techRequired": [],
+      "terrainRequired": [],
+      "terrainForbidden": ["water"],
+      "unlocked": true,
+      "buildTime": 30,
+      "functionality": [
+        {
+          "type": "crafting",
+          "params": {}
+        }
+      ],
+      "canRotate": true,
+      "rotationAngles": [0, 90, 180, 270],
+      "snapToGrid": true,
+      "requiresFoundation": false,
+      "layout": [
+        "#####",
+        "#...#",
+        "#.K.#",
+        "##D##"
+      ],
+      "materials": {
+        "wall": "war_stone",
+        "floor": "valor_steel",
+        "door": "valor_steel"
+      },
+      "capacity": 4
+    },
+    {
+      "id": "valkyr_shield_wall",
+      "name": "Shield Wall",
+      "description": "Fortified defensive structure with training grounds",
+      "category": "military",
+      "tier": 2,
+      "width": 5,
+      "height": 4,
+      "resourceCost": [
+        {
+          "resourceId": "stone",
+          "amountRequired": 40
+        },
+        {
+          "resourceId": "metal",
+          "amountRequired": 20
+        }
+      ],
+      "techRequired": [],
+      "terrainRequired": [],
+      "terrainForbidden": ["water"],
+      "unlocked": true,
+      "buildTime": 50,
+      "functionality": [
+        {
+          "type": "storage",
+          "params": {}
+        }
+      ],
+      "canRotate": true,
+      "rotationAngles": [0, 90, 180, 270],
+      "snapToGrid": true,
+      "requiresFoundation": false,
+      "layout": [
+        "#####",
+        "#...#",
+        "#.K.#",
+        "##D##"
+      ],
+      "materials": {
+        "wall": "war_stone",
+        "floor": "war_stone",
+        "door": "valor_steel"
+      },
+      "capacity": 4
+    },
+    {
+      "id": "valkyr_soul_vault",
+      "name": "Soul Vault",
+      "description": "Sacred vault preserving the essence-records of fallen warriors",
+      "category": "spiritual",
+      "tier": 2,
+      "width": 5,
+      "height": 4,
+      "resourceCost": [
+        {
+          "resourceId": "stone",
+          "amountRequired": 35
+        },
+        {
+          "resourceId": "crystal",
+          "amountRequired": 25
+        }
+      ],
+      "techRequired": [],
+      "terrainRequired": [],
+      "terrainForbidden": ["water"],
+      "unlocked": true,
+      "buildTime": 50,
+      "functionality": [
+        {
+          "type": "storage",
+          "params": {}
+        }
+      ],
+      "canRotate": true,
+      "rotationAngles": [0, 90, 180, 270],
+      "snapToGrid": true,
+      "requiresFoundation": false,
+      "layout": [
+        "#####",
+        "#...#",
+        "#.K.#",
+        "##D##"
+      ],
+      "materials": {
+        "wall": "soul_crystal",
+        "floor": "war_stone",
+        "door": "valor_steel"
+      },
+      "capacity": 4
+    },
+    {
+      "id": "valkyr_ascension_spire",
+      "name": "Ascension Spire",
+      "description": "Tall spire where the worthy dead are sent skyward in final rites",
+      "category": "spiritual",
+      "tier": 3,
+      "width": 5,
+      "height": 4,
+      "resourceCost": [
+        {
+          "resourceId": "stone",
+          "amountRequired": 50
+        },
+        {
+          "resourceId": "crystal",
+          "amountRequired": 30
+        },
+        {
+          "resourceId": "metal",
+          "amountRequired": 10
+        }
+      ],
+      "techRequired": [],
+      "terrainRequired": [],
+      "terrainForbidden": ["water"],
+      "unlocked": true,
+      "buildTime": 80,
+      "functionality": [
+        {
+          "type": "research",
+          "params": {}
+        }
+      ],
+      "canRotate": true,
+      "rotationAngles": [0, 90, 180, 270],
+      "snapToGrid": true,
+      "requiresFoundation": false,
+      "layout": [
+        "#####",
+        "#...#",
+        "#.K.#",
+        "##D##"
+      ],
+      "materials": {
+        "wall": "soul_crystal",
+        "floor": "war_stone",
+        "door": "valor_steel"
+      },
+      "capacity": 4
     }
   ]
 }
