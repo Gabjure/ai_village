@@ -1673,6 +1673,295 @@
         "door": "starlight"
       },
       "capacity": 4
+    },
+    {
+      "id": "dvergar_forge_hall",
+      "name": "Runeforge Hall",
+      "description": "A precision-engineered forge hall of carved stone and forged steel, where runic crystal channels forge-heat into masterwork crafting.",
+      "category": "industrial",
+      "tier": 1,
+      "width": 6,
+      "height": 5,
+      "resourceCost": [
+        {
+          "resourceId": "stone",
+          "amountRequired": 50
+        },
+        {
+          "resourceId": "metal",
+          "amountRequired": 25
+        }
+      ],
+      "techRequired": [],
+      "terrainRequired": [],
+      "terrainForbidden": [
+        "water"
+      ],
+      "unlocked": true,
+      "buildTime": 40,
+      "functionality": [
+        {
+          "type": "crafting",
+          "params": {}
+        }
+      ],
+      "canRotate": true,
+      "rotationAngles": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "snapToGrid": true,
+      "requiresFoundation": false,
+      "layout": [
+        "######",
+        "#W..W#",
+        "#.K..#",
+        "#..S.#",
+        "###D##"
+      ],
+      "materials": {
+        "wall": "carved_stone",
+        "floor": "forged_steel",
+        "door": "runic_crystal"
+      },
+      "capacity": 4
+    },
+    {
+      "id": "dvergar_hold",
+      "name": "Stonekin Hold",
+      "description": "A solid residential hold carved from stone, with forged steel doors and geometric precision in every block.",
+      "category": "residential",
+      "tier": 1,
+      "width": 5,
+      "height": 5,
+      "resourceCost": [
+        {
+          "resourceId": "stone",
+          "amountRequired": 40
+        },
+        {
+          "resourceId": "metal",
+          "amountRequired": 10
+        }
+      ],
+      "techRequired": [],
+      "terrainRequired": [],
+      "terrainForbidden": [
+        "water"
+      ],
+      "unlocked": true,
+      "buildTime": 40,
+      "functionality": [
+        {
+          "type": "sleeping",
+          "params": {
+            "beds": 2
+          }
+        }
+      ],
+      "canRotate": true,
+      "rotationAngles": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "snapToGrid": true,
+      "requiresFoundation": false,
+      "layout": [
+        "#####",
+        "#B.B#",
+        "#...#",
+        "#.S.#",
+        "##D##"
+      ],
+      "materials": {
+        "wall": "carved_stone",
+        "floor": "carved_stone",
+        "door": "forged_steel"
+      },
+      "capacity": 2
+    },
+    {
+      "id": "dvergar_vault",
+      "name": "Debtkeeper's Vault",
+      "description": "A reinforced commercial vault of carved stone and forged steel, sealed with runic crystal locks for secure trade and storage.",
+      "category": "commercial",
+      "tier": 2,
+      "width": 5,
+      "height": 5,
+      "resourceCost": [
+        {
+          "resourceId": "stone",
+          "amountRequired": 45
+        },
+        {
+          "resourceId": "metal",
+          "amountRequired": 30
+        },
+        {
+          "resourceId": "glass",
+          "amountRequired": 10
+        }
+      ],
+      "techRequired": [],
+      "terrainRequired": [],
+      "terrainForbidden": [
+        "water"
+      ],
+      "unlocked": true,
+      "buildTime": 55,
+      "functionality": [
+        {
+          "type": "storage",
+          "params": {}
+        }
+      ],
+      "canRotate": true,
+      "rotationAngles": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "snapToGrid": true,
+      "requiresFoundation": false,
+      "layout": [
+        "#####",
+        "#W.W#",
+        "#.S.#",
+        "#...#",
+        "##D##"
+      ],
+      "materials": {
+        "wall": "carved_stone",
+        "floor": "forged_steel",
+        "door": "runic_crystal"
+      },
+      "capacity": 4
+    },
+    {
+      "id": "dvergar_assay_chamber",
+      "name": "Assay Chamber",
+      "description": "A geometric research chamber with runic crystal floors that refract forge-light for precise mineral assay and metallurgical study.",
+      "category": "industrial",
+      "tier": 2,
+      "width": 6,
+      "height": 6,
+      "resourceCost": [
+        {
+          "resourceId": "stone",
+          "amountRequired": 55
+        },
+        {
+          "resourceId": "metal",
+          "amountRequired": 35
+        },
+        {
+          "resourceId": "glass",
+          "amountRequired": 15
+        }
+      ],
+      "techRequired": [],
+      "terrainRequired": [],
+      "terrainForbidden": [
+        "water"
+      ],
+      "unlocked": true,
+      "buildTime": 55,
+      "functionality": [
+        {
+          "type": "research",
+          "params": {}
+        }
+      ],
+      "canRotate": true,
+      "rotationAngles": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "snapToGrid": true,
+      "requiresFoundation": false,
+      "layout": [
+        "######",
+        "#W..W#",
+        "#.T..#",
+        "#.K..#",
+        "#...S#",
+        "###D##"
+      ],
+      "materials": {
+        "wall": "carved_stone",
+        "floor": "runic_crystal",
+        "door": "forged_steel"
+      },
+      "capacity": 4
+    },
+    {
+      "id": "dvergar_ancestor_hall",
+      "name": "Hall of Measured Days",
+      "description": "A solemn spiritual hall of carved stone with runic crystal floors and ceiling, where Dvergar commune with ancestral echoes etched in rune-script.",
+      "category": "spiritual",
+      "tier": 3,
+      "width": 7,
+      "height": 7,
+      "resourceCost": [
+        {
+          "resourceId": "stone",
+          "amountRequired": 80
+        },
+        {
+          "resourceId": "metal",
+          "amountRequired": 50
+        },
+        {
+          "resourceId": "glass",
+          "amountRequired": 25
+        }
+      ],
+      "techRequired": [],
+      "terrainRequired": [],
+      "terrainForbidden": [
+        "water"
+      ],
+      "unlocked": true,
+      "buildTime": 80,
+      "functionality": [
+        {
+          "type": "meditation",
+          "params": {
+            "capacity": 4
+          }
+        }
+      ],
+      "canRotate": true,
+      "rotationAngles": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "snapToGrid": true,
+      "requiresFoundation": true,
+      "layout": [
+        "#######",
+        "#W...W#",
+        "#.....#",
+        "#..T..#",
+        "#.....#",
+        "#S...S#",
+        "###D###"
+      ],
+      "materials": {
+        "wall": "carved_stone",
+        "floor": "runic_crystal",
+        "door": "runic_crystal"
+      },
+      "capacity": 6
     }
   ]
 }

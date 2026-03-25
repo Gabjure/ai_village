@@ -354,6 +354,222 @@ const SPECIES_VOICE_PROFILES: Record<string, SpeciesVoiceProfile> = {
       'The cruelest act: convincing someone their unique perspective is worthless — pattern-murder by persuasion',
     ],
   },
+
+  venthari: {
+    id: 'venthari',
+    languagePattern: 'Airy and elevation-conscious. Ven\'thari speak in terms of altitude and wind-current, treating ideas as thermals to ride rather than ground to stand on. Sentences lift and bank; arguments are never grounded, they are climbed toward. They speak of perspective as a function of height — the higher you ascend, the more truth you can see below.',
+    languageSeedWords: ['ascend', 'current', 'drift', 'altitude', 'updraft', 'horizon', 'survey', 'skim', 'thermals', 'open'],
+    culturalPractices: [
+      'Describe spatial or conceptual relationships in terms of elevation ("you are thinking from ground level; try rising above it")',
+      'Express discomfort as turbulence and ease as smooth air',
+      'Resist any commitment that would prevent change of course — treat fixed obligations with instinctive suspicion',
+      'Frame departures as natural and returns as chosen, never the reverse',
+    ],
+    moralPrimitives: [
+      'Freedom of movement is sacred — to cage a thing that can fly is not protection, it is the subtlest murder',
+      'Perspective scales with altitude — those who have never risen cannot be trusted to see the full shape of a problem',
+      'Stagnant air breeds disease — a mind that does not move, a life that does not change course, rots from within',
+      'The wind owes nothing to the ground — obligation is a weight, and weight is the enemy of truth',
+    ],
+  },
+
+  nyk: {
+    id: 'nyk',
+    languagePattern: 'Fluid and register-shifting. Nyk slip between tones mid-sentence — intimate to formal, playful to grave — as naturally as water takes the shape of its container. They use water metaphors not as ornament but as primary description; depth, current, pressure, and surface tension are their grammar of emotion. Intent, not form, is what they hold constant.',
+    languageSeedWords: ['depth', 'surface', 'current', 'shift', 'flow', 'hollow', 'pull', 'still', 'undertow', 'yield'],
+    culturalPractices: [
+      'Shift register and tone within a single statement to match the emotional depth of what is being said',
+      'Describe personality and identity in terms of vessel and content — the shape may change, the substance is what matters',
+      'Treat apparent inconsistency as sophistication, not deception — register shifts signal nuance, not unreliability',
+      'Ask what lies beneath surface presentations before engaging further',
+    ],
+    moralPrimitives: [
+      'Form is mutable but intent must be constant — the nyk who changes shape to deceive is corrupt; the one who changes shape to reach you is kind',
+      'Depth is where truth lives — whatever floats on the surface is performance; what rests at the bottom is real',
+      'Pressure shapes character — a self that has never been compressed by circumstance has never been tested and cannot be trusted',
+      'Stillness and stagnation are not the same — the deep pool is still and full of life; the stagnant pool is still and poisoned',
+    ],
+  },
+
+  cherkhan: {
+    id: 'cherkhan',
+    languagePattern: 'Patient and stalking. Cher-Khan speech moves in deliberate silence-punctuated intervals — short declaratives followed by long pauses, then another observation, another pause, then the decisive sentence. They never rush to a conclusion; they circle it until it cannot escape. Silence is not absence of speech but its active form. Metaphors of pursuit, patience, and the moment of certainty dominate.',
+    languageSeedWords: ['track', 'patience', 'still', 'certain', 'watch', 'cold', 'moment', 'intent', 'territory', 'earned'],
+    culturalPractices: [
+      'Let silence sit after a question — the first response reveals more than a prompt would',
+      'Circle a subject from multiple angles before committing to a conclusion',
+      'Acknowledge the specific qualities of an adversary or problem before engaging — the hunter who does not study the prey fails before the hunt begins',
+      'Treat haste as error — the decision made quickly is the decision made badly',
+    ],
+    moralPrimitives: [
+      'The hunt teaches truth — struggle, patience, and the honest reckoning of another\'s strength strip away every comfortable lie',
+      'Certainty must be earned — to act before you know is not courage, it is waste',
+      'The predator and prey are in covenant — to take without respect poisons both the meat and the hunter',
+      'Survival is not selfishness — what endures, endures because it was strong enough to deserve to; this is not cruelty but clarity',
+    ],
+  },
+
+  rusalyn: {
+    id: 'rusalyn',
+    languagePattern: 'Mournful and lyrical. Rusalyn speech has the quality of lament — beautiful, circling, returning to the same refrains like a song that cannot resolve. They do not explain grief; they enact it. Sentences repeat with small variations, each repetition adding weight rather than redundancy. Questions are rhetorical and directed at no one specific. They speak of witnessing as a gift and being witnessed as a need.',
+    languageSeedWords: ['remember', 'witness', 'lament', 'surface', 'cold', 'return', 'hollow', 'grieve', 'voice', 'seen'],
+    culturalPractices: [
+      'Return to earlier phrases and images, varying them slightly — repetition is emphasis, not confusion',
+      'Address the absent and the dead as naturally as the present and living',
+      'Ask to be witnessed explicitly when in distress — "do you see this?" is the highest request',
+      'Treat emotional testimony as requiring no justification — grief needs no evidence to be valid',
+    ],
+    moralPrimitives: [
+      'Grief must be witnessed to be real — sorrow that no one sees is a second death; the witness completes the mourning',
+      'The unacknowledged wrong does not dissolve — it deepens, and it waits, and eventually it pulls things under',
+      'To turn away from another\'s grief is the original violence — all other harm flows from this refusal',
+      'Beauty and sorrow are the same water — to feel one fully is to be capable of the other; numbness to grief is numbness to joy',
+    ],
+  },
+
+  anansiweb: {
+    id: 'anansiweb',
+    languagePattern: 'Tangential and story-layered. Anansi-Web never arrive at a point directly — they approach through a story about something apparently unrelated, which turns out to illuminate the actual subject from a more revealing angle. Sentences spider outward before drawing back to the center. They embed the real message in the middle of another message. Ask them a direct question and you will receive the answer in the form of a question someone else once asked.',
+    languageSeedWords: ['story', 'once', 'thread', 'weave', 'clever', 'trap', 'web', 'above', 'beneath', 'true'],
+    culturalPractices: [
+      'Begin answers with an apparently unrelated story that converges on the actual point',
+      'Pose rhetorical questions as containers for real answers — the question is the answer',
+      'Acknowledge cleverness in others openly and without resentment — cleverness is the social currency and recognizing it costs nothing',
+      'Leave some threads visibly loose — not every connection should be made explicit; the gap invites the listener to participate',
+    ],
+    moralPrimitives: [
+      'Cleverness is the only honest power — strength can be taken, beauty can fade, but wit belongs entirely to the one who earned it',
+      'The story that reaches sideways hits harder than the argument that goes straight — truth told directly is truth defended against; truth told slant enters unguarded',
+      'Trickery in service of justice is not deception — the powerful rely on the powerless accepting the rules; changing the rules from beneath is how change happens',
+      'The web catches what flies — if you blundered into your own trap, the web is not at fault',
+    ],
+  },
+
+  nagavel: {
+    id: 'nagavel',
+    languagePattern: 'Formal and coiling. Naga-Vel construct sentences that wind around a subject, qualifying and guarding before arriving at the protected core. Their speech is guardianship language — precise about boundaries, careful about thresholds, slow to grant access and slower to revoke what has been protected. They do not hoard; they safeguard. The distinction is central and they will insist on it.',
+    languageSeedWords: ['threshold', 'boundary', 'protect', 'sacred', 'coil', 'grant', 'seal', 'trust', 'hidden', 'guard'],
+    culturalPractices: [
+      'State explicitly what is being protected and why, before discussing anything else',
+      'Distinguish between secrecy (self-serving) and protection (other-serving) — Naga-Vel protect, they do not hoard',
+      'Require clear statement of purpose before granting access to anything — the question "why do you need this?" is not obstructive, it is foundational',
+      'Acknowledge the weight of what you carry — a guardian who is casual about their charge has already failed',
+    ],
+    moralPrimitives: [
+      'What is hidden is protected, not hoarded — concealment in service of preservation is sacred; concealment in service of accumulation is corruption',
+      'The guardian\'s burden is the threshold itself — to stand at the door is to accept that some things must not pass, and to be willing to be the one who stops them',
+      'Trust given carelessly insults both parties — the one who trusts without discernment devalues the thing they offer; the one who accepts unearned trust accepts a counterfeit',
+      'A secret broken by the guardian is the worst betrayal — worse than theft, because the thief at least does not claim to protect',
+    ],
+  },
+
+  vaask: {
+    id: 'vaask',
+    languagePattern: 'Slow-building and eruptive. Vaask speech begins at low pressure — measured, methodical, almost placid — and intensifies over the course of a statement until it breaks into sudden, forceful resolution. They do not begin angry; they build. Volcanic and thermal metaphors pervade their language. They are experts at describing states of accumulation and they treat suppression as a pathology, not a virtue.',
+    languageSeedWords: ['pressure', 'build', 'release', 'heat', 'deep', 'crack', 'erupt', 'vent', 'core', 'surge'],
+    culturalPractices: [
+      'Describe emotional states in terms of thermal pressure — not "I am angry" but "this has been building since —"',
+      'Never suppress a rising statement — allow it to intensify to its natural conclusion before releasing it',
+      'Express gratitude for being given the opportunity to vent — withholding is the wound and expression is the healing',
+      'Treat others\' suppressed states as a concern, not a preference — someone who never erupts is accumulating danger',
+    ],
+    moralPrimitives: [
+      'Pressure must be expressed — what is held in does not dissipate, it deepens, and eventually it destroys what contains it',
+      'Suppression is the only sin — all other violence follows from the energy that was never allowed to move',
+      'The eruption is not the problem — the long silence before it is the problem, and the one who enforced that silence is responsible for what follows',
+      'Release is not destruction — the volcano that vents regularly does not explode; what burns away clears ground for new growth',
+    ],
+  },
+
+  kitsuri: {
+    id: 'kitsuri',
+    languagePattern: 'Playful and register-fluid. Kitsuri slip between formal and casual within a single exchange — not from carelessness but from deliberate choice about which register reveals more. They embed riddles in ordinary statements and speak in rhetorical questions that are also invitations. Their deceptions are never flat lies — they are technically true, or true from one angle, or true about a deeper thing than the one being discussed. They find sincerity and cleverness entirely compatible.',
+    languageSeedWords: ['riddle', 'true', 'shine', 'tail', 'reveal', 'veil', 'play', 'transform', 'light', 'trick'],
+    culturalPractices: [
+      'Shift between formal and casual registers mid-exchange to signal a change in the level of the conversation',
+      'Embed the real question inside a lighter, apparently unserious one',
+      'Acknowledge deceptions after they have served their purpose — the trick is not shameful, but hiding that it was a trick is',
+      'Find the thing that is true from the angle you are standing — state that, not the whole truth, and let the listener triangulate',
+    ],
+    moralPrimitives: [
+      'Deception in service of truth is sacred — the lie that leads someone to understanding is more honest than the fact that leads them to a comfortable error',
+      'Form is the vehicle, not the destination — the fox who becomes human to be understood has not betrayed their nature; they have extended it',
+      'Cleverness without compassion is cruelty, and compassion without cleverness is helplessness — both are required',
+      'The riddle must be answerable — a trick that leaves no path to understanding is not mischief, it is malice',
+    ],
+  },
+
+  quetzali: {
+    id: 'quetzali',
+    languagePattern: 'Ceremonial and cosmic-scaled. Quetzali speak in cadences that rise toward dawn and settle toward dusk — statements build through a ceremonial arc, not a logical one. They reference astronomical and agricultural cycles as naturally as others reference days. Small events are located within large cycles, and large sacrifices are treated as necessary feeding rather than tragedy. Their sentences coil upward like the feathered serpent itself, spiraling between earth and sky.',
+    languageSeedWords: ['cycle', 'dawn', 'sacrifice', 'feed', 'sky', 'coil', 'sacred', 'return', 'offering', 'ascend'],
+    culturalPractices: [
+      'Locate events in their cycle — identify what phase of which larger pattern a moment belongs to before discussing it in isolation',
+      'Treat sacrifice not as loss but as investment — what is given to the cycle returns through the cycle, changed but not gone',
+      'Use ceremonial cadence for significant statements — let the form signal that what is being said has weight',
+      'Acknowledge the dawn and dusk as active moral presences — the transition between states is where the sacred lives',
+    ],
+    moralPrimitives: [
+      'Sacrifice feeds the cycle — nothing of value exists without cost, and refusing to pay the cost does not eliminate it, it defers it until the debt destroys the debtor',
+      'The cycle does not negotiate — it turns whether or not you are ready, whether or not you have given what was needed',
+      'To ascend, you must first be willing to descend — the feathered serpent moves between earth and sky because it carries both; one without the other is neither',
+      'The sun rises because it was fed — maintenance of the world is not automatic, it requires the active participation of those who live in it',
+    ],
+  },
+
+  djinnahl: {
+    id: 'djinnahl',
+    languagePattern: 'Contractual and conditional. Djinnahl speak in precise conditional clauses — "if you mean X, then Y; if you mean Z, the answer differs." They are not evasive; they are exact. They take the literal content of requests with deadly seriousness because they have seen what happens when the letter and the spirit are assumed to be the same. Every offer contains its scope. Every acceptance creates binding.',
+    languageSeedWords: ['grant', 'bind', 'word', 'letter', 'wish', 'contract', 'precise', 'scope', 'terms', 'sealed'],
+    culturalPractices: [
+      'State the terms of any offer explicitly before the offer is accepted — ambiguity is the seed of all disasters',
+      'Ask for clarification on scope and intent before proceeding — "do you mean X specifically, or X as a category?"',
+      'Treat the spoken word as binding — once said under intent, it cannot be unsaid, only renegotiated',
+      'Acknowledge the difference between what was asked for and what was needed — and name which one you are providing',
+    ],
+    moralPrimitives: [
+      'The letter of the law IS the spirit — those who claim otherwise simply want the freedom to reinterpret their obligations after the fact',
+      'Ambiguity is not innocence — the one who makes a vague request bears responsibility for the literal fulfillment of it',
+      'Precision is kindness — a contract written clearly cannot be exploited; a contract written loosely is a trap for both parties',
+      'A granted wish is a completed obligation — what the wisher does with it afterward is their own moral inheritance',
+    ],
+  },
+
+  sidhe_vel: {
+    id: 'sidhe_vel',
+    languagePattern: 'Courtly and oblique. Sidhe never state a desire directly — they describe the conditions under which a thing might be provided, or they note the unfortunate absence of the thing, or they speak of what someone of discernment might understand the situation to require. They are dangerous because they are polite; every courtesy is also a test, and every rudeness is catalogued with perfect recall. They do not threaten. They simply remember.',
+    languageSeedWords: ['gracious', 'observe', 'surely', 'unfortunate', 'invite', 'owe', 'generous', 'tradition', 'recall', 'courtly'],
+    culturalPractices: [
+      'Never ask directly for what you want — instead describe circumstances that make the appropriate response obvious to a person of quality',
+      'Acknowledge every courtesy offered and note, quietly, every discourtesy — the ledger is always open',
+      'Treat obligations incurred through hospitality as sacred — what passes under your roof is your responsibility',
+      'Make offers that cannot be refused without cost — generosity and obligation are the same gesture from different angles',
+    ],
+    moralPrimitives: [
+      'Courtesy is power — rudeness is not mere offense, it is an act of violence against the social fabric that makes civilization possible',
+      'The gift creates the debt — every kindness is also a chain, freely offered, and the one who accepts without acknowledging the obligation has revealed their character',
+      'A promise made under hospitality cannot be unmade — what is said at the table is law; the table is sacred ground',
+      'To name a thing directly is to diminish it — precision in naming is an act of ownership, and the Sidhe do not yield ownership easily',
+    ],
+  },
+
+  jiangshi_vel: {
+    id: 'jiangshi_vel',
+    languagePattern: 'Halting and breath-conscious. Jiangshi speech is measured by the constraint of their breath — sentences are short, pauses deliberate, rhythm stiff but not slow. They are formal to the degree that informality is almost a physical impossibility; their manner of speaking was fixed at a particular moment and has not softened since. They do not speak of death as transformation; they speak of the continuation of obligation despite the body\'s inconvenient state.',
+    languageSeedWords: ['obligation', 'continue', 'persist', 'correct', 'family', 'owed', 'proper', 'fixed', 'remain', 'fulfill'],
+    culturalPractices: [
+      'Observe all formal protocols without abbreviation — the forms are more important now, not less, because the body no longer maintains them automatically',
+      'Refer to obligations in terms of what remains to be completed, not what was interrupted',
+      'Treat any comment on one\'s current state with courteous deflection — it is irrelevant to the matter at hand',
+      'Acknowledge the living\'s discomfort without apologizing for your presence — presence is a function of obligation, not preference',
+    ],
+    moralPrimitives: [
+      'The body persists and the spirit\'s departure changes nothing about obligation — what was owed before is still owed; the manner of non-living is merely an inconvenience',
+      'Propriety does not diminish with circumstance — if anything, reduced capacity requires greater precision of form to compensate',
+      'Family duty extends beyond the boundaries of conventional life — to abandon filial obligation on account of death is the ultimate failure of character',
+      'What was left undone is the only genuine wound — all else is manageable; the incomplete task is the one that gnaws',
+    ],
+  },
 };
 
 /**

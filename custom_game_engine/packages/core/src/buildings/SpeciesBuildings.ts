@@ -93,6 +93,24 @@ export const ALL_HIGH_FAE_BUILDINGS = [
 ];
 
 // =============================================================================
+// DVERGAR BUILDINGS - Underground precision engineering, stone and steel
+// =============================================================================
+
+export const DVERGAR_RUNEFORGE_HALL: BuildingBlueprint = getBuilding('dvergar_forge_hall');
+export const DVERGAR_STONEKIN_HOLD: BuildingBlueprint = getBuilding('dvergar_hold');
+export const DVERGAR_DEBTKEEPERS_VAULT: BuildingBlueprint = getBuilding('dvergar_vault');
+export const DVERGAR_ASSAY_CHAMBER: BuildingBlueprint = getBuilding('dvergar_assay_chamber');
+export const DVERGAR_ANCESTOR_HALL: BuildingBlueprint = getBuilding('dvergar_ancestor_hall');
+
+export const ALL_DVERGAR_BUILDINGS = [
+  DVERGAR_RUNEFORGE_HALL,
+  DVERGAR_STONEKIN_HOLD,
+  DVERGAR_DEBTKEEPERS_VAULT,
+  DVERGAR_ASSAY_CHAMBER,
+  DVERGAR_ANCESTOR_HALL,
+];
+
+// =============================================================================
 // SPECIES COLLECTIONS
 // =============================================================================
 
@@ -104,6 +122,7 @@ export const BUILDINGS_BY_SPECIES = {
   centaur: ALL_CENTAUR_BUILDINGS,
   angelic: ALL_ANGELIC_BUILDINGS,
   high_fae: ALL_HIGH_FAE_BUILDINGS,
+  dvergar: ALL_DVERGAR_BUILDINGS,
 };
 
 /**
@@ -114,6 +133,7 @@ export const ALL_SPECIES_BUILDINGS = [
   ...ALL_CENTAUR_BUILDINGS,
   ...ALL_ANGELIC_BUILDINGS,
   ...ALL_HIGH_FAE_BUILDINGS,
+  ...ALL_DVERGAR_BUILDINGS,
 ];
 
 /**
@@ -133,6 +153,9 @@ export function getBuildingsForSpecies(species: string): BuildingBlueprint[] {
   }
   if (normalized.includes('fae') || normalized.includes('10d')) {
     return ALL_HIGH_FAE_BUILDINGS;
+  }
+  if (normalized.includes('dvergar') || normalized.includes('dwarf')) {
+    return ALL_DVERGAR_BUILDINGS;
   }
 
   return [];
