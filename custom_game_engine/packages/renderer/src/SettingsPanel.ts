@@ -19,17 +19,36 @@ export interface AgentBehaviorSettings {
 
 export interface RenderSettings {
   drawDistance3D: number;           // Draw distance for 3D view (in tiles)
+  qualityPreset: 'high' | 'medium' | 'low';
+  maxParticles: number;
+  spriteResolution: 1 | 0.5 | 0.25;
+  enable3DRenderer: boolean;
+}
+
+export interface SoundSettings {
+  masterMuted: boolean;
+  masterVolume: number;
 }
 
 export interface GameSettings {
   llm: LLMSettings;
   agentBehavior: AgentBehaviorSettings;
   render: RenderSettings;
+  sound: SoundSettings;
   dungeonMasterPrompt: string;
 }
 
 // Detect macOS for MLX default
 const isMacOS = navigator.platform.toLowerCase().includes('mac');
+
+function isMobileDevice(): boolean {
+  if (typeof window === 'undefined') return false;
+  const hasTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+  const smallScreen = window.innerWidth <= 768;
+  return hasTouch && smallScreen;
+}
+
+const _isMobile = isMobileDevice();
 
 const DEFAULT_SETTINGS: GameSettings = {
   llm: isMacOS ? {
@@ -49,7 +68,15 @@ const DEFAULT_SETTINGS: GameSettings = {
     enableLLMAgents: true,        // LLM agents enabled by default
   },
   render: {
-    drawDistance3D: 60,           // 60 tiles draw distance in 3D (matches renderRadius)
+    drawDistance3D: _isMobile ? 20 : 60,
+    qualityPreset: _isMobile ? 'low' : 'high',
+    maxParticles: _isMobile ? 500 : 10000,
+    spriteResolution: _isMobile ? 0.25 : 1,
+    enable3DRenderer: !_isMobile,
+  },
+  sound: {
+    masterMuted: _isMobile,
+    masterVolume: 0.7,
   },
   dungeonMasterPrompt: '',
 };
@@ -82,6 +109,12 @@ const PRESETS: Record<string, Partial<LLMSettings>> = {
     baseUrl: 'https://openrouter.ai/api/v1',
     model: 'meta-llama/llama-3.3-70b-instruct',
   },
+};
+
+const QUALITY_PRESETS: Record<string, { drawDistance3D: number; maxParticles: number; spriteResolution: 1 | 0.5 | 0.25; enable3DRenderer: boolean; label: string; description: string }> = {
+  'high': { drawDistance3D: 60, maxParticles: 10000, spriteResolution: 1, enable3DRenderer: true, label: 'High (Desktop)', description: 'Full draw distance, all effects enabled' },
+  'medium': { drawDistance3D: 35, maxParticles: 2000, spriteResolution: 0.5, enable3DRenderer: true, label: 'Medium (Tablet)', description: 'Reduced draw distance and particles' },
+  'low': { drawDistance3D: 20, maxParticles: 500, spriteResolution: 0.25, enable3DRenderer: false, label: 'Low (Mobile)', description: 'Minimum effects, 3D disabled, best performance' },
 };
 
 // Dungeon Master Prompt Presets
@@ -183,6 +216,8 @@ export class SettingsPanel implements IWindowPanel {
           ...parsed,
           llm: { ...DEFAULT_SETTINGS.llm, ...parsed.llm },
           agentBehavior: { ...DEFAULT_SETTINGS.agentBehavior, ...parsed.agentBehavior },
+          render: { ...DEFAULT_SETTINGS.render, ...parsed.render },
+          sound: { ...DEFAULT_SETTINGS.sound, ...parsed.sound },
         };
       }
     } catch (e) {
@@ -259,8 +294,9 @@ export class SettingsPanel implements IWindowPanel {
       border: 2px solid #4a4a6a;
       border-radius: 12px;
       padding: 24px;
-      min-width: 450px;
-      max-width: 500px;
+      min-width: min(450px, calc(100vw - 32px));
+      max-width: min(500px, calc(100vw - 32px));
+      width: min(500px, calc(100vw - 32px));
       max-height: 85vh;
       overflow-y: auto;
       color: #e0e0e0;
@@ -444,6 +480,28 @@ export class SettingsPanel implements IWindowPanel {
     renderSection.style.cssText = 'margin-top: 20px;';
     renderSection.innerHTML = '<h3 style="margin: 0 0 12px 0; font-size: 14px; color: #8a8aaa; text-transform: uppercase;">Render Settings</h3>';
 
+    // Quality preset selector
+    const qualityGroup = this.createFormGroup('Graphics Quality', 'select');
+    const qualitySelect = qualityGroup.querySelector('select')!;
+    qualitySelect.id = 'settings-quality-preset';
+    qualitySelect.innerHTML = Object.entries(QUALITY_PRESETS).map(([key, preset]) =>
+      `<option value="${key}">${preset.label}</option>`
+    ).join('');
+    qualitySelect.value = this.settings.render.qualityPreset;
+    qualitySelect.onchange = () => {
+      const preset = QUALITY_PRESETS[qualitySelect.value];
+      if (preset) {
+        this.settings.render.qualityPreset = qualitySelect.value as 'high' | 'medium' | 'low';
+        this.settings.render.drawDistance3D = preset.drawDistance3D;
+        this.settings.render.maxParticles = preset.maxParticles;
+        this.settings.render.spriteResolution = preset.spriteResolution;
+        this.settings.render.enable3DRenderer = preset.enable3DRenderer;
+        const drawInput = document.getElementById('settings-draw-distance-3d') as HTMLInputElement;
+        if (drawInput) drawInput.value = String(preset.drawDistance3D);
+      }
+    };
+    renderSection.appendChild(qualityGroup);
+
     // 3D Draw Distance
     const drawDistanceGroup = this.createFormGroup('3D Draw Distance (tiles)', 'text');
     const drawDistanceInput = drawDistanceGroup.querySelector('input')!;
@@ -467,6 +525,51 @@ export class SettingsPanel implements IWindowPanel {
     renderSection.appendChild(renderHelp);
 
     panel.appendChild(renderSection);
+
+    // Sound Settings Section
+    const soundSection = document.createElement('div');
+    soundSection.style.cssText = 'margin-top: 20px;';
+    soundSection.innerHTML = '<h3 style="margin: 0 0 12px 0; font-size: 14px; color: #8a8aaa; text-transform: uppercase;">Sound</h3>';
+
+    // Mute toggle
+    const muteGroup = document.createElement('div');
+    muteGroup.style.cssText = 'margin-bottom: 12px; display: flex; align-items: center; gap: 8px;';
+    const muteCheckbox = document.createElement('input');
+    muteCheckbox.type = 'checkbox';
+    muteCheckbox.id = 'settings-sound-muted';
+    muteCheckbox.checked = this.settings.sound.masterMuted;
+    muteCheckbox.onchange = () => {
+      this.settings.sound.masterMuted = muteCheckbox.checked;
+    };
+    const muteLabel = document.createElement('label');
+    muteLabel.htmlFor = 'settings-sound-muted';
+    muteLabel.textContent = 'Mute all sounds';
+    muteLabel.style.cssText = 'font-size: 13px; color: #ccc; cursor: pointer;';
+    muteGroup.appendChild(muteCheckbox);
+    muteGroup.appendChild(muteLabel);
+    soundSection.appendChild(muteGroup);
+
+    // Volume slider
+    const volumeGroup = this.createFormGroup('Master Volume', 'text');
+    const volumeInput = volumeGroup.querySelector('input')!;
+    volumeInput.id = 'settings-master-volume';
+    volumeInput.type = 'range';
+    volumeInput.min = '0';
+    volumeInput.max = '1';
+    volumeInput.step = '0.1';
+    volumeInput.value = String(this.settings.sound.masterVolume);
+    volumeInput.style.cssText = 'width: 100%; cursor: pointer;';
+    volumeInput.oninput = () => {
+      this.settings.sound.masterVolume = parseFloat(volumeInput.value);
+    };
+    soundSection.appendChild(volumeGroup);
+
+    const soundHelp = document.createElement('p');
+    soundHelp.style.cssText = 'margin: 8px 0 0 0; font-size: 11px; color: #666; font-style: italic;';
+    soundHelp.textContent = _isMobile ? 'Sound is muted by default on mobile. Tap unmute to enable.' : 'Control game audio. Sound respects browser autoplay policy.';
+    soundSection.appendChild(soundHelp);
+
+    panel.appendChild(soundSection);
 
     // Dungeon Master Prompt Section
     const dmSection = document.createElement('div');

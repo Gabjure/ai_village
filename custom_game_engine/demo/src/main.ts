@@ -4262,6 +4262,12 @@ async function main() {
   if ('set3DDrawDistance' in renderer) {
     (renderer as any).set3DDrawDistance(settings.render.drawDistance3D);
   }
+  if ('set3DEnabled' in renderer) {
+    (renderer as any).set3DEnabled(settings.render.enable3DRenderer);
+  }
+  if ('setResolutionScale' in renderer) {
+    (renderer as any).setResolutionScale(settings.render.spriteResolution);
+  }
 
   // Create input handler
   const inputHandler = new InputHandler(canvas, renderer.getCamera());
