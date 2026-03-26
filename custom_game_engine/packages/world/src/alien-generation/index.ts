@@ -22,6 +22,11 @@ export {
   createAlienSpeciesGenerator,
 } from './AlienSpeciesGenerator.js';
 
+// Alien species importer (Folkfork cross-game pipeline)
+// NOTE: AlienSpeciesImporter class uses node:fs and is server-only.
+// Import it directly from './AlienSpeciesImporter.js' in server code.
+export { type ImportedSpecies } from './AlienSpeciesImporter.js';
+
 // Granular creature components
 export {
   BODY_PLANS,
