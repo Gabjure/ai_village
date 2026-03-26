@@ -135,6 +135,7 @@ export class UniversePostcardsGallery {
   private sortMode: SortMode = 'newest';
   private shareModalEl: HTMLElement | null = null;
   private detailModalEl: HTMLElement | null = null;
+  private importModalEl: HTMLElement | null = null;
   private stylesInjected: boolean = false;
   private biomeFilter: string | null = null;
   private epochFilter: string | null = null;
@@ -173,6 +174,8 @@ export class UniversePostcardsGallery {
       if (e.key === 'Escape') {
         if (this.detailModalEl) {
           this.closeDetailModal();
+        } else if (this.importModalEl) {
+          this.closeImportModal();
         } else if (this.shareModalEl) {
           this.closeShareModal();
         } else {
@@ -307,7 +310,35 @@ export class UniversePostcardsGallery {
 
     header.appendChild(left);
 
-    // Right: share button
+    // Right: import + share buttons
+    const rightButtons = document.createElement('div');
+    rightButtons.style.cssText = 'display: flex; align-items: center; gap: 12px;';
+
+    const importBtn = document.createElement('button');
+    importBtn.textContent = '↓ Import Postcard';
+    importBtn.style.cssText = `
+      padding: 13px 26px;
+      font-size: 15px;
+      font-family: monospace;
+      background: linear-gradient(135deg, #2ecc71 0%, #3498db 100%);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+      box-shadow: 0 4px 15px rgba(46, 204, 113, 0.3);
+    `;
+    importBtn.onmouseenter = () => {
+      importBtn.style.transform = 'scale(1.05)';
+      importBtn.style.boxShadow = '0 6px 25px rgba(46, 204, 113, 0.5)';
+    };
+    importBtn.onmouseleave = () => {
+      importBtn.style.transform = 'scale(1)';
+      importBtn.style.boxShadow = '0 4px 15px rgba(46, 204, 113, 0.3)';
+    };
+    importBtn.onclick = () => this.openImportModal();
+    rightButtons.appendChild(importBtn);
+
     const shareBtn = document.createElement('button');
     shareBtn.textContent = '✦ Share My Universe';
     shareBtn.style.cssText = `
@@ -331,7 +362,9 @@ export class UniversePostcardsGallery {
       shareBtn.style.boxShadow = '0 4px 15px rgba(155, 89, 182, 0.3)';
     };
     shareBtn.onclick = () => this.openShareModal();
-    header.appendChild(shareBtn);
+    rightButtons.appendChild(shareBtn);
+
+    header.appendChild(rightButtons);
 
     return header;
   }
@@ -1129,7 +1162,44 @@ export class UniversePostcardsGallery {
       modal.appendChild(section);
     }
 
-    // 11. Close button
+    // 11. Action row: Copy Share Code + Close
+    const detailActionRow = document.createElement('div');
+    detailActionRow.style.cssText = 'display: flex; gap: 12px; justify-content: flex-end; align-items: center; margin-top: 4px;';
+
+    const copyCodeBtn = document.createElement('button');
+    copyCodeBtn.textContent = '⎘ Copy Share Code';
+    copyCodeBtn.style.cssText = `
+      padding: 11px 22px;
+      font-size: 14px;
+      font-family: monospace;
+      background: linear-gradient(135deg, #2ecc71 0%, #3498db 100%);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+      box-shadow: 0 4px 15px rgba(46, 204, 113, 0.3);
+    `;
+    copyCodeBtn.onmouseenter = () => {
+      copyCodeBtn.style.transform = 'scale(1.04)';
+      copyCodeBtn.style.boxShadow = '0 6px 20px rgba(46, 204, 113, 0.5)';
+    };
+    copyCodeBtn.onmouseleave = () => {
+      copyCodeBtn.style.transform = 'scale(1)';
+      copyCodeBtn.style.boxShadow = '0 4px 15px rgba(46, 204, 113, 0.3)';
+    };
+    copyCodeBtn.onclick = () => {
+      const code = btoa(JSON.stringify(postcard));
+      navigator.clipboard.writeText(code).then(() => {
+        const originalText = copyCodeBtn.textContent;
+        copyCodeBtn.textContent = '✓ Copied!';
+        setTimeout(() => { copyCodeBtn.textContent = originalText; }, 2000);
+      }).catch((err) => {
+        console.error('[PostcardGallery] Failed to copy share code to clipboard:', err);
+      });
+    };
+    detailActionRow.appendChild(copyCodeBtn);
+
     const closeBtn = document.createElement('button');
     closeBtn.textContent = 'Close';
     closeBtn.style.cssText = `
@@ -1141,14 +1211,14 @@ export class UniversePostcardsGallery {
       border: 1px solid #3a3a5a;
       border-radius: 8px;
       cursor: pointer;
-      align-self: flex-end;
       transition: all 0.2s;
-      margin-top: 4px;
     `;
     closeBtn.onmouseenter = () => { closeBtn.style.borderColor = '#667eea'; closeBtn.style.color = '#fff'; };
     closeBtn.onmouseleave = () => { closeBtn.style.borderColor = '#3a3a5a'; closeBtn.style.color = '#888'; };
     closeBtn.onclick = () => this.closeDetailModal();
-    modal.appendChild(closeBtn);
+    detailActionRow.appendChild(closeBtn);
+
+    modal.appendChild(detailActionRow);
 
     backdrop.appendChild(modal);
 
@@ -1425,6 +1495,258 @@ export class UniversePostcardsGallery {
     if (this.shareModalEl) {
       this.shareModalEl.remove();
       this.shareModalEl = null;
+    }
+  }
+
+  // ─── Import modal ─────────────────────────────────────────────────────────────
+
+  private openImportModal(): void {
+    // Backdrop
+    const backdrop = document.createElement('div');
+    backdrop.style.cssText = `
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      z-index: 10004;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    `;
+
+    const modal = document.createElement('div');
+    modal.style.cssText = `
+      background: linear-gradient(160deg, #0e0e28 0%, #141430 100%);
+      border: 1px solid rgba(46, 204, 113, 0.3);
+      border-radius: 16px;
+      padding: 36px;
+      width: 480px;
+      max-width: 90vw;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6), 0 0 40px rgba(46, 204, 113, 0.08);
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      font-family: monospace;
+      color: #e0e0e0;
+    `;
+
+    // Modal title
+    const modalTitle = document.createElement('h2');
+    modalTitle.textContent = 'Import Postcard';
+    modalTitle.style.cssText = `
+      margin: 0;
+      font-size: 22px;
+      font-weight: normal;
+      color: #fff;
+      text-shadow: 0 0 15px rgba(46, 204, 113, 0.3);
+    `;
+    modal.appendChild(modalTitle);
+
+    // Instructions
+    const instructions = document.createElement('div');
+    instructions.textContent = 'Paste a share code below to import a universe postcard from another player.';
+    instructions.style.cssText = 'font-size: 13px; color: #666; line-height: 1.5;';
+    modal.appendChild(instructions);
+
+    // Textarea label + textarea
+    const codeLabel = document.createElement('label');
+    codeLabel.style.cssText = 'display: flex; flex-direction: column; gap: 6px;';
+
+    const codeLabelText = document.createElement('span');
+    codeLabelText.textContent = 'Share Code *';
+    codeLabelText.style.cssText = 'font-size: 12px; color: #777; text-transform: uppercase; letter-spacing: 1px;';
+    codeLabel.appendChild(codeLabelText);
+
+    const codeTextarea = document.createElement('textarea');
+    codeTextarea.placeholder = 'Paste share code here...';
+    codeTextarea.rows = 4;
+    codeTextarea.style.cssText = `
+      padding: 11px 14px;
+      font-size: 12px;
+      font-family: monospace;
+      background: rgba(20, 20, 50, 0.8);
+      border: 1px solid #3a3a5a;
+      border-radius: 8px;
+      color: #ddd;
+      outline: none;
+      resize: vertical;
+      transition: border-color 0.2s;
+      line-height: 1.5;
+      word-break: break-all;
+    `;
+    codeTextarea.onfocus = () => { codeTextarea.style.borderColor = '#2ecc71'; };
+    codeTextarea.onblur = () => { codeTextarea.style.borderColor = '#3a3a5a'; };
+    codeLabel.appendChild(codeTextarea);
+    modal.appendChild(codeLabel);
+
+    // Inline error message (hidden until needed)
+    const errorEl = document.createElement('div');
+    errorEl.style.cssText = `
+      font-size: 13px;
+      color: #e74c3c;
+      display: none;
+      padding: 8px 12px;
+      background: rgba(231, 76, 60, 0.08);
+      border: 1px solid rgba(231, 76, 60, 0.25);
+      border-radius: 6px;
+      line-height: 1.5;
+    `;
+    modal.appendChild(errorEl);
+
+    const showError = (message: string): void => {
+      errorEl.textContent = message;
+      errorEl.style.display = 'block';
+      codeTextarea.style.borderColor = '#e74c3c';
+    };
+
+    const clearError = (): void => {
+      errorEl.style.display = 'none';
+      codeTextarea.style.borderColor = '#3a3a5a';
+    };
+
+    // Buttons
+    const buttonRow = document.createElement('div');
+    buttonRow.style.cssText = 'display: flex; gap: 12px; justify-content: flex-end; margin-top: 4px;';
+
+    const cancelBtn = document.createElement('button');
+    cancelBtn.textContent = 'Cancel';
+    cancelBtn.style.cssText = `
+      padding: 11px 22px;
+      font-size: 14px;
+      font-family: monospace;
+      background: transparent;
+      color: #888;
+      border: 1px solid #3a3a5a;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+    `;
+    cancelBtn.onmouseenter = () => { cancelBtn.style.borderColor = '#5a5a7a'; cancelBtn.style.color = '#bbb'; };
+    cancelBtn.onmouseleave = () => { cancelBtn.style.borderColor = '#3a3a5a'; cancelBtn.style.color = '#888'; };
+    cancelBtn.onclick = () => this.closeImportModal();
+    buttonRow.appendChild(cancelBtn);
+
+    const importActionBtn = document.createElement('button');
+    importActionBtn.textContent = '↓ Import';
+    importActionBtn.style.cssText = `
+      padding: 11px 28px;
+      font-size: 14px;
+      font-family: monospace;
+      background: linear-gradient(135deg, #2ecc71 0%, #3498db 100%);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+      box-shadow: 0 4px 15px rgba(46, 204, 113, 0.3);
+    `;
+    importActionBtn.onmouseenter = () => {
+      importActionBtn.style.transform = 'scale(1.04)';
+      importActionBtn.style.boxShadow = '0 6px 20px rgba(46, 204, 113, 0.5)';
+    };
+    importActionBtn.onmouseleave = () => {
+      importActionBtn.style.transform = 'scale(1)';
+      importActionBtn.style.boxShadow = '0 4px 15px rgba(46, 204, 113, 0.3)';
+    };
+    importActionBtn.onclick = async () => {
+      clearError();
+
+      const code = codeTextarea.value.trim();
+      if (!code) {
+        showError('Please paste a share code.');
+        codeTextarea.focus();
+        return;
+      }
+
+      let decoded: unknown;
+      try {
+        decoded = JSON.parse(atob(code));
+      } catch {
+        showError('Invalid share code. Make sure you copied the full code without any extra spaces or line breaks.');
+        return;
+      }
+
+      if (
+        typeof decoded !== 'object' ||
+        decoded === null ||
+        typeof (decoded as Record<string, unknown>)['agentCount'] !== 'number' ||
+        typeof (decoded as Record<string, unknown>)['dominantBiome'] !== 'string' ||
+        typeof (decoded as Record<string, unknown>)['worldAge'] !== 'number' ||
+        !Array.isArray((decoded as Record<string, unknown>)['activeMagicParadigms']) ||
+        !Array.isArray((decoded as Record<string, unknown>)['notableAgents']) ||
+        typeof (decoded as Record<string, unknown>)['populationBySpecies'] !== 'object' ||
+        (decoded as Record<string, unknown>)['populationBySpecies'] === null
+      ) {
+        showError('Share code does not contain a valid universe postcard. Required fields are missing.');
+        return;
+      }
+
+      // At this point `decoded` has passed field-level validation above so
+      // we know the required UniversePostcard fields are present and typed
+      // correctly. Build the SharedPostcard explicitly from the raw record.
+      const raw = decoded as Record<string, unknown>;
+      const decodedPostcard: SharedPostcard = {
+        capturedAt: typeof raw['capturedAt'] === 'string' ? raw['capturedAt'] : new Date().toISOString(),
+        simulationTick: typeof raw['simulationTick'] === 'number' ? raw['simulationTick'] : 0,
+        agentCount: raw['agentCount'] as number,
+        notableAgents: raw['notableAgents'] as SharedPostcard['notableAgents'],
+        recentLegends: Array.isArray(raw['recentLegends']) ? raw['recentLegends'] as string[] : [],
+        dominantBiome: raw['dominantBiome'] as string,
+        activeMagicParadigms: raw['activeMagicParadigms'] as string[],
+        populationBySpecies: raw['populationBySpecies'] as Record<string, number>,
+        worldAge: raw['worldAge'] as number,
+        epochTitle: typeof raw['epochTitle'] === 'string' ? raw['epochTitle'] : undefined,
+        id: typeof raw['id'] === 'string' && raw['id'] ? raw['id'] : crypto.randomUUID(),
+        title: typeof raw['title'] === 'string' ? raw['title'] : 'Imported Universe',
+        description: typeof raw['description'] === 'string' ? raw['description'] : '',
+        playerName: typeof raw['playerName'] === 'string' ? raw['playerName'] : 'Anonymous Explorer',
+        sharedAt: typeof raw['sharedAt'] === 'string' && raw['sharedAt'] ? raw['sharedAt'] : new Date().toISOString(),
+      };
+
+      importActionBtn.disabled = true;
+      importActionBtn.textContent = 'Importing...';
+      importActionBtn.style.opacity = '0.7';
+
+      try {
+        await this.dataSource.sharePostcard(
+          decodedPostcard,
+          decodedPostcard.title,
+          decodedPostcard.description,
+        );
+        this.closeImportModal();
+        this.showSuccessToast('Postcard imported into the gallery!');
+        await this.loadAndRender();
+      } catch (err) {
+        console.error('[PostcardGallery] Failed to import postcard:', err);
+        importActionBtn.disabled = false;
+        importActionBtn.textContent = '↓ Import';
+        importActionBtn.style.opacity = '1';
+        showError('Failed to save the postcard. Please try again.');
+      }
+    };
+    buttonRow.appendChild(importActionBtn);
+
+    modal.appendChild(buttonRow);
+    backdrop.appendChild(modal);
+
+    // Close on backdrop click
+    backdrop.onclick = (e) => {
+      if (e.target === backdrop) this.closeImportModal();
+    };
+
+    this.importModalEl = backdrop;
+    document.body.appendChild(backdrop);
+
+    // Focus textarea
+    requestAnimationFrame(() => codeTextarea.focus());
+  }
+
+  private closeImportModal(): void {
+    if (this.importModalEl) {
+      this.importModalEl.remove();
+      this.importModalEl = null;
     }
   }
 

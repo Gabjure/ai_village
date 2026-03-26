@@ -5683,17 +5683,44 @@ async function main() {
     () => (gameLoop.world as any)._universeName as string | undefined,
   );
 
-  // Register keyboard shortcut: P for Postcards
+  // Register a proxy IWindowPanel so the postcards gallery appears in the Social
+  // section of the Agent menu. The panel delegates show/hide to the overlay instead
+  // of rendering a window panel itself.
+  const postcardsPanelProxy = {
+    getId: () => 'universe-postcards-gallery',
+    getTitle: () => 'Universe Gallery',
+    getDefaultWidth: () => 1,
+    getDefaultHeight: () => 1,
+    isVisible: () => postcardsGallery.isVisible,
+    setVisible: (visible: boolean) => {
+      if (visible) {
+        postcardsGallery.show();
+      } else {
+        postcardsGallery.hide();
+      }
+    },
+    render: () => { /* full-screen overlay handles its own rendering */ },
+  };
+
+  windowManager.registerWindow('universe-postcards-gallery', postcardsPanelProxy, {
+    defaultX: 0,
+    defaultY: 0,
+    defaultWidth: 1,
+    defaultHeight: 1,
+    showInWindowList: true,
+    menuCategory: 'social',
+    title: 'Universe Gallery',
+    keyboardShortcut: 'P',
+  });
+
+  // Register keyboard shortcut: P for Postcards — goes through windowManager so
+  // the menu's checked state stays in sync with keyboard toggles.
   keyboardRegistry.register('toggle_postcards', {
     key: 'P',
     description: 'Toggle Universe Postcards Gallery',
     category: 'Windows',
     handler: () => {
-      if (postcardsGallery.isVisible) {
-        postcardsGallery.hide();
-      } else {
-        postcardsGallery.show();
-      }
+      windowManager.toggleWindow('universe-postcards-gallery');
       return true;
     },
   });
