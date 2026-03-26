@@ -9,7 +9,7 @@
   "scripts": {
     "build": "tsc --build > /dev/null 2>&1 || tsc --build",
     "build:stable": "npx tsx scripts/create-stable-build.ts",
-    "build:prod": "cd demo && npx vite build --config vite.config.prod.ts",
+    "build:prod": "rm -rf demo/public/assets/sprites/pixellab && cp -r packages/renderer/assets/sprites/pixellab demo/public/assets/sprites/pixellab && cd demo && npx vite build --config vite.config.prod.ts",
     "dev": "tsc --build --watch",
     "test": "npm run validate-data && vitest run",
     "test:perf": "vitest run --config vitest.config.perf.ts",
@@ -71,6 +71,11 @@
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
     "express": "^5.2.1",
+    "pg": "^8.20.0",
     "sharp": "^0.34.5"
+  },
+  "optionalDependencies": {
+    "@mlc-ai/web-llm": "^0.2.82",
+    "@nicepkg/wllama": "npm:null@*"
   }
 }
