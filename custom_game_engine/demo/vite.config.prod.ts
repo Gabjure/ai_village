@@ -96,9 +96,11 @@ export default defineConfig({
 
           if (id.includes('/packages/') && id.includes('/src/')) {
             // Renderer: leaf node — nothing imports it, safe to split
-            if (id.includes('/renderer/')) return 'engine-renderer';
-            // Packages only imported by renderer / main.ts, no circular deps back to core
-            if (id.includes('/persistence/') || id.includes('/shared-worker/')) return 'engine-infra';
+            if (id.includes('/packages/renderer/')) return 'engine-renderer';
+            // Persistence + shared-worker packages (NOT core/src/persistence/ which is internal to core).
+            // Must match the actual package boundary to avoid splitting core's internal persistence
+            // utilities into a separate chunk, which causes TDZ violations from circular cross-chunk deps.
+            if (id.includes('/packages/persistence/') || id.includes('/packages/shared-worker/')) return 'engine-infra';
             // Everything else: core + its bidirectional deps (world, botany, agents,
             // magic, llm, metrics, reproduction, divinity, introspection, language, etc.)
             return 'engine-core';
