@@ -34,7 +34,7 @@ const ACCENT = 'rgba(0, 220, 0,';
 const ACCENT_SOLID = '#00dc00';
 
 export class PWYCButton {
-  private triggerEl: HTMLElement;
+  private triggerEl: HTMLButtonElement;
   private tooltipEl: HTMLElement;
   private overlayEl: HTMLElement | null = null;
   private selectedTierIdx = TIERS.findIndex(t => t.isDefault);
@@ -62,14 +62,15 @@ export class PWYCButton {
     this.pulseStyleEl.textContent = `
       @keyframes pwyc-heartbeat {
         0%, 100% { transform: scale(1); }
-        14% { transform: scale(1.15); }
+        14% { transform: scale(1.05); }
         28% { transform: scale(1); }
-        42% { transform: scale(1.1); }
+        42% { transform: scale(1.03); }
         56% { transform: scale(1); }
       }
       #pwyc-trigger {
         animation: pwyc-heartbeat 3s ease-in-out infinite;
         animation-delay: 10s;
+        transition: bottom 0.4s ease, border-color 0.2s, color 0.2s, background 0.2s;
       }
       #pwyc-trigger:hover {
         animation-play-state: paused;
@@ -78,53 +79,71 @@ export class PWYCButton {
     document.head.appendChild(this.pulseStyleEl);
   }
 
-  private _buildTrigger(): HTMLElement {
+  private _buildTrigger(): HTMLButtonElement {
     const btn = document.createElement('button');
     btn.id = 'pwyc-trigger';
     btn.title = 'Support this game — pay what you can';
-    btn.textContent = '\u2661';
+    btn.innerHTML = '<span style="font-size:15px;line-height:1;">♡</span> Support';
     btn.setAttribute('data-umami-event', 'pwyc-mvee-button-clicked');
     btn.setAttribute('data-pwyc-game', 'mvee');
+    btn.setAttribute('aria-label', 'Support this game — pay what you can');
     btn.style.cssText = `
       position: fixed;
-      bottom: 62px;
-      right: 12px;
-      width: 44px;
-      height: 44px;
-      padding: 0;
-      border-radius: 50%;
-      border: 1px solid ${ACCENT} 0.28);
-      background: rgba(0, 8, 0, 0.88);
-      color: ${ACCENT} 0.6);
-      font-size: 18px;
+      bottom: 14px;
+      right: 14px;
+      height: 38px;
+      padding: 0 14px 0 11px;
+      border-radius: 19px;
+      border: 1px solid ${ACCENT}0.4);
+      background: rgba(0,2,8,0.92);
+      color: ${ACCENT_SOLID};
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
       cursor: pointer;
       z-index: 8999;
       display: flex;
       align-items: center;
-      justify-content: center;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.5);
-      transition: border-color 0.2s, color 0.2s;
-      backdrop-filter: blur(4px);
+      gap: 5px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.5);
+      backdrop-filter: blur(6px);
       text-decoration: none;
       line-height: 1;
+      font-family: 'Courier New', monospace;
+      white-space: nowrap;
     `;
 
     btn.addEventListener('mouseenter', () => {
-      btn.style.borderColor = `${ACCENT} 0.55)`;
-      btn.style.color = `${ACCENT} 0.95)`;
-      this.tooltipEl.style.opacity = '1';
+      btn.style.borderColor = `${ACCENT}0.7)`;
+      btn.style.background = 'rgba(0,2,8,0.96)';
+      btn.style.boxShadow = `0 2px 16px ${ACCENT}0.25)`;
     });
     btn.addEventListener('mouseleave', () => {
-      btn.style.borderColor = `${ACCENT} 0.28)`;
-      btn.style.color = `${ACCENT} 0.6)`;
-      this.tooltipEl.style.opacity = '0';
+      btn.style.borderColor = `${ACCENT}0.4)`;
+      btn.style.background = 'rgba(0,2,8,0.92)';
+      btn.style.boxShadow = '0 2px 12px rgba(0,0,0,0.5)';
     });
     btn.addEventListener('click', () => {
       this._trackClick();
       this._openModal();
     });
 
+    // Move button up when support-prompt banner appears
+    this._observeSupportBanner(btn);
+
     return btn;
+  }
+
+  private _observeSupportBanner(btn: HTMLButtonElement): void {
+    const observer = new MutationObserver(() => {
+      const banner = document.getElementById('support-prompt-banner');
+      if (banner && banner.classList.contains('sp-visible')) {
+        btn.style.bottom = '64px';
+      } else {
+        btn.style.bottom = '14px';
+      }
+    });
+    observer.observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ['class'] });
   }
 
   private _buildTooltip(): HTMLElement {
