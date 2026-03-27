@@ -55,6 +55,7 @@ export default defineConfig({
       '@ai-village/agents': path.resolve(__dirname, '../packages/agents/src/index.ts'),
       '@ai-village/language': path.resolve(__dirname, '../packages/language/src/index.ts'),
       '@ai-village/introspection': path.resolve(__dirname, '../packages/introspection/src/index.ts'),
+      '@akashic-records/lib': path.resolve(__dirname, '../vendor/akashic-records/lib'),
       'fs': path.resolve(__dirname, '../packages/llm/src/browser-stubs/fs.ts'),
       'path': path.resolve(__dirname, '../packages/llm/src/browser-stubs/path.ts'),
     },
