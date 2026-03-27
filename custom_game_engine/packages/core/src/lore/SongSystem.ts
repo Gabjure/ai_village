@@ -67,7 +67,6 @@ export const NORN_SONG_CATALOGUE: readonly SongEntry[] = [
 const DEFAULT_AUDIO_BASE_PATH = '/audio/norn/';
 const FADE_DURATION_MS = 2000;
 const COOLDOWN_MS = 90_000;
-const AMBIENT_IDLE_MS = 60_000;
 const FADE_INTERVAL_MS = 50;
 const MAX_VOLUME = 1 / 3;
 
@@ -95,7 +94,6 @@ export class SongSystem extends BaseSystem {
   private currentAudio: HTMLAudioElement | null = null;
   private currentOccasion: SongOccasion | null = null;
   private lastSwitchTime = 0;
-  private lastEventTime = 0;
   private isFading = false;
   private fadeTimer: ReturnType<typeof setInterval> | null = null;
   private initialized = false;
@@ -143,18 +141,8 @@ export class SongSystem extends BaseSystem {
 
   protected onUpdate(_ctx: SystemContext): void {
     if (!this.initialized) return;
-
-    // Check ambient timer: if no event-triggered song for AMBIENT_IDLE_MS, play ambient
-    const now = Date.now();
-    const isPlaying = this.currentAudio !== null && !this.currentAudio.paused;
-
-    if (
-      this.currentOccasion !== 'ambient' &&
-      !this.isFading &&
-      (now - this.lastEventTime > AMBIENT_IDLE_MS || !isPlaying)
-    ) {
-      this.playSongForOccasion('ambient');
-    }
+    // Event-driven music only — no ambient auto-play.
+    // Music plays in response to game events (birth, death, combat, etc.)
   }
 
   // ============================================================================
@@ -180,7 +168,8 @@ export class SongSystem extends BaseSystem {
     this.events.on('agent:birth', () => this.onGameEvent('birth'));
     this.events.on('agent:born', () => this.onGameEvent('birth'));
 
-    // Hearth: courtship:consent, conception
+    // Hearth: courtship:romance, courtship:consent, conception
+    this.events.on('courtship:romance', () => this.onGameEvent('hearth'));
     this.events.on('courtship:consent', () => this.onGameEvent('hearth'));
     this.events.on('conception', () => this.onGameEvent('hearth'));
 
@@ -207,7 +196,6 @@ export class SongSystem extends BaseSystem {
 
   private onGameEvent(occasion: SongOccasion): void {
     const now = Date.now();
-    this.lastEventTime = now;
 
     // Grief overrides cooldown; everything else respects it
     if (occasion !== 'grief' && now - this.lastSwitchTime < COOLDOWN_MS) {
