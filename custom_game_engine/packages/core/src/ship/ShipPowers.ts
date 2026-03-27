@@ -10,25 +10,37 @@
 // ============================================================================
 
 export enum ShipPower {
-  // Scanner tiers
+  // Scanner tiers (creature inspect gates)
   SCANNER_BASIC = 'scanner_basic',
   SCANNER_BIO = 'scanner_bio',
   SCANNER_GENOME = 'scanner_genome',
 
-  // Creature powers
-  TEMPORAL_LENS = 'temporal_lens',
-  LIFE_FORGE = 'life_forge',
-  NUTRIENT_SYNTHESIZER = 'nutrient_synthesizer',
-  MEMORY_CRYSTAL = 'memory_crystal',
-  LEARNING_TERMINAL = 'learning_terminal',
-  NEURAL_LATTICE = 'neural_lattice',
-  RESONANCE_AMPLIFIER = 'resonance_amplifier',
-  CREATOR_POD = 'creator_pod',
-  ATMOSPHERE_ENGINE = 'atmosphere_engine',
+  // Creature interaction powers
+  TEMPORAL_LENS = 'temporal_lens',           // age_control
+  LIFE_FORGE = 'life_forge',                 // cloning
+  NUTRIENT_SYNTHESIZER = 'nutrient_synthesizer', // chemical_inject
+  MEMORY_CRYSTAL = 'memory_crystal',         // memory_edit
+  LEARNING_TERMINAL = 'learning_terminal',   // teach
+  NEURAL_LATTICE = 'neural_lattice',         // impulse
+  RESONANCE_AMPLIFIER = 'resonance_amplifier', // sing_together
+  CREATOR_POD = 'creator_pod',               // spawn/create
+  ATMOSPHERE_ENGINE = 'atmosphere_engine',    // environment control
+  TRACTOR_BEAM = 'tractor_beam',             // pickup_carry
+  ENTROPY_REVERSAL = 'entropy_reversal',     // death_control
 
-  // Ship powers
+  // Camera / navigation
+  FREE_CAMERA = 'free_camera',
   FOG_BYPASS = 'fog_bypass',
-  TELEPORT = 'teleport',
+  GALACTIC_MAP = 'galactic_map',
+
+  // Ship combat & structure
+  DEFLECTOR_ARRAY = 'deflector_array',       // shields
+  PARTICLE_CANNON = 'particle_cannon',       // lasers
+  HULL_SEPARATOR = 'hull_separator',         // section_detach
+
+  // FTL powers
+  TELEPORT = 'teleport',                     // warp
+  WORMHOLE_DRIVE = 'wormhole_drive',         // wormhole
 }
 
 // ============================================================================
@@ -111,6 +123,33 @@ export class ShipPowerState {
     const currentIndex = SCANNER_TIER_ORDER.indexOf(this.getScannerTier());
     const requiredIndex = SCANNER_TIER_ORDER.indexOf(tier);
     return currentIndex >= requiredIndex;
+  }
+
+  /** Return all currently unlocked powers as an array (for persistence). */
+  getUnlockedPowers(): ShipPower[] {
+    return Array.from(this.unlockedPowers);
+  }
+
+  /** Serialize to a plain object suitable for JSON persistence. */
+  serialize(): { unlockedPowers: string[] } {
+    return { unlockedPowers: Array.from(this.unlockedPowers) };
+  }
+
+  /** Restore state from a previously serialized object. */
+  deserialize(data: { unlockedPowers: string[] }): void {
+    this.unlockedPowers.clear();
+    for (const value of data.unlockedPowers) {
+      if (Object.values(ShipPower).includes(value as ShipPower)) {
+        this.unlockedPowers.add(value as ShipPower);
+      } else {
+        console.warn(`[ShipPowerState] Ignoring unknown power during load: "${value}"`);
+      }
+    }
+    // Ensure SCANNER_BASIC is always present
+    if (!this.unlockedPowers.has(ShipPower.SCANNER_BASIC)) {
+      console.warn('[ShipPowerState] SCANNER_BASIC was missing from save data — re-adding.');
+      this.unlockedPowers.add(ShipPower.SCANNER_BASIC);
+    }
   }
 }
 

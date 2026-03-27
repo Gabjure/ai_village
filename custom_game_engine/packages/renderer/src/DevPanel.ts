@@ -57,13 +57,14 @@ import {
   BELIEF_GENERATION_RATES,
 } from '@ai-village/divinity';
 import { DevRenderer, ComponentRegistry, IdentitySchema } from '@ai-village/introspection';
+import { ShipPower, getShipPowerState } from '@ai-village/core';
 import type { IWindowPanel } from './types/WindowTypes.js';
 
 // ============================================================================
 // Types
 // ============================================================================
 
-type DevSection = 'magic' | 'divinity' | 'skills' | 'events' | 'state' | 'research' | 'buildings' | 'agents' | 'world' | 'introspection' | 'grand_strategy';
+type DevSection = 'magic' | 'divinity' | 'skills' | 'events' | 'state' | 'research' | 'buildings' | 'agents' | 'world' | 'introspection' | 'grand_strategy' | 'ship_powers';
 
 interface ResourceSlider {
   id: string;
@@ -712,6 +713,9 @@ export class DevPanel implements IWindowPanel {
       case 'grand_strategy':
         y = this.renderGrandStrategySection(ctx, width, y);
         break;
+      case 'ship_powers':
+        y = this.renderShipPowersSection(ctx, width, y);
+        break;
     }
 
     ctx.restore();
@@ -753,6 +757,7 @@ export class DevPanel implements IWindowPanel {
       { id: 'state', label: 'State' },
       { id: 'grand_strategy', label: 'GrandStrat' },
       { id: 'introspection', label: 'Intro' },
+      { id: 'ship_powers', label: 'Ship' },
     ];
 
     const tabWidth = width / sections.length;
@@ -1375,6 +1380,82 @@ export class DevPanel implements IWindowPanel {
       });
 
       y += SIZES.buttonHeight + 4;
+    }
+
+    return y + SIZES.padding;
+  }
+
+  private renderShipPowersSection(ctx: CanvasRenderingContext2D, width: number, y: number): number {
+    y = this.renderSectionHeader(ctx, width, y, 'SHIP POWERS');
+
+    let state: import('@ai-village/core').ShipPowerState;
+    try {
+      state = getShipPowerState();
+    } catch {
+      ctx.fillStyle = COLORS.textDim;
+      ctx.font = '10px monospace';
+      ctx.fillText('ShipPowerState not initialized', SIZES.padding, y + 8);
+      return y + 30;
+    }
+
+    // Unlock All / Lock All buttons
+    const halfWidth = (width - SIZES.padding * 3) / 2;
+    const unlockAllBtn = { label: 'Unlock All', action: 'ship_unlock_all' };
+    const lockAllBtn = { label: 'Lock All', action: 'ship_lock_all' };
+
+    for (const [i, btn] of [unlockAllBtn, lockAllBtn].entries()) {
+      const bx = SIZES.padding + i * (halfWidth + SIZES.padding);
+      ctx.fillStyle = i === 0 ? COLORS.success + '44' : COLORS.buttonDanger;
+      ctx.beginPath();
+      ctx.roundRect(bx, y + 2, halfWidth, SIZES.buttonHeight, 4);
+      ctx.fill();
+
+      ctx.fillStyle = COLORS.text;
+      ctx.font = 'bold 9px monospace';
+      ctx.fillText(btn.label, bx + 8, y + 10);
+
+      this.clickRegions.push({
+        x: bx,
+        y: y + 2,
+        width: halfWidth,
+        height: SIZES.buttonHeight,
+        action: 'execute_action',
+        data: btn.action,
+      });
+    }
+    y += SIZES.buttonHeight + 8;
+
+    // Individual power toggles
+    const allPowers = Object.values(ShipPower);
+    for (const power of allPowers) {
+      const unlocked = state.isUnlocked(power);
+      const btnWidth = width - SIZES.padding * 2;
+
+      ctx.fillStyle = unlocked ? 'rgba(40, 80, 40, 0.7)' : 'rgba(60, 30, 30, 0.7)';
+      ctx.beginPath();
+      ctx.roundRect(SIZES.padding, y + 2, btnWidth, SIZES.buttonHeight, 4);
+      ctx.fill();
+
+      // Status indicator
+      ctx.fillStyle = unlocked ? COLORS.success : COLORS.dev;
+      ctx.font = 'bold 9px monospace';
+      ctx.fillText(unlocked ? '●' : '○', SIZES.padding + 6, y + 10);
+
+      // Power name
+      ctx.fillStyle = COLORS.text;
+      ctx.font = '9px monospace';
+      ctx.fillText(power, SIZES.padding + 20, y + 10);
+
+      this.clickRegions.push({
+        x: SIZES.padding,
+        y: y + 2,
+        width: btnWidth,
+        height: SIZES.buttonHeight,
+        action: 'execute_action',
+        data: `ship_toggle_${power}`,
+      });
+
+      y += SIZES.buttonHeight + 2;
     }
 
     return y + SIZES.padding;
@@ -2209,6 +2290,42 @@ export class DevPanel implements IWindowPanel {
     // Handle agent spawning
     if (actionId.startsWith('spawn_')) {
       this.handleSpawnAction(actionId);
+      return;
+    }
+
+    // Handle ship power toggles
+    if (actionId === 'ship_unlock_all') {
+      try {
+        getShipPowerState().unlockAll();
+        this.log('Ship: All powers unlocked');
+      } catch (e) {
+        this.log(`ERROR: ${e instanceof Error ? e.message : String(e)}`);
+      }
+      return;
+    }
+    if (actionId === 'ship_lock_all') {
+      try {
+        getShipPowerState().lockAll();
+        this.log('Ship: Powers locked (BASIC scanner only)');
+      } catch (e) {
+        this.log(`ERROR: ${e instanceof Error ? e.message : String(e)}`);
+      }
+      return;
+    }
+    if (actionId.startsWith('ship_toggle_')) {
+      const powerKey = actionId.replace('ship_toggle_', '');
+      try {
+        const state = getShipPowerState();
+        if (state.isUnlocked(powerKey as ShipPower)) {
+          state.lock(powerKey as ShipPower);
+          this.log(`Ship: Locked ${powerKey}`);
+        } else {
+          state.unlock(powerKey as ShipPower);
+          this.log(`Ship: Unlocked ${powerKey}`);
+        }
+      } catch (e) {
+        this.log(`ERROR: ${e instanceof Error ? e.message : String(e)}`);
+      }
       return;
     }
 

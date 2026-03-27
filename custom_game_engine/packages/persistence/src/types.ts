@@ -211,6 +211,9 @@ export interface WorldSnapshot {
   /** Zone configuration */
   zones: ZoneSnapshot[];
 
+  /** Serialized ship power unlock state */
+  shipPowers?: { unlockedPowers: string[] };
+
   /**
    * All planets in this universe (Phase 4+).
    * Each planet has its own terrain and config.

@@ -3,7 +3,7 @@
  */
 
 import type { World, WorldMutator } from '@ai-village/core';
-import { WorldImpl } from '@ai-village/core';
+import { WorldImpl, getShipPowerState } from '@ai-village/core';
 import type { Entity } from '@ai-village/core';
 import type { Component } from '@ai-village/core';
 import type { UniverseDivineConfig } from '@ai-village/divinity';
@@ -158,6 +158,15 @@ export class WorldSerializer {
       zoneManager.deserializeZones(snapshot.worldState.zones as ZoneData[]);
     }
 
+    // Restore ship powers
+    if (snapshot.worldState.shipPowers) {
+      try {
+        getShipPowerState().deserialize(snapshot.worldState.shipPowers);
+      } catch {
+        console.warn('[WorldSerializer] ShipPowerState not initialized during load — ship powers not restored.');
+      }
+    }
+
     // NOTE: Weather and buildings are already deserialized through entity system (lines 125-133)
     // - Weather: Stored as 'weather' component on entities (registered in serializers/index.ts)
     // - Buildings: Stored as 'building' component on entities + tile data in terrain chunks
@@ -305,9 +314,18 @@ export class WorldSerializer {
     // NOTE: Weather is stored as WeatherComponent on the world entity (already serialized with entities)
     // NOTE: Buildings are stored in tiles and BuildingComponent entities (already serialized)
 
+    // Serialize ship powers
+    let shipPowers: { unlockedPowers: string[] } | undefined;
+    try {
+      shipPowers = getShipPowerState().serialize();
+    } catch {
+      // ShipPowerState not initialized — skip
+    }
+
     return {
       terrain,
       zones,
+      shipPowers,
     };
   }
 

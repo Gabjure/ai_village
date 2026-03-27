@@ -88,6 +88,7 @@ import {
   // Universe Postcards (Drive 5: Social)
   WorldSnapshotService,
   initShipPowerState,
+  getShipPowerState,
 } from '@ai-village/core';
 import { saveLoadService, IndexedDBStorage, migrateLocalSaves, checkMigrationStatus, planetClient, multiverseClient, creationStateManager, EntityPersistenceStream, type PlanetMetadata, type CreationState, type SettlementData } from '@ai-village/persistence';
 import { LiveEntityAPI } from '@ai-village/metrics';
@@ -3413,8 +3414,8 @@ async function main() {
     isSharedWorkerMode = false;
   }
 
-  // Initialize ship power state (BASIC scanner by default; DevMode will unlock all)
-  initShipPowerState();
+  // Initialize ship power state — dev mode unlocks all powers
+  initShipPowerState(true);
 
   // Create agent debug manager for deep logging
   const agentDebugManager = new AgentDebugManager('logs/agent-debug');
