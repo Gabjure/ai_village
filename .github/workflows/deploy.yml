@@ -155,20 +155,8 @@ jobs:
           fi
           echo "Smoke test passed: HTML 200, bundle loads (${BUNDLE_SIZE} bytes)"
 
-      - name: Setup Node.js for smoke test
-        uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-
-      - name: Install Playwright
-        working-directory: scripts
-        run: |
-          npm ci
-          npx playwright install chromium --with-deps
-
-      - name: Browser smoke test (zero JS errors)
-        working-directory: scripts
-        run: node smoke-test.mjs mvee
+      # TODO: Add Playwright browser smoke test when scripts/smoke-test.mjs is created
+      # For now, HTTP 200 + JS bundle load checks above are the smoke tests
 
   rollback:
     name: Rollback on Failure
