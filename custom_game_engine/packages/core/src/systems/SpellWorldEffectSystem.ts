@@ -51,7 +51,10 @@ interface EffectRejection {
 export class SpellWorldEffectSystem extends BaseSystem {
   public readonly id = 'spell_world_effect' as const;
   public readonly priority = 160;
-  public readonly requiredComponents: string[] = [];
+  // Performance: Use a non-existent component type so the entity query returns ~0 results.
+  // This system is event-driven and never iterates ctx.activeEntities.
+  // With requiredComponents: [], the framework queries ALL entities every tick (~40ms waste).
+  public readonly requiredComponents: string[] = ['spell_world_effect_marker'];
   public readonly activationComponents = ['agent'] as const;
   protected readonly throttleInterval = 0;
 

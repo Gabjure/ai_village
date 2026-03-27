@@ -75,6 +75,11 @@ export class MovementSystem extends BaseSystem {
   // Performance: Reusable objects for collision calculations (zero allocations in hot path)
   private readonly workingPosition = { x: 0, y: 0 };
 
+  // Performance: Cache world terrain capabilities (checked once per tick, not per collision call)
+  private worldHasTileAccess = false;
+  private worldChunkManager: { getChunk: (x: number, y: number) => { generated?: boolean } | undefined } | undefined = undefined;
+  private worldCapsCachedTick = -1;
+
   // Performance: Precomputed collision constants
   private readonly BUILDING_COLLISION_RADIUS_SQUARED = 0.25; // 0.5 * 0.5
   private readonly SOFT_COLLISION_RADIUS = 0.8;
@@ -321,7 +326,10 @@ export class MovementSystem extends BaseSystem {
         const newY = pos.y + deltaY;
 
         // Check for hard collisions before applying
-        if (!this.hasHardCollision(ctx.world, entityId, newX, newY)) {
+        const soaEntity = ctx.world.getEntity(entityId);
+        const soaPosComp = soaEntity ? (soaEntity as EntityImpl).getComponent<PositionComponent>(CT.Position) : undefined;
+        const soaImpl = soaEntity as EntityImpl;
+        if (soaPosComp && !this.hasHardCollision(ctx.world, soaImpl, newX, newY, soaPosComp)) {
           // Check soft collisions
           const softPenalty = this.getSoftCollisionPenalty(ctx.world, entityId, newX, newY);
 
@@ -335,20 +343,15 @@ export class MovementSystem extends BaseSystem {
           positionSoA.set(entityId, adjustedX, adjustedY, pos.z, newChunkX, newChunkY);
 
           // Sync back to component (for backward compatibility with systems not using SoA yet)
-          // Only update if position actually changed
-          const entity = ctx.world.getEntity(entityId);
-          if (entity) {
-            const posComp = (entity as EntityImpl).getComponent<PositionComponent>(CT.Position);
-            if (posComp && (posComp.x !== adjustedX || posComp.y !== adjustedY ||
-                posComp.chunkX !== newChunkX || posComp.chunkY !== newChunkY)) {
-              (entity as EntityImpl).updateComponent<PositionComponent>(CT.Position, (current) => ({
-                ...current,
-                x: adjustedX,
-                y: adjustedY,
-                chunkX: newChunkX,
-                chunkY: newChunkY,
-              }));
-            }
+          if (soaPosComp.x !== adjustedX || soaPosComp.y !== adjustedY ||
+              soaPosComp.chunkX !== newChunkX || soaPosComp.chunkY !== newChunkY) {
+            soaImpl.updateComponent<PositionComponent>(CT.Position, (current) => ({
+              ...current,
+              x: adjustedX,
+              y: adjustedY,
+              chunkX: newChunkX,
+              chunkY: newChunkY,
+            }));
           }
         } else {
           // Collision - try perpendicular slide (handled in main loop)
@@ -382,7 +385,10 @@ export class MovementSystem extends BaseSystem {
         const newY = pos.y + deltaY;
 
         // Check for hard collisions before applying
-        if (!this.hasHardCollision(ctx.world, entityId, newX, newY)) {
+        const cpuEntity = ctx.world.getEntity(entityId);
+        const cpuPosComp = cpuEntity ? (cpuEntity as EntityImpl).getComponent<PositionComponent>(CT.Position) : undefined;
+        const cpuImpl = cpuEntity as EntityImpl;
+        if (cpuPosComp && !this.hasHardCollision(ctx.world, cpuImpl, newX, newY, cpuPosComp)) {
           // Check soft collisions
           const softPenalty = this.getSoftCollisionPenalty(ctx.world, entityId, newX, newY);
 
@@ -395,21 +401,16 @@ export class MovementSystem extends BaseSystem {
           const newChunkY = Math.floor(adjustedY / 32);
           positionSoA.set(entityId, adjustedX, adjustedY, pos.z, newChunkX, newChunkY);
 
-          // Sync back to component (for backward compatibility with systems not using SoA yet)
-          // Only update if position actually changed
-          const entity = ctx.world.getEntity(entityId);
-          if (entity) {
-            const posComp = (entity as EntityImpl).getComponent<PositionComponent>(CT.Position);
-            if (posComp && (posComp.x !== adjustedX || posComp.y !== adjustedY ||
-                posComp.chunkX !== newChunkX || posComp.chunkY !== newChunkY)) {
-              (entity as EntityImpl).updateComponent<PositionComponent>(CT.Position, (current) => ({
-                ...current,
-                x: adjustedX,
-                y: adjustedY,
-                chunkX: newChunkX,
-                chunkY: newChunkY,
-              }));
-            }
+          // Sync back to component
+          if (cpuPosComp.x !== adjustedX || cpuPosComp.y !== adjustedY ||
+              cpuPosComp.chunkX !== newChunkX || cpuPosComp.chunkY !== newChunkY) {
+            cpuImpl.updateComponent<PositionComponent>(CT.Position, (current) => ({
+              ...current,
+              x: adjustedX,
+              y: adjustedY,
+              chunkX: newChunkX,
+              chunkY: newChunkY,
+            }));
           }
         } else {
           // Collision - try perpendicular slide (handled in main loop)
@@ -504,6 +505,17 @@ export class MovementSystem extends BaseSystem {
     // stay frozen at zero, causing the batch path to compute zero deltas.
     // All entities are now processed by the per-entity loop below.
     // TODO: Re-enable SoA batch once entity.updateComponent marks dirty tracker.
+
+    // Performance: Cache world terrain capabilities once per tick (avoids typeof checks per collision call)
+    if (this.worldCapsCachedTick !== ctx.tick) {
+      this.worldCapsCachedTick = ctx.tick;
+      const w = ctx.world as typeof ctx.world & {
+        getTileAt?: (x: number, y: number) => Tile | undefined;
+        getChunkManager?: () => { getChunk: (x: number, y: number) => { generated?: boolean } | undefined } | undefined;
+      };
+      this.worldHasTileAccess = typeof w.getTileAt === 'function';
+      this.worldChunkManager = typeof w.getChunkManager === 'function' ? w.getChunkManager() : undefined;
+    }
 
     // Entities already filtered by requiredComponents and SimulationScheduler
     for (const entity of ctx.activeEntities) {
@@ -600,7 +612,7 @@ export class MovementSystem extends BaseSystem {
       const newY = position.y + deltaY;
 
       // Check for hard collisions (buildings) - these block completely
-      if (this.hasHardCollision(ctx.world, entity.id, newX, newY)) {
+      if (this.hasHardCollision(ctx.world, impl, newX, newY, position)) {
         // Try perpendicular directions to slide along walls
         // Performance: Use pooled vectors to avoid allocations
         const perp1 = vector2DPool.acquire();
@@ -616,9 +628,9 @@ export class MovementSystem extends BaseSystem {
         const alt2X = position.x + perp2.x;
         const alt2Y = position.y + perp2.y;
 
-        if (!this.hasHardCollision(ctx.world, entity.id, alt1X, alt1Y)) {
+        if (!this.hasHardCollision(ctx.world, impl, alt1X, alt1Y, position)) {
           this.updatePosition(impl, alt1X, alt1Y, ctx.world);
-        } else if (!this.hasHardCollision(ctx.world, entity.id, alt2X, alt2Y)) {
+        } else if (!this.hasHardCollision(ctx.world, impl, alt2X, alt2Y, position)) {
           this.updatePosition(impl, alt2X, alt2Y, ctx.world);
         } else {
           // Completely blocked by buildings - stop
@@ -638,7 +650,7 @@ export class MovementSystem extends BaseSystem {
         const adjustedNewY = position.y + adjustedDeltaY;
 
         // Final check that adjusted position doesn't hit a building
-        if (!this.hasHardCollision(ctx.world, entity.id, adjustedNewX, adjustedNewY)) {
+        if (!this.hasHardCollision(ctx.world, impl, adjustedNewX, adjustedNewY, position)) {
           this.updatePosition(impl, adjustedNewX, adjustedNewY, ctx.world);
         } else {
           // The adjusted position would hit a building - try original with penalty
@@ -695,83 +707,60 @@ export class MovementSystem extends BaseSystem {
 
   /**
    * Check for hard collisions (buildings, water, steep elevation changes, and tile walls/doors) - these block movement completely
-   * Performance: Uses cached building positions, skips ungenerated chunks to avoid expensive terrain generation
+   * Performance: Uses cached world capabilities, single getTileAt call, accepts entity + currentPos to avoid re-lookups
    */
   private hasHardCollision(
     world: World,
-    entityId: string,
+    entityImpl: EntityImpl,
     x: number,
-    y: number
+    y: number,
+    currentPos: PositionComponent
   ): boolean {
-    // Extended world interface with tile access
-    const worldWithTerrain = world as typeof world & {
-      getTerrainAt?: (x: number, y: number) => string | null;
-      getTileAt?: (x: number, y: number) => Tile | undefined;
-      getChunkManager?: () => {
-        getChunk: (x: number, y: number) => { generated?: boolean } | undefined;
-      } | undefined;
-    };
-
-    // Performance: Skip tile checks for ungenerated chunks to avoid triggering expensive terrain generation
-    const chunkManager = typeof worldWithTerrain.getChunkManager === 'function'
-      ? worldWithTerrain.getChunkManager()
-      : undefined;
-    if (chunkManager) {
+    // Performance: Use cached chunk manager (set once per tick in onUpdate)
+    if (this.worldChunkManager) {
       const CHUNK_SIZE = 32;
       const chunkX = Math.floor(x / CHUNK_SIZE);
       const chunkY = Math.floor(y / CHUNK_SIZE);
-      const chunk = chunkManager.getChunk(chunkX, chunkY);
+      const chunk = this.worldChunkManager.getChunk(chunkX, chunkY);
       if (!chunk?.generated) {
-        // Chunk not generated - skip tile collision checks (no invisible walls)
-        // Still check building collisions below
         return this.checkBuildingCollision(world, x, y);
       }
     }
 
-    // Check for water terrain - depth-based blocking
-    if (typeof worldWithTerrain.getTileAt === 'function') {
-      const tile = worldWithTerrain.getTileAt(Math.floor(x), Math.floor(y));
+    // Performance: Use cached tile access flag (set once per tick in onUpdate)
+    // Single getTileAt call replaces previous two separate calls
+    if (this.worldHasTileAccess) {
+      const worldWithTiles = world as typeof world & {
+        getTileAt: (x: number, y: number) => Tile | undefined;
+      };
+      const targetTile = worldWithTiles.getTileAt(Math.floor(x), Math.floor(y));
 
-      const tileWithFluid = tile as (typeof tile & { fluid?: { type: string; depth: number } }) | undefined;
-      if (tileWithFluid?.fluid && tileWithFluid.fluid.type === 'water') {
-        const depth = tileWithFluid.fluid.depth;
+      if (targetTile) {
+        // Check for water terrain - depth-based blocking
+        const tileWithFluid = targetTile as (typeof targetTile & { fluid?: { type: string; depth: number } });
+        if (tileWithFluid.fluid && tileWithFluid.fluid.type === 'water') {
+          const depth = tileWithFluid.fluid.depth;
 
-        // Shallow water (depth 1-2): Wadeable, no blocking
-        // Movement penalty applied by AgentSwimmingSystem instead
-        if (depth <= 2) {
-          return false; // Allow movement (will be slowed)
-        }
+          if (depth <= 2) {
+            return false; // Shallow water - wadeable
+          }
 
-        // Medium-deep water (depth 3-4): Swimmable for aquatic species
-        if (depth <= 4) {
-          // Check if entity has swimming locomotion capability
-          const entity = world.entities.get(entityId);
-          if (entity) {
-            const impl = entity as EntityImpl;
-            const body = impl.getComponent<BodyComponent>(CT.Body);
+          if (depth <= 4) {
+            // Medium-deep water - check swimming capability
+            const body = entityImpl.getComponent<BodyComponent>(CT.Body);
             if (body) {
               const swimmingParts = getPartsByFunction(body, 'swimming');
-              // Allow movement if entity has functional swimming parts
               if (swimmingParts.length > 0) {
                 return false; // Allow swimming
               }
             }
+            return true; // Block - no swimming capability
           }
-          // Block movement if no swimming capability
-          return true;
+
+          return true; // Deep water - blocks all
         }
 
-        // Deep water (depth 5-7): Dangerous, blocks all
-        return true;
-      }
-    }
-
-    // Check tile-based walls, doors, and windows
-    if (typeof worldWithTerrain.getTileAt === 'function') {
-      const targetTile = worldWithTerrain.getTileAt(Math.floor(x), Math.floor(y));
-
-      if (targetTile) {
-        // Check for walls - block if construction >= 50% (per VOXEL_BUILDING_SPEC.md)
+        // Check for walls
         if (targetTile.wall) {
           const progress = targetTile.wall.constructionProgress ?? 100;
           if (progress >= 50) {
@@ -779,7 +768,7 @@ export class MovementSystem extends BaseSystem {
           }
         }
 
-        // Check for windows - always block movement (even partially built)
+        // Check for windows
         if (targetTile.window) {
           const progress = targetTile.window.constructionProgress ?? 100;
           if (progress >= 50) {
@@ -787,32 +776,21 @@ export class MovementSystem extends BaseSystem {
           }
         }
 
-        // Check for doors - block if closed or locked (open doors allow passage)
+        // Check for doors
         if (targetTile.door) {
           const progress = targetTile.door.constructionProgress ?? 100;
           if (progress >= 50) {
             if (targetTile.door.state === 'closed' || targetTile.door.state === 'locked') {
               return true;
             }
-            // Open doors allow passage
           }
         }
-      }
 
-      // Check for steep elevation changes - entities cannot climb/fall more than 2 elevation levels
-      const entity = world.entities.get(entityId);
-      if (entity) {
-        const currentPos = (entity as EntityImpl).getComponent<PositionComponent>(CT.Position);
-        if (currentPos) {
-          const currentTile = worldWithTerrain.getTileAt(Math.floor(currentPos.x), Math.floor(currentPos.y));
-
-          if (currentTile && targetTile &&
-              currentTile.elevation !== undefined &&
-              targetTile.elevation !== undefined) {
+        // Check elevation changes - use passed-in currentPos instead of entity re-lookup
+        if (targetTile.elevation !== undefined) {
+          const currentTile = worldWithTiles.getTileAt(Math.floor(currentPos.x), Math.floor(currentPos.y));
+          if (currentTile && currentTile.elevation !== undefined) {
             const elevationDiff = Math.abs(targetTile.elevation - currentTile.elevation);
-
-            // Block movement if elevation change is too steep (more than 2 levels)
-            // This prevents entities from falling into deep basins or climbing cliffs
             if (elevationDiff > 2) {
               return true;
             }
@@ -872,9 +850,9 @@ export class MovementSystem extends BaseSystem {
     const chunkY = Math.floor(y / CHUNK_SIZE);
 
     // Check current chunk and adjacent chunks (3x3 grid = 9 chunks)
-    for (let dx = -1; dx <= 1; dx++) {
-      for (let dy = -1; dy <= 1; dy++) {
-        const nearbyEntityIds = world.getEntitiesInChunk(chunkX + dx, chunkY + dy);
+    for (let cdx = -1; cdx <= 1; cdx++) {
+      for (let cdy = -1; cdy <= 1; cdy++) {
+        const nearbyEntityIds = world.getEntitiesInChunk(chunkX + cdx, chunkY + cdy);
 
         for (const nearbyId of nearbyEntityIds) {
           if (nearbyId === entityId) {
@@ -899,9 +877,9 @@ export class MovementSystem extends BaseSystem {
           }
 
           // Squared distance for precision (avoid sqrt)
-          const dx = pos.x - x;
-          const dy = pos.y - y;
-          const distanceSquared = dx * dx + dy * dy;
+          const ndx = pos.x - x;
+          const ndy = pos.y - y;
+          const distanceSquared = ndx * ndx + ndy * ndy;
 
           // Apply graduated slowdown based on proximity
           if (distanceSquared < this.SOFT_COLLISION_RADIUS_SQUARED) {
@@ -910,6 +888,11 @@ export class MovementSystem extends BaseSystem {
             const proximityFactor = distance / this.SOFT_COLLISION_RADIUS;
             const thisPenalty = this.MIN_PENALTY + (1 - this.MIN_PENALTY) * proximityFactor;
             penalty = Math.min(penalty, thisPenalty);
+
+            // Performance: Early exit when penalty already at minimum — can't get worse
+            if (penalty <= this.MIN_PENALTY) {
+              return penalty;
+            }
           }
         }
       }
