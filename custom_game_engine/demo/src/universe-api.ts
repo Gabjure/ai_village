@@ -31,9 +31,18 @@ import {
   type PlanetMetadata,
   type BiosphereData,
 } from './planet-storage.js';
-import { BiosphereGenerator } from '../../packages/world/src/biosphere/BiosphereGenerator.js';
-import type { PlanetConfig } from '../../packages/world/src/planet/PlanetTypes.js';
-import { OpenAICompatProvider } from '@ai-village/llm';
+// Dynamic imports — workspace packages may not be present in prebuilt Docker images
+// BiosphereGenerator and OpenAICompatProvider are loaded on-demand only when
+// biosphere generation is actually triggered.
+type PlanetConfig = any;
+
+async function loadBiosphereModules() {
+  const [{ BiosphereGenerator }, { OpenAICompatProvider }] = await Promise.all([
+    import('../../packages/world/src/biosphere/BiosphereGenerator.js'),
+    import('@ai-village/llm'),
+  ]);
+  return { BiosphereGenerator, OpenAICompatProvider };
+}
 import crypto from 'crypto';
 import zlib from 'zlib';
 import { promisify } from 'util';
@@ -41,20 +50,23 @@ import { promisify } from 'util';
 const gunzip = promisify(zlib.gunzip);
 
 // ---------------------------------------------------------------------------
-// Server-side LLM provider for biosphere generation
+// Server-side LLM provider for biosphere generation (lazy-loaded)
 // ---------------------------------------------------------------------------
-function createServerLLMProvider(): OpenAICompatProvider | null {
+let serverLLMProvider: any = undefined; // undefined = not yet checked, null = disabled
+async function getServerLLMProvider(): Promise<any> {
+  if (serverLLMProvider !== undefined) return serverLLMProvider;
   const apiKey = process.env.GROQ_API_KEY;
-  const model = process.env.GROQ_MODEL || 'openai/gpt-oss-120b';
-  const baseUrl = process.env.GROQ_BASE_URL || 'https://api.groq.com/openai/v1';
   if (!apiKey) {
     console.warn('[UniverseAPI] GROQ_API_KEY not set — server-side biosphere generation disabled');
+    serverLLMProvider = null;
     return null;
   }
-  return new OpenAICompatProvider(model, baseUrl, apiKey);
+  const model = process.env.GROQ_MODEL || 'openai/gpt-oss-120b';
+  const baseUrl = process.env.GROQ_BASE_URL || 'https://api.groq.com/openai/v1';
+  const { OpenAICompatProvider } = await loadBiosphereModules();
+  serverLLMProvider = new OpenAICompatProvider(model, baseUrl, apiKey);
+  return serverLLMProvider;
 }
-
-const serverLLMProvider = createServerLLMProvider();
 
 // Track in-progress biosphere generations
 const activeGenerations = new Map<string, { startedAt: number; progress: string }>();
@@ -64,15 +76,17 @@ const activeGenerations = new Map<string, { startedAt: number; progress: string 
  * Runs in the background — caller should not await.
  */
 async function runBiosphereGeneration(planetId: string, planetConfig: PlanetConfig): Promise<void> {
-  if (!serverLLMProvider) {
+  const llmProvider = await getServerLLMProvider();
+  if (!llmProvider) {
     throw new Error('Server-side LLM provider not configured (missing GROQ_API_KEY)');
   }
 
   activeGenerations.set(planetId, { startedAt: Date.now(), progress: 'Starting generation...' });
 
   try {
+    const { BiosphereGenerator } = await loadBiosphereModules();
     const generator = new BiosphereGenerator(
-      serverLLMProvider,
+      llmProvider,
       planetConfig,
       (message: string) => {
         const entry = activeGenerations.get(planetId);
@@ -631,7 +645,7 @@ export function createUniverseApiRouter(): Router {
 
       // Trigger async biosphere generation if requested
       let biosphereGenerationStarted = false;
-      if (generateBiosphere && serverLLMProvider) {
+      if (generateBiosphere && process.env.GROQ_API_KEY) {
         const planetConfig: PlanetConfig = {
           id: planetId,
           name,
@@ -821,7 +835,8 @@ export function createUniverseApiRouter(): Router {
     try {
       const { planetId } = req.params;
 
-      if (!serverLLMProvider) {
+      const llmProvider = await getServerLLMProvider();
+      if (!llmProvider) {
         return res.status(503).json({
           error: 'Server-side LLM provider not configured (missing GROQ_API_KEY)',
         });
