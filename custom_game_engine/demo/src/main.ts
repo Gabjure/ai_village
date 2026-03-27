@@ -4737,7 +4737,22 @@ async function main() {
       currentSettings.sound.masterMuted = !currentSettings.sound.masterMuted;
       touchControls.soundMuted = currentSettings.sound.masterMuted;
     },
+    onPanelOpen: (panelId: string) => {
+      windowManager.showWindow(panelId);
+    },
+    onMobileBack: () => {
+      windowManager.mobileBack();
+    },
   });
+
+  // Populate the mobile panel drawer with all menu-visible windows
+  const drawerPanels: Array<{ id: string; title: string }> = [];
+  for (const win of windowManager.getAllWindows()) {
+    if (win.config.showInWindowList !== false && win.config.title) {
+      drawerPanels.push({ id: win.id, title: win.config.title });
+    }
+  }
+  touchControls.setPanelList(drawerPanels);
 
   // Set initial sound muted state on touch controls
   touchControls.soundMuted = settingsPanel.getSettings().sound.masterMuted;
@@ -4796,6 +4811,12 @@ async function main() {
           // Update mobile action button visibility based on possession state
           touchControls.showPossessionControls = !!(pc?.isPossessed);
         }
+      }
+
+      // Update mobile back button visibility based on whether any panel is open
+      if (renderFrameCount % 10 === 0 && touchControls.isTouchDevice && windowManager.isMobileViewport()) {
+        const hasVisiblePanel = windowManager.getAllWindows().some(w => w.visible && !w.minimized);
+        touchControls.showBackButton = hasVisiblePanel;
       }
 
       // Update time display on mobile
