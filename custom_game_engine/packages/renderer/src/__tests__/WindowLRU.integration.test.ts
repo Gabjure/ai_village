@@ -412,28 +412,30 @@ describe('LRU (Least Recently Used) Eviction System', () => {
     });
 
     it('should not auto-close when all windows are pinned', () => {
+      const menuBarHeight = 30;
       const smallCanvas = document.createElement('canvas');
-      smallCanvas.width = 600;
-      smallCanvas.height = 400;
+      smallCanvas.width = 800;  // Must be >= 768 to avoid mobile viewport mode
+      smallCanvas.height = 400 + menuBarHeight; // Account for menu bar
       windowManager = new WindowManager(smallCanvas);
+      windowManager.handleCanvasResize(800, 400 + menuBarHeight);
 
-      // Create and pin two windows that fill canvas
-      const panel1 = new MockPanel('pinned-1', 'Pinned 1', 600, 400);
+      // Create and pin a window that fills the available area below the menu bar
+      const panel1 = new MockPanel('pinned-1', 'Pinned 1', 800, 400);
       windowManager.registerWindow('pinned-1', panel1, {
         defaultX: 0,
-        defaultY: 0,
-        defaultWidth: 600,
+        defaultY: menuBarHeight,
+        defaultWidth: 800,
         defaultHeight: 400,
       });
       windowManager.showWindow('pinned-1');
       windowManager.pinWindow('pinned-1', true);
 
       // Try to add another window - should throw error
-      const panel2 = new MockPanel('cannot-open', 'Cannot Open', 600, 400);
+      const panel2 = new MockPanel('cannot-open', 'Cannot Open', 800, 400);
       windowManager.registerWindow('cannot-open', panel2, {
         defaultX: 0,
-        defaultY: 0,
-        defaultWidth: 600,
+        defaultY: menuBarHeight,
+        defaultWidth: 800,
         defaultHeight: 400,
       });
 
@@ -448,6 +450,7 @@ describe('LRU (Least Recently Used) Eviction System', () => {
       smallCanvas.width = 800;
       smallCanvas.height = 400 + menuBarHeight; // Account for menu bar
       windowManager = new WindowManager(smallCanvas);
+      windowManager.handleCanvasResize(800, 400 + menuBarHeight);
 
       // Create two windows
       const panel1 = new MockPanel('older-pinned', 'Older Pinned', 400, 400);
@@ -498,27 +501,28 @@ describe('LRU (Least Recently Used) Eviction System', () => {
       const autoCloseSpy = vi.fn();
 
       const smallCanvas = document.createElement('canvas');
-      smallCanvas.width = 600;
+      smallCanvas.width = 800;  // Must be >= 768 to avoid mobile viewport mode
       smallCanvas.height = 400 + menuBarHeight; // Account for menu bar
       windowManager = new WindowManager(smallCanvas);
+      windowManager.handleCanvasResize(800, 400 + menuBarHeight);
       windowManager.on('window:auto-closed', autoCloseSpy);
 
-      const panel1 = new MockPanel('old', 'Old Window', 600, 400);
+      const panel1 = new MockPanel('old', 'Old Window', 800, 400);
       vi.setSystemTime(1000);
       windowManager.registerWindow('old', panel1, {
         defaultX: 0,
         defaultY: menuBarHeight,
-        defaultWidth: 600,
+        defaultWidth: 800,
         defaultHeight: 400,
       });
       windowManager.showWindow('old');
 
-      const panel2 = new MockPanel('new', 'New Window', 600, 400);
+      const panel2 = new MockPanel('new', 'New Window', 800, 400);
       vi.setSystemTime(2000);
       windowManager.registerWindow('new', panel2, {
         defaultX: 0,
         defaultY: menuBarHeight,
-        defaultWidth: 600,
+        defaultWidth: 800,
         defaultHeight: 400,
       });
       windowManager.showWindow('new');
