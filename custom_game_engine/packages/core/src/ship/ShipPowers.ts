@@ -27,6 +27,7 @@ export enum ShipPower {
   ATMOSPHERE_ENGINE = 'atmosphere_engine',    // environment control
   TRACTOR_BEAM = 'tractor_beam',             // pickup_carry
   ENTROPY_REVERSAL = 'entropy_reversal',     // death_control
+  SHIP_OVERRIDE = 'ship_override',           // terminate_creature
 
   // Camera / navigation
   FREE_CAMERA = 'free_camera',

@@ -1458,6 +1458,280 @@ export class DevPanel implements IWindowPanel {
       y += SIZES.buttonHeight + 2;
     }
 
+    // ── SHIP OVERRIDE: TERMINATE ──────────────────────────────────────────────
+    if (state.isUnlocked(ShipPower.SHIP_OVERRIDE) && this.selectedAgentId) {
+      y = this.renderSectionHeader(ctx, width, y, 'SHIP OVERRIDE');
+
+      const terminateBtnWidth = width - SIZES.padding * 2;
+      ctx.fillStyle = COLORS.buttonDanger;
+      ctx.beginPath();
+      ctx.roundRect(SIZES.padding, y + 2, terminateBtnWidth, SIZES.buttonHeight, 4);
+      ctx.fill();
+
+      ctx.fillStyle = COLORS.text;
+      ctx.font = 'bold 9px monospace';
+      ctx.fillText('⚠ TERMINATE CREATURE', SIZES.padding + 8, y + 10);
+
+      this.clickRegions.push({
+        x: SIZES.padding,
+        y: y + 2,
+        width: terminateBtnWidth,
+        height: SIZES.buttonHeight,
+        action: 'execute_action',
+        data: 'ship_terminate_creature',
+      });
+
+      y += SIZES.buttonHeight + 6;
+    }
+
+    // ── MEMORY CRYSTAL ────────────────────────────────────────────────────────
+    if (state.isUnlocked(ShipPower.MEMORY_CRYSTAL) && this.selectedAgentId && this.world) {
+      y = this.renderSectionHeader(ctx, width, y, 'MEMORY CRYSTAL');
+
+      const memEntity = this.world.getEntity(this.selectedAgentId);
+      if (memEntity) {
+        ctx.fillStyle = COLORS.textMuted;
+        ctx.font = 'bold 9px monospace';
+        ctx.fillText('Episodic Memories', SIZES.padding, y + 8);
+        y += 18;
+
+        const episodicComp = memEntity.components.get('episodic_memory') as
+          | { memories: Array<{ content?: string; summary?: string; tick?: number; timestamp?: number }> }
+          | undefined;
+
+        if (episodicComp && episodicComp.memories.length > 0) {
+          const recentMemories = episodicComp.memories.slice(-5).reverse();
+          const memBtnWidth = 18;
+          const memRowHeight = 20;
+
+          for (const [memIdx, mem] of recentMemories.entries()) {
+            const rawText = mem.summary ?? mem.content ?? '';
+            const truncated = rawText.length > 32 ? rawText.slice(0, 32) + '…' : rawText;
+            const tick = mem.tick ?? mem.timestamp ?? 0;
+            const label = `[${tick}] ${truncated}`;
+
+            ctx.fillStyle = COLORS.text;
+            ctx.font = '9px monospace';
+            ctx.fillText(label, SIZES.padding, y + 6);
+
+            // ✕ delete button
+            const delX = width - SIZES.padding - memBtnWidth;
+            ctx.fillStyle = COLORS.buttonDanger;
+            ctx.beginPath();
+            ctx.roundRect(delX, y, memBtnWidth, memBtnWidth - 2, 3);
+            ctx.fill();
+
+            ctx.fillStyle = COLORS.text;
+            ctx.font = 'bold 9px monospace';
+            ctx.fillText('✕', delX + 4, y + 8);
+
+            this.clickRegions.push({
+              x: delX,
+              y: y,
+              width: memBtnWidth,
+              height: memBtnWidth - 2,
+              action: 'execute_action',
+              data: `ship_memory_delete_${memIdx}`,
+            });
+
+            y += memRowHeight;
+          }
+        } else {
+          ctx.fillStyle = COLORS.textDim;
+          ctx.font = '9px monospace';
+          ctx.fillText('No episodic memories', SIZES.padding, y + 6);
+          y += 18;
+        }
+
+        // Inject Memory row
+        ctx.fillStyle = COLORS.textMuted;
+        ctx.font = '9px monospace';
+        ctx.fillText('Inject Memory:', SIZES.padding, y + 8);
+
+        const injectBtnWidth = 140;
+        const injectX = width - SIZES.padding - injectBtnWidth;
+        ctx.fillStyle = COLORS.magic + '55';
+        ctx.beginPath();
+        ctx.roundRect(injectX, y, injectBtnWidth, SIZES.buttonHeight - 4, 4);
+        ctx.fill();
+
+        ctx.fillStyle = COLORS.magic;
+        ctx.font = 'bold 9px monospace';
+        ctx.fillText('💉 Inject Custom Memory', injectX + 6, y + 9);
+
+        this.clickRegions.push({
+          x: injectX,
+          y: y,
+          width: injectBtnWidth,
+          height: SIZES.buttonHeight - 4,
+          action: 'execute_action',
+          data: 'ship_memory_inject',
+        });
+
+        y += SIZES.buttonHeight + 4;
+      }
+    }
+
+    // ── NUTRIENT SYNTHESIZER ──────────────────────────────────────────────────
+    if (state.isUnlocked(ShipPower.NUTRIENT_SYNTHESIZER) && this.selectedAgentId && this.world) {
+      y = this.renderSectionHeader(ctx, width, y, 'NUTRIENT SYNTHESIZER');
+
+      const chemEntity = this.world.getEntity(this.selectedAgentId);
+      if (chemEntity) {
+        ctx.fillStyle = COLORS.textMuted;
+        ctx.font = 'bold 9px monospace';
+        ctx.fillText('Biochemistry Controls', SIZES.padding, y + 8);
+        y += 18;
+
+        const needsComp = chemEntity.components.get('needs') as
+          | Record<string, number>
+          | undefined;
+        const bioComp = chemEntity.components.get('biochemistry') as
+          | Record<string, number>
+          | undefined;
+
+        const chemChannels: Array<{ name: string; label: string; value: number }> = [];
+
+        if (needsComp) {
+          const needsMap: Array<[string, string]> = [
+            ['hunger', 'hunger'],
+            ['energy', 'energy'],
+            ['health', 'health'],
+            ['social', 'social'],
+            ['stimulation', 'stimulation'],
+            ['thirst', 'thirst'],
+          ];
+          for (const [key, label] of needsMap) {
+            if (key in needsComp) {
+              chemChannels.push({ name: key, label, value: needsComp[key] as number });
+            }
+          }
+        }
+
+        if (bioComp) {
+          const bioKeys: string[] = ['oxytocin', 'serotonin', 'dopamine', 'cortisol'];
+          for (const key of bioKeys) {
+            if (key in bioComp) {
+              chemChannels.push({ name: key, label: key, value: bioComp[key] as number });
+            }
+          }
+        }
+
+        const rowH = 16;
+        const smallBtnW = 20;
+        const smallBtnH = 14;
+
+        for (const channel of chemChannels) {
+          const valText = `${channel.label}: ${channel.value.toFixed(2)}`;
+          ctx.fillStyle = COLORS.text;
+          ctx.font = '9px monospace';
+          ctx.fillText(valText, SIZES.padding, y + rowH - 4);
+
+          // [+] button
+          const plusX = width - SIZES.padding - smallBtnW;
+          ctx.fillStyle = COLORS.success + '44';
+          ctx.beginPath();
+          ctx.roundRect(plusX, y + 1, smallBtnW, smallBtnH, 3);
+          ctx.fill();
+          ctx.fillStyle = COLORS.success;
+          ctx.font = 'bold 9px monospace';
+          ctx.fillText('+', plusX + 6, y + 9);
+
+          this.clickRegions.push({
+            x: plusX,
+            y: y + 1,
+            width: smallBtnW,
+            height: smallBtnH,
+            action: 'execute_action',
+            data: `ship_chem_inc_${channel.name}`,
+          });
+
+          // [-] button
+          const minusX = plusX - smallBtnW - 4;
+          ctx.fillStyle = COLORS.dev + '44';
+          ctx.beginPath();
+          ctx.roundRect(minusX, y + 1, smallBtnW, smallBtnH, 3);
+          ctx.fill();
+          ctx.fillStyle = COLORS.dev;
+          ctx.font = 'bold 9px monospace';
+          ctx.fillText('-', minusX + 7, y + 9);
+
+          this.clickRegions.push({
+            x: minusX,
+            y: y + 1,
+            width: smallBtnW,
+            height: smallBtnH,
+            action: 'execute_action',
+            data: `ship_chem_dec_${channel.name}`,
+          });
+
+          y += rowH;
+        }
+
+        if (chemChannels.length === 0) {
+          ctx.fillStyle = COLORS.textDim;
+          ctx.font = '9px monospace';
+          ctx.fillText('No needs/biochemistry components', SIZES.padding, y + 6);
+          y += 18;
+        } else {
+          y += 4;
+        }
+      }
+    }
+
+    // ── NEURAL LATTICE: IMPULSES ──────────────────────────────────────────────
+    if (state.isUnlocked(ShipPower.NEURAL_LATTICE) && this.selectedAgentId) {
+      y = this.renderSectionHeader(ctx, width, y, 'NEURAL LATTICE');
+
+      ctx.fillStyle = COLORS.textMuted;
+      ctx.font = 'bold 9px monospace';
+      ctx.fillText('Trigger Impulse', SIZES.padding, y + 8);
+      y += 18;
+
+      const impulses: Array<{ behavior: string; label: string }> = [
+        { behavior: 'wander', label: 'explore' },
+        { behavior: 'seek_food', label: 'eat' },
+        { behavior: 'talk', label: 'socialize' },
+        { behavior: 'pray', label: 'meditate' },
+        { behavior: 'cast_spell', label: 'magic' },
+        { behavior: 'explore_frontier', label: 'far explore' },
+        { behavior: 'sleep', label: 'rest' },
+      ];
+
+      const impulseCols = 2;
+      const impulseGap = 4;
+      const impulseBtnW = Math.floor((width - SIZES.padding * 2 - impulseGap * (impulseCols - 1)) / impulseCols);
+      const impulseBtnH = SIZES.buttonHeight - 4;
+
+      for (const [impIdx, imp] of impulses.entries()) {
+        const col = impIdx % impulseCols;
+        const row = Math.floor(impIdx / impulseCols);
+        const bx = SIZES.padding + col * (impulseBtnW + impulseGap);
+        const by = y + row * (impulseBtnH + impulseGap);
+
+        ctx.fillStyle = COLORS.button;
+        ctx.beginPath();
+        ctx.roundRect(bx, by, impulseBtnW, impulseBtnH, 4);
+        ctx.fill();
+
+        ctx.fillStyle = COLORS.text;
+        ctx.font = '9px monospace';
+        ctx.fillText(imp.label, bx + 6, by + 9);
+
+        this.clickRegions.push({
+          x: bx,
+          y: by,
+          width: impulseBtnW,
+          height: impulseBtnH,
+          action: 'execute_action',
+          data: `ship_impulse_${imp.behavior}`,
+        });
+      }
+
+      const impulseRows = Math.ceil(impulses.length / impulseCols);
+      y += impulseRows * (impulseBtnH + impulseGap) + 4;
+    }
+
     return y + SIZES.padding;
   }
 
@@ -2326,6 +2600,184 @@ export class DevPanel implements IWindowPanel {
       } catch (e) {
         this.log(`ERROR: ${e instanceof Error ? e.message : String(e)}`);
       }
+      return;
+    }
+
+    if (actionId === 'ship_terminate_creature') {
+      if (!this.selectedAgentId || !this.world) {
+        this.log('ERROR: No agent selected');
+        return;
+      }
+      // Use window.confirm for safety
+      if (typeof window !== 'undefined' && !window.confirm('SHIP OVERRIDE: Terminate this creature? This cannot be undone.')) {
+        return;
+      }
+      const entity = this.world.getEntity(this.selectedAgentId);
+      if (!entity) {
+        this.log('ERROR: Entity not found');
+        return;
+      }
+      const needs = entity.components.get('needs') as { health: number } | undefined;
+      if (needs) {
+        needs.health = 0;
+      }
+      // Mark as not alive on agent component
+      const agent = entity.components.get('agent') as { isAlive?: boolean } | undefined;
+      if (agent) {
+        agent.isAlive = false;
+      }
+      // Emit death event
+      try {
+        this.world.eventBus.emit({
+          type: 'agent:death',
+          source: this.selectedAgentId,
+          data: {
+            agentId: this.selectedAgentId,
+            cause: 'ship_override_terminate',
+          },
+        });
+      } catch (e) {
+        console.error('[DevPanel] Failed to emit agent:death:', e);
+      }
+      this.log(`Ship Override: Terminated creature ${this.selectedAgentId.slice(0, 8)}`);
+      return;
+    }
+
+    if (actionId.startsWith('ship_memory_delete_')) {
+      const index = parseInt(actionId.replace('ship_memory_delete_', ''), 10);
+      if (!this.selectedAgentId || !this.world) {
+        this.log('ERROR: No agent selected');
+        return;
+      }
+      const entity = this.world.getEntity(this.selectedAgentId);
+      if (!entity) {
+        this.log('ERROR: Entity not found');
+        return;
+      }
+      const episodicMemory = entity.components.get('episodic_memory') as {
+        memories?: Array<{ content?: string; summary?: string }>;
+      } | undefined;
+      if (!episodicMemory?.memories || index < 0 || index >= episodicMemory.memories.length) {
+        this.log('ERROR: Invalid memory index');
+        return;
+      }
+      const removed = episodicMemory.memories.splice(index, 1)[0];
+      this.log(`Memory Crystal: Deleted memory "${(removed?.summary || removed?.content || '').slice(0, 30)}..."`);
+      return;
+    }
+
+    if (actionId === 'ship_memory_inject') {
+      if (!this.selectedAgentId || !this.world) {
+        this.log('ERROR: No agent selected');
+        return;
+      }
+      const content = typeof window !== 'undefined' ? window.prompt('Enter memory to inject:') : null;
+      if (!content) return;
+      const entity = this.world.getEntity(this.selectedAgentId);
+      if (!entity) {
+        this.log('ERROR: Entity not found');
+        return;
+      }
+      const episodicMemory = entity.components.get('episodic_memory') as {
+        memories?: Array<Record<string, unknown>>;
+      } | undefined;
+      if (!episodicMemory) {
+        this.log('ERROR: Entity has no episodic_memory component');
+        return;
+      }
+      if (!episodicMemory.memories) {
+        episodicMemory.memories = [];
+      }
+      // Get current tick
+      const timeEntity = this.world.query().with('time').executeEntities()[0];
+      const time = timeEntity?.components.get('time') as { tick?: number } | undefined;
+      const tick = time?.tick || 0;
+      episodicMemory.memories.push({
+        content,
+        summary: content,
+        tick,
+        timestamp: tick,
+        importance: 0.7,
+        emotionalValence: 0,
+        emotionalIntensity: 0.3,
+        clarity: 1.0,
+        consolidated: false,
+        eventType: 'ship_injected',
+        id: `ship_inject_${Date.now()}`,
+      });
+      this.log(`Memory Crystal: Injected memory "${content.slice(0, 30)}..."`);
+      return;
+    }
+
+    if (actionId.startsWith('ship_chem_inc_') || actionId.startsWith('ship_chem_dec_')) {
+      const isInc = actionId.startsWith('ship_chem_inc_');
+      const channel = actionId.replace(isInc ? 'ship_chem_inc_' : 'ship_chem_dec_', '');
+      if (!this.selectedAgentId || !this.world) {
+        this.log('ERROR: No agent selected');
+        return;
+      }
+      const entity = this.world.getEntity(this.selectedAgentId);
+      if (!entity) {
+        this.log('ERROR: Entity not found');
+        return;
+      }
+      const delta = isInc ? 0.2 : -0.2;
+      // Check needs component first
+      const needsChannels = ['hunger', 'energy', 'health', 'social', 'stimulation', 'thirst'];
+      if (needsChannels.includes(channel)) {
+        const needs = entity.components.get('needs') as Record<string, number> | undefined;
+        if (!needs) {
+          this.log('ERROR: Entity has no needs component');
+          return;
+        }
+        const current = needs[channel] ?? 0.5;
+        needs[channel] = Math.max(0, Math.min(1, current + delta));
+        this.log(`Nutrient Synth: ${channel} ${isInc ? '+' : '-'}0.2 → ${needs[channel].toFixed(2)}`);
+        return;
+      }
+      // Check biochemistry component
+      const bioChannels = ['oxytocin', 'serotonin', 'dopamine', 'cortisol'];
+      if (bioChannels.includes(channel)) {
+        const biochem = entity.components.get('biochemistry') as Record<string, number> | undefined;
+        if (!biochem) {
+          this.log('ERROR: Entity has no biochemistry component');
+          return;
+        }
+        const current = biochem[channel] ?? 0.5;
+        biochem[channel] = Math.max(0, Math.min(1, current + delta));
+        this.log(`Nutrient Synth: ${channel} ${isInc ? '+' : '-'}0.2 → ${biochem[channel].toFixed(2)}`);
+        return;
+      }
+      this.log(`ERROR: Unknown biochemistry channel: ${channel}`);
+      return;
+    }
+
+    if (actionId.startsWith('ship_impulse_')) {
+      const behavior = actionId.replace('ship_impulse_', '');
+      if (!this.selectedAgentId || !this.world) {
+        this.log('ERROR: No agent selected');
+        return;
+      }
+      const entity = this.world.getEntity(this.selectedAgentId);
+      if (!entity) {
+        this.log('ERROR: Entity not found');
+        return;
+      }
+      const agent = entity.components.get('agent') as {
+        currentBehavior?: string;
+        behavior?: string;
+      } | undefined;
+      if (!agent) {
+        this.log('ERROR: Entity is not an agent');
+        return;
+      }
+      if ('currentBehavior' in agent) {
+        agent.currentBehavior = behavior;
+      }
+      if ('behavior' in agent) {
+        agent.behavior = behavior;
+      }
+      this.log(`Neural Lattice: Triggered impulse "${behavior}" on agent`);
       return;
     }
 
