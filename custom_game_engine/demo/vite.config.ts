@@ -441,6 +441,7 @@ export default defineConfig({
       '@ai-village/agents': path.resolve(__dirname, '../packages/agents/src/index.ts'),
       '@ai-village/language': path.resolve(__dirname, '../packages/language/src/index.ts'),
       '@ai-village/introspection': path.resolve(__dirname, '../packages/introspection/src/index.ts'),
+      '@akashic-records/lib': path.resolve(__dirname, '../vendor/akashic-records/lib'),
       // Stub out Node.js modules for browser
       'fs': path.resolve(__dirname, '../packages/llm/src/browser-stubs/fs.ts'),
       'path': path.resolve(__dirname, '../packages/llm/src/browser-stubs/path.ts'),
@@ -467,22 +468,59 @@ export default defineConfig({
         entryFileNames: `assets/[name].[hash].js`,
         chunkFileNames: `assets/[name].[hash].js`,
         assetFileNames: `assets/[name].[hash].[ext]`,
-        // Manual chunk splitting — all engine packages in ONE chunk to avoid
-        // TDZ errors from circular deps (core <-> world <-> botany have 30+
-        // circular import cycles)
+        // Engine split into functional groups:
+        // - engine-core: core + packages with circular deps (world, building-designer, hierarchy-simulator, types)
+        // - engine-ai: LLM, introspection, language, agents — loaded after initial render
+        // - engine-simulation: magic, divinity, botany, reproduction, environment, navigation
+        // - engine-infra: persistence, shared-worker, metrics
+        // - engine-renderer: rendering (already split — leaf node)
+        // Vendor split by major library for parallel loading.
         manualChunks(id) {
-          if (id.includes('node_modules/three')) {
-            return 'vendor-three';
-          }
-          if (id.includes('browser-stubs/')) {
-            return 'vendor';
-          }
+          if (id.includes('browser-stubs/')) return 'vendor';
+
           if (id.includes('/packages/') && id.includes('/src/')) {
-            return 'engine';
+            // Renderer: leaf node — safe to split
+            if (id.includes('/packages/renderer/')) return 'engine-renderer';
+
+            // Core + packages with bidirectional deps on core — must stay together
+            // core <-> world, core <-> building-designer, core <-> hierarchy-simulator
+            if (id.includes('/packages/core/')) return 'engine-core';
+            if (id.includes('/packages/world/')) return 'engine-core';
+            if (id.includes('/packages/building-designer/')) return 'engine-core';
+            if (id.includes('/packages/hierarchy-simulator/')) return 'engine-core';
+            if (id.includes('/packages/types/')) return 'engine-core';
+
+            // AI/LLM subsystem — loaded after initial render
+            if (id.includes('/packages/llm/')) return 'engine-ai';
+            if (id.includes('/packages/introspection/')) return 'engine-ai';
+            if (id.includes('/packages/language/')) return 'engine-ai';
+            if (id.includes('/packages/agents/')) return 'engine-ai';
+
+            // Simulation subsystems — leaf dependencies on core
+            if (id.includes('/packages/magic/')) return 'engine-simulation';
+            if (id.includes('/packages/divinity/')) return 'engine-simulation';
+            if (id.includes('/packages/botany/')) return 'engine-simulation';
+            if (id.includes('/packages/reproduction/')) return 'engine-simulation';
+            if (id.includes('/packages/environment/')) return 'engine-simulation';
+            if (id.includes('/packages/navigation/')) return 'engine-simulation';
+
+            // Infrastructure
+            if (id.includes('/packages/persistence/')) return 'engine-infra';
+            if (id.includes('/packages/shared-worker/')) return 'engine-infra';
+            if (id.includes('/packages/metrics/')) return 'engine-infra';
+            if (id.includes('/packages/metrics-dashboard/')) return 'engine-infra';
+
+            // Catch-all for any new packages
+            return 'engine-core';
           }
-          if (id.includes('node_modules/')) {
-            return 'vendor';
-          }
+
+          // Vendor splitting
+          if (id.includes('node_modules/three')) return 'vendor-three';
+          if (id.includes('node_modules/pixi')) return 'vendor-pixi';
+          if (id.includes('node_modules/d3')) return 'vendor-d3';
+          if (id.includes('node_modules/chart.js') || id.includes('node_modules/chartjs-')) return 'vendor-charts';
+          if (id.includes('node_modules/dexie')) return 'vendor-dexie';
+          if (id.includes('node_modules/')) return 'vendor';
         },
       },
     },

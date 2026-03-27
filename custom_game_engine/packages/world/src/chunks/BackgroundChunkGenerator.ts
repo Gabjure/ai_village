@@ -267,21 +267,24 @@ export class BackgroundChunkGenerator {
             // Place entities on main thread (requires world access)
             this.terrainGenerator.placeEntities(chunk, world);
 
-            // Spawn animals in chunk
-            const chunkBiome = this.terrainGenerator.determineChunkBiome(chunk);
-            this.terrainGenerator.animalSpawner.spawnAnimalsInChunk(world, {
-              x: chunk.x,
-              y: chunk.y,
-              biome: chunkBiome,
-              size: CHUNK_SIZE,
-            });
-
-            // Spawn god-crafted content if available
-            if (this.terrainGenerator.godCraftedSpawner) {
-              this.terrainGenerator.godCraftedSpawner.spawnContentInChunk(world, {
+            // Spawn animals in chunk (only when spawner is available)
+            if (this.terrainGenerator.animalSpawner) {
+              const chunkBiome = this.terrainGenerator.determineChunkBiome(chunk);
+              this.terrainGenerator.animalSpawner.spawnAnimalsInChunk(world, {
                 x: chunk.x,
                 y: chunk.y,
                 biome: chunkBiome,
+                size: CHUNK_SIZE,
+              });
+            }
+
+            // Spawn god-crafted content if available
+            if (this.terrainGenerator.godCraftedSpawner) {
+              const godCraftBiome = this.terrainGenerator.determineChunkBiome(chunk);
+              this.terrainGenerator.godCraftedSpawner.spawnContentInChunk(world, {
+                x: chunk.x,
+                y: chunk.y,
+                biome: godCraftBiome,
                 size: CHUNK_SIZE,
               });
             }

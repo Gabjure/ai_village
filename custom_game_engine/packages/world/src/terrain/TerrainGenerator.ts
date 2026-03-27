@@ -32,12 +32,18 @@ import {
   createCopperDeposit,
   createGoldDeposit,
 } from '../entities/OreDepositEntity.js';
-import {
-  WildAnimalSpawningSystem,
-  getMapKnowledge,
-  SECTOR_SIZE,
-  type GodCraftedDiscoverySystem,
-} from '@ai-village/core';
+import type { GodCraftedDiscoverySystem } from '@ai-village/core';
+
+/** Minimal interface for animal spawning - avoids importing full core barrel */
+interface AnimalSpawner {
+  spawnAnimalsInChunk(world: any, info: { x: number; y: number; biome: string; size: number }): void;
+}
+
+/** Minimal interface for map knowledge provider - avoids importing full core barrel */
+interface MapKnowledgeProvider {
+  getMapKnowledge: () => { updateSectorTerrain(x: number, y: number, tiles: Array<{ elevation: number; terrain: string }>): void };
+  SECTOR_SIZE: number;
+}
 import type { PlanetConfig } from '../planet/PlanetTypes.js';
 
 /**
@@ -54,9 +60,11 @@ export class TerrainGenerator {
   private geologicalNoise: PerlinNoise;
   private seed: string;
   /** Public so BackgroundChunkGenerator can access for entity spawning */
-  public animalSpawner: WildAnimalSpawningSystem;
+  public animalSpawner: AnimalSpawner | null;
   /** Public so BackgroundChunkGenerator can access for entity spawning */
   public godCraftedSpawner?: GodCraftedDiscoverySystem;
+  /** Optional map knowledge provider - only available on main thread */
+  private mapKnowledgeProvider?: MapKnowledgeProvider;
 
   // Planet configuration (optional - defaults to terrestrial)
   private planetConfig?: PlanetConfig;
@@ -86,7 +94,9 @@ export class TerrainGenerator {
   constructor(
     seed: string = 'default',
     godCraftedSpawner?: GodCraftedDiscoverySystem,
-    planetConfig?: PlanetConfig
+    planetConfig?: PlanetConfig,
+    animalSpawner?: AnimalSpawner,
+    mapKnowledgeProvider?: MapKnowledgeProvider,
   ) {
     this.seed = seed;
     const seedHash = this.hashString(seed);
@@ -95,8 +105,9 @@ export class TerrainGenerator {
     this.moistureNoise = new PerlinNoise(seedHash + 1000);
     this.temperatureNoise = new PerlinNoise(seedHash + 2000);
     this.geologicalNoise = new PerlinNoise(seedHash + 3000);
-    this.animalSpawner = new WildAnimalSpawningSystem();
+    this.animalSpawner = animalSpawner ?? null;
     this.godCraftedSpawner = godCraftedSpawner;
+    this.mapKnowledgeProvider = mapKnowledgeProvider;
 
     // Apply planet configuration if provided
     if (planetConfig) {
@@ -404,21 +415,26 @@ export class TerrainGenerator {
       }
     }
 
-    // Update MapKnowledge sector terrain data for pathfinding
-    this.updateSectorTerrainData(chunk);
+    // Update MapKnowledge sector terrain data for pathfinding (main thread only)
+    if (this.mapKnowledgeProvider) {
+      this.updateSectorTerrainData(chunk);
+    }
 
     // Place entities (trees, rocks)
     if (world) {
       this.placeEntities(chunk, world);
 
-      // Spawn wild animals in chunk
       const chunkBiome = this.determineChunkBiome(chunk);
-      this.animalSpawner.spawnAnimalsInChunk(world, {
-        x: chunk.x,
-        y: chunk.y,
-        biome: chunkBiome,
-        size: CHUNK_SIZE,
-      });
+
+      // Spawn wild animals in chunk (only when spawner is available)
+      if (this.animalSpawner) {
+        this.animalSpawner.spawnAnimalsInChunk(world, {
+          x: chunk.x,
+          y: chunk.y,
+          biome: chunkBiome,
+          size: CHUNK_SIZE,
+        });
+      }
 
       // Spawn god-crafted content in chunk
       if (this.godCraftedSpawner) {
@@ -439,7 +455,9 @@ export class TerrainGenerator {
    * Sectors may span multiple chunks, so we collect tiles per sector.
    */
   private updateSectorTerrainData(chunk: Chunk): void {
-    const mapKnowledge = getMapKnowledge();
+    if (!this.mapKnowledgeProvider) return;
+    const mapKnowledge = this.mapKnowledgeProvider.getMapKnowledge();
+    const SECTOR_SIZE = this.mapKnowledgeProvider.SECTOR_SIZE;
 
     // Group tiles by sector
     const sectorTiles = new Map<string, Array<{ elevation: number; terrain: string }>>();

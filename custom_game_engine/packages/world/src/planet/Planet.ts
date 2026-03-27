@@ -14,7 +14,8 @@ import { TerrainGenerator } from '../terrain/TerrainGenerator.js';
 import type { Chunk } from '../chunks/Chunk.js';
 import type { Tile } from '../chunks/Tile.js';
 import type { PlanetConfig, PlanetSnapshot } from './PlanetTypes.js';
-import type { WorldMutator, GodCraftedDiscoverySystem } from '@ai-village/core';
+import { WildAnimalSpawningSystem, getMapKnowledge, SECTOR_SIZE, type GodCraftedDiscoverySystem } from '@ai-village/core';
+import type { WorldMutator } from '@ai-village/core';
 import type { BiosphereData } from '../biosphere/BiosphereTypes.js';
 
 /**
@@ -46,7 +47,13 @@ export class Planet {
     this.config = config;
     this.chunkManager = new ChunkManager(2); // Default load radius
     this.nameRegistry = new ChunkNameRegistry();
-    this.terrainGenerator = new TerrainGenerator(config.seed, godCraftedSpawner, config);
+    this.terrainGenerator = new TerrainGenerator(
+      config.seed,
+      godCraftedSpawner,
+      config,
+      new WildAnimalSpawningSystem(),
+      { getMapKnowledge, SECTOR_SIZE },
+    );
     this.godCraftedSpawner = godCraftedSpawner;
   }
 
