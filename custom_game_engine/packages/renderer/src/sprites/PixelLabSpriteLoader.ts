@@ -125,14 +125,36 @@ export class PixelLabSpriteLoader {
   private instances: Map<string, PixelLabCharacterInstance> = new Map();
   private loadingPromises: Map<string, Promise<LoadedPixelLabCharacter>> = new Map();
 
+  private maxConcurrentLoads: number;
+  private activeLoadCount = 0;
+  private pendingImageLoads: Array<{
+    path: string;
+    characterId?: string;
+    priority: number;  // Lower = higher priority
+    resolve: (img: HTMLImageElement) => void;
+    reject: (err: Error) => void;
+  }> = [];
+
+  private maxCharacters: number;
+  private characterAccessOrder: string[] = [];
+  private deferAnimations: boolean;
+
   constructor(basePath: string = SPRITE_BASE_PATH) {
     this.basePath = basePath;
+    const isMobile = typeof navigator !== 'undefined' &&
+      (navigator.maxTouchPoints > 0 || (typeof window !== 'undefined' && window.innerWidth < 768));
+    this.maxConcurrentLoads = isMobile ? 3 : 8;
+    this.maxCharacters = isMobile ? 30 : 100;
+    this.deferAnimations = isMobile;
   }
 
   /**
    * Load a character from its folder (reads metadata.json)
    */
   async loadCharacter(folderId: string): Promise<LoadedPixelLabCharacter> {
+    // Touch LRU before any early return
+    this.touchLRU(folderId);
+
     // Check if already loaded
     if (this.characters.has(folderId)) {
       return this.characters.get(folderId)!;
@@ -150,9 +172,25 @@ export class PixelLabSpriteLoader {
     try {
       const character = await loadPromise;
       this.characters.set(folderId, character);
+      this.evictIfNeeded();
       return character;
     } finally {
       this.loadingPromises.delete(folderId);
+    }
+  }
+
+  private touchLRU(folderId: string): void {
+    const idx = this.characterAccessOrder.indexOf(folderId);
+    if (idx !== -1) this.characterAccessOrder.splice(idx, 1);
+    this.characterAccessOrder.push(folderId);
+  }
+
+  private evictIfNeeded(): void {
+    while (this.characters.size > this.maxCharacters && this.characterAccessOrder.length > 0) {
+      const oldest = this.characterAccessOrder.shift()!;
+      if (this.characters.has(oldest)) {
+        this.unloadCharacter(oldest);
+      }
     }
   }
 
@@ -241,59 +279,63 @@ export class PixelLabSpriteLoader {
         }
       }
 
-      // Only probe for animation frames if we actually found directions.
-      // For single-image sprites (sprite.png) or sprites without animation
-      // directories, probing generates unnecessary 404 requests.
-      // Use a single test fetch for the first animation + first direction to
-      // check whether animations exist at all before probing every combination.
-      let hasAnimationDir = false;
-      if (rotations.size > 0) {
-        try {
-          const testDir = directionNames[0] || 'south';
-          await this.loadImage(
-            `${folderPath}/animations/breathing-idle/${testDir}/frame_000.png`,
-            metadata!.id
-          );
-          hasAnimationDir = true;
-        } catch {
-          // No animation directory — skip all animation probing
+      // On mobile, defer animation loading until animations are actually needed
+      // This saves 40+ fetch requests per character on initial load
+      if (!this.deferAnimations) {
+        // Only probe for animation frames if we actually found directions.
+        // For single-image sprites (sprite.png) or sprites without animation
+        // directories, probing generates unnecessary 404 requests.
+        // Use a single test fetch for the first animation + first direction to
+        // check whether animations exist at all before probing every combination.
+        let hasAnimationDir = false;
+        if (rotations.size > 0) {
+          try {
+            const testDir = directionNames[0] || 'south';
+            await this.loadImage(
+              `${folderPath}/animations/breathing-idle/${testDir}/frame_000.png`,
+              metadata!.id
+            );
+            hasAnimationDir = true;
+          } catch {
+            // No animation directory — skip all animation probing
+          }
         }
-      }
 
-      // Load animations if they exist (flat format)
-      const commonAnimations = hasAnimationDir
-        ? ['breathing-idle', 'idle', 'walking-8-frames', 'walking-4-frames', 'running']
-        : [];
+        // Load animations if they exist (flat format)
+        const commonAnimations = hasAnimationDir
+          ? ['breathing-idle', 'idle', 'walking-8-frames', 'walking-4-frames', 'running']
+          : [];
 
-      for (const animName of commonAnimations) {
-        const animMap = new Map<string, HTMLImageElement[]>();
-        let foundAnyFrames = false;
+        for (const animName of commonAnimations) {
+          const animMap = new Map<string, HTMLImageElement[]>();
+          let foundAnyFrames = false;
 
-        for (const dirName of directionNames) {
-          const frames: HTMLImageElement[] = [];
-          let frameIndex = 0;
+          for (const dirName of directionNames) {
+            const frames: HTMLImageElement[] = [];
+            let frameIndex = 0;
 
-          // Try loading frames until we hit a missing one
-          // File paths use original name (may have hyphens), map keys use normalized name
-          while (true) {
-            const framePath = `${folderPath}/animations/${animName}/${dirName}/frame_${frameIndex.toString().padStart(3, '0')}.png`;
-            try {
-              const img = await this.loadImage(framePath, metadata.id);
-              frames.push(img);
-              foundAnyFrames = true;
-              frameIndex++;
-            } catch {
-              break; // No more frames for this direction
+            // Try loading frames until we hit a missing one
+            // File paths use original name (may have hyphens), map keys use normalized name
+            while (true) {
+              const framePath = `${folderPath}/animations/${animName}/${dirName}/frame_${frameIndex.toString().padStart(3, '0')}.png`;
+              try {
+                const img = await this.loadImage(framePath, metadata.id);
+                frames.push(img);
+                foundAnyFrames = true;
+                frameIndex++;
+              } catch {
+                break; // No more frames for this direction
+              }
+            }
+
+            if (frames.length > 0) {
+              animMap.set(normalizeDirectionName(dirName), frames);
             }
           }
 
-          if (frames.length > 0) {
-            animMap.set(normalizeDirectionName(dirName), frames);
+          if (foundAnyFrames && animMap.size > 0) {
+            animations.set(animName, animMap);
           }
-        }
-
-        if (foundAnyFrames && animMap.size > 0) {
-          animations.set(animName, animMap);
         }
       }
 
@@ -409,19 +451,60 @@ export class PixelLabSpriteLoader {
     };
   }
 
-  private async loadImage(path: string, characterId?: string): Promise<HTMLImageElement> {
-    // Check cache first
+  private async loadImage(path: string, characterId?: string, priority: number = 0): Promise<HTMLImageElement> {
     const cache = getSpriteCache();
     const cached = await cache.getSprite(path);
-    if (cached) {
-      return cached;
-    }
+    if (cached) return cached;
 
-    // Load from network
+    // Queue the network load
+    return new Promise((resolve, reject) => {
+      this.pendingImageLoads.push({ path, characterId, priority, resolve, reject });
+      this.processImageQueue();
+    });
+  }
+
+  private processImageQueue(): void {
+    while (this.activeLoadCount < this.maxConcurrentLoads && this.pendingImageLoads.length > 0) {
+      // Pick highest priority item (lowest priority number)
+      let bestIdx = 0;
+      let bestPriority = this.pendingImageLoads[0]?.priority ?? 0;
+      for (let i = 1; i < this.pendingImageLoads.length; i++) {
+        const p = this.pendingImageLoads[i]?.priority ?? 0;
+        if (p < bestPriority) {
+          bestIdx = i;
+          bestPriority = p;
+        }
+      }
+      const [item] = this.pendingImageLoads.splice(bestIdx, 1);
+      if (!item) break;
+      this.activeLoadCount++;
+      this.doLoadImage(item.path, item.characterId)
+        .then(item.resolve)
+        .catch(item.reject)
+        .finally(() => {
+          this.activeLoadCount--;
+          this.processImageQueue();
+        });
+    }
+  }
+
+  /**
+   * Boost loading priority for a character (call for visible entities).
+   * Moves any pending image loads for this character to high priority.
+   */
+  boostPriority(characterId: string): void {
+    for (const item of this.pendingImageLoads) {
+      if (item.characterId === characterId) {
+        item.priority = -1; // Highest priority
+      }
+    }
+  }
+
+  private doLoadImage(path: string, characterId?: string): Promise<HTMLImageElement> {
+    const cache = getSpriteCache();
     return new Promise((resolve, reject) => {
       const img = new Image();
       img.onload = async () => {
-        // Cache for next time
         await cache.cacheSprite(path, img, characterId);
         resolve(img);
       };
@@ -831,7 +914,11 @@ export class PixelLabSpriteLoader {
    * Check if a character is loaded
    */
   isLoaded(characterFolderId: string): boolean {
-    return this.characters.has(characterFolderId);
+    if (this.characters.has(characterFolderId)) {
+      this.touchLRU(characterFolderId);
+      return true;
+    }
+    return false;
   }
 
   /**

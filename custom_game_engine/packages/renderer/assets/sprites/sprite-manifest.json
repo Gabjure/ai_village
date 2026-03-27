@@ -1,0 +1,3470 @@
+{
+  "generatedAt": 1774586077213,
+  "sprites": {
+    "aardvark": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "adaptable_default": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "adder": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "aether_manta": {
+      "size": 64,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "ageless_default": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "alligator": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "alpine_chough": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "alux_kin": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "anaconda": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "anemone": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "angelfish": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "anteater": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "antelope": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "anubis_v1": {
+      "size": 48,
+      "directions": 8,
+      "hasAnimations": false
+    },
+    "anzar_vel": {
+      "size": 32,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "aquatic_breathing_default": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "arctic_fox_blue": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "arctic_fox_white": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "arctic_hare": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "arctic_tern": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "armadillo": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "athena": {
+      "size": 48,
+      "directions": 8,
+      "hasAnimations": false
+    },
+    "avalanche_lily": {
+      "size": 32,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "azure_hawk": {
+      "size": 48,
+      "directions": 8,
+      "hasAnimations": true
+    },
+    "baboon": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "barrel_wooden": {
+      "size": 32,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "bass": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "bedroll": {
+      "size": 32,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "bee": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "berry-bush": {
+      "size": 32,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "bison": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "bittern": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "blackberry-bush": {
+      "size": 32,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "blackberry-bush-flowering": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "blackberry-bush-fruiting": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "blackberry-bush-mature": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "blackberry-bush-seed": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "blackberry-bush-seeding": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "blackberry-bush-sprout": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "blackberry-bush-vegetative": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "blackberry-bush-withered": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "blackbird": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "blob-alien": {
+      "size": 48,
+      "directions": 8,
+      "hasAnimations": false
+    },
+    "blue_heron": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "blueberry-bush": {
+      "size": 32,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "blueberry-bush-flowering": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "blueberry-bush-fruiting": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "blueberry-bush-mature": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "blueberry-bush-seed": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "blueberry-bush-seeding": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "blueberry-bush-sprout": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "blueberry-bush-vegetative": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "blueberry-bush-withered": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "bouda_kin": {
+      "size": 32,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "brown": {
+      "size": 48,
+      "directions": 8,
+      "hasAnimations": true
+    },
+    "bullfrog": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "bush_berry": {
+      "size": 32,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "butterfly_blue": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "butterfly_monarch": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "butterfly_peacock": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "butterfly_swallowtail": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "buzzard": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "cactus_wren": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "camel": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "camel_bactrian": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "campfire": {
+      "size": 32,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "campfire_animated": {
+      "size": 32,
+      "directions": 4,
+      "hasAnimations": true
+    },
+    "campfire_flames": {
+      "size": 64,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "campfire_frame1": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "campfire_frame2": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "campfire_frame3": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "campfire_frame4": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "campfire_static_backup": {
+      "size": 32,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "cape_buffalo": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "cardinal": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "caribou": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "carp": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "carrot-flowering": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "carrot-fruiting": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "carrot-mature": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "carrot-seed": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "carrot-seeding": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "carrot-sprout": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "carrot-vegetative": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "carrot-withered": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "cat": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "cat_black": {
+      "size": 64,
+      "directions": 4,
+      "hasAnimations": true
+    },
+    "cat_black_v1": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "cat_black_v1_backup_1768788586430": {
+      "size": 32,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "cat_grey": {
+      "size": 64,
+      "directions": 4,
+      "hasAnimations": true
+    },
+    "cat_grey_v1": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "cat_grey_v1_backup_1768788775677": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "cat_orange": {
+      "size": 64,
+      "directions": 4,
+      "hasAnimations": true
+    },
+    "cat_orange_v1": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "cat_orange_v1_backup_1768789033612": {
+      "size": 32,
+      "directions": 4,
+      "hasAnimations": true
+    },
+    "cat_white": {
+      "size": 64,
+      "directions": 4,
+      "hasAnimations": true
+    },
+    "cat_white_v1": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "cat_white_v1_backup_1768789283039": {
+      "size": 32,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "cat_white_v1_backup_1768789547622": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "catfish": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "centipede": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "chameleon": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "chamois": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "chamomile": {
+      "size": 32,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "cheetah": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "chest_wooden": {
+      "size": 32,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "chickadee": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "chicken": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "chicken_backup_1768790330558": {
+      "size": 32,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "chicken_black": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "chicken_black_backup_1768790497243": {
+      "size": 64,
+      "directions": 4,
+      "hasAnimations": true
+    },
+    "chicken_brown": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "chicken_brown_backup_1768790672587": {
+      "size": 64,
+      "directions": 4,
+      "hasAnimations": true
+    },
+    "chicken_white": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "chicken_white_backup_1768790816673": {
+      "size": 64,
+      "directions": 4,
+      "hasAnimations": true
+    },
+    "chimpanzee": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "chipmunk": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "chitinous_armor_default": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "chuckwalla": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "clam": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "clover": {
+      "size": 32,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "clover-flowering": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "clover-fruiting": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "clover-mature": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "clover-seed": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "clover-seeding": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "clover-sprout": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "clover-vegetative": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "clover-withered": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "clownfish": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "cobra_king": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "cockatoo": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "collared_lizard": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "compound_eyes_default": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "condor": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "construction_frame_25": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "construction_frame_50": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "construction_frame_75": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "coot": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "coral": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "coral_fish": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": true
+    },
+    "corn-flowering": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "corn-fruiting": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "corn-mature": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "corn-seed": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "corn-seeding": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "corn-sprout": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "corn-vegetative": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "corn-withered": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "cow": {
+      "size": 32,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "cow_black_white": {
+      "size": 64,
+      "directions": 4,
+      "hasAnimations": true
+    },
+    "cow_brown": {
+      "size": 64,
+      "directions": 4,
+      "hasAnimations": true
+    },
+    "cow_brown_white": {
+      "size": 64,
+      "directions": 4,
+      "hasAnimations": true
+    },
+    "coyote": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "crab": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "crane": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "crawfish": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "cricket": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "crimson_deer": {
+      "size": 48,
+      "directions": 8,
+      "hasAnimations": true
+    },
+    "crocodile": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "crystalline-alien": {
+      "size": 48,
+      "directions": 8,
+      "hasAnimations": false
+    },
+    "cuckoo": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "damselfly": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "death-gods/clockwork-reaper": {
+      "size": 48,
+      "directions": 8,
+      "hasAnimations": false
+    },
+    "death-gods/cosmic-void-entity": {
+      "size": 48,
+      "directions": 8,
+      "hasAnimations": false
+    },
+    "death-gods/day-of-dead-goddess": {
+      "size": 48,
+      "directions": 8,
+      "hasAnimations": false
+    },
+    "death-gods/mushroom-druid": {
+      "size": 48,
+      "directions": 8,
+      "hasAnimations": false
+    },
+    "death-gods/plague-doctor": {
+      "size": 48,
+      "directions": 8,
+      "hasAnimations": false
+    },
+    "death-gods/valraven-goddess": {
+      "size": 48,
+      "directions": 8,
+      "hasAnimations": false
+    },
+    "deer": {
+      "size": 32,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "deer_brown": {
+      "size": 64,
+      "directions": 4,
+      "hasAnimations": true
+    },
+    "deer_spotted": {
+      "size": 64,
+      "directions": 4,
+      "hasAnimations": true
+    },
+    "desert_fox": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "desert_hare": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "desert_lizard": {
+      "size": 48,
+      "directions": 8,
+      "hasAnimations": true
+    },
+    "desert_tortoise": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "divine_wings_default": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "dog": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "dog_black": {
+      "size": 64,
+      "directions": 4,
+      "hasAnimations": true
+    },
+    "dog_brown": {
+      "size": 64,
+      "directions": 4,
+      "hasAnimations": true
+    },
+    "dog_spotted": {
+      "size": 64,
+      "directions": 4,
+      "hasAnimations": true
+    },
+    "dog_white": {
+      "size": 64,
+      "directions": 4,
+      "hasAnimations": true
+    },
+    "dolphin": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "door_metal_closed": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "door_stone_closed": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "door_wood_closed": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "door_wood_open": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "dormouse": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "dove": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "downloads": {
+      "size": 32,
+      "directions": 8,
+      "hasAnimations": true
+    },
+    "dragonfly": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "dream_lotus": {
+      "size": 32,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "drowning_pitcher": {
+      "size": 32,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "dune_specter": {
+      "size": 64,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "echo_moss": {
+      "size": 32,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "eel": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "egret": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "elderberry": {
+      "size": 32,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "elderberry-flowering": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "elderberry-fruiting": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "elderberry-mature": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "elderberry-seed": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "elderberry-seeding": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "elderberry-sprout": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "elderberry-vegetative": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "elderberry-withered": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "electric_eel": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "elephant_african": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "elephant_asian": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "emerald_serpent": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": true
+    },
+    "ermine_white": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "falcon_peregrine": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "fawn": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "fennec_fox": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "fern": {
+      "size": 32,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "fern-mature": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "fern-seed": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "fern-sprout": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "fern-vegetative": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "fern-withered": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "ferret_wild": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "fever_bulrush": {
+      "size": 32,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "fever_fungus": {
+      "size": 32,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "feverfew": {
+      "size": 32,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "fiber": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "finch": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "firefly": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "flamingo": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "floor_dirt": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "floor_stone": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "floor_wood": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "forest-sprite": {
+      "size": 48,
+      "directions": 8,
+      "hasAnimations": false
+    },
+    "forest_bear": {
+      "size": 48,
+      "directions": 8,
+      "hasAnimations": true
+    },
+    "four_arms_default": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "frog_poison_dart": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "frost_stalker": {
+      "size": 64,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "frostbloom": {
+      "size": 32,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "garter_snake": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "gazelle": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "giant_spider": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "gila_monster": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "ginseng": {
+      "size": 32,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "ginseng-mature": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "ginseng-seed": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "ginseng-sprout": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "ginseng-vegetative": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "ginseng-withered": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "giraffe": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "glacier_lichen": {
+      "size": 32,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "goat": {
+      "size": 32,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "goat_black": {
+      "size": 64,
+      "directions": 4,
+      "hasAnimations": true
+    },
+    "goat_brown": {
+      "size": 64,
+      "directions": 4,
+      "hasAnimations": true
+    },
+    "goat_white": {
+      "size": 64,
+      "directions": 4,
+      "hasAnimations": true
+    },
+    "goldcrest": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "golden_fox": {
+      "size": 48,
+      "directions": 8,
+      "hasAnimations": true
+    },
+    "goldfish": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "gopher": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "gorilla": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "grass": {
+      "size": 32,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "grass-flowering": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "grass-fruiting": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "grass-mature": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "grass-seed": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "grass-seeding": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "grass-sprout": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "grass-vegetative": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "grass-withered": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "grasshopper": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "grebe": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "grootslang_rin": {
+      "size": 92,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "ground_squirrel": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "grouse": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "gyrfalcon": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "hare_european": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "harvest_mouse": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "hawk": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "hel": {
+      "size": 48,
+      "directions": 8,
+      "hasAnimations": false
+    },
+    "hermit_crab": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "heron_great_blue": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "high-elf": {
+      "size": 48,
+      "directions": 8,
+      "hasAnimations": false
+    },
+    "hippopotamus": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "holy_aura_default": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "hornbill": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "horned_lizard": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "horse": {
+      "size": 64,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "horse_black": {
+      "size": 64,
+      "directions": 4,
+      "hasAnimations": true
+    },
+    "horse_brown": {
+      "size": 64,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "horse_brown_backup_1768779484794": {
+      "size": 64,
+      "directions": 4,
+      "hasAnimations": true
+    },
+    "horse_chestnut": {
+      "size": 64,
+      "directions": 4,
+      "hasAnimations": true
+    },
+    "horse_white": {
+      "size": 64,
+      "directions": 4,
+      "hasAnimations": true
+    },
+    "human_female_black_dark": {
+      "size": 48,
+      "directions": 8,
+      "hasAnimations": false
+    },
+    "human_female_black_light": {
+      "size": 48,
+      "directions": 8,
+      "hasAnimations": false
+    },
+    "human_female_black_medium": {
+      "size": 48,
+      "directions": 8,
+      "hasAnimations": false
+    },
+    "human_male_black": {
+      "size": 48,
+      "directions": 8,
+      "hasAnimations": false
+    },
+    "human_male_black_dark": {
+      "size": 48,
+      "directions": 8,
+      "hasAnimations": false
+    },
+    "human_male_black_light": {
+      "size": 48,
+      "directions": 8,
+      "hasAnimations": false
+    },
+    "human_male_black_medium": {
+      "size": 48,
+      "directions": 8,
+      "hasAnimations": false
+    },
+    "human_male_blonde": {
+      "size": 48,
+      "directions": 8,
+      "hasAnimations": true
+    },
+    "human_male_blonde_light": {
+      "size": 48,
+      "directions": 8,
+      "hasAnimations": false
+    },
+    "human_male_brown": {
+      "size": 48,
+      "directions": 8,
+      "hasAnimations": true
+    },
+    "human_nonbinary_black": {
+      "size": 48,
+      "directions": 8,
+      "hasAnimations": true
+    },
+    "hyena": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "ibex": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "ibis": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "iguana": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "item_apple": {
+      "size": 32,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "item_axe": {
+      "size": 32,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "item_berry": {
+      "size": 32,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "item_bread": {
+      "size": 32,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "item_fiber": {
+      "size": 32,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "item_fish": {
+      "size": 32,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "item_gold_ore": {
+      "size": 32,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "item_hammer": {
+      "size": 32,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "item_hoe": {
+      "size": 32,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "item_iron_ore": {
+      "size": 32,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "item_meat": {
+      "size": 32,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "item_pickaxe": {
+      "size": 32,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "item_stone": {
+      "size": 32,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "item_wood": {
+      "size": 32,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "jackrabbit": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "jaguar": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "javelina": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "jay_blue": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "jellyfish": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "jerboa": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "jiangshi_vel": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "kangaroo_rat": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "keen_senses_default": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "kestrel": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "killdeer": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "koi": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "lark": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "lavender": {
+      "size": 32,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "lemming": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "lemur": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "leopard": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "limestone": {
+      "size": 32,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "lion": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "lioness": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "lizard_fence": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "lobster": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "loon": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "luminous_toadstool": {
+      "size": 32,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "lus_vel": {
+      "size": 32,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "lynx": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "lynx_canadian": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "macaw_blue": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "macaw_scarlet": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "magma_salamander": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "magpie": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "manatee": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "mandrill": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "manta_ray": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "mantis-alien": {
+      "size": 48,
+      "directions": 8,
+      "hasAnimations": false
+    },
+    "marmot": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "marsh_mallow": {
+      "size": 32,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "marsh_rabbit": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "marten": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "mboi_tuivel": {
+      "size": 32,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "meadowlark": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "memory_reed": {
+      "size": 32,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "mink": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "mole": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "monitor_lizard": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "monkey_capuchin": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "monkey_howler": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "monkey_spider": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "moonpetal": {
+      "size": 32,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "moorhen": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "moose_bull": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "mosquito": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "moss": {
+      "size": 32,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "moss-mature": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "moss-spore": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "moss-sprout": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "moss-vegetative": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "moss-withered": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "moth_emperor": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "moth_luna": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "mountain_goat": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "mountain_hare": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "mountain_lion_tan": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "mountain_thyme": {
+      "size": 32,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "mud_crab": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "mud_puppy": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "mushroom-mature": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "mushroom-spore": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "mushroom-sprout": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "mushroom-vegetative": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "mushroom-withered": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "musk_ox": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "muskrat": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "mussel": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "narwhal": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "newt": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "nightjar": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "nuthatch": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "nutria": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "oak-tree": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "oak-tree-flowering": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "oak-tree-fruiting": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "oak-tree-seed": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "oak-tree-sprout": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "oak-tree-vegetative": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "oak-tree-withered": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "obsidian_beetle": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "octopus": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "odin": {
+      "size": 48,
+      "directions": 8,
+      "hasAnimations": false
+    },
+    "okapi": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "opossum": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "orangutan": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "orca": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "ostrich": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "owl_burrowing": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "owl_elf": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "oyster": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "pangolin": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "panther_black": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "parrot_african_grey": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "partridge": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "peacock": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "peak_sage": {
+      "size": 32,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "peuchen_vel": {
+      "size": 32,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "pig": {
+      "size": 32,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "pig_black": {
+      "size": 64,
+      "directions": 4,
+      "hasAnimations": true
+    },
+    "pig_pink": {
+      "size": 64,
+      "directions": 4,
+      "hasAnimations": true
+    },
+    "pika": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "pike": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "pine-tree": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "pine-tree-seed": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "pine-tree-sprout": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "pine-tree-vegetative": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "pine-tree-withered": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "piranha": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "pixie": {
+      "size": 48,
+      "directions": 8,
+      "hasAnimations": false
+    },
+    "plains_bison": {
+      "size": 48,
+      "directions": 8,
+      "hasAnimations": true
+    },
+    "poison_orchid": {
+      "size": 32,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "polar_bear": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "porcupine": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "potato-flowering": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "potato-fruiting": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "potato-mature": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "potato-seed": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "potato-seeding": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "potato-sprout": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "potato-vegetative": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "potato-withered": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "prairie_dog": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "ptarmigan": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "ptarmigan_white": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "pufferfish": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "puffin": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "punisher-angel": {
+      "size": 48,
+      "directions": 8,
+      "hasAnimations": false
+    },
+    "python": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "qalupalik_vel": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "quail": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "rabbit": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "rabbit_brown": {
+      "size": 64,
+      "directions": 4,
+      "hasAnimations": true
+    },
+    "rabbit_grey": {
+      "size": 64,
+      "directions": 4,
+      "hasAnimations": true
+    },
+    "rabbit_white_v2": {
+      "size": 64,
+      "directions": 4,
+      "hasAnimations": true
+    },
+    "rail": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "raspberry-bush": {
+      "size": 32,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "raspberry-bush-flowering": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "raspberry-bush-fruiting": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "raspberry-bush-mature": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "raspberry-bush-seed": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "raspberry-bush-seeding": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "raspberry-bush-sprout": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "raspberry-bush-vegetative": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "raspberry-bush-withered": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "rattlesnake": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "raven": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "red_deer": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "red_panda": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "redstart": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "reef_shark": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": true
+    },
+    "rhinoceros": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "river_otter": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "roadrunner": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "robin": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "rock_boulder": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "rock_lizard": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "roe_deer": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "sable": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "sage": {
+      "size": 32,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "sage-flowering": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "sage-fruiting": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "sage-mature": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "sage-seed": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "sage-seeding": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "sage-sprout": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "sage-vegetative": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "sage-withered": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "salamander": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "salmon": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "sandstone": {
+      "size": 32,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "scallop": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "scarab_beetle": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "scorpion": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "sea_lion": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "sea_otter": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "sea_turtle": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "sea_urchin": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "seahorse": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "seal_harbor": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "seal_harp": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "secretary_bird": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "serpent_liana": {
+      "size": 32,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "shadowcap": {
+      "size": 32,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "shark_great_white": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "shark_hammerhead": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "sheep": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "sheep_backup_1768790953464": {
+      "size": 32,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "sheep_black": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "sheep_black_backup_1768788351249": {
+      "size": 64,
+      "directions": 4,
+      "hasAnimations": true
+    },
+    "sheep_grey": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "sheep_grey_backup_1768791081590": {
+      "size": 64,
+      "directions": 4,
+      "hasAnimations": true
+    },
+    "sheep_white": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "sheep_white_backup_1768791213358": {
+      "size": 64,
+      "directions": 4,
+      "hasAnimations": true
+    },
+    "shrew": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "shrimp": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "siberian_tiger": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "sidewinder": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "silver_wolf": {
+      "size": 48,
+      "directions": 8,
+      "hasAnimations": true
+    },
+    "skunk": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "sky_edelweiss": {
+      "size": 32,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "sloth": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "slow_worm": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "slug": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "snail": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "snap_maw": {
+      "size": 32,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "snapping_turtle": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "snow_finch": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "snow_goose": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "snow_leopard": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "snowshoe_hare": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "snowy_owl": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "softshell_turtle": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "soul_038706c4-1056-4484-8144-e8cdd3551e88": {
+      "size": 16,
+      "directions": 1,
+      "hasAnimations": false
+    },
+    "soul_057cae95-9021-401a-bc27-4461a894e259": {
+      "size": 24,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "soul_11452730-c8d0-434d-bdf0-486fc4204c21": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "soul_11974010-9385-4b33-8c9f-27793e64baf3": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "soul_1de57574-98f8-449b-a0f3-c974f45dfdde": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "soul_26ab6ad1-3ea4-4217-84c3-41c2de19948d": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "soul_2dd86482-4143-49ee-b9eb-59243a1146ef": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "soul_30588d62-137c-4a3d-b2d3-c575763f3b95": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "soul_922a554b-617f-40ba-83a0-1852d499a9a9": {
+      "size": 16,
+      "directions": 1,
+      "hasAnimations": false
+    },
+    "soul_9a9b4811-4913-43fa-bff9-f244f6e9cc11": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "soul_a3a844b9-3acd-4de2-a653-48aead3495a5": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "soul_a4fc761b-de4e-4185-b403-6be727e29312": {
+      "size": 16,
+      "directions": 1,
+      "hasAnimations": false
+    },
+    "soul_a7bd27ca-e03e-4ee3-bfc3-d7e841fdb5b4": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "soul_b780018a-58e0-4951-a30f-5275dc0e105a": {
+      "size": 16,
+      "directions": 1,
+      "hasAnimations": false
+    },
+    "soul_c5963f2c-348d-45ff-91ef-82d1e475c98e": {
+      "size": 16,
+      "directions": 1,
+      "hasAnimations": false
+    },
+    "soul_e0389226-e82c-4532-9718-4e36a822c8b3": {
+      "size": 16,
+      "directions": 1,
+      "hasAnimations": false
+    },
+    "soul_e4821ffb-d02a-4033-b3d1-9d735798d9d6": {
+      "size": 16,
+      "directions": 1,
+      "hasAnimations": false
+    },
+    "soul_ef367e29-3e8e-4e9b-b0c4-9df9063e928b": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "soul_f1c3036e-e9e6-4134-afae-79b2955593af": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "sparrow": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "spoonbill": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "squid": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "starfish": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "stingray": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "stoat": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "stone_orchid": {
+      "size": 32,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "stork": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "strangler_vine": {
+      "size": 32,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "sturdy_default": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "sturdy_default_v1": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "sulfur_moth": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "sunburst_flower": {
+      "size": 32,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "swallow": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "swamp_frog": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": true
+    },
+    "swordfish": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "tapir": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "tarantula": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "tentacles_default": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "test_sprite": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "thanatos": {
+      "size": 48,
+      "directions": 8,
+      "hasAnimations": false
+    },
+    "thistle": {
+      "size": 32,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "thistle-flowering": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "thistle-fruiting": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "thistle-mature": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "thistle-seed": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "thistle-seeding": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "thistle-sprout": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "thistle-vegetative": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "thistle-withered": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "thrasher": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "thrush": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "tiger_bengal": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "toad": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "toucan": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "tree": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "tree-flowering": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "tree-fruiting": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "tree-seed": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "tree-sprout": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "tree-vegetative": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "tree-withered": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "tree_frog": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "tree_oak_large": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "tree_oak_large_v1": {
+      "size": 64,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "tree_pine": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "tree_pine_v1": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "tree_v1": {
+      "size": 32,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "treecreeper": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "tropical_parrot": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "trout": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "tuna": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "tusked_default": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "valerian": {
+      "size": 32,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "villager": {
+      "size": 48,
+      "directions": 8,
+      "hasAnimations": true
+    },
+    "vole": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "vulture": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "vulture_turkey": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "wall_ice": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "wall_metal": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "wall_mud_brick": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "wall_stone": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "wall_wood": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "walrus": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "warbler": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "warthog": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "water_buffalo": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "water_snake": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "water_strider": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "water_vole": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "waxwing": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "weasel": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "well": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "whale_blue": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "whale_humpback": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "wheat-flowering": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "wheat-fruiting": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "wheat-mature": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "wheat-seed": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "wheat-seeding": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "wheat-sprout": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "wheat-vegetative": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "wheat-withered": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "whisperleaf": {
+      "size": 32,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "wild-garlic": {
+      "size": 32,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "wild-garlic-flowering": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "wild-garlic-fruiting": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "wild-garlic-mature": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "wild-garlic-seed": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "wild-garlic-seeding": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "wild-garlic-sprout": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "wild-garlic-vegetative": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "wild-garlic-withered": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "wild-onion": {
+      "size": 32,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "wild-onion-flowering": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "wild-onion-fruiting": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "wild-onion-mature": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "wild-onion-seed": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "wild-onion-seeding": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "wild-onion-sprout": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "wild-onion-vegetative": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "wild-onion-withered": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "wild_boar_striped": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "wild_sheep": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "wildcat": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "wildebeest": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "wildflower": {
+      "size": 32,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "wildflower-flowering": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "wildflower-fruiting": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "wildflower-mature": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "wildflower-seed": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "wildflower-seeding": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "wildflower-sprout": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "wildflower-vegetative": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "wildflower-withered": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "will_o_wisp_bloom": {
+      "size": 32,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "willow_bark": {
+      "size": 32,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "wind_pine": {
+      "size": 32,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "wolverine": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "woodchuck": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "woodlark": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "woodpecker": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "wren": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "yak": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "yarrow": {
+      "size": 32,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "yarrow-flowering": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "yarrow-fruiting": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "yarrow-mature": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "yarrow-seed": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "yarrow-seeding": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "yarrow-sprout": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "yarrow-vegetative": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "yarrow-withered": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "yelbegen_rin": {
+      "size": 32,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "zebra": {
+      "size": 48,
+      "directions": 4,
+      "hasAnimations": false
+    },
+    "zeus": {
+      "size": 48,
+      "directions": 8,
+      "hasAnimations": false
+    }
+  }
+}

@@ -11,6 +11,21 @@
 import { findSpriteWithFallback, type SpriteTraits } from './SpriteRegistry.js';
 import { SPRITE_BASE_PATH } from './spriteBasePath.js';
 
+// ---------------------------------------------------------------------------
+// Sprite Manifest types (mirrors generate-sprite-manifest.ts output)
+// ---------------------------------------------------------------------------
+
+interface SpriteManifestEntry {
+  size: number;
+  directions: number;
+  hasAnimations: boolean;
+}
+
+interface SpriteManifest {
+  generatedAt: number;
+  sprites: Record<string, SpriteManifestEntry>;
+}
+
 export type SpriteStatus = 'available' | 'missing' | 'generating' | 'unknown';
 
 export interface SpriteInfo {
@@ -451,5 +466,56 @@ export function addKnownSprites(spriteIds: string[]): void {
   for (const id of spriteIds) {
     KNOWN_AVAILABLE_SPRITES.add(id);
     spriteStatusCache.set(id, 'available');
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Manifest loading
+// ---------------------------------------------------------------------------
+
+/**
+ * Load the pre-built sprite manifest from the assets directory.
+ *
+ * On success, replaces the hardcoded KNOWN_AVAILABLE_SPRITES set with the
+ * full manifest contents (which is generated at build time by scanning the
+ * pixellab directory). This eliminates per-sprite HEAD requests on mobile.
+ *
+ * On failure (network error, missing file, malformed JSON) the hardcoded
+ * fallback set remains intact.
+ *
+ * Call this during game initialization, before the first call to lookupSprite.
+ */
+export async function loadSpriteManifest(): Promise<void> {
+  const manifestUrl = `${assetsBasePath}/sprite-manifest.json`;
+  try {
+    const response = await fetch(manifestUrl);
+    if (!response.ok) {
+      console.warn(`[SpriteService] Manifest fetch failed (${response.status}): ${manifestUrl}`);
+      return;
+    }
+
+    const ct = response.headers.get('content-type') ?? '';
+    if (!ct.includes('json') && !ct.includes('octet-stream')) {
+      // SPA HTML fallback — not the manifest
+      console.warn(`[SpriteService] Manifest response is not JSON (content-type: ${ct}), falling back to hardcoded set`);
+      return;
+    }
+
+    const manifest: SpriteManifest = await response.json() as SpriteManifest;
+    if (!manifest || typeof manifest.sprites !== 'object') {
+      throw new Error('Invalid manifest structure: missing "sprites" object');
+    }
+
+    const ids = Object.keys(manifest.sprites);
+    // Replace the known-available set with the manifest contents
+    KNOWN_AVAILABLE_SPRITES.clear();
+    for (const id of ids) {
+      KNOWN_AVAILABLE_SPRITES.add(id);
+      spriteStatusCache.set(id, 'available');
+    }
+
+    console.error(`[SpriteService] Loaded sprite manifest: ${ids.length} sprites (generated ${new Date(manifest.generatedAt).toISOString()})`);
+  } catch (e) {
+    console.warn('[SpriteService] Failed to load sprite manifest, using hardcoded fallback:', e);
   }
 }

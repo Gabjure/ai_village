@@ -240,6 +240,7 @@ import {
   LocalStoragePostcardSource,
   ServerPostcardSource,
   BrowserLLMStatusPanel,
+  loadSpriteManifest,
 } from '@ai-village/renderer';
 import {
   OllamaProvider,
@@ -4286,6 +4287,10 @@ async function main() {
   const renderer = await createRenderer(canvas, chunkManager, terrainGenerator);
   activeRenderer = renderer;
   console.log(`[Main] Renderer created with backend: ${renderer.getStats().backend}`);
+
+  // Load sprite manifest (async, non-blocking) — populates KNOWN_AVAILABLE_SPRITES
+  // from build-time scan instead of per-sprite HEAD requests. Critical for mobile.
+  loadSpriteManifest().catch(() => { /* fallback to hardcoded set */ });
 
   // Destroy renderer on page unload to release WebGL context before the browser re-uses the slot.
   // This is belt-and-suspenders alongside PixiJSRenderer's own beforeunload handler.

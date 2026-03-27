@@ -144,6 +144,15 @@ export type {
   SpriteMapping,
 } from './SpriteRegistry';
 
+// Sprite Service - Sprite lookup, availability, and manifest loading
+export {
+  lookupSprite,
+  loadSpriteManifest,
+  initializeSpriteService,
+  addKnownSprites,
+  markSpriteAvailable,
+} from './SpriteService';
+
 // Sprite Importer - Import custom sprites for planets
 export {
   validateSprite,
