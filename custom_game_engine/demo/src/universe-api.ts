@@ -31,11 +31,124 @@ import {
   type PlanetMetadata,
   type BiosphereData,
 } from './planet-storage.js';
+import { BiosphereGenerator } from '../../packages/world/src/biosphere/BiosphereGenerator.js';
+import type { PlanetConfig } from '../../packages/world/src/planet/PlanetTypes.js';
+import { OpenAICompatProvider } from '@ai-village/llm';
 import crypto from 'crypto';
 import zlib from 'zlib';
 import { promisify } from 'util';
 
 const gunzip = promisify(zlib.gunzip);
+
+// ---------------------------------------------------------------------------
+// Server-side LLM provider for biosphere generation
+// ---------------------------------------------------------------------------
+function createServerLLMProvider(): OpenAICompatProvider | null {
+  const apiKey = process.env.GROQ_API_KEY;
+  const model = process.env.GROQ_MODEL || 'openai/gpt-oss-120b';
+  const baseUrl = process.env.GROQ_BASE_URL || 'https://api.groq.com/openai/v1';
+  if (!apiKey) {
+    console.warn('[UniverseAPI] GROQ_API_KEY not set — server-side biosphere generation disabled');
+    return null;
+  }
+  return new OpenAICompatProvider(model, baseUrl, apiKey);
+}
+
+const serverLLMProvider = createServerLLMProvider();
+
+// Track in-progress biosphere generations
+const activeGenerations = new Map<string, { startedAt: number; progress: string }>();
+
+/**
+ * Trigger async biosphere generation for a planet.
+ * Runs in the background — caller should not await.
+ */
+async function runBiosphereGeneration(planetId: string, planetConfig: PlanetConfig): Promise<void> {
+  if (!serverLLMProvider) {
+    throw new Error('Server-side LLM provider not configured (missing GROQ_API_KEY)');
+  }
+
+  activeGenerations.set(planetId, { startedAt: Date.now(), progress: 'Starting generation...' });
+
+  try {
+    const generator = new BiosphereGenerator(
+      serverLLMProvider,
+      planetConfig,
+      (message: string) => {
+        const entry = activeGenerations.get(planetId);
+        if (entry) entry.progress = message;
+      },
+      { maxSpecies: 20 },
+    );
+
+    const generated = await generator.generateBiosphere();
+
+    // Build reverse map: speciesId -> nicheCategory
+    const speciesNicheCategory = new Map<string, string>();
+    for (const [nicheId, speciesIds] of Object.entries(generated.nicheFilling)) {
+      const niche = generated.niches.find((n) => n.id === nicheId);
+      if (niche) {
+        for (const sid of speciesIds) {
+          speciesNicheCategory.set(sid, niche.category);
+        }
+      }
+    }
+
+    // Map niche category to storage species type
+    function nicheToType(category: string): 'plant' | 'animal' | 'fungus' {
+      if (category === 'producer') return 'plant';
+      if (category === 'decomposer') return 'fungus';
+      return 'animal';
+    }
+
+    // Flatten FoodWeb index into predator-prey array
+    const foodWebEntries: Array<{ predator: string; prey: string; strength: number }> = [];
+    for (const [speciesId, relations] of Object.entries(generated.foodWeb)) {
+      for (const preyId of relations.preys) {
+        foodWebEntries.push({ predator: speciesId, prey: preyId, strength: 1.0 });
+      }
+    }
+
+    // Map generator output to planet-storage BiosphereData shape
+    const storableBiosphere: BiosphereData = {
+      $schema: generated.$schema,
+      species: generated.species.map((s) => ({
+        id: s.id,
+        name: s.name,
+        type: nicheToType(speciesNicheCategory.get(s.id) || 'herbivore'),
+        traits: {
+          bodyPlan: s.bodyPlan,
+          locomotion: s.locomotion,
+          sensorySystem: s.sensorySystem,
+          diet: s.diet,
+          socialStructure: s.socialStructure,
+          defense: s.defense,
+          reproduction: s.reproduction,
+          intelligence: s.intelligence,
+        },
+        habitat: [s.nativeWorld],
+        diet: [s.diet],
+      })),
+      foodWeb: foodWebEntries,
+      niches: generated.niches.map((n) => ({
+        id: n.id,
+        name: n.name,
+        conditions: { category: n.category, energySource: n.energySource },
+        species: generated.nicheFilling[n.id] || [],
+      })),
+      generatedAt: generated.metadata.generatedAt,
+      generationDurationMs: generated.metadata.generationTimeMs,
+    };
+
+    await planetStorage.saveBiosphere(planetId, storableBiosphere);
+    console.log(`[UniverseAPI] Biosphere generation complete for ${planetId}: ${generated.metadata.totalSpecies} species`);
+  } catch (error: any) {
+    console.error(`[UniverseAPI] Biosphere generation failed for ${planetId}:`, error);
+    throw error;
+  } finally {
+    activeGenerations.delete(planetId);
+  }
+}
 
 /**
  * Create and configure the universe API router
@@ -516,9 +629,26 @@ export function createUniverseApiRouter(): Router {
 
       console.log(`[UniverseAPI] Created planet ${planetId} (${name}) in universe ${universeId}`);
 
+      // Trigger async biosphere generation if requested
+      let biosphereGenerationStarted = false;
+      if (generateBiosphere && serverLLMProvider) {
+        const planetConfig: PlanetConfig = {
+          id: planetId,
+          name,
+          type: type as PlanetConfig['type'],
+          seed,
+        };
+        // Fire and forget — don't block the response
+        runBiosphereGeneration(planetId, planetConfig).catch((err) => {
+          console.error(`[UniverseAPI] Background biosphere generation failed for ${planetId}:`, err);
+        });
+        biosphereGenerationStarted = true;
+      }
+
       res.status(201).json({
         success: true,
         planet: metadata,
+        biosphereGenerationStarted,
       });
     } catch (error: any) {
       console.error('[UniverseAPI] Error creating planet:', error);
@@ -656,6 +786,17 @@ export function createUniverseApiRouter(): Router {
           ecosystems: biosphere.ecosystems || [],
           simulationYears: biosphere.simulationYears || 0,
         });
+      } else if (activeGenerations.has(planetId)) {
+        // Generation is in progress
+        const gen = activeGenerations.get(planetId)!;
+        res.json({
+          complete: false,
+          generating: true,
+          startedAt: gen.startedAt,
+          progress: gen.progress,
+          species: [],
+          message: 'Server-side biosphere generation in progress',
+        });
       } else {
         // No biosphere yet - tell client to use local simulation
         // This returns 200 to avoid console errors, with a flag for local simulation
@@ -668,6 +809,69 @@ export function createUniverseApiRouter(): Router {
       }
     } catch (error: any) {
       console.error('[UniverseAPI] Error getting generation status:', error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  /**
+   * POST /api/multiverse/planet/:planetId/generate-biosphere
+   * Trigger server-side biosphere generation for an existing planet
+   */
+  router.post('/planet/:planetId/generate-biosphere', async (req: Request, res: Response) => {
+    try {
+      const { planetId } = req.params;
+
+      if (!serverLLMProvider) {
+        return res.status(503).json({
+          error: 'Server-side LLM provider not configured (missing GROQ_API_KEY)',
+        });
+      }
+
+      const metadata = await planetStorage.getPlanetMetadata(planetId);
+      if (!metadata) {
+        return res.status(404).json({ error: 'Planet not found' });
+      }
+
+      // Check if already generating
+      if (activeGenerations.has(planetId)) {
+        return res.status(409).json({
+          error: 'Biosphere generation already in progress',
+          startedAt: activeGenerations.get(planetId)!.startedAt,
+        });
+      }
+
+      // Check if biosphere already exists
+      const existing = await planetStorage.getBiosphere(planetId);
+      if (existing && existing.species && existing.species.length > 0) {
+        const force = req.body?.force === true;
+        if (!force) {
+          return res.status(409).json({
+            error: 'Biosphere already exists. Pass { "force": true } to regenerate.',
+            speciesCount: existing.species.length,
+          });
+        }
+      }
+
+      const planetConfig: PlanetConfig = {
+        id: metadata.id,
+        name: metadata.name,
+        type: metadata.type as PlanetConfig['type'],
+        seed: metadata.seed,
+      };
+
+      // Fire and forget
+      runBiosphereGeneration(planetId, planetConfig).catch((err) => {
+        console.error(`[UniverseAPI] Background biosphere generation failed for ${planetId}:`, err);
+      });
+
+      res.status(202).json({
+        success: true,
+        message: 'Biosphere generation started',
+        planetId,
+        statusUrl: `/api/multiverse/planet/${planetId}/generation-status`,
+      });
+    } catch (error: any) {
+      console.error('[UniverseAPI] Error triggering biosphere generation:', error);
       res.status(500).json({ error: error.message });
     }
   });
