@@ -171,8 +171,10 @@ export enum ComponentType {
   Body = 'body',
   Species = 'species',
   Genetic = 'genetic',
+  ExtinctionVortexMonitor = 'extinction_vortex_monitor',
   Biochemistry = 'biochemistry',
   CapabilityProfile = 'capability_profile',
+  TimeCapsuleDiscovery = 'time_capsule_discovery',
 
   // Magic & Divine
   Magic = 'magic',  // Monolithic magic component (migration to split components in progress - see MagicComponentMigration.ts)

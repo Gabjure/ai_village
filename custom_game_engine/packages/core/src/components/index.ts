@@ -379,6 +379,9 @@ export * from './GeneticComponent.js';
 // Biochemistry (neurotransmitters, nurture/trauma)
 export * from './BiochemistryComponent.js';
 export { BiochemistryComponent } from './BiochemistryComponent.js';
+// Capability profile (genome + biochemistry derived affordances)
+export * from './CapabilityProfileComponent.js';
+export { CapabilityProfileComponent } from './CapabilityProfileComponent.js';
 // Plant knowledge system (agent learning about plants)
 export * from './PlantKnowledgeComponent.js';
 export { PlantKnowledgeComponent } from './PlantKnowledgeComponent.js';
@@ -1431,3 +1434,6 @@ export {
   type SettlementMetadata,
   type SettlementRole,
 } from './SettlementComponent.js';
+
+export { createExtinctionVortexMonitor } from './ExtinctionVortexMonitorComponent.js';
+export type { ExtinctionVortexMonitorComponent, ExtinctionVortexPhase, ExtinctionMetrics, ExtinctionSurvivorData } from './ExtinctionVortexMonitorComponent.js';

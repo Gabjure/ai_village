@@ -283,6 +283,7 @@ import { ConversionWarfareSystem } from './ConversionWarfareSystem.js';
 // Divinity - World Impact
 import { TerrainModificationSystem } from './TerrainModificationSystem.js';
 import { SpeciesCreationSystem } from './SpeciesCreationSystem.js';
+import { ExtinctionVortexSystem } from './ExtinctionVortexSystem.js';
 import { DivineWeatherControl } from './DivineWeatherControl.js';
 import { DivineBodyModification } from './DivineBodyModification.js';
 import { MassEventSystem } from './MassEventSystem.js';
@@ -661,6 +662,7 @@ export function registerAllSystems(
     gameLoop.systemRegistry.register(new AnimalGroupSystem());
     gameLoop.systemRegistry.register(new PredatorPreyEcologySystem());
     gameLoop.systemRegistry.register(new QuarantineSystem());
+    gameLoop.systemRegistry.register(new ExtinctionVortexSystem());
   }
 
   // ============================================================================
