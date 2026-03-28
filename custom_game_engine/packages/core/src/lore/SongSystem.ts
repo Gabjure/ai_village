@@ -37,6 +37,8 @@ export interface SongSystemConfig {
   audioBasePath: string;
   /** Song catalogue for this game. Empty array = no songs (silence). */
   songCatalogue: readonly SongEntry[];
+  /** Whether audio playback is enabled. When false, lore tracking still runs but no audio plays. */
+  musicEnabled?: boolean;
 }
 
 /**
@@ -89,6 +91,7 @@ export class SongSystem extends BaseSystem {
 
   private readonly audioBasePath: string;
   private readonly songCatalogue: readonly SongEntry[];
+  private readonly musicEnabled: boolean;
 
   private songsByOccasion = new Map<SongOccasion, SongEntry[]>();
   private currentAudio: HTMLAudioElement | null = null;
@@ -124,6 +127,7 @@ export class SongSystem extends BaseSystem {
     super();
     this.audioBasePath = config?.audioBasePath ?? DEFAULT_AUDIO_BASE_PATH;
     this.songCatalogue = config?.songCatalogue ?? NORN_SONG_CATALOGUE;
+    this.musicEnabled = config?.musicEnabled ?? true;
   }
 
   protected onInitialize(): void {
@@ -135,7 +139,9 @@ export class SongSystem extends BaseSystem {
     this.buildOccasionIndex();
     this.loadPlayHistory();
     this.subscribeToEvents();
-    this.addGestureListeners();
+    if (this.musicEnabled) {
+      this.addGestureListeners();
+    }
     this.initialized = true;
   }
 
@@ -221,6 +227,10 @@ export class SongSystem extends BaseSystem {
     const song = this.selectBestSong(pool, occasion);
     if (!song) return;
     this.recordPlay(song, occasion);
+
+    // When music is disabled, track lore (above) but skip audio playback
+    if (!this.musicEnabled) return;
+
     const url = this.audioBasePath + encodeURIComponent(song.filename);
 
     if (this.currentAudio && !this.currentAudio.paused) {

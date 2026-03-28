@@ -1175,6 +1175,7 @@ export function registerAllSystems(
   gameLoop.systemRegistry.register(new SongSystem({
     audioBasePath: '/mvee/audio/',
     songCatalogue: MVEE_SONG_CATALOGUE,
+    musicEnabled: false, // Disabled until MVEE has its own generated soundtrack
   }));
 
   // ============================================================================
