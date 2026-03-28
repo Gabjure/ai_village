@@ -74,7 +74,7 @@ const CATEGORY_MAP: Record<string, PortableMythCategory> = {
   divine_council: 'covenant',
 
   // Moral/teaching
-  parable: 'trickster',
+  parable: 'covenant',
   commandment: 'covenant',
   warning_tale: 'betrayal',
   reward_tale: 'covenant',
@@ -120,7 +120,7 @@ const CATEGORY_MAP: Record<string, PortableMythCategory> = {
   // Punishment/protection
   punishment_tale: 'betrayal',
   protection_miracle: 'hero_journey',
-  weather_miracle: 'stolen_fire',
+  weather_miracle: 'transformation',
   fertility_miracle: 'creation',
   answered_prayer: 'covenant',
 };
@@ -148,10 +148,25 @@ export function meetsExportThreshold(myth: Myth): boolean {
 
 /**
  * Map an MVEE MythCategory string to a PortableMythCategory.
- * Falls back to 'origin' for unmapped categories.
+ * Throws for unmapped categories.
  */
 export function mapMythCategory(category: string): PortableMythCategory {
-  return CATEGORY_MAP[category] ?? 'origin';
+  const mapped = CATEGORY_MAP[category];
+  if (!mapped) {
+    throw new Error(`Unmapped MythCategory: ${category}`);
+  }
+  return mapped;
+}
+
+/**
+ * Map MVEE MythStatus to PortableMythStatus.
+ * 'forgotten' is not a valid PortableMythStatus, so it maps to 'apocryphal'.
+ */
+export function mapMythStatus(status: MythStatus | 'forgotten'): PortableMythStatus {
+  if (status === 'forgotten') {
+    return 'apocryphal';
+  }
+  return status as PortableMythStatus;
 }
 
 /**
@@ -207,8 +222,8 @@ export function exportMyth(
     }
   }
 
-  // Map category
-  const category = mapMythCategory(mythCategory ?? 'origin');
+  // Map category — if no category provided, default to 'origin'
+  const category = mythCategory ? mapMythCategory(mythCategory) : 'origin';
 
   return {
     mythId: myth.id,
@@ -229,7 +244,7 @@ export function exportMyth(
       : undefined,
     mutations: [], // Mutation tracking is future work
     canonicityScore,
-    status: myth.status as PortableMythStatus,
+    status: mapMythStatus(myth.status),
     exportedAt: new Date().toISOString(),
     tellingCount: myth.tellingCount,
     believerCount: myth.knownBy.length,

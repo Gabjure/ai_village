@@ -10,6 +10,7 @@ import {
   computeCanonicity,
   meetsExportThreshold,
   mapMythCategory,
+  mapMythStatus,
   mapPersonality,
   exportMyth,
   exportEligibleMyths,
@@ -164,8 +165,34 @@ describe('MythExporter', () => {
       expect(mapMythCategory('end_times')).toBe('apocalypse');
     });
 
-    it('falls back to origin for unmapped categories', () => {
-      expect(mapMythCategory('completely_unknown_category')).toBe('origin');
+    it('throws on unmapped categories', () => {
+      expect(() => mapMythCategory('completely_unknown_category')).toThrow('Unmapped MythCategory: completely_unknown_category');
+    });
+
+    it('maps parable to covenant', () => {
+      expect(mapMythCategory('parable')).toBe('covenant');
+    });
+
+    it('maps weather_miracle to transformation', () => {
+      expect(mapMythCategory('weather_miracle')).toBe('transformation');
+    });
+  });
+
+  describe('mapMythStatus', () => {
+    it('passes through canonical status unchanged', () => {
+      expect(mapMythStatus('canonical')).toBe('canonical');
+    });
+
+    it('maps forgotten to apocryphal', () => {
+      expect(mapMythStatus('forgotten' as any)).toBe('apocryphal');
+    });
+
+    it('passes through all standard statuses', () => {
+      expect(mapMythStatus('oral')).toBe('oral');
+      expect(mapMythStatus('recorded')).toBe('recorded');
+      expect(mapMythStatus('disputed')).toBe('disputed');
+      expect(mapMythStatus('apocryphal')).toBe('apocryphal');
+      expect(mapMythStatus('heretical')).toBe('heretical');
     });
   });
 
