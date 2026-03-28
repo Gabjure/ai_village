@@ -714,7 +714,7 @@ export class UniversePostcardsGallery {
         agentEl.appendChild(name);
 
         const detail = document.createElement('span');
-        detail.textContent = ` (${agent.species}, age ${agent.age.toFixed(0)})`;
+        detail.textContent = ` (${agent.species}, age ${this.formatAgentAge(agent.age)})`;
         detail.style.cssText = 'color: #666;';
         agentEl.appendChild(detail);
 
@@ -1017,7 +1017,7 @@ export class UniversePostcardsGallery {
         agentEl.appendChild(name);
 
         const detail = document.createElement('span');
-        detail.textContent = `${agent.species}, age ${agent.age.toFixed(0)}`;
+        detail.textContent = `${agent.species}, age ${this.formatAgentAge(agent.age)}`;
         detail.style.cssText = 'color: #777;';
         agentEl.appendChild(detail);
 
@@ -1802,6 +1802,13 @@ export class UniversePostcardsGallery {
   }
 
   // ─── Utilities ───────────────────────────────────────────────────────────────
+
+  private formatAgentAge(age: unknown): string {
+    if (typeof age !== 'number' || !Number.isFinite(age)) {
+      return '0';
+    }
+    return age.toFixed(0);
+  }
 
   private relativeDate(iso: string): string {
     const now = Date.now();
