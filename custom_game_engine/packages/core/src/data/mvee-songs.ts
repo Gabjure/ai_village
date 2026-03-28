@@ -11,7 +11,11 @@
 import type { SongEntry } from '../lore/SongSystem.js';
 
 export const MVEE_SONG_CATALOGUE: readonly SongEntry[] = [
-  // Event-driven tracks only — ambient drone tracks removed (board directive: no generative tones)
+  // Ambient (4 tracks)
+  { filename: 'Void Garden.mp3', occasion: 'ambient' },
+  { filename: 'Stardust Whisper.mp3', occasion: 'ambient' },
+  { filename: 'Cosmic Drift.mp3', occasion: 'ambient' },
+  { filename: 'Eternal Hum.mp3', occasion: 'ambient' },
   // Grief (2 tracks)
   { filename: 'Last Light.mp3', occasion: 'grief' },
   { filename: 'Fading Echo.mp3', occasion: 'grief' },
