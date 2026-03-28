@@ -172,6 +172,7 @@ export enum ComponentType {
   Species = 'species',
   Genetic = 'genetic',
   ExtinctionVortexMonitor = 'extinction_vortex_monitor',
+  ExtinctionSurvivor = 'extinction_survivor',
   Biochemistry = 'biochemistry',
   CapabilityProfile = 'capability_profile',
   TimeCapsuleDiscovery = 'time_capsule_discovery',

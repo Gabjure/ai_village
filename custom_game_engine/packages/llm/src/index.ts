@@ -182,6 +182,7 @@ export * from './TrajectoryPromptBuilder';
 // ============================================================================
 
 export * from './ResponseParser';
+export * from './EmoteParser';
 export * from './ActionDefinitions';
 export * from './SkillContextTemplates';
 

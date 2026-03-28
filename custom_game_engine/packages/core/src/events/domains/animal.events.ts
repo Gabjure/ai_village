@@ -103,6 +103,36 @@ export interface AnimalEvents {
     adaptationScore: number;
     totalTicks: number;
   };
+  // Extinction vortex events
+  'species:extinction_warning': {
+    speciesId: string;
+    phase: 'warning';
+    metrics: { fPopulation: number; dccPopulation: number; populationSize: number };
+  };
+  'species:extinction_grace_started': {
+    speciesId: string;
+    graceTicksRemaining: number;
+    metrics: { fPopulation: number; dccPopulation: number; populationSize: number };
+  };
+  'species:extinction_grace_tick': {
+    speciesId: string;
+    graceTicksRemaining: number;
+  };
+  'species:extinct': {
+    speciesId: string;
+    finalMetrics: { fPopulation: number; dccPopulation: number; populationSize: number };
+    survivorCount: number;
+  };
+  'species:extinction_recovered': {
+    speciesId: string;
+    fromPhase: 'warning' | 'grace';
+    metrics: { fPopulation: number; dccPopulation: number; populationSize: number };
+  };
+  'species:survivors_flagged': {
+    speciesId: string;
+    survivorCount: number;
+    lastSurvivorGeneration: number;
+  };
 }
 export type AnimalEventType = keyof AnimalEvents;
 export type AnimalEventData = AnimalEvents[AnimalEventType];

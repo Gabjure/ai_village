@@ -284,6 +284,7 @@ import { ConversionWarfareSystem } from './ConversionWarfareSystem.js';
 import { TerrainModificationSystem } from './TerrainModificationSystem.js';
 import { SpeciesCreationSystem } from './SpeciesCreationSystem.js';
 import { ExtinctionVortexSystem } from './ExtinctionVortexSystem.js';
+import { ExtinctionSurvivorSystem } from './ExtinctionSurvivorSystem.js';
 import { DivineWeatherControl } from './DivineWeatherControl.js';
 import { DivineBodyModification } from './DivineBodyModification.js';
 import { MassEventSystem } from './MassEventSystem.js';
@@ -666,6 +667,7 @@ export function registerAllSystems(
     gameLoop.systemRegistry.register(new PredatorPreyEcologySystem());
     gameLoop.systemRegistry.register(new QuarantineSystem());
     gameLoop.systemRegistry.register(new ExtinctionVortexSystem());
+    gameLoop.systemRegistry.register(new ExtinctionSurvivorSystem());
     gameLoop.systemRegistry.register(new CulturalDriftSystem());
   }
 

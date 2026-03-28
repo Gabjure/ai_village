@@ -5,7 +5,7 @@ import type { Entity } from '../ecs/Entity.js';
 import { EntityImpl } from '../ecs/Entity.js';
 import type { EventBus } from '../events/EventBus.js';
 import type { Myth, MythologyComponent } from '../components/MythComponent.js';
-import { tellMyth } from '../components/MythComponent.js';
+import { tellMyth, advanceMythStatus } from '../components/MythComponent.js';
 import type { SpiritualComponent } from '../components/SpiritualComponent.js';
 import type { PersonalityComponent } from '../components/PersonalityComponent.js';
 import type { DeityComponent } from '../components/DeityComponent.js';
@@ -289,6 +289,58 @@ export class MythRetellingSystem extends BaseSystem {
           (targetDeity as EntityImpl).addComponent(updatedMythology);
         }
       }
+    }
+
+    // Check for status transitions on the final myth
+    const statusResult = advanceMythStatus(finalMyth);
+    if (statusResult.statusChanged) {
+      // Update the myth with new status
+      const targetDeityId = mutationResult?.newDeityId || deityEntity.id;
+      const targetDeity = allDeities.find(d => d.id === targetDeityId);
+      if (targetDeity) {
+        const targetMythology = targetDeity.components.get(CT.Mythology) as MythologyComponent | undefined;
+        if (targetMythology) {
+          const statusUpdated = this._updateMythology(targetMythology, finalMyth.id, statusResult.myth);
+          (targetDeity as EntityImpl).addComponent(statusUpdated);
+        }
+      }
+
+      // Emit lore event for status change
+      if (statusResult.newStatus === 'canonical') {
+        this.events.emitGeneric('lore:myth_canonized', {
+          mythId: finalMyth.id,
+          deityId: finalMyth.deityId,
+          believerCount: finalMyth.knownBy.length,
+          canonicityScore: Math.min(1.0, finalMyth.knownBy.length / 50 + finalMyth.tellingCount / 100),
+          sourceGame: 'mvee',
+        });
+      }
+    }
+
+    // Emit lore:myth_mutated when a mutation occurred
+    if (mutationResult) {
+      this.events.emitGeneric('lore:myth_mutated', {
+        mythId: finalMyth.id,
+        mutation: {
+          fromVersion: myth.currentVersion,
+          toVersion: finalMyth.currentVersion,
+          mutationType: mutationResult.mutationType,
+          description: mutationResult.changeDescription,
+          sourceGame: 'mvee',
+          timestamp: new Date().toISOString(),
+        },
+        sourceGame: 'mvee',
+      });
+    }
+
+    // Emit lore:myth_disputed when attribution changes
+    if (mutationResult?.attributionChanged) {
+      this.events.emitGeneric('lore:myth_disputed', {
+        mythId: myth.id,
+        disputedBy: narrator.id,
+        reason: `Attribution changed: ${mutationResult.changeDescription}`,
+        sourceGame: 'mvee',
+      });
     }
   }
 

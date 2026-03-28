@@ -20,6 +20,7 @@ import type { RelationshipComponent } from '../components/RelationshipComponent.
 import { ensureRelationshipComponent } from '../components/RelationshipComponent.js';
 import type { InterestsComponent } from '../components/InterestsComponent.js';
 import type { SocialMemoryComponent } from '../components/SocialMemoryComponent.js';
+import { getCultureAffinityScore, type GeneticComponent } from '../components/GeneticComponent.js';
 import type { ConversationQuality } from '../conversation/ConversationQuality.js';
 import type { TopicId } from '../components/InterestsComponent.js';
 
@@ -48,21 +49,25 @@ export class RelationshipConversationSystem extends BaseSystem {
    * EventMap defines: conversationId, participants, duration, agent1?, agent2?, topics?, depth?, messageCount?, quality?
    */
   private handleConversationEnded(data: GameEventMap['conversation:ended']): void {
+    const conversationData = data as GameEventMap['conversation:ended'] & {
+      topicsDiscussed?: string[];
+      overallQuality?: number;
+    };
 
     // EventMap has agent1? and agent2? as optional EntityId
-    if (!data.agent1 || !data.agent2) {
-      console.warn('[RelationshipConversationSystem] Conversation ended without agent1/agent2:', data);
+    if (!conversationData.agent1 || !conversationData.agent2) {
+      console.warn('[RelationshipConversationSystem] Conversation ended without agent1/agent2:', conversationData);
       return;
     }
 
-    const agent1Id: EntityId = data.agent1;
-    const agent2Id: EntityId = data.agent2;
+    const agent1Id: EntityId = conversationData.agent1;
+    const agent2Id: EntityId = conversationData.agent2;
 
     // EventMap has topics?: string[], but we treat them as TopicId (string union).
     // This is safe because ConversationSystem emits TopicId values, but EventMap uses string[] for flexibility.
-    const topics: TopicId[] = (data.topics ?? []) as TopicId[];
-    const qualityScore = data.quality ?? 0.5;
-    const depth = data.depth ?? 0.5;
+    const topics: TopicId[] = (conversationData.topics ?? conversationData.topicsDiscussed ?? []) as TopicId[];
+    const qualityScore = conversationData.quality ?? conversationData.overallQuality ?? 0.5;
+    const depth = conversationData.depth ?? 0.5;
 
     const entity1 = this.world.getEntity(agent1Id);
     const entity2 = this.world.getEntity(agent2Id);
@@ -132,6 +137,18 @@ export class RelationshipConversationSystem extends BaseSystem {
     relationship.lastInteraction = this.world!.tick;
     relationship.interactionCount++;
 
+    const cultureAffinity = this.getPairCultureAffinity(self, partner);
+    const relationshipMultiplier = 0.75 + cultureAffinity * 0.5; // 1.0 at neutral
+    const partnerRelationship = partner
+      .getComponent<RelationshipComponent>(CT.Relationship)
+      ?.relationships
+      .get(self.id);
+    const reciprocityStrength = this.getReciprocityStrength(
+      relationship.trust,
+      partnerRelationship?.trust,
+      cultureAffinity
+    );
+
     // Familiarity always increases
     const familiarityGain = 2 + quality.overallQuality * 3;
     relationship.familiarity = Math.min(100, relationship.familiarity + familiarityGain);
@@ -142,15 +159,19 @@ export class RelationshipConversationSystem extends BaseSystem {
       relationship.affinity = Math.min(100, Math.max(-100, relationship.affinity + affinityGain));
     }
 
-    // Trust grows with emotional connection
-    if (quality.emotionalConnection > 0.5) {
-      const trustGain = quality.emotionalConnection * 3;
+    // Trust gain/loss scales with cultural affinity and reciprocity.
+    if (quality.overallQuality >= 0.5) {
+      const trustGain = (quality.overallQuality - 0.45) * 6 * relationshipMultiplier * reciprocityStrength;
       relationship.trust = Math.min(100, relationship.trust + trustGain);
+    } else {
+      const trustLossResistance = 1.3 - cultureAffinity * 0.5;
+      const trustLoss = (0.5 - quality.overallQuality) * 4 * trustLossResistance;
+      relationship.trust = Math.max(0, relationship.trust - trustLoss);
     }
 
     // Shared information counts as shared memories
     if (quality.informationExchange > 0.3) {
-      relationship.sharedMemories++;
+      relationship.sharedMemories += reciprocityStrength > 1.1 ? 2 : 1;
     }
   }
 
@@ -163,8 +184,10 @@ export class RelationshipConversationSystem extends BaseSystem {
     const interests = self.getComponent<InterestsComponent>(CT.Interests);
     if (!interests) return;
 
+    const reciprocityMultiplier = 0.75 + this.getPairCultureAffinity(self, partner) * 0.5;
+
     // Only record if conversation was good
-    if (quality.topicResonance < 0.4) return;
+    if (quality.topicResonance * reciprocityMultiplier < 0.4) return;
 
     for (const interest of interests.interests) {
       if (topics.includes(interest.topic)) {
@@ -201,6 +224,7 @@ export class RelationshipConversationSystem extends BaseSystem {
     // Check existing memory to avoid duplicates
     const existingMemory = socialMemory.socialMemories?.get(teacher.id);
     const existingFacts = existingMemory?.knownFacts ?? [];
+    const reciprocityMultiplier = 0.75 + this.getPairCultureAffinity(learner, teacher) * 0.5;
 
     // Add known facts about partner's interests
     for (const topic of topicsDiscussed) {
@@ -213,7 +237,7 @@ export class RelationshipConversationSystem extends BaseSystem {
           socialMemory.learnAboutAgent({
             agentId: teacher.id,
             fact: `interested in ${topic}`,
-            confidence: 0.7,
+            confidence: Math.min(1, 0.7 * reciprocityMultiplier),
             source: 'conversation',
           });
         } else {
@@ -233,5 +257,26 @@ export class RelationshipConversationSystem extends BaseSystem {
     // Check if the component has the internal _socialMemories Map
     // We use 'in' operator to check property existence without type casting
     return '_socialMemories' in component && component['_socialMemories' as keyof typeof component] instanceof Map;
+  }
+
+  private getPairCultureAffinity(self: EntityImpl, partner: EntityImpl): number {
+    return (this.getCultureAffinity(self) + this.getCultureAffinity(partner)) / 2;
+  }
+
+  private getCultureAffinity(entity: EntityImpl): number {
+    return getCultureAffinityScore(entity.getComponent<GeneticComponent>(CT.Genetic));
+  }
+
+  private getReciprocityStrength(
+    selfTrust: number,
+    partnerTrust: number | undefined,
+    cultureAffinity: number
+  ): number {
+    if (partnerTrust === undefined) {
+      return 0.8 + cultureAffinity * 0.4;
+    }
+    const alignment = 1 - Math.min(1, Math.abs(selfTrust - partnerTrust) / 100);
+    const reciprocity = (selfTrust + partnerTrust) / 200;
+    return 0.8 + (alignment * 0.25) + (reciprocity * 0.25) + (cultureAffinity * 0.2);
   }
 }

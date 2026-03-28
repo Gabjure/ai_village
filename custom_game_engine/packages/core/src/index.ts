@@ -78,6 +78,7 @@ export {
 // ============================================================================
 export * from './species/index.js';
 export * from './skills/index.js';
+export * from './capabilities/index.js';
 
 // ============================================================================
 // Buildings & City Management
@@ -371,6 +372,25 @@ export {
   suggestBuildingFromStorage,
   type StorageStats,
 } from './utils/StorageContext.js';
+
+// Genetic Time Capsule - Species genome archival and discovery system
+export type {
+  DepositType, DepositContext, SpeciesStatus,
+  CapsuleDepositor, CapsuleProvenance, GenomicIntegrity, DiscoveryHints,
+  GenomeCapsuleV1, SpeciesCatalogEntry, ArchiveIndex, SpeciesIndex,
+  AttributionGeneration, AttributionDisplay,
+} from './types/GenomeCapsule.js';
+
+export { GeneticTimeCapsuleService } from './services/GeneticTimeCapsuleService.js';
+export type { CreateCapsuleParams } from './services/GeneticTimeCapsuleService.js';
+
+export { TimeCapsuleDiscoveryComponent } from './components/TimeCapsuleDiscoveryComponent.js';
+export type {
+  DiscoveryStage, DiscoveryChannel, TimeCapsuleDiscoveryData,
+  DiscoveryCandidate,
+  ArchaeologicalDiscoveryChannel, GeneticEchoDiscoveryChannel,
+  DivineRevelationDiscoveryChannel, ExtinctionArchaeologyDiscoveryChannel,
+} from './components/TimeCapsuleDiscoveryComponent.js';
 
 // ============================================================================
 // Knowledge & Affordances

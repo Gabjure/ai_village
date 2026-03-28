@@ -17,6 +17,7 @@ import type { ResourceComponent } from '../components/ResourceComponent.js';
 import type { PlantComponent } from '../components/PlantComponent.js';
 import type { ConversationComponent } from '../components/ConversationComponent.js';
 import type { MagicComponent } from '../components/MagicComponent.js';
+import { getCultureAffinityScore, type GeneticComponent } from '../components/GeneticComponent.js';
 import { isHungry } from '../components/NeedsComponent.js';
 import { isInConversation, startConversation, ensureConversationComponent } from '../components/ConversationComponent.js';
 import { calculateFarmingContext, calculateFarmingUtilities, shouldFarm } from './FarmingUtilityCalculator.js';
@@ -138,7 +139,7 @@ export class ScriptedDecisionProcessor {
     }
     // NOTE: Following continues until LLM explicitly changes behavior
     // Start conversation
-    if ((currentBehavior === 'wander' || currentBehavior === 'rest' || currentBehavior === 'idle') && Math.random() < 0.08) {
+    if (currentBehavior === 'wander' || currentBehavior === 'rest' || currentBehavior === 'idle') {
       const result = this.checkConversation(entity, world, getNearbyAgents);
       if (result) return result;
     }
@@ -147,8 +148,9 @@ export class ScriptedDecisionProcessor {
       const result = this.checkSeedGathering(entity, world);
       if (result) return result;
     }
-    // End conversation randomly
-    if (currentBehavior === 'talk' && Math.random() < 0.03) {
+    // End conversation probabilistically when active.
+    const activeConversation = entity.getComponent<ConversationComponent>(ComponentType.Conversation);
+    if (activeConversation && isInConversation(activeConversation)) {
       const result = this.checkEndConversation(entity, world);
       if (result) return result;
     }
@@ -305,12 +307,14 @@ export class ScriptedDecisionProcessor {
     getNearbyAgents: (entity: EntityImpl, world: World, range: number) => Entity[]
   ): ScriptedDecisionResult | null {
     const conversation = entity.getComponent<ConversationComponent>(ComponentType.Conversation);
-    if (!conversation || isInConversation(conversation)) return null;
+    if (conversation && isInConversation(conversation)) return null;
     const nearbyAgents = getNearbyAgents(entity, world, 3); // Must be close (3 tiles)
     if (nearbyAgents.length === 0) return null;
     const targetAgent = nearbyAgents[Math.floor(Math.random() * nearbyAgents.length)];
     if (!targetAgent) return null;
     const targetImpl = targetAgent as EntityImpl;
+    const initiationChance = this.getConversationInitiationChance(entity, targetImpl);
+    if (Math.random() >= initiationChance) return null;
     // Ensure both entities have conversation components
     const myConversation = ensureConversationComponent(entity, 10);
     const targetConversation = ensureConversationComponent(targetImpl, 10);
@@ -448,6 +452,8 @@ export class ScriptedDecisionProcessor {
     const partner = world.getEntity(conversation.partnerId);
     if (!partner) return null;
     const partnerImpl = partner as EntityImpl;
+    const endChance = this.getConversationEndChance(entity, partnerImpl);
+    if (Math.random() >= endChance) return null;
     // End conversation for both - but DON'T force behavior change
     // LLM will see conversation ended and decide what to do next
     entity.updateComponent<ConversationComponent>(ComponentType.Conversation, (current) => ({
@@ -463,6 +469,55 @@ export class ScriptedDecisionProcessor {
     // NOTE: Don't force behavior change - LLM decides next action
     return { changed: false };
   }
+
+  private getConversationInitiationChance(self: EntityImpl, partner: EntityImpl): number {
+    const cultureAffinity = this.getPairCultureAffinity(self, partner);
+    const chemistryBias = this.getConversationChemistryBias(self, partner);
+    return this.clampProbability(
+      0.08 * (0.55 + cultureAffinity * 0.6 + chemistryBias * 0.25)
+    );
+  }
+
+  private getConversationEndChance(self: EntityImpl, partner: EntityImpl): number {
+    const cultureAffinity = this.getPairCultureAffinity(self, partner);
+    const conversation = self.getComponent<ConversationComponent>(ComponentType.Conversation);
+    const chemistryBias = this.getConversationChemistryBias(self, partner);
+    const fatiguePressure = conversation
+      ? 1 + (conversation.socialFatigue / 100) + Math.max(0, conversation.socialFatigue - conversation.fatigueThreshold) / 40
+      : 1;
+    return this.clampProbability(
+      0.03 * fatiguePressure * (1.35 - cultureAffinity * 0.6) * (1.15 - chemistryBias * 0.3)
+    );
+  }
+
+  private getPairCultureAffinity(self: EntityImpl, partner: EntityImpl): number {
+    return (this.getCultureAffinity(self) + this.getCultureAffinity(partner)) / 2;
+  }
+
+  private getCultureAffinity(entity: EntityImpl): number {
+    return getCultureAffinityScore(entity.getComponent<GeneticComponent>(ComponentType.Genetic));
+  }
+
+  private getConversationChemistryBias(self: EntityImpl, partner: EntityImpl): number {
+    const selfBiochem = self.getComponent(ComponentType.Biochemistry) as {
+      oxytocin?: number;
+      cortisol?: number;
+    } | undefined;
+    const partnerBiochem = partner.getComponent(ComponentType.Biochemistry) as {
+      oxytocin?: number;
+      cortisol?: number;
+    } | undefined;
+    const selfOxy = selfBiochem?.oxytocin ?? 0.5;
+    const partnerOxy = partnerBiochem?.oxytocin ?? 0.5;
+    const selfCort = selfBiochem?.cortisol ?? 0.5;
+    const partnerCort = partnerBiochem?.cortisol ?? 0.5;
+    return this.clampProbability(0.5 + (((selfOxy + partnerOxy) / 2) - ((selfCort + partnerCort) / 2)) * 0.5);
+  }
+
+  private clampProbability(value: number): number {
+    return Math.max(0, Math.min(1, value));
+  }
+
   /**
    * Process planned builds - gather resources or execute build when ready.
    */

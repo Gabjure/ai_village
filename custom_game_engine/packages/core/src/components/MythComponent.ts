@@ -256,3 +256,29 @@ export function getCanonicalTraits(
 
   return traitScores;
 }
+
+/**
+ * Check and advance myth status based on spread metrics.
+ * oral → recorded: when written in at least 1 text
+ * recorded → canonical: when known by 10+ agents AND told 20+ times
+ * Returns updated myth if status changed, or original myth if no change.
+ */
+export function advanceMythStatus(myth: Myth): { myth: Myth; statusChanged: boolean; newStatus?: MythStatus } {
+  if (myth.status === 'oral' && myth.writtenIn.length > 0) {
+    return {
+      myth: { ...myth, status: 'recorded' },
+      statusChanged: true,
+      newStatus: 'recorded',
+    };
+  }
+
+  if (myth.status === 'recorded' && myth.knownBy.length >= 10 && myth.tellingCount >= 20) {
+    return {
+      myth: { ...myth, status: 'canonical' },
+      statusChanged: true,
+      newStatus: 'canonical',
+    };
+  }
+
+  return { myth, statusChanged: false };
+}

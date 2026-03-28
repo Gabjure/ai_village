@@ -195,6 +195,13 @@ export interface AgentEvents {
     category: 'prayer' | 'conversation' | 'monologue' | 'announcement';
     tick: number;
   };
+  'agent:emote': {
+    agentId: string;
+    emoteText: string;
+    emoteType: 'sound' | 'action' | 'expression';
+    glyph: string;
+    tick: number;
+  };
   'agent:meditation_started': {
     agentId: EntityId;
     position?: { x: number; y: number };

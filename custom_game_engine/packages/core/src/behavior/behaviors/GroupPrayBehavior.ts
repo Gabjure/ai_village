@@ -17,7 +17,12 @@ import type { World } from '../../ecs/World.js';
 import type { AgentComponent } from '../../components/AgentComponent.js';
 import type { SpiritualComponent, Prayer, PrayerType } from '../../components/SpiritualComponent.js';
 import type { PositionComponent } from '../../components/PositionComponent.js';
-import type { RelationshipComponent } from '../../components/RelationshipComponent.js';
+import type { Relationship, RelationshipComponent } from '../../components/RelationshipComponent.js';
+import type { GeneticComponent } from '../../components/GeneticComponent.js';
+import {
+  getCultureAffinityScore,
+  getSynchronizedParticipationScore,
+} from '../../components/GeneticComponent.js';
 import { ComponentType } from '../../types/ComponentType.js';
 import { recordPrayer } from '../../components/SpiritualComponent.js';
 import type { BehaviorContext, BehaviorResult as ContextBehaviorResult } from '../BehaviorContext.js';
@@ -51,6 +56,18 @@ const GROUP_PRAYER_CONFIG = {
  */
 type GroupPrayerPhase = 'gathering' | 'praying' | 'complete';
 
+export interface GroupPrayerJoinSignals {
+  faith: number;
+  cultureAffinityParticipation: number;
+  cultureAffinity: number;
+  oxytocin?: number;
+  cortisol?: number;
+  speciesId?: string;
+  relationshipAffinity?: number;
+  relationshipTrust?: number;
+  relationshipFamiliarity?: number;
+}
+
 /**
  * Group prayer call phrases
  */
@@ -70,6 +87,140 @@ const GROUP_PRAYERS = [
 ];
 
 let groupPrayerIdCounter = 0;
+
+function clamp01(value: number): number {
+  return Math.max(0, Math.min(1, value));
+}
+
+function normalizeSignedRelationshipValue(value: number | undefined): number {
+  if (typeof value !== 'number' || !Number.isFinite(value)) return 0.5;
+  return clamp01((Math.max(-100, Math.min(100, value)) + 100) / 200);
+}
+
+function normalizeBoundedRelationshipValue(value: number | undefined): number {
+  if (typeof value !== 'number' || !Number.isFinite(value)) return 0.5;
+  return clamp01(Math.max(0, Math.min(100, value)) / 100);
+}
+
+export function getCultureAffinityParticipationScore(genetic: GeneticComponent | undefined): number {
+  return getSynchronizedParticipationScore(genetic);
+}
+
+export function calculateGroupPrayerJoinChance(signals: GroupPrayerJoinSignals): number {
+  const cultureAffinityParticipation = clamp01(signals.cultureAffinityParticipation);
+  const cultureAffinity = clamp01(signals.cultureAffinity);
+  const faithScore = clamp01((clamp01(signals.faith) - 0.2) / 0.8);
+  const oxytocin = clamp01(signals.oxytocin ?? 0.5);
+  const cortisol = clamp01(signals.cortisol ?? 0.5);
+  const relationshipAffinity = normalizeSignedRelationshipValue(signals.relationshipAffinity);
+  const relationshipTrust = normalizeBoundedRelationshipValue(signals.relationshipTrust);
+  const relationshipFamiliarity = normalizeBoundedRelationshipValue(signals.relationshipFamiliarity);
+  const socialScaffolding = clamp01(
+    (relationshipAffinity * 0.6) +
+    (relationshipTrust * 0.25) +
+    (relationshipFamiliarity * 0.15)
+  );
+  const biochemistryReadiness = clamp01(0.5 + (oxytocin - cortisol) * 0.5);
+  const isNornLike = (signals.speciesId ?? '').toLowerCase().includes('norn');
+  const nornBonus = isNornLike && biochemistryReadiness > 0.55 ? 0.08 : 0;
+  const scaffoldingGate = isNornLike
+    ? 1
+    : clamp01((socialScaffolding * 0.7) + (faithScore * 0.3));
+
+  return clamp01(
+    0.05 +
+    (cultureAffinityParticipation * 0.3) +
+    (cultureAffinity * 0.2) +
+    (faithScore * 0.15) +
+    (socialScaffolding * 0.15) +
+    (biochemistryReadiness * 0.15) +
+    nornBonus
+  ) * scaffoldingGate;
+}
+
+function getBiochemistrySignals(entity: EntityImpl): { oxytocin: number; cortisol: number } {
+  const biochemistry = entity.getComponent(ComponentType.Biochemistry) as {
+    oxytocin?: number;
+    cortisol?: number;
+  } | undefined;
+  return {
+    oxytocin: clamp01(biochemistry?.oxytocin ?? 0.5),
+    cortisol: clamp01(biochemistry?.cortisol ?? 0.5),
+  };
+}
+
+function getSpeciesId(entity: EntityImpl): string {
+  const species = entity.getComponent(ComponentType.Species) as { speciesId?: string } | undefined;
+  return species?.speciesId ?? '';
+}
+
+function getJoinSignals(
+  agent: EntityImpl,
+  spiritual: SpiritualComponent,
+  genetic: GeneticComponent | undefined,
+  relationship: Relationship | undefined
+): GroupPrayerJoinSignals {
+  const biochemistry = getBiochemistrySignals(agent);
+  return {
+    faith: spiritual.faith,
+    cultureAffinityParticipation: getCultureAffinityParticipationScore(genetic),
+    cultureAffinity: getCultureAffinityScore(genetic),
+    oxytocin: biochemistry.oxytocin,
+    cortisol: biochemistry.cortisol,
+    speciesId: getSpeciesId(agent),
+    relationshipAffinity: relationship?.affinity,
+    relationshipTrust: relationship?.trust,
+    relationshipFamiliarity: relationship?.familiarity,
+  };
+}
+
+function getRelationshipToLeader(
+  agent: EntityImpl,
+  leaderId: string
+): Relationship | undefined {
+  return agent.getComponent<RelationshipComponent>(ComponentType.Relationship)
+    ?.relationships
+    .get(leaderId);
+}
+
+function shouldAgentJoinGroupPrayer(
+  agent: EntityImpl,
+  leaderId: string,
+  spiritual: SpiritualComponent,
+  genetic: GeneticComponent | undefined
+): boolean {
+  const relationship = getRelationshipToLeader(agent, leaderId);
+  const joinSignals = getJoinSignals(agent, spiritual, genetic, relationship);
+  return shouldJoinGroupPrayer(joinSignals);
+}
+
+function getContextJoinSignals(
+  agent: EntityImpl,
+  leaderId: string,
+  spiritual: SpiritualComponent,
+  genetic: GeneticComponent | undefined
+): GroupPrayerJoinSignals {
+  const relationship = getRelationshipToLeader(agent, leaderId);
+  return getJoinSignals(agent, spiritual, genetic, relationship);
+}
+
+export function calculateJoinChanceForEntity(
+  agent: EntityImpl,
+  leaderId: string,
+  spiritual: SpiritualComponent,
+  genetic: GeneticComponent | undefined
+): number {
+  return calculateGroupPrayerJoinChance(
+    getContextJoinSignals(agent, leaderId, spiritual, genetic)
+  );
+}
+
+export function shouldJoinGroupPrayer(
+  signals: GroupPrayerJoinSignals,
+  rng: () => number = Math.random
+): boolean {
+  return rng() < calculateGroupPrayerJoinChance(signals);
+}
 
 /**
  * GroupPrayBehavior - Coordinated spiritual practice
@@ -351,6 +502,7 @@ export class GroupPrayBehavior extends BaseBehavior {
       const agentPos = agent.getComponent(ComponentType.Position);
       const spiritual = agent.getComponent(ComponentType.Spiritual);
       const agentComp = agent.getComponent(ComponentType.Agent);
+      const genetic = agent.getComponent<GeneticComponent>(ComponentType.Genetic);
 
       if (!agentPos || !spiritual || !agentComp) continue;
 
@@ -368,6 +520,10 @@ export class GroupPrayBehavior extends BaseBehavior {
       // Check willingness based on faith
       if (spiritual.faith < 0.2) continue; // Low faith agents won't join
       if (spiritual.crisisOfFaith) continue; // Crisis agents won't join groups
+
+      if (!shouldAgentJoinGroupPrayer(agent as EntityImpl, leader.id, spiritual, genetic)) {
+        continue;
+      }
 
       // Add to participants
       participants.push(agent as EntityImpl);
@@ -657,6 +813,7 @@ function gatherParticipantsWithContext(ctx: BehaviorContext): EntityImpl[] {
     const agentImpl = agent as EntityImpl;
     const spiritual = agentImpl.getComponent<SpiritualComponent>(CT.Spiritual);
     const agentComp = agentImpl.getComponent<AgentComponent>(CT.Agent);
+    const genetic = agentImpl.getComponent<GeneticComponent>(CT.Genetic);
 
     if (!spiritual || !agentComp) continue;
 
@@ -667,6 +824,10 @@ function gatherParticipantsWithContext(ctx: BehaviorContext): EntityImpl[] {
     // Check willingness based on faith
     if (spiritual.faith < 0.2) continue; // Low faith agents won't join
     if (spiritual.crisisOfFaith) continue; // Crisis agents won't join groups
+
+    if (!shouldJoinGroupPrayer(getContextJoinSignals(agentImpl, ctx.entity.id, spiritual, genetic))) {
+      continue;
+    }
 
     // Add to participants
     participants.push(agentImpl);

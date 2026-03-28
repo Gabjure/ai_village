@@ -2,6 +2,10 @@
  * ChorusStateSystem — manages cross-game "Chorus" state from the Folkfork
  * collective intelligence system.
  *
+ * In the Fourth Person framework (see akashic-records/lore/cross-game/THE_FOURTH_PERSON.md),
+ * the Chorus IS the player — the collective emergence field that the player
+ * embodies. When E_f reaches the Chorus band, the player is most fully present.
+ *
  * Receives E_f (emergence field) values pushed via updateChorusState() and
  * applies gradual gameplay effects based on the current band:
  *

@@ -17,7 +17,11 @@ import { EntityImpl } from '../ecs/Entity.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import type { ComponentType } from '../types.js';
 import { SpeciesComponent, type Mutation, type MutationType } from '../components/SpeciesComponent.js';
-import { GeneticComponent } from '../components/GeneticComponent.js';
+import {
+  GeneticComponent,
+  type MatePreferenceVector,
+  type SocialCulturalAffinityVector,
+} from '../components/GeneticComponent.js';
 import type { BodyComponent, BodyPart } from '../components/BodyComponent.js';
 import { createBodyComponentFromPlan } from '../components/BodyPlanRegistry.js';
 import {
@@ -339,16 +343,61 @@ export class ReproductionSystem extends BaseSystem {
       ]),
     ];
 
+    const matePreferenceVector = this.inheritMatePreferenceVector(
+      parent1Genetics,
+      parent2Genetics
+    );
+    const socialCulturalAffinityVector = this.inheritSocialCulturalAffinityVector(
+      parent1Genetics,
+      parent2Genetics
+    );
+
     return new GeneticComponent({
       genome: offspringGenome,
       hereditaryModifications: offspringMods,
       mutationRate,
       compatibleSpecies,
+      matePreferenceVector,
+      socialCulturalAffinityVector,
       geneticHealth,
       inbreedingCoefficient: inbreeding,
       parentIds: [parent1Id, parent2Id],
       generation: Math.max(parent1Genetics.generation, parent2Genetics.generation) + 1,
     });
+  }
+
+  private inheritMatePreferenceVector(
+    parent1Genetics: GeneticComponent,
+    parent2Genetics: GeneticComponent
+  ): MatePreferenceVector {
+    const p1 = parent1Genetics.matePreferenceVector;
+    const p2 = parent2Genetics.matePreferenceVector;
+    return {
+      assortativePreference: this.clamp01((p1.assortativePreference + p2.assortativePreference) / 2),
+      disassortativePreference: this.clamp01((p1.disassortativePreference + p2.disassortativePreference) / 2),
+      biochemicalAffinity: this.clamp01((p1.biochemicalAffinity + p2.biochemicalAffinity) / 2),
+      fertilitySensitivity: this.clamp01((p1.fertilitySensitivity + p2.fertilitySensitivity) / 2),
+      gestationSensitivity: this.clamp01((p1.gestationSensitivity + p2.gestationSensitivity) / 2),
+      tabooSensitivity: this.clamp01((p1.tabooSensitivity + p2.tabooSensitivity) / 2),
+    };
+  }
+
+  private inheritSocialCulturalAffinityVector(
+    parent1Genetics: GeneticComponent,
+    parent2Genetics: GeneticComponent
+  ): SocialCulturalAffinityVector {
+    const p1 = parent1Genetics.socialCulturalAffinityVector;
+    const p2 = parent2Genetics.socialCulturalAffinityVector;
+    return {
+      socialAffinity: this.clamp01((p1.socialAffinity + p2.socialAffinity) / 2),
+      culturalAffinity: this.clamp01((p1.culturalAffinity + p2.culturalAffinity) / 2),
+      collectiveAffinity: this.clamp01((p1.collectiveAffinity + p2.collectiveAffinity) / 2),
+      traditionAffinity: this.clamp01((p1.traditionAffinity + p2.traditionAffinity) / 2),
+    };
+  }
+
+  private clamp01(value: number): number {
+    return Math.max(0, Math.min(1, value));
   }
 
   // ==========================================================================

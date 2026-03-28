@@ -12,7 +12,7 @@ import type { SexualityComponent } from '../SexualityComponent';
 import type { RelationshipComponent } from '../../components/RelationshipComponent';
 import { updateRelationship, ensureRelationshipComponent } from '../../components/RelationshipComponent';
 import type { CourtshipTactic, CourtshipParadigm, ActiveCourtship } from './types';
-import { calculateCompatibility } from './compatibility';
+import { calculateCompatibility, calculateCourtshipStrategyProfile } from './compatibility';
 
 export class CourtshipStateMachine {
   /**
@@ -42,9 +42,20 @@ export class CourtshipStateMachine {
 
     // Calculate compatibility
     const compatibility = calculateCompatibility(agent, target, world);
+    const strategyProfile = calculateCourtshipStrategyProfile(agent, target);
 
-    // Threshold based on romantic inclination
-    const threshold = 0.5 - courtship.romanticInclination * 0.3;
+    // Threshold based on romantic inclination plus inherited mate strategy
+    const threshold = Math.max(
+      0.15,
+      Math.min(
+        0.85,
+        0.5 -
+          courtship.romanticInclination * 0.3 -
+          (strategyProfile.geneticSimilarity - 0.5) * strategyProfile.similarityBias * 0.15 -
+          (strategyProfile.biochemicalAffinity - 0.5) * strategyProfile.preferenceVector.biochemicalAffinity * 0.1 +
+          (strategyProfile.tabooSensitivity - 0.5) * 0.08
+      )
+    );
 
     if (compatibility > threshold) {
       courtship.state = 'interested';
@@ -180,7 +191,8 @@ export class CourtshipStateMachine {
     // Check paradigm requirements
     const tacticsMet = this.checkParadigmRequirements(
       courtship.paradigm,
-      receivedCourtship.tacticsReceived
+      receivedCourtship.tacticsReceived,
+      calculateCourtshipStrategyProfile(agent, initiator)
     );
 
     // If requirements not met, continue
@@ -190,11 +202,23 @@ export class CourtshipStateMachine {
 
     // Calculate final decision
     const compatibility = calculateCompatibility(agent, initiator, world);
+    const strategyProfile = calculateCourtshipStrategyProfile(agent, initiator);
     const interest = receivedCourtship.currentInterest;
-    const decisionScore = compatibility * 0.6 + interest * 0.4;
+    const chemistryBoost = (strategyProfile.biochemicalAffinity - 0.5) * 0.1;
+    const decisionScore = compatibility * 0.55 + interest * 0.35 + chemistryBoost;
 
     // Romantic inclination affects threshold
-    const threshold = 0.6 - courtship.romanticInclination * 0.2;
+    const threshold = Math.max(
+      0.2,
+      Math.min(
+        0.85,
+        0.6 -
+          courtship.romanticInclination * 0.2 -
+          (strategyProfile.geneticSimilarity - 0.5) * strategyProfile.similarityBias * 0.1 -
+          (strategyProfile.biochemicalAffinity - 0.5) * strategyProfile.preferenceVector.biochemicalAffinity * 0.08 +
+          (strategyProfile.tabooSensitivity - 0.5) * 0.05
+      )
+    );
 
     if (decisionScore > threshold) {
       receivedCourtship.willingToConsent = true;
@@ -240,14 +264,22 @@ export class CourtshipStateMachine {
    */
   public checkParadigmRequirements(
     paradigm: CourtshipParadigm,
-    tacticsReceived: CourtshipTactic[]
+    tacticsReceived: CourtshipTactic[],
+    strategyProfile?: ReturnType<typeof calculateCourtshipStrategyProfile>
   ): boolean {
     const tacticIds = tacticsReceived.map((t) => t.id);
+    const tabooSensitivity = strategyProfile?.tabooSensitivity;
 
-    // Check for forbidden tactics
-    for (const forbidden of paradigm.forbiddenTactics) {
-      if (tacticIds.includes(forbidden)) {
-        return false; // Forbidden tactic used
+    // Check for forbidden tactics, softened by inherited taboo tolerance when available
+    const forbiddenMatches = paradigm.forbiddenTactics.filter(forbidden => tacticIds.includes(forbidden));
+    if (forbiddenMatches.length > 0) {
+      if (tabooSensitivity === undefined) {
+        return false;
+      }
+
+      const toleratedForbidden = Math.floor(tacticsReceived.length * (1 - tabooSensitivity) * 0.5);
+      if (forbiddenMatches.length > toleratedForbidden) {
+        return false;
       }
     }
 
@@ -281,15 +313,17 @@ export class CourtshipStateMachine {
     }
 
     let reception = tactic.baseAppeal;
+    const targetCourtshipStrategy = calculateCourtshipStrategyProfile(target, target);
+    const tabooScale = 1 + (targetCourtshipStrategy.tabooSensitivity - 0.5) * 0.5;
 
     // Check if preferred
     if (targetCourtship.preferredTactics.includes(tactic.id)) {
-      reception += 0.3;
+      reception += 0.3 * (1 + (targetCourtshipStrategy.tabooSensitivity - 0.5) * 0.25);
     }
 
     // Check if disliked
     if (targetCourtship.dislikedTactics.includes(tactic.id)) {
-      reception -= 0.5;
+      reception -= 0.5 * tabooScale;
     }
 
     // Apply romantic inclination modifier

@@ -30,6 +30,215 @@ export interface GeneticAllele {
 }
 
 // ============================================================================
+// Mate Preference Strategy
+// ============================================================================
+
+export interface MatePreferenceVector {
+  /** Preference for similar genotypes and courtship styles. */
+  assortativePreference: number;
+  /** Preference for dissimilar / complementary genotypes. */
+  disassortativePreference: number;
+  /** How strongly biochemistry shapes attraction. */
+  biochemicalAffinity: number;
+  /** How much fertility signals influence conception chances. */
+  fertilitySensitivity: number;
+  /** How much biochemistry shifts gestation pacing. */
+  gestationSensitivity: number;
+  /** How strongly taboo / forbidden tactics suppress courtship. */
+  tabooSensitivity: number;
+}
+
+const MATE_PREFERENCE_TRAIT_IDS = {
+  assortativePreference: 'courtship_assortative_preference',
+  disassortativePreference: 'courtship_disassortative_preference',
+  biochemicalAffinity: 'courtship_biochemical_affinity',
+  fertilitySensitivity: 'courtship_fertility_sensitivity',
+  gestationSensitivity: 'courtship_gestation_sensitivity',
+  tabooSensitivity: 'courtship_taboo_sensitivity',
+} as const;
+
+export const DEFAULT_MATE_PREFERENCE_VECTOR: MatePreferenceVector = {
+  assortativePreference: 0.5,
+  disassortativePreference: 0.5,
+  biochemicalAffinity: 0.5,
+  fertilitySensitivity: 0.5,
+  gestationSensitivity: 0.5,
+  tabooSensitivity: 0.5,
+};
+
+// ============================================================================
+// Social/Cultural Affinity Strategy
+// ============================================================================
+
+export interface SocialCulturalAffinityVector {
+  /** Affinity for social cohesion and group bonding. */
+  socialAffinity: number;
+  /** Affinity for shared cultural practices and norms. */
+  culturalAffinity: number;
+  /** Affinity for collective / communal decision-making. */
+  collectiveAffinity: number;
+  /** Affinity for tradition, ritual, and inherited custom. */
+  traditionAffinity: number;
+}
+
+const SOCIAL_CULTURAL_AFFINITY_TRAIT_IDS = {
+  socialAffinity: 'social_affinity',
+  culturalAffinity: 'cultural_affinity',
+  collectiveAffinity: 'collective_affinity',
+  traditionAffinity: 'tradition_affinity',
+} as const;
+
+export const DEFAULT_SOCIAL_CULTURAL_AFFINITY_VECTOR: SocialCulturalAffinityVector = {
+  socialAffinity: 0.5,
+  culturalAffinity: 0.5,
+  collectiveAffinity: 0.5,
+  traditionAffinity: 0.5,
+};
+
+const CULTURE_AFFINITY_WEIGHTS = {
+  socialAffinity: 0.35,
+  culturalAffinity: 0.25,
+  collectiveAffinity: 0.25,
+  traditionAffinity: 0.15,
+} as const;
+
+const SYNCHRONIZED_PARTICIPATION_WEIGHTS = {
+  socialAffinity: 0.2,
+  culturalAffinity: 0.2,
+  collectiveAffinity: 0.35,
+  traditionAffinity: 0.25,
+} as const;
+
+function clamp01(value: number): number {
+  return Math.max(0, Math.min(1, value));
+}
+
+function normalizeMatePreferenceVector(
+  vector?: Partial<MatePreferenceVector>
+): MatePreferenceVector {
+  return {
+    assortativePreference: clamp01(vector?.assortativePreference ?? DEFAULT_MATE_PREFERENCE_VECTOR.assortativePreference),
+    disassortativePreference: clamp01(vector?.disassortativePreference ?? DEFAULT_MATE_PREFERENCE_VECTOR.disassortativePreference),
+    biochemicalAffinity: clamp01(vector?.biochemicalAffinity ?? DEFAULT_MATE_PREFERENCE_VECTOR.biochemicalAffinity),
+    fertilitySensitivity: clamp01(vector?.fertilitySensitivity ?? DEFAULT_MATE_PREFERENCE_VECTOR.fertilitySensitivity),
+    gestationSensitivity: clamp01(vector?.gestationSensitivity ?? DEFAULT_MATE_PREFERENCE_VECTOR.gestationSensitivity),
+    tabooSensitivity: clamp01(vector?.tabooSensitivity ?? DEFAULT_MATE_PREFERENCE_VECTOR.tabooSensitivity),
+  };
+}
+
+function normalizeSocialCulturalAffinityVector(
+  vector?: Partial<SocialCulturalAffinityVector>
+): SocialCulturalAffinityVector {
+  return {
+    socialAffinity: clamp01(vector?.socialAffinity ?? DEFAULT_SOCIAL_CULTURAL_AFFINITY_VECTOR.socialAffinity),
+    culturalAffinity: clamp01(vector?.culturalAffinity ?? DEFAULT_SOCIAL_CULTURAL_AFFINITY_VECTOR.culturalAffinity),
+    collectiveAffinity: clamp01(vector?.collectiveAffinity ?? DEFAULT_SOCIAL_CULTURAL_AFFINITY_VECTOR.collectiveAffinity),
+    traditionAffinity: clamp01(vector?.traditionAffinity ?? DEFAULT_SOCIAL_CULTURAL_AFFINITY_VECTOR.traditionAffinity),
+  };
+}
+
+function weightedVectorAverage(
+  vector: SocialCulturalAffinityVector,
+  weights: Record<keyof SocialCulturalAffinityVector, number>
+): number {
+  return clamp01(
+    (vector.socialAffinity * weights.socialAffinity) +
+    (vector.culturalAffinity * weights.culturalAffinity) +
+    (vector.collectiveAffinity * weights.collectiveAffinity) +
+    (vector.traditionAffinity * weights.traditionAffinity)
+  );
+}
+
+function parsePreferenceAlleleValue(value: string | undefined): number | undefined {
+  if (!value) return undefined;
+  const parsed = Number.parseFloat(value);
+  return Number.isFinite(parsed) ? clamp01(parsed) : undefined;
+}
+
+function extractMatePreferenceVectorFromGenome(
+  genome: GeneticAllele[]
+): Partial<MatePreferenceVector> {
+  const byTrait = new Map(genome.map(allele => [allele.traitId, allele] as const));
+
+  return {
+    assortativePreference: parsePreferenceAlleleValue(
+      byTrait.get(MATE_PREFERENCE_TRAIT_IDS.assortativePreference)?.dominantAllele
+    ),
+    disassortativePreference: parsePreferenceAlleleValue(
+      byTrait.get(MATE_PREFERENCE_TRAIT_IDS.disassortativePreference)?.dominantAllele
+    ),
+    biochemicalAffinity: parsePreferenceAlleleValue(
+      byTrait.get(MATE_PREFERENCE_TRAIT_IDS.biochemicalAffinity)?.dominantAllele
+    ),
+    fertilitySensitivity: parsePreferenceAlleleValue(
+      byTrait.get(MATE_PREFERENCE_TRAIT_IDS.fertilitySensitivity)?.dominantAllele
+    ),
+    gestationSensitivity: parsePreferenceAlleleValue(
+      byTrait.get(MATE_PREFERENCE_TRAIT_IDS.gestationSensitivity)?.dominantAllele
+    ),
+    tabooSensitivity: parsePreferenceAlleleValue(
+      byTrait.get(MATE_PREFERENCE_TRAIT_IDS.tabooSensitivity)?.dominantAllele
+    ),
+  };
+}
+
+function extractSocialCulturalAffinityVectorFromGenome(
+  genome: GeneticAllele[]
+): Partial<SocialCulturalAffinityVector> {
+  const byTrait = new Map(genome.map(allele => [allele.traitId, allele] as const));
+
+  return {
+    socialAffinity: parsePreferenceAlleleValue(
+      byTrait.get(SOCIAL_CULTURAL_AFFINITY_TRAIT_IDS.socialAffinity)?.dominantAllele
+    ),
+    culturalAffinity: parsePreferenceAlleleValue(
+      byTrait.get(SOCIAL_CULTURAL_AFFINITY_TRAIT_IDS.culturalAffinity)?.dominantAllele
+    ),
+    collectiveAffinity: parsePreferenceAlleleValue(
+      byTrait.get(SOCIAL_CULTURAL_AFFINITY_TRAIT_IDS.collectiveAffinity)?.dominantAllele
+    ),
+    traditionAffinity: parsePreferenceAlleleValue(
+      byTrait.get(SOCIAL_CULTURAL_AFFINITY_TRAIT_IDS.traditionAffinity)?.dominantAllele
+    ),
+  };
+}
+
+function deriveSpeciesSocialCulturalAffinityVector(
+  speciesId: string
+): SocialCulturalAffinityVector {
+  const normalized = speciesId.toLowerCase();
+
+  if (normalized.includes('norn')) {
+    return {
+      socialAffinity: 0.82,
+      culturalAffinity: 0.84,
+      collectiveAffinity: 0.8,
+      traditionAffinity: 0.9,
+    };
+  }
+
+  if (normalized.includes('ettin')) {
+    return {
+      socialAffinity: 0.58,
+      culturalAffinity: 0.52,
+      collectiveAffinity: 0.55,
+      traditionAffinity: 0.62,
+    };
+  }
+
+  if (normalized.includes('grendel')) {
+    return {
+      socialAffinity: 0.3,
+      culturalAffinity: 0.35,
+      collectiveAffinity: 0.28,
+      traditionAffinity: 0.25,
+    };
+  }
+
+  return DEFAULT_SOCIAL_CULTURAL_AFFINITY_VECTOR;
+}
+
+// ============================================================================
 // Hereditary Modifications
 // ============================================================================
 
@@ -80,6 +289,12 @@ export class GeneticComponent extends ComponentBase {
   // Genetic compatibility
   public compatibleSpecies: string[];  // Can hybridize with these species IDs
 
+  // Heritable courtship strategy
+  public matePreferenceVector: MatePreferenceVector;
+
+  // Heritable social/cultural affinity strategy
+  public socialCulturalAffinityVector: SocialCulturalAffinityVector;
+
   // Genetic health
   public geneticHealth: number; // 0-1, affects mutation resistance and offspring viability
   public inbreedingCoefficient: number; // 0-1, tracks genetic diversity loss
@@ -91,10 +306,22 @@ export class GeneticComponent extends ComponentBase {
   constructor(options: Partial<GeneticComponent> = {}) {
     super();
 
-    this.genome = options.genome ?? [];
+    this.genome = options.genome ? options.genome.map(allele => ({ ...allele })) : [];
     this.hereditaryModifications = options.hereditaryModifications ?? [];
     this.mutationRate = options.mutationRate ?? 0.01; // 1% default
     this.compatibleSpecies = options.compatibleSpecies ?? [];
+    const genomePreferenceVector = normalizeMatePreferenceVector(
+      extractMatePreferenceVectorFromGenome(this.genome)
+    );
+    this.matePreferenceVector = normalizeMatePreferenceVector(
+      options.matePreferenceVector ?? genomePreferenceVector
+    );
+    const genomeSocialCulturalAffinityVector = normalizeSocialCulturalAffinityVector(
+      extractSocialCulturalAffinityVectorFromGenome(this.genome)
+    );
+    this.socialCulturalAffinityVector = normalizeSocialCulturalAffinityVector(
+      options.socialCulturalAffinityVector ?? genomeSocialCulturalAffinityVector
+    );
     this.geneticHealth = options.geneticHealth ?? 1.0;
     this.inbreedingCoefficient = options.inbreedingCoefficient ?? 0.0;
     this.parentIds = options.parentIds;
@@ -323,6 +550,8 @@ export class GeneticComponent extends ComponentBase {
       hereditaryModifications: this.hereditaryModifications.map(m => ({ ...m })),
       mutationRate: this.mutationRate,
       compatibleSpecies: [...this.compatibleSpecies],
+      matePreferenceVector: { ...this.matePreferenceVector },
+      socialCulturalAffinityVector: { ...this.socialCulturalAffinityVector },
       geneticHealth: this.geneticHealth,
       inbreedingCoefficient: this.inbreedingCoefficient,
       parentIds: this.parentIds ? [...this.parentIds] : undefined,
@@ -339,19 +568,45 @@ export class GeneticComponent extends ComponentBase {
  * Create a default genetic component for a species
  */
 export function createDefaultGenetics(
-  _speciesId: string,
+  speciesId: string,
   compatibleSpecies: string[] = [],
-  mutationRate: number = 0.01
+  mutationRate: number = 0.01,
+  matePreferenceVector: Partial<MatePreferenceVector> = {},
+  socialCulturalAffinityVector: Partial<SocialCulturalAffinityVector> = {}
 ): GeneticComponent {
+  const speciesAffinityDefaults = deriveSpeciesSocialCulturalAffinityVector(speciesId);
+
   return new GeneticComponent({
     genome: [],
     hereditaryModifications: [],
     mutationRate,
     compatibleSpecies,
+    matePreferenceVector: normalizeMatePreferenceVector(matePreferenceVector),
+    socialCulturalAffinityVector: normalizeSocialCulturalAffinityVector({
+      ...speciesAffinityDefaults,
+      ...socialCulturalAffinityVector,
+    }),
     geneticHealth: 1.0,
     inbreedingCoefficient: 0.0,
     generation: 0,
   });
+}
+
+export function getCultureAffinityScore(
+  genetics: { socialCulturalAffinityVector?: SocialCulturalAffinityVector } | null | undefined
+): number {
+  if (!genetics?.socialCulturalAffinityVector) return 0.5;
+  return weightedVectorAverage(genetics.socialCulturalAffinityVector, CULTURE_AFFINITY_WEIGHTS);
+}
+
+export function getSynchronizedParticipationScore(
+  genetics: { socialCulturalAffinityVector?: SocialCulturalAffinityVector } | null | undefined
+): number {
+  if (!genetics?.socialCulturalAffinityVector) return 0.5;
+  return weightedVectorAverage(
+    genetics.socialCulturalAffinityVector,
+    SYNCHRONIZED_PARTICIPATION_WEIGHTS
+  );
 }
 
 /**

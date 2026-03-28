@@ -1440,12 +1440,13 @@ export class MythGenerationSystem extends BaseSystem {
 
         // Spread to agent (witness) and nearby agents
         const nearbyAgents = this._findNearbyAgents(agent, world);
+        let mythologyToCommit = updatedMythology;
         for (const nearby of nearbyAgents.slice(0, 3)) {
-          tellMyth(updatedMythology, myth.id, nearby.id, currentTick);
+          mythologyToCommit = tellMyth(mythologyToCommit, myth.id, nearby.id, currentTick);
         }
 
         // Update the deity's mythology
-        (deity as EntityImpl).addComponent(updatedMythology);
+        (deity as EntityImpl).addComponent(mythologyToCommit);
       }
 
       // Also add to deity's myths array (for dashboard view)

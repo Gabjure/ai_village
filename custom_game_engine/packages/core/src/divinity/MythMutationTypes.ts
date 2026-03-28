@@ -20,7 +20,13 @@ export type MutationType =
   | 'merger'             // Combined with another similar story
   | 'inversion'          // Good becomes bad or vice versa
   | 'attribution'        // Credit moved to different deity ⭐
-  | 'localization';      // Settings changed to local places
+  | 'localization'       // Settings changed to local places
+  | 'amplification'      // Effects/consequences made larger
+  | 'rationalization'    // Supernatural explained by natural causes
+  | 'embellishment'      // New details added to the story
+  | 'abbreviation'       // Story shortened, meaning preserved
+  | 'correction'         // "Errors" fixed based on narrator's beliefs
+  | 'reinterpretation';  // Same events, completely different meaning
 
 /**
  * Result of applying a mutation to a myth
@@ -134,6 +140,22 @@ export function calculateMutationProbabilities(
     probabilities.set('moralization', current + 0.15);
   }
 
+  // New mutation type base probabilities
+  probabilities.set('amplification', 0.08);
+  probabilities.set('embellishment', 0.10);
+  probabilities.set('abbreviation', 0.05);
+  probabilities.set('reinterpretation', 0.03);
+
+  // Rationalization increases if narrator has low spirituality
+  const spirituality = context.narratorPersonality?.spirituality ?? 0.5;
+  probabilities.set('rationalization', 0.06 + (spirituality < 0.4 ? (0.4 - spirituality) * 0.2 : 0));
+
+  // Correction increases if narrator believes in a different deity
+  const believesDifferentDeity =
+    context.narratorBeliefs?.believedDeity !== undefined &&
+    context.narratorBeliefs.believedDeity !== myth.deityId;
+  probabilities.set('correction', believesDifferentDeity ? 0.12 : 0.04);
+
   return probabilities;
 }
 
@@ -194,6 +216,18 @@ export function applyMutation(
       return applyInversionMutation(myth, context);
     case 'merger':
       return applyMergerMutation(myth, context);
+    case 'amplification':
+      return applyAmplificationMutation(myth, context);
+    case 'rationalization':
+      return applyRationalizationMutation(myth, context);
+    case 'embellishment':
+      return applyEmbellishmentMutation(myth, context);
+    case 'abbreviation':
+      return applyAbbreviationMutation(myth, context);
+    case 'correction':
+      return applyCorrectionMutation(myth, context);
+    case 'reinterpretation':
+      return applyReinterpretationMutation(myth, context);
     default:
       // Fallback: no change
       return {
@@ -460,6 +494,224 @@ function applyMergerMutation(
     },
     mutationType: 'merger',
     changeDescription: 'Story merged with another myth',
+    attributionChanged: false,
+  };
+}
+
+/**
+ * Amplification Mutation - Effects/consequences made larger
+ */
+function applyAmplificationMutation(
+  myth: Myth,
+  context: MutationContext
+): MutationResult {
+  const echoPhrases = [
+    ' And the consequences echoed across the land.',
+    ' The effects of this were felt for generations to come.',
+    ' Nothing was ever the same after that great event.',
+    ' All the world trembled at what had come to pass.',
+  ];
+
+  const phrase = echoPhrases[Math.floor(Math.random() * echoPhrases.length)]!;
+  const modifiedText = myth.fullText + phrase;
+
+  const amplifiedTraits: TraitImplication[] = myth.traitImplications.map(t => ({
+    ...t,
+    strength: Math.min(1.0, t.strength * 1.5),
+  }));
+
+  return {
+    mutatedMyth: {
+      ...myth,
+      fullText: modifiedText,
+      traitImplications: amplifiedTraits,
+      currentVersion: myth.currentVersion + 1,
+    },
+    mutationType: 'amplification',
+    changeDescription: 'Story amplified — effects and consequences enlarged',
+    attributionChanged: false,
+  };
+}
+
+/**
+ * Rationalization Mutation - Supernatural explained by natural causes
+ */
+function applyRationalizationMutation(
+  myth: Myth,
+  context: MutationContext
+): MutationResult {
+  const naturalPhrases = [
+    ' Though some say it was merely the wind.',
+    ' Perhaps it was just a coincidence.',
+    ' The wise say there is always a natural explanation.',
+    ' Scholars note it could have been a trick of the light.',
+  ];
+
+  const phrase = naturalPhrases[Math.floor(Math.random() * naturalPhrases.length)]!;
+  const modifiedText = myth.fullText + phrase;
+
+  const weakenedTraits: TraitImplication[] = myth.traitImplications.map(t => ({
+    ...t,
+    strength: t.strength * 0.5,
+  }));
+
+  return {
+    mutatedMyth: {
+      ...myth,
+      fullText: modifiedText,
+      traitImplications: weakenedTraits,
+      currentVersion: myth.currentVersion + 1,
+    },
+    mutationType: 'rationalization',
+    changeDescription: 'Supernatural elements explained away with natural causes',
+    attributionChanged: false,
+  };
+}
+
+/**
+ * Embellishment Mutation - New details added
+ */
+function applyEmbellishmentMutation(
+  myth: Myth,
+  context: MutationContext
+): MutationResult {
+  const sensoryPhrases = [
+    ' The air smelled of rain and ancient stone.',
+    ' A deep golden light suffused everything at the moment of wonder.',
+    ' The ground hummed with a warmth that none could explain.',
+    ' Stars wheeled overhead as if watching the scene below.',
+  ];
+
+  const phrase = sensoryPhrases[Math.floor(Math.random() * sensoryPhrases.length)]!;
+  const modifiedText = myth.fullText + phrase;
+
+  const embellishmentTraits = ['wisdom', 'courage', 'mystery'];
+  const newTrait = embellishmentTraits[Math.floor(Math.random() * embellishmentTraits.length)]!;
+
+  const newImplication: TraitImplication = {
+    trait: newTrait,
+    direction: 'positive',
+    strength: 0.3,
+    extractedFrom: `Added detail: ${phrase.trim()}`,
+  };
+
+  return {
+    mutatedMyth: {
+      ...myth,
+      fullText: modifiedText,
+      traitImplications: [...myth.traitImplications, newImplication],
+      currentVersion: myth.currentVersion + 1,
+    },
+    mutationType: 'embellishment',
+    changeDescription: `Story embellished with new sensory detail; added '${newTrait}' implication`,
+    attributionChanged: false,
+  };
+}
+
+/**
+ * Abbreviation Mutation - Story shortened, meaning preserved
+ */
+function applyAbbreviationMutation(
+  myth: Myth,
+  context: MutationContext
+): MutationResult {
+  const sentences = myth.fullText.split(/[.!?]\s+/);
+  const abbreviated = sentences.slice(0, Math.max(1, Math.floor(sentences.length * 0.5))).join('. ') + '.';
+
+  return {
+    mutatedMyth: {
+      ...myth,
+      fullText: abbreviated,
+      currentVersion: myth.currentVersion + 1,
+    },
+    mutationType: 'abbreviation',
+    changeDescription: 'Story shortened to first 50% of sentences; meaning preserved',
+    attributionChanged: false,
+  };
+}
+
+/**
+ * Correction Mutation - "Errors" fixed based on narrator's beliefs
+ */
+function applyCorrectionMutation(
+  myth: Myth,
+  context: MutationContext
+): MutationResult {
+  if (myth.traitImplications.length === 0) {
+    return {
+      mutatedMyth: { ...myth, currentVersion: myth.currentVersion + 1 },
+      mutationType: 'correction',
+      changeDescription: 'Correction attempted but no trait implications to adjust',
+      attributionChanged: false,
+    };
+  }
+
+  // Swap the direction of one trait implication to reflect the narrator's beliefs
+  const swapIndex = Math.floor(Math.random() * myth.traitImplications.length);
+  const correctedTraits: TraitImplication[] = myth.traitImplications.map((t, i) => {
+    if (i !== swapIndex) return t;
+    return {
+      ...t,
+      direction: t.direction === 'positive' ? 'negative' : 'positive',
+      extractedFrom: `Corrected interpretation: ${t.extractedFrom}`,
+    };
+  });
+
+  const believedDeity = context.narratorBeliefs?.believedDeity;
+  const correctorNote = believedDeity
+    ? ` (Retold in light of ${believedDeity}'s teachings.)`
+    : ' (Retold with corrections.)';
+
+  return {
+    mutatedMyth: {
+      ...myth,
+      fullText: myth.fullText + correctorNote,
+      traitImplications: correctedTraits,
+      currentVersion: myth.currentVersion + 1,
+    },
+    mutationType: 'correction',
+    changeDescription: `Narrator corrected the story; swapped direction of '${myth.traitImplications[swapIndex]!.trait}' implication`,
+    attributionChanged: false,
+  };
+}
+
+/**
+ * Reinterpretation Mutation - Same events, completely different meaning
+ */
+function applyReinterpretationMutation(
+  myth: Myth,
+  context: MutationContext
+): MutationResult {
+  const reinterpretedTraits: TraitImplication[] = myth.traitImplications.map(t => {
+    const flipDirection = Math.random() < 0.5;
+    const newStrength = Math.random() * 0.6 + 0.2; // 0.2–0.8 range
+    return {
+      ...t,
+      direction: flipDirection
+        ? (t.direction === 'positive' ? 'negative' : 'positive')
+        : t.direction,
+      strength: newStrength,
+      extractedFrom: `Reinterpreted: ${t.extractedFrom}`,
+    };
+  });
+
+  const reinterpretNotes = [
+    '\n\nBut others read the very same tale as proof of the opposite.',
+    '\n\nYet the meaning of this story depends entirely on who you ask.',
+    '\n\nSome hold this to be a warning; others, a celebration.',
+  ];
+  const note = reinterpretNotes[Math.floor(Math.random() * reinterpretNotes.length)]!;
+
+  return {
+    mutatedMyth: {
+      ...myth,
+      fullText: myth.fullText + note,
+      traitImplications: reinterpretedTraits,
+      currentVersion: myth.currentVersion + 1,
+      status: myth.status === 'canonical' ? 'disputed' : myth.status,
+    },
+    mutationType: 'reinterpretation',
+    changeDescription: 'Story reinterpreted — same events, new meaning; ~50% of trait directions flipped',
     attributionChanged: false,
   };
 }

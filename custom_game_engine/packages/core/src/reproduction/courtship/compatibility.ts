@@ -11,6 +11,121 @@ import type { SexualityComponent } from '../SexualityComponent';
 import type { RelationshipComponent } from '../../components/RelationshipComponent';
 import type { PersonalityComponent } from '../../components/PersonalityComponent';
 import type { StrategicPriorities } from '../../components/AgentComponent';
+import type { GeneticComponent, MatePreferenceVector } from '../../components/GeneticComponent';
+import { DEFAULT_MATE_PREFERENCE_VECTOR } from '../../components/GeneticComponent';
+import type { BiochemistryComponent } from '../../components/BiochemistryComponent';
+
+export interface CourtshipStrategyProfile {
+  preferenceVector: MatePreferenceVector;
+  geneticSimilarity: number;
+  biochemicalAffinity: number;
+  similarityBias: number;
+  tabooSensitivity: number;
+  fertilitySensitivity: number;
+  gestationSensitivity: number;
+}
+
+function clamp01(value: number): number {
+  return Math.max(0, Math.min(1, value));
+}
+
+function average(values: number[]): number {
+  if (values.length === 0) return 0.5;
+  return values.reduce((sum, value) => sum + value, 0) / values.length;
+}
+
+function getGeneticComponent(entity: Entity): GeneticComponent | undefined {
+  return (entity as EntityImpl).getComponent<GeneticComponent>('genetic');
+}
+
+function getBiochemistryComponent(entity: Entity): BiochemistryComponent | undefined {
+  return (entity as EntityImpl).getComponent<BiochemistryComponent>('biochemistry');
+}
+
+function resolvePreferenceVector(entity: Entity): MatePreferenceVector {
+  const genetics = getGeneticComponent(entity);
+  return genetics?.matePreferenceVector ?? DEFAULT_MATE_PREFERENCE_VECTOR;
+}
+
+function compareGenomeExpression(genetics1: GeneticComponent, genetics2: GeneticComponent): number {
+  if (genetics1.genome.length === 0 || genetics2.genome.length === 0) {
+    return 0.5;
+  }
+
+  const sharedTraits = genetics1.genome
+    .map(allele => allele.traitId)
+    .filter((traitId, index, traits) => traits.indexOf(traitId) === index && genetics2.getAllele(traitId));
+
+  if (sharedTraits.length === 0) {
+    return 0.5;
+  }
+
+  let score = 0;
+  for (const traitId of sharedTraits) {
+    const expressed1 = genetics1.getExpressedTrait(traitId);
+    const expressed2 = genetics2.getExpressedTrait(traitId);
+
+    if (expressed1 === null || expressed2 === null) {
+      score += 0.5;
+      continue;
+    }
+
+    score += expressed1 === expressed2 ? 1 : 0.5;
+  }
+
+  return clamp01(score / sharedTraits.length);
+}
+
+function calculateBiochemicalAffinity(agent1: Entity, agent2: Entity): number {
+  const biochem1 = getBiochemistryComponent(agent1);
+  const biochem2 = getBiochemistryComponent(agent2);
+
+  if (!biochem1 || !biochem2) {
+    return 0.5;
+  }
+
+  const bonding = average([biochem1.oxytocin, biochem2.oxytocin]);
+  const stability = average([biochem1.serotonin, biochem2.serotonin]);
+  const reward = average([biochem1.dopamine, biochem2.dopamine]);
+  const stress = average([biochem1.cortisol, biochem2.cortisol]);
+  const nurture = average([biochem1.nurtureScore, biochem2.nurtureScore]);
+
+  return clamp01(
+    bonding * 0.28 +
+    stability * 0.16 +
+    reward * 0.10 +
+    nurture * 0.26 +
+    (1 - stress) * 0.20
+  );
+}
+
+export function calculateCourtshipStrategyProfile(agent1: Entity, agent2: Entity): CourtshipStrategyProfile {
+  const genetics1 = getGeneticComponent(agent1);
+  const genetics2 = getGeneticComponent(agent2);
+  const vector1 = resolvePreferenceVector(agent1);
+  const vector2 = resolvePreferenceVector(agent2);
+  const preferenceVector: MatePreferenceVector = {
+    assortativePreference: average([vector1.assortativePreference, vector2.assortativePreference]),
+    disassortativePreference: average([vector1.disassortativePreference, vector2.disassortativePreference]),
+    biochemicalAffinity: average([vector1.biochemicalAffinity, vector2.biochemicalAffinity]),
+    fertilitySensitivity: average([vector1.fertilitySensitivity, vector2.fertilitySensitivity]),
+    gestationSensitivity: average([vector1.gestationSensitivity, vector2.gestationSensitivity]),
+    tabooSensitivity: average([vector1.tabooSensitivity, vector2.tabooSensitivity]),
+  };
+
+  const geneticSimilarity = genetics1 && genetics2 ? compareGenomeExpression(genetics1, genetics2) : 0.5;
+  const biochemicalAffinity = calculateBiochemicalAffinity(agent1, agent2);
+
+  return {
+    preferenceVector,
+    geneticSimilarity,
+    biochemicalAffinity,
+    similarityBias: preferenceVector.assortativePreference - preferenceVector.disassortativePreference,
+    tabooSensitivity: preferenceVector.tabooSensitivity,
+    fertilitySensitivity: preferenceVector.fertilitySensitivity,
+    gestationSensitivity: preferenceVector.gestationSensitivity,
+  };
+}
 
 // ============================================================================
 // Sexual Compatibility
@@ -262,26 +377,62 @@ export function calculateCompatibility(agent1: Entity, agent2: Entity, _world: W
   const socialScore = 0.5; // Placeholder - could include community approval, family, etc.
   score += socialScore * 0.1;
 
+  const strategyProfile = calculateCourtshipStrategyProfile(agent1, agent2);
+  const strategyModifier = 1 +
+    (strategyProfile.geneticSimilarity - 0.5) * strategyProfile.similarityBias * 0.3 +
+    (strategyProfile.biochemicalAffinity - 0.5) * (strategyProfile.preferenceVector.biochemicalAffinity - 0.5) * 0.3;
+
   // Normalize (max possible is 0.3 + 0.25 + 0.2 + 0.15 + 0.1 = 1.0)
-  return Math.max(0, Math.min(1, score));
+  return clamp01(score * strategyModifier);
 }
 
 // ============================================================================
 // Conception Probability
 // ============================================================================
 
-export function calculateConceptionProbability(_agent1: Entity, _agent2: Entity): number {
+export function calculateConceptionProbability(agent1: Entity, agent2: Entity): number {
   let baseProbability = 0.3; // 30% base chance
+
+  const genetics1 = getGeneticComponent(agent1);
+  const genetics2 = getGeneticComponent(agent2);
+  const biochem1 = getBiochemistryComponent(agent1);
+  const biochem2 = getBiochemistryComponent(agent2);
+  const strategyProfile = calculateCourtshipStrategyProfile(agent1, agent2);
+
+  const fertilitySignal1 = biochem1
+    ? clamp01(
+      biochem1.oxytocin * 0.3 +
+      biochem1.serotonin * 0.15 +
+      biochem1.dopamine * 0.1 +
+      biochem1.nurtureScore * 0.25 +
+      (1 - biochem1.cortisol) * 0.2
+    )
+    : 0.5;
+  const fertilitySignal2 = biochem2
+    ? clamp01(
+      biochem2.oxytocin * 0.3 +
+      biochem2.serotonin * 0.15 +
+      biochem2.dopamine * 0.1 +
+      biochem2.nurtureScore * 0.25 +
+      (1 - biochem2.cortisol) * 0.2
+    )
+    : 0.5;
+
+  const fertilitySensitivity = strategyProfile.fertilitySensitivity;
+  const fertilityModifier1 = 1 + (fertilitySignal1 - 0.5) * fertilitySensitivity * 0.8;
+  const fertilityModifier2 = 1 + (fertilitySignal2 - 0.5) * fertilitySensitivity * 0.8;
+
+  const chemistryAffinity = strategyProfile.biochemicalAffinity;
+  const chemistryModifier = 1 + (chemistryAffinity - 0.5) * (strategyProfile.preferenceVector.biochemicalAffinity - 0.5) * 0.6;
+
+  const geneticAffinity = genetics1 && genetics2 ? compareGenomeExpression(genetics1, genetics2) : 0.5;
+  const geneticModifier = 1 + (geneticAffinity - 0.5) * strategyProfile.similarityBias * 0.6;
+
+  // Bond strength
+  const bondStrength = calculateBondStrength(agent1, agent2);
 
   // Health factors (placeholder - health tracked in BodyComponent or NeedsComponent)
   const healthModifier = 1.0; // Perfect health assumption for now
-
-  // Fertility by age (simplified - would be species-specific in full implementation)
-  const fertilityModifier1 = 1.0; // Placeholder
-  const fertilityModifier2 = 1.0; // Placeholder
-
-  // Bond strength
-  const bondStrength = calculateBondStrength(_agent1, _agent2);
 
   // Magical/mystical factors (placeholder)
   const magicModifier = 1.0;
@@ -291,6 +442,8 @@ export function calculateConceptionProbability(_agent1: Entity, _agent2: Entity)
     fertilityModifier1 *
     fertilityModifier2 *
     healthModifier *
+    chemistryModifier *
+    geneticModifier *
     (0.8 + bondStrength * 0.4) * // 0.8-1.2 multiplier
     magicModifier;
 
@@ -330,6 +483,9 @@ export function attemptConception(agent1: Entity, agent2: Entity, world: World):
       otherParent = canAgent1BePregnant ? agent2 : agent1;
     }
 
+    const strategyProfile = calculateCourtshipStrategyProfile(agent1, agent2);
+    const fertilitySignal = calculateBiochemicalAffinity(agent1, agent2);
+
     // Emit conception event
     world.eventBus.emit({
       type: 'conception',
@@ -338,6 +494,11 @@ export function attemptConception(agent1: Entity, agent2: Entity, world: World):
         pregnantAgentId: pregnantAgent.id,
         otherParentId: otherParent.id,
         conceptionTick: world.tick,
+        fertilityModifier: fertilitySignal,
+        gestationModifier: 1 + (strategyProfile.gestationSensitivity - 0.5) * 0.2,
+        geneticSimilarity: strategyProfile.geneticSimilarity,
+        biochemicalAffinity: strategyProfile.biochemicalAffinity,
+        matePreferenceVector: strategyProfile.preferenceVector,
       },
     });
 

@@ -151,6 +151,19 @@ export interface SocialMetrics {
 }
 
 /**
+ * Capability unlock telemetry grouped by capability/species/agent.
+ */
+export interface CapabilityMetrics {
+  totalUnlocks: number;
+  unlocksByCapability: Record<string, number>;
+  unlocksBySpecies: Record<string, number>;
+  unlocksByAgent: Record<string, number>;
+  capabilitySpeciesMatrix: Record<string, Record<string, number>>;
+  averageUnlockScoreByCapability: Record<string, number>;
+  lastUnlockTimestamp?: number;
+}
+
+/**
  * Position in 2D space (re-exported from core types)
  */
 export type Position = CorePosition;

@@ -21,6 +21,9 @@ import { ComponentType } from '../../types/ComponentType.js';
 import { THROTTLE } from '../../ecs/SystemThrottleConfig.js';
 import type { IdentityComponent } from '../../components/IdentityComponent.js';
 import type { PositionComponent } from '../../components/PositionComponent.js';
+import type { BiochemistryComponent } from '../../components/BiochemistryComponent.js';
+import type { GeneticComponent, MatePreferenceVector } from '../../components/GeneticComponent.js';
+import { DEFAULT_MATE_PREFERENCE_VECTOR } from '../../components/GeneticComponent.js';
 
 import {
   PregnancyComponent,
@@ -128,6 +131,112 @@ export class MidwiferySystem extends BaseSystem {
   private reproductionSystem: ReproductionSystem | null = null;
   private midwiferyLastUpdate: Tick = 0;
 
+  private static clamp01(value: number): number {
+    return Math.max(0, Math.min(1, value));
+  }
+
+  private static average(values: number[]): number {
+    if (values.length === 0) return 0.5;
+    return values.reduce((sum, value) => sum + value, 0) / values.length;
+  }
+
+  private getGenetics(entity: Entity): GeneticComponent | undefined {
+    return (entity as EntityImpl).getComponent<GeneticComponent>('genetic');
+  }
+
+  private getBiochemistry(entity: Entity): BiochemistryComponent | undefined {
+    return (entity as EntityImpl).getComponent<BiochemistryComponent>('biochemistry');
+  }
+
+  private resolvePreferenceVector(entity: Entity): MatePreferenceVector {
+    return this.getGenetics(entity)?.matePreferenceVector ?? DEFAULT_MATE_PREFERENCE_VECTOR;
+  }
+
+  private calculateGestationParameters(mother: Entity, father: Entity): {
+    gestationTicks: number;
+    gestationModifier: number;
+    fertilityModifier: number;
+  } {
+    const motherPrefs = this.resolvePreferenceVector(mother);
+    const fatherPrefs = this.resolvePreferenceVector(father);
+    const motherBiochem = this.getBiochemistry(mother);
+    const fatherBiochem = this.getBiochemistry(father);
+
+    const preferenceVector: MatePreferenceVector = {
+      assortativePreference: MidwiferySystem.average([
+        motherPrefs.assortativePreference,
+        fatherPrefs.assortativePreference,
+      ]),
+      disassortativePreference: MidwiferySystem.average([
+        motherPrefs.disassortativePreference,
+        fatherPrefs.disassortativePreference,
+      ]),
+      biochemicalAffinity: MidwiferySystem.average([
+        motherPrefs.biochemicalAffinity,
+        fatherPrefs.biochemicalAffinity,
+      ]),
+      fertilitySensitivity: MidwiferySystem.average([
+        motherPrefs.fertilitySensitivity,
+        fatherPrefs.fertilitySensitivity,
+      ]),
+      gestationSensitivity: MidwiferySystem.average([
+        motherPrefs.gestationSensitivity,
+        fatherPrefs.gestationSensitivity,
+      ]),
+      tabooSensitivity: MidwiferySystem.average([
+        motherPrefs.tabooSensitivity,
+        fatherPrefs.tabooSensitivity,
+      ]),
+    };
+
+    const bondingSignal = MidwiferySystem.average([
+      motherBiochem?.oxytocin ?? 0.5,
+      fatherBiochem?.oxytocin ?? 0.5,
+    ]);
+    const nurtureSignal = MidwiferySystem.average([
+      motherBiochem?.nurtureScore ?? 0.5,
+      fatherBiochem?.nurtureScore ?? 0.5,
+    ]);
+    const stressSignal = MidwiferySystem.average([
+      motherBiochem?.cortisol ?? 0.5,
+      fatherBiochem?.cortisol ?? 0.5,
+    ]);
+
+    const fertilityAffinity = MidwiferySystem.clamp01(
+      bondingSignal * 0.3 +
+      nurtureSignal * 0.35 +
+      (1 - stressSignal) * 0.35
+    );
+
+    const gestationModifier = Math.max(
+      0.8,
+      Math.min(
+        1.2,
+        1 +
+          (preferenceVector.gestationSensitivity - 0.5) * 0.18 +
+          (stressSignal - 0.5) * 0.15 -
+          (bondingSignal - 0.5) * 0.08 -
+          (nurtureSignal - 0.5) * 0.08
+      )
+    );
+
+    const fertilityModifier = Math.max(
+      0.75,
+      Math.min(
+        1.35,
+        1 +
+          (fertilityAffinity - 0.5) * 0.5 +
+          (preferenceVector.fertilitySensitivity - 0.5) * 0.25
+      )
+    );
+
+    return {
+      gestationTicks: Math.max(1, Math.round(DEFAULT_GESTATION_TICKS * gestationModifier)),
+      gestationModifier,
+      fertilityModifier,
+    };
+  }
+
   protected async onInitialize(world: World, eventBus: EventBus): Promise<void> {
     // Get reference to ReproductionSystem for creating offspring with proper genetics
     // Note: world.getSystem may not be available in all contexts (e.g., tests)
@@ -205,9 +314,21 @@ export class MidwiferySystem extends BaseSystem {
     otherParentId: string;
     conceptionTick: Tick;
     expectedOffspringCount?: number;
+    gestationLength?: number;
+    gestationModifier?: number;
+    fertilityModifier?: number;
   }): void {
     const mother = this.world.getEntity(data.pregnantAgentId);
     if (!mother) return;
+
+    const father = this.world.getEntity(data.otherParentId);
+    const gestationParameters = father
+      ? this.calculateGestationParameters(mother, father)
+      : {
+          gestationTicks: DEFAULT_GESTATION_TICKS,
+          gestationModifier: 1,
+          fertilityModifier: 0.5,
+        };
 
     const impl = mother as EntityImpl;
 
@@ -218,7 +339,9 @@ export class MidwiferySystem extends BaseSystem {
     const pregnancy = createPregnancyComponent(
       data.otherParentId,
       data.conceptionTick,
-      DEFAULT_GESTATION_TICKS
+      data.gestationLength
+        ?? gestationParameters.gestationTicks
+        ?? DEFAULT_GESTATION_TICKS
     );
 
     if (data.expectedOffspringCount) {
@@ -249,6 +372,9 @@ export class MidwiferySystem extends BaseSystem {
       fatherId: data.otherParentId,
       expectedDueDate: pregnancy.expectedDueDate,
       riskFactors: pregnancy.riskFactors,
+      gestationLength: pregnancy.gestationLength,
+      gestationModifier: data.gestationModifier ?? gestationParameters.gestationModifier,
+      fertilityModifier: data.fertilityModifier ?? gestationParameters.fertilityModifier,
     }, data.pregnantAgentId);
   }
 

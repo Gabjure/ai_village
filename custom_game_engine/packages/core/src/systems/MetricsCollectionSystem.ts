@@ -607,6 +607,21 @@ export class MetricsCollectionSystem extends BaseSystem {
       });
     });
 
+    eventBus.subscribe('capability:unlocked', (event) => {
+      const data = event.data;
+      this.recordEvent({
+        type: 'capability:unlocked',
+        timestamp: Date.now(),
+        agentId: data.agentId,
+        capabilityId: data.capabilityId,
+        speciesId: data.speciesId,
+        score: data.score,
+        geneticScore: data.geneticScore,
+        biochemicalScore: data.biochemicalScore,
+        tick: data.tick,
+      });
+    });
+
     eventBus.subscribe('behavior:goal_achieved', (event) => {
       const data = event.data;
       this.recordEvent({

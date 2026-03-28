@@ -10,6 +10,7 @@ import type {
   NeedsMetrics,
   EconomicMetrics,
   SocialMetrics,
+  CapabilityMetrics,
   SpatialMetrics,
   BehavioralMetrics,
   IntelligenceMetrics,
@@ -66,6 +67,7 @@ const VALID_EVENT_TYPES = new Set([
   'session:ended',
   'player:intervention',
   'game:speed_changed',
+  'capability:unlocked',
 ]);
 
 export class MetricsCollector {
@@ -81,6 +83,7 @@ export class MetricsCollector {
   private needsMetrics: Map<string, NeedsMetrics> = new Map();
   private economicMetrics: EconomicMetrics;
   private socialMetrics: SocialMetrics;
+  private capabilityMetrics: CapabilityMetrics;
   private spatialMetrics: SpatialMetrics;
   private behavioralMetrics: Map<string, BehavioralMetrics[string]> = new Map();
   private intelligenceMetrics: IntelligenceMetrics;
@@ -108,6 +111,7 @@ export class MetricsCollector {
     // Initialize metrics
     this.economicMetrics = this.initializeEconomicMetrics();
     this.socialMetrics = this.initializeSocialMetrics();
+    this.capabilityMetrics = this.initializeCapabilityMetrics();
     this.spatialMetrics = this.initializeSpatialMetrics();
     this.intelligenceMetrics = this.initializeIntelligenceMetrics();
     this.performanceMetrics = this.initializePerformanceMetrics();
@@ -194,6 +198,20 @@ export class MetricsCollector {
       conflictsPerDay: 0,
       conflictTypes: {},
       conflictResolutionRate: 0,
+    };
+  }
+
+  /**
+   * Initialize capability unlock metrics
+   */
+  private initializeCapabilityMetrics(): CapabilityMetrics {
+    return {
+      totalUnlocks: 0,
+      unlocksByCapability: {},
+      unlocksBySpecies: {},
+      unlocksByAgent: {},
+      capabilitySpeciesMatrix: {},
+      averageUnlockScoreByCapability: {},
     };
   }
 
@@ -368,6 +386,9 @@ export class MetricsCollector {
         break;
       case 'game:speed_changed':
         this.handleGameSpeedChanged(event);
+        break;
+      case 'capability:unlocked':
+        this.handleCapabilityUnlocked(event);
         break;
       case 'population:sampled':
         this.handlePopulationSampled(event);
@@ -980,6 +1001,37 @@ export class MetricsCollector {
     this.addBoundedSample(this.sessionMetrics.gameSpeed, { timestamp, value: speed });
   }
 
+  /**
+   * Handle first-time capability unlock telemetry
+   */
+  private handleCapabilityUnlocked(event: Record<string, unknown>): void {
+    const capabilityId = event.capabilityId as string;
+    const agentId = event.agentId as string;
+    const speciesId = (event.speciesId as string | undefined) ?? 'unknown';
+    const score = (event.score as number | undefined) ?? 0;
+
+    const prevCount = this.capabilityMetrics.unlocksByCapability[capabilityId] ?? 0;
+    const nextCount = prevCount + 1;
+
+    this.capabilityMetrics.totalUnlocks++;
+    this.capabilityMetrics.unlocksByCapability[capabilityId] = nextCount;
+    this.capabilityMetrics.unlocksBySpecies[speciesId] =
+      (this.capabilityMetrics.unlocksBySpecies[speciesId] ?? 0) + 1;
+    this.capabilityMetrics.unlocksByAgent[agentId] =
+      (this.capabilityMetrics.unlocksByAgent[agentId] ?? 0) + 1;
+
+    if (!this.capabilityMetrics.capabilitySpeciesMatrix[capabilityId]) {
+      this.capabilityMetrics.capabilitySpeciesMatrix[capabilityId] = {};
+    }
+    const speciesBreakdown = this.capabilityMetrics.capabilitySpeciesMatrix[capabilityId]!;
+    speciesBreakdown[speciesId] = (speciesBreakdown[speciesId] ?? 0) + 1;
+
+    const prevAverage = this.capabilityMetrics.averageUnlockScoreByCapability[capabilityId] ?? 0;
+    this.capabilityMetrics.averageUnlockScoreByCapability[capabilityId] =
+      ((prevAverage * prevCount) + score) / nextCount;
+    this.capabilityMetrics.lastUnlockTimestamp = event.timestamp as number;
+  }
+
   // Storage for custom analysis events
   private populationSamples: Array<{ timestamp: number; population: number }> = [];
   private generationData: Array<{ timestamp: number; generation: number; avgIntelligence: number }> = [];
@@ -1212,6 +1264,9 @@ export class MetricsCollector {
       case 'social_metrics':
         data = this.socialMetrics;
         break;
+      case 'capability_metrics':
+        data = this.capabilityMetrics;
+        break;
       case 'spatial_metrics':
         // Flatten the structure for backward compatibility with tests
         data = {
@@ -1264,6 +1319,7 @@ export class MetricsCollector {
       Object.keys(this.economicMetrics.resourcesGathered).length > 0 ||
       Object.keys(this.economicMetrics.resourcesConsumed).length > 0 ||
       this.socialMetrics.relationshipsFormed > 0 ||
+      this.capabilityMetrics.totalUnlocks > 0 ||
       Object.keys(this.spatialMetrics.agents).length > 0 ||
       this.behavioralMetrics.size > 0 ||
       this.performanceMetrics.fps.length > 0 ||
@@ -1278,6 +1334,7 @@ export class MetricsCollector {
       needs_metrics: Object.fromEntries(this.needsMetrics),
       economic_metrics: this.economicMetrics,
       social_metrics: this.socialMetrics,
+      capability_metrics: this.capabilityMetrics,
       spatial_metrics: this.spatialMetrics,
       behavioral_metrics: Object.fromEntries(this.behavioralMetrics),
       intelligence_metrics: this.intelligenceMetrics,
