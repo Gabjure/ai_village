@@ -283,6 +283,18 @@ export class SyncretismSystem extends BaseSystem {
       outcome: result.outcome,
       newDeityId: result.newDeityId,
     });
+
+    // Cross-game lore export event (see cross-game-lore-bridge-spec-v1.md)
+    this.events.emitGeneric('lore:syncretism_occurred', {
+      sourceGame: 'mvee',
+      syncretismId: syncretism.id,
+      deity1Id,
+      deity2Id,
+      syncretismType: type,
+      outcome: result.outcome,
+      newDeityId: result.newDeityId,
+      timestamp: currentTick,
+    });
   }
 
   /**

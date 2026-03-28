@@ -172,6 +172,17 @@ export class RitualSystem extends BaseSystem {
         timestamp: currentTick,
       });
 
+      // Emit festival event for seasonal festivals (cross-game lore bridge)
+      if (ritual.type === 'seasonal_festival') {
+        this.events.emitGeneric('lore:festival_occurred', {
+          sourceGame: 'mvee',
+          ritualId: ritual.id,
+          name: ritual.name,
+          deityId: ritual.deityId,
+          timestamp: currentTick,
+        });
+      }
+
       // Reschedule based on type (use lookup table)
       const interval = this.ritualIntervalLookup.get(ritual.type) ?? 0;
       if (interval > 0) {

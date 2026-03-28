@@ -620,6 +620,17 @@ export class SchismSystem extends BaseSystem {
       cause: divergence.cause,
       believersAffected: remainedWith.length + joinedNew.length,
     });
+
+    // Cross-game lore export event (see cross-game-lore-bridge-spec-v1.md)
+    this.events.emitGeneric('lore:schism_occurred', {
+      sourceGame: 'mvee',
+      schismId: schism.id,
+      originalDeityId,
+      newDeityId: newDeityEntity.id,
+      cause: divergence.cause,
+      believersAffected: remainedWith.length + joinedNew.length,
+      timestamp: currentTick,
+    });
   }
 
   /**

@@ -43,6 +43,8 @@ export { AnimalGroupSystem } from './AnimalGroupSystem.js';
 export { PredatorPreyEcologySystem } from './PredatorPreyEcologySystem.js';
 export * from './WildAnimalSpawningSystem.js';
 export * from './AnimalHousingSystem.js';
+export { QuarantineSystem } from './QuarantineSystem.js';
+export { CreatureImportFactory, CreatureImportError } from './CreatureImportFactory.js';
 // Visual Metadata Systems (compute sizeMultiplier/alpha from game state)
 export * from './PlantVisualsSystem.js';
 export * from './AnimalVisualsSystem.js';

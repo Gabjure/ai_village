@@ -164,12 +164,15 @@ export enum ComponentType {
   AnimalGroup = 'animal_group',
   WorkingAnimal = 'working_animal',
   AnimalMigration = 'animal_migration',
+  QuarantineStatus = 'quarantine_status',
+  MigrationProvenance = 'migration_provenance',
 
   // Body Parts, Species & Genetics
   Body = 'body',
   Species = 'species',
   Genetic = 'genetic',
   Biochemistry = 'biochemistry',
+  CapabilityProfile = 'capability_profile',
 
   // Magic & Divine
   Magic = 'magic',  // Monolithic magic component (migration to split components in progress - see MagicComponentMigration.ts)

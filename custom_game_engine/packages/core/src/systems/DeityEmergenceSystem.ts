@@ -801,6 +801,16 @@ If the prayer doesn't clearly fit any domain, use "mystery" as the domain.`;
       initialBelief: pattern.totalBelief,
       tick: currentTick,
     });
+
+    // Cross-game lore export event (see cross-game-lore-bridge-spec-v1.md)
+    this.events.emitGeneric('lore:deity_emerged', {
+      sourceGame: 'mvee',
+      deityId: deityEntity.id,
+      deityName: identity.primaryName,
+      domain: pattern.concept,
+      believerCount: pattern.agentIds.length,
+      timestamp: currentTick,
+    });
   }
 
   /**

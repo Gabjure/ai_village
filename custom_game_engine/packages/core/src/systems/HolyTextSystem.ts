@@ -161,6 +161,16 @@ export class HolyTextSystem extends BaseSystem {
           text.title = parsed.title;
           text.content = parsed.content;
           text.teachingsContained = parsed.teachings;
+          // Cross-game lore export event (see cross-game-lore-bridge-spec-v1.md)
+          this.events.emitGeneric('lore:holy_text_written', {
+            sourceGame: 'mvee',
+            textId: text.id,
+            title: text.title,
+            deityId: text.deityId,
+            authorAgentId: text.authorAgentId,
+            canonicity: text.canonicity,
+            timestamp: text.writtenAt,
+          });
           break;
         }
       }
@@ -240,6 +250,17 @@ export class HolyTextSystem extends BaseSystem {
         teachingsContained: generated.teachings,
       };
       this.holyTexts.set(text.id, text);
+
+      // Cross-game lore export event (see cross-game-lore-bridge-spec-v1.md)
+      this.events.emitGeneric('lore:holy_text_written', {
+        sourceGame: 'mvee',
+        textId: text.id,
+        title: text.title,
+        deityId: text.deityId,
+        authorAgentId: text.authorAgentId,
+        canonicity: text.canonicity,
+        timestamp: currentTick,
+      });
     }
   }
 

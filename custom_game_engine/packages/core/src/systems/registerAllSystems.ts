@@ -404,6 +404,9 @@ import { AchievementService } from './AchievementService.js';
 // Animal Brain (from behavior module)
 import { AnimalBrainSystem } from '../behavior/animal-behaviors/AnimalBrainSystem.js';
 
+// Creature Import / Quarantine
+import { QuarantineSystem } from './QuarantineSystem.js';
+
 // Chunk Loading System
 import { ChunkLoadingSystem } from './ChunkLoadingSystem.js';
 
@@ -657,6 +660,7 @@ export function registerAllSystems(
     gameLoop.systemRegistry.register(new WorkingAnimalSystem());
     gameLoop.systemRegistry.register(new AnimalGroupSystem());
     gameLoop.systemRegistry.register(new PredatorPreyEcologySystem());
+    gameLoop.systemRegistry.register(new QuarantineSystem());
   }
 
   // ============================================================================

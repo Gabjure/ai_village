@@ -87,6 +87,22 @@ export interface AnimalEvents {
     speciesId: string;
     biome: string;
   };
+  'creature:imported': {
+    entityId: EntityId;
+    sourceGame: string;
+    migrationType: string;
+    speciesId: string;
+  };
+  'creature:quarantine_phase_changed': {
+    entityId: EntityId;
+    oldPhase: string;
+    newPhase: string;
+  };
+  'creature:quarantine_complete': {
+    entityId: EntityId;
+    adaptationScore: number;
+    totalTicks: number;
+  };
 }
 export type AnimalEventType = keyof AnimalEvents;
 export type AnimalEventData = AnimalEvents[AnimalEventType];

@@ -49,10 +49,85 @@ export async function initLoreDiscoveryBridge(eventBus: EventBus): Promise<void>
       getUserId: () => window.matrixAuth?.userId ?? null,
     });
 
-    unsubscribe = eventBus.on('lore:discovery' as any, (event: any) => {
-      const { category, subject, aspect, detail } = event.data;
-      emitter!.discover(category, subject, aspect, detail);
-    });
+    const unsubscribers: Array<() => void> = [];
+
+    // Forward basic discovery events
+    unsubscribers.push(
+      eventBus.on('lore:discovery' as any, (event: any) => {
+        const { category, subject, aspect, detail } = event.data;
+        emitter!.discover(category, subject, aspect, detail);
+      })
+    );
+
+    // Forward religion/mythology lore events to emitter as civilization discoveries
+    const religionEventMappings: Array<{
+      event: string;
+      map: (data: any) => { category: string; subject: string; aspect: string; detail: string | null };
+    }> = [
+      {
+        event: 'lore:myth_created',
+        map: (d) => ({ category: 'civilization', subject: d.deityId ?? d.title ?? 'unknown', aspect: 'discovered', detail: d.title ?? null }),
+      },
+      {
+        event: 'lore:myth_canonized',
+        map: (d) => ({ category: 'civilization', subject: d.deityId ?? d.title ?? 'unknown', aspect: 'texts_read', detail: d.title ?? null }),
+      },
+      {
+        event: 'lore:myth_disputed',
+        map: (d) => ({ category: 'civilization', subject: d.deityId ?? 'unknown', aspect: 'discovered', detail: d.title ?? null }),
+      },
+      {
+        event: 'lore:myth_mutated',
+        map: (d) => ({ category: 'civilization', subject: d.deityId ?? 'unknown', aspect: 'discovered', detail: d.title ?? null }),
+      },
+      {
+        event: 'lore:schism_occurred',
+        map: (d) => ({ category: 'event', subject: d.schismId ?? 'schism', aspect: 'witnessed', detail: d.cause ?? null }),
+      },
+      {
+        event: 'lore:syncretism_occurred',
+        map: (d) => ({ category: 'event', subject: d.syncretismId ?? 'syncretism', aspect: 'witnessed', detail: d.outcome ?? null }),
+      },
+      {
+        event: 'lore:holy_text_written',
+        map: (d) => ({ category: 'civilization', subject: d.deityId ?? 'unknown', aspect: 'texts_read', detail: d.title ?? null }),
+      },
+      {
+        event: 'lore:ritual_performed',
+        map: (d) => ({ category: 'event', subject: d.name ?? d.ritualId ?? 'ritual', aspect: 'participated', detail: d.deityId ?? null }),
+      },
+      {
+        event: 'lore:festival_occurred',
+        map: (d) => ({ category: 'event', subject: d.name ?? d.ritualId ?? 'festival', aspect: 'participated', detail: d.deityId ?? null }),
+      },
+      {
+        event: 'lore:deity_emerged',
+        map: (d) => ({ category: 'civilization', subject: d.deityName ?? d.deityId ?? 'deity', aspect: 'emerged', detail: d.domain ?? null }),
+      },
+      {
+        event: 'lore:deity_dormant',
+        map: (d) => ({ category: 'civilization', subject: d.deityName ?? d.deityId ?? 'deity', aspect: 'identified', detail: 'dormant' }),
+      },
+    ];
+
+    for (const mapping of religionEventMappings) {
+      unsubscribers.push(
+        eventBus.on(mapping.event as any, (event: any) => {
+          const { category, subject, aspect, detail } = mapping.map(event.data ?? event);
+          try {
+            emitter!.discover(category, subject, aspect, detail);
+          } catch {
+            // Aspect/category not yet in emitter — skip silently
+          }
+        })
+      );
+    }
+
+    unsubscribe = () => {
+      for (const unsub of unsubscribers) {
+        unsub();
+      }
+    };
   } catch {
     // @akashic-records not installed yet — bridge is a no-op
   }
