@@ -411,7 +411,7 @@ app.get(`${BASE_PATH}/admin/{*splat}`, (req, res, next) => {
 const universeRouter = createUniverseApiRouter();
 app.use(`${BASE_PATH}/api/multiverse`, universeRouter);
 
-// Planet API routes — used by PlanetClient for planet listing, stats, and liveness probes
+// Planet API routes — used by PlanetClient for planet listing, stats, entities, and liveness probes
 app.get(`${BASE_PATH}/api/planets/stats`, async (_req, res) => {
   try {
     const stats = await planetStorage.getStats();
@@ -427,6 +427,42 @@ app.get(`${BASE_PATH}/api/planets`, async (_req, res) => {
     res.json({ success: true, planets });
   } catch (err) {
     res.status(500).json({ error: err instanceof Error ? err.message : 'Failed to list planets' });
+  }
+});
+
+// Entity persistence routes — used by EntityPersistenceStream via PlanetClient
+app.get(`${BASE_PATH}/api/planets/:id/entities`, async (req, res) => {
+  try {
+    const planetId = decodeURIComponent(req.params.id);
+    const entities = await planetStorage.getEntities(planetId);
+    res.json({ success: true, entities });
+  } catch (err) {
+    res.status(500).json({ error: err instanceof Error ? err.message : 'Failed to get entities' });
+  }
+});
+
+app.put(`${BASE_PATH}/api/planets/:id/entities`, async (req, res) => {
+  try {
+    const planetId = decodeURIComponent(req.params.id);
+    const { entities, savedAt, savedBy } = req.body;
+    if (!Array.isArray(entities)) {
+      res.status(400).json({ error: 'entities must be an array' });
+      return;
+    }
+    await planetStorage.saveEntities(planetId, entities);
+    res.json({ success: true, saved: entities.length });
+  } catch (err) {
+    res.status(500).json({ error: err instanceof Error ? err.message : 'Failed to save entities' });
+  }
+});
+
+app.delete(`${BASE_PATH}/api/planets/:id/entities`, async (req, res) => {
+  try {
+    const planetId = decodeURIComponent(req.params.id);
+    await planetStorage.clearEntities(planetId);
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: err instanceof Error ? err.message : 'Failed to clear entities' });
   }
 });
 

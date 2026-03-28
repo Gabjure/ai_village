@@ -153,6 +153,7 @@ import {
   ART_STYLE_PROMPTS,
   parseSpriteId,
 } from './sprite-description-builder.js';
+import { checkSpriteApprovalGate } from './sprite-approval-gate.js';
 
 const gzip = promisify(zlib.gzip);
 const gunzip = promisify(zlib.gunzip);
@@ -627,22 +628,52 @@ if (!fs.existsSync(SPRITES_DIR)) {
 /**
  * Queue a sprite generation request
  */
+interface QueueSpriteResult {
+  queued: boolean;
+  reason?: string;
+  speciesKey?: string;
+}
+
 function queueSpriteGeneration(
   folderId: string,
   description: string,
-  traits: SpriteGenerationJob['traits']
-): void {
+  traits: SpriteGenerationJob['traits'],
+  options: { allowRegeneration?: boolean } = {}
+): QueueSpriteResult {
   // Check if already exists or generating
   if (spriteGenerationJobs.has(folderId)) {
     console.log(`[SpriteGen] Already queued/generating: ${folderId}`);
-    return;
+    return {
+      queued: false,
+      reason: `Already queued or generating: ${folderId}`,
+    };
   }
 
   // Check if sprite already exists on disk
   const spritePath = path.join(SPRITES_DIR, folderId);
   if (fs.existsSync(spritePath)) {
     console.log(`[SpriteGen] Already exists on disk: ${folderId}`);
-    return;
+    return {
+      queued: false,
+      reason: `Sprite already exists on disk: ${folderId}`,
+    };
+  }
+
+  const gateDecision = checkSpriteApprovalGate({
+    folderId,
+    traits: traits as unknown as Record<string, unknown>,
+    allowRegeneration: options.allowRegeneration,
+  });
+  if (!gateDecision.allowed) {
+    console.warn(`[SpriteGate] ${gateDecision.reason}`);
+    return {
+      queued: false,
+      reason: gateDecision.reason,
+      speciesKey: gateDecision.speciesKey,
+    };
+  }
+  if (gateDecision.claimedPending || gateDecision.approved) {
+    console.log(`[SpriteGate] ${gateDecision.reason}`);
   }
 
   // Create folder and metadata.json immediately so it appears in sprite gallery
@@ -682,6 +713,12 @@ function queueSpriteGeneration(
 
   // Save queue to file for Claude to process
   saveGenerationQueue();
+
+  return {
+    queued: true,
+    speciesKey: gateDecision.speciesKey,
+    reason: gateDecision.reason,
+  };
 }
 
 /**
@@ -8126,7 +8163,7 @@ See TIME_MANIPULATION_DEVTOOLS.md for more details
   // ============================================================
 
   // GET /api/planets/:id/entities - Get all entities for a planet
-  if (pathname.match(/^\/api\/planet\/[^\/]+\/entities$/) && req.method === 'GET') {
+  if (pathname.match(/^\/api\/planets\/[^\/]+\/entities$/) && req.method === 'GET') {
     res.setHeader('Content-Type', 'application/json');
     res.setHeader('Access-Control-Allow-Origin', '*');
 
@@ -8143,7 +8180,7 @@ See TIME_MANIPULATION_DEVTOOLS.md for more details
   }
 
   // PUT /api/planets/:id/entities - Save batch of entities
-  if (pathname.match(/^\/api\/planet\/[^\/]+\/entities$/) && req.method === 'PUT') {
+  if (pathname.match(/^\/api\/planets\/[^\/]+\/entities$/) && req.method === 'PUT') {
     res.setHeader('Content-Type', 'application/json');
     res.setHeader('Access-Control-Allow-Origin', '*');
 
@@ -8171,7 +8208,7 @@ See TIME_MANIPULATION_DEVTOOLS.md for more details
   }
 
   // DELETE /api/planets/:id/entities - Clear all entities for a planet
-  if (pathname.match(/^\/api\/planet\/[^\/]+\/entities$/) && req.method === 'DELETE') {
+  if (pathname.match(/^\/api\/planets\/[^\/]+\/entities$/) && req.method === 'DELETE') {
     res.setHeader('Content-Type', 'application/json');
     res.setHeader('Access-Control-Allow-Origin', '*');
 
@@ -8559,13 +8596,28 @@ ENDPOINTS:
         const versionedPath = path.join(SPRITES_DIR, versionedName);
         fs.renameSync(folderPath, versionedPath);
 
-        // Queue new generation with enriched description and traits
-        queueSpriteGeneration(folderId, spriteDescription, spriteTraits);
+        // Queue new generation with enriched description and traits.
+        // Regeneration is explicitly allowed through the species gate so QA can iterate.
+        const queueResult = queueSpriteGeneration(
+          folderId,
+          spriteDescription,
+          spriteTraits,
+          { allowRegeneration: true }
+        );
+        if (!queueResult.queued) {
+          res.statusCode = 409;
+          res.end(JSON.stringify({
+            success: false,
+            error: queueResult.reason || `Failed to queue regeneration for ${folderId}`,
+          }));
+          return;
+        }
 
         res.end(JSON.stringify({
           success: true,
           versionedAs: versionedName,
           queuedNew: folderId,
+          speciesKey: queueResult.speciesKey,
           artStyle: artStyle || 'default',
           description: spriteDescription,
           message: `Old version saved as ${versionedName}, new generation queued with ${artStyle ? `art style '${artStyle}'` : 'default description'}`,
@@ -8840,13 +8892,30 @@ ENDPOINTS:
           spriteGenerationJobs.delete(folderId);
         }
 
-        // Queue the generation request
-        queueSpriteGeneration(folderId, description, traits || {});
+        // Queue the generation request (guarded by single-species approval gate)
+        const queueResult = queueSpriteGeneration(
+          folderId,
+          description,
+          traits || {},
+          { allowRegeneration: Boolean(regenerate) }
+        );
+        if (!queueResult.queued) {
+          res.statusCode = 409;
+          res.end(JSON.stringify({
+            status: 'blocked',
+            folderId,
+            speciesKey: queueResult.speciesKey,
+            regenerate: regenerate || false,
+            message: queueResult.reason || 'Sprite generation blocked by species approval gate.',
+          }));
+          return;
+        }
 
         const job = spriteGenerationJobs.get(folderId);
         res.end(JSON.stringify({
           status: job?.status || 'queued',
           folderId,
+          speciesKey: queueResult.speciesKey,
           regenerate: regenerate || false,
           message: regenerate
             ? 'Sprite regeneration queued. Previous sprite cleared.'
