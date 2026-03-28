@@ -40,7 +40,7 @@ const STATUS_TO_CANONICITY: Record<MythStatus, number> = {
 
 /**
  * Map MVEE's 50+ MythCategory values to the 34 PortableMythCategory values.
- * Categories not listed here fall through to 'origin' as the safe default.
+ * Categories not listed here cause mapMythCategory() to throw.
  */
 const CATEGORY_MAP: Record<string, PortableMythCategory> = {
   // Direct mappings
