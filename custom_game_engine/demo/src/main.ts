@@ -5998,6 +5998,33 @@ async function main() {
     },
   });
 
+  // === Eighth Child: ambient edge pulse signal (MUL-4352) ===
+  const triggerEighthChildSignal = 'triggerEighthChildSignal' in renderer
+    ? (renderer as any).triggerEighthChildSignal.bind(renderer) as () => void
+    : null;
+
+  if (triggerEighthChildSignal) {
+    gameLoop.world.eventBus.subscribe('eighth_child_moment' as any, () => {
+      triggerEighthChildSignal();
+    });
+  }
+
+  // === Eighth Child: audio signal (MUL-4353) ===
+  // Null-safe: continues silently if audio asset is missing or fails to decode.
+  gameLoop.world.eventBus.subscribe('eighth_child_moment' as any, () => {
+    const sound = settingsPanel.getSettings().sound;
+    if (sound?.masterMuted) return;
+
+    const volume = Math.min(1, Math.max(0, (sound?.masterVolume ?? 0.7) * 0.4));
+    if (volume <= 0) return;
+
+    const audio = new Audio('/audio/eighth-child-resolve.mp3');
+    audio.volume = volume;
+    audio.play().catch(() => {
+      // Asset missing, autoplay blocked, or decode error — continue silently
+    });
+  });
+
   // === Eternal Return: Glyph trigger (MUL-2543) ===
   // When the first settlement is founded, call Folkfork glyph API and display the glyph.
   const glyphOverlay = 'eternalReturnGlyphOverlay' in renderer
