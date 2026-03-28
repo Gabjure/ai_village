@@ -397,6 +397,7 @@ import { SongSystem } from '../lore/SongSystem.js';
 import { MVEE_SONG_CATALOGUE } from '../data/mvee-songs.js';
 import { ChorusStateSystem } from './ChorusStateSystem.js';
 import { ChorusWeatherEffectSystem } from './ChorusWeatherEffectSystem.js';
+import { EighthChildDetectorSystem } from './EighthChildDetectorSystem.js';
 import { SpellWorldEffectSystem } from './SpellWorldEffectSystem.js';
 import { AchievementService } from './AchievementService.js';
 
@@ -1185,6 +1186,11 @@ export function registerAllSystems(
   // CHORUS WEATHER EFFECTS (terrain/sky anomalies for Blooming/Chorus — priority 46)
   // ============================================================================
   gameLoop.systemRegistry.register(new ChorusWeatherEffectSystem());
+
+  // ============================================================================
+  // EIGHTH CHILD DETECTOR (cross-game presence-over-power signal — priority 855)
+  // ============================================================================
+  gameLoop.systemRegistry.register(new EighthChildDetectorSystem());
 
   // ============================================================================
   // SPELL WORLD EFFECTS (Drive 3 — Spell Sandbox world mutations, priority 160)
