@@ -33,23 +33,26 @@ const RESPAWN_HEALTH_FRACTION = 0.5;
 export class AvatarRespawnSystem extends BaseSystem {
   public readonly id = 'AvatarRespawnSystem' as const;
   public readonly priority = 55;
-  public readonly requiredComponents: string[] = [] as const;
+  public readonly requiredComponents = ['avatar_entity'] as const;
   public readonly activationComponents = ['avatar_entity'] as const;
-  protected readonly throttleInterval = 0; // EVERY_TICK
+  protected readonly throttleInterval = 20; // ~1 second; respawn checks are infrequent
+
+  /** Cached roster entities — refreshed every throttleInterval ticks */
+  private _cachedRosterEntities: ReadonlyArray<Entity> = [];
+  private _rosterCacheTick = -1;
 
   protected onUpdate(ctx: SystemContext): void {
     const world: World = ctx.world;
     const currentTick = ctx.tick;
 
-    const avatarEntities = world
-      .query()
-      .with('avatar_entity')
-      .executeEntities();
+    // Refresh roster cache once per throttled update (same cadence as onUpdate)
+    if (currentTick !== this._rosterCacheTick) {
+      this._cachedRosterEntities = world.query().with('avatar_roster').executeEntities();
+      this._rosterCacheTick = currentTick;
+    }
+    const rosterEntities = this._cachedRosterEntities;
 
-    // Hoist roster query outside the avatar entity loop
-    const rosterEntities = world.query().with('avatar_roster').executeEntities();
-
-    for (const avatarEntity of avatarEntities) {
+    for (const avatarEntity of ctx.activeEntities) {
       const avatarComp = avatarEntity.getComponent<AvatarComponent>('avatar_entity');
       if (!avatarComp) continue;
 
@@ -68,7 +71,7 @@ export class AvatarRespawnSystem extends BaseSystem {
       if (currentTick < avatarComp.autoRespawnDeadlineTick) continue;
       if (!avatarComp.pendingRespawnOptions || avatarComp.pendingRespawnOptions.length === 0) continue;
 
-      // Find the owning agent from pre-queried roster entities
+      // Find the owning agent from the cached roster entities
       for (const rosterEntity of rosterEntities) {
         const roster = rosterEntity.getComponent<AvatarRosterComponent>('avatar_roster');
         if (!roster) continue;

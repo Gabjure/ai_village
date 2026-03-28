@@ -34,21 +34,16 @@ const TICKS_PER_SECOND = 20;
 export class AvatarManagementSystem extends BaseSystem {
   public readonly id = 'AvatarManagementSystem' as const;
   public readonly priority = 10;
-  public readonly requiredComponents: string[] = [] as const;
-  public readonly activationComponents = ['avatar_roster'] as const;
-  protected readonly throttleInterval = 0; // EVERY_TICK
+  public readonly requiredComponents = ['avatar_entity'] as const;
+  public readonly activationComponents = ['avatar_entity'] as const;
+  protected readonly throttleInterval = 20; // ~1 second; avatar deadline changes are infrequent
 
   protected onUpdate(ctx: SystemContext): void {
     const world: World = ctx.world;
     const currentTick = ctx.tick;
 
     // Process auto-respawn deadlines for avatars in destroyed state
-    const avatarEntities = world
-      .query()
-      .with('avatar_entity')
-      .executeEntities();
-
-    for (const avatarEntity of avatarEntities) {
+    for (const avatarEntity of ctx.activeEntities) {
       const avatarComp = avatarEntity.getComponent<AvatarComponent>('avatar_entity');
       if (!avatarComp) continue;
 

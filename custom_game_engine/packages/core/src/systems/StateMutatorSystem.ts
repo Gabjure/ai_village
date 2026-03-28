@@ -61,6 +61,12 @@ export class StateMutatorSystem extends BaseSystem {
   // Process entities with mutation vectors
   public readonly requiredComponents = [CT.MutationVector] as const;
 
+  // Pre-allocated to avoid per-entity array allocation every tick
+  private _expiredFields: string[] = [];
+
+  // Cache parsed field paths to avoid repeated split/join allocations
+  private _pathCache = new Map<string, { componentType: ComponentType; pathParts: string[] }>();
+
   /**
    * Main update - applies mutations every tick with zero allocations
    */
@@ -74,19 +80,19 @@ export class StateMutatorSystem extends BaseSystem {
       const mv = entity.getComponent<MutationVectorComponent>(CT.MutationVector);
       if (!mv) continue;
 
-      const expiredFields: string[] = [];
-      const fieldEntries = Object.entries(mv.fields) as [string, MutationField][];
+      this._expiredFields.length = 0;
 
-      for (const [fieldPath, field] of fieldEntries) {
+      for (const fieldPath in mv.fields) {
+        const field = mv.fields[fieldPath] as MutationField;
         // Check tick expiration before applying (don't apply on expiration tick)
         if (field.expiresAt !== undefined && tick >= field.expiresAt) {
-          expiredFields.push(fieldPath);
+          this._expiredFields.push(fieldPath);
           continue;
         }
 
         // Check if rate has decayed to negligible
         if (Math.abs(field.rate) < 0.0001 && field.derivative === 0) {
-          expiredFields.push(fieldPath);
+          this._expiredFields.push(fieldPath);
           continue;
         }
 
@@ -103,13 +109,13 @@ export class StateMutatorSystem extends BaseSystem {
         if (field.totalAmount !== undefined && field.appliedAmount !== undefined) {
           field.appliedAmount += Math.abs(delta);
           if (field.appliedAmount >= field.totalAmount) {
-            expiredFields.push(fieldPath);
+            this._expiredFields.push(fieldPath);
           }
         }
       }
 
       // Remove expired fields (direct mutation - no new object)
-      for (const path of expiredFields) {
+      for (const path of this._expiredFields) {
         delete mv.fields[path];
       }
     }
@@ -125,14 +131,18 @@ export class StateMutatorSystem extends BaseSystem {
     delta: number,
     field: MutationField
   ): void {
-    const parts = fieldPath.split('.');
-    if (parts.length < 2) {
-      console.warn(`[StateMutator] Invalid field path: ${fieldPath} (expected "component.field")`);
-      return;
+    let cached = this._pathCache.get(fieldPath);
+    if (!cached) {
+      const parts = fieldPath.split('.');
+      if (parts.length < 2) {
+        console.warn(`[StateMutator] Invalid field path: ${fieldPath} (expected "component.field")`);
+        return;
+      }
+      cached = { componentType: parts[0] as ComponentType, pathParts: parts.slice(1) };
+      this._pathCache.set(fieldPath, cached);
     }
 
-    const componentType = parts[0] as ComponentType;
-    const fieldName = parts.slice(1).join('.');
+    const componentType = cached.componentType;
 
     const component = entity.getComponent(componentType);
     if (!component) return;
@@ -141,7 +151,7 @@ export class StateMutatorSystem extends BaseSystem {
     // We need to treat component as a record for dynamic field access
     // This is safe because we're doing runtime type checks below
     let current: Record<string, unknown> = component as unknown as Record<string, unknown>;
-    const pathParts = fieldName.split('.');
+    const pathParts = cached.pathParts;
 
     for (let i = 0; i < pathParts.length - 1; i++) {
       const part = pathParts[i];

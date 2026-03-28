@@ -61,8 +61,8 @@ export class SteeringSystem extends BaseSystem {
     'seek', 'arrive', 'obstacle_avoidance', 'wander', 'combined', 'none',
   ]);
 
-  // Track stuck agents for pathfinding fallback
-  private stuckTracker: Map<string, { lastPos: Vector2; stuckTime: number; target: Vector2 }> = new Map();
+  // Track stuck agents for pathfinding fallback (tick-based to avoid Date.now() in hot path)
+  private stuckTracker: Map<string, { lastPos: Vector2; lastTick: number; target: Vector2 }> = new Map();
 
   // Reusable obstacles array to avoid per-entity allocation in obstacle avoidance
   private _obstacleBuffer: Entity[] = [];
@@ -74,6 +74,11 @@ export class SteeringSystem extends BaseSystem {
   private _scratchHeading: MutableVector2 = { x: 0, y: 0 };
   private _scratchPerpLeft: MutableVector2 = { x: 0, y: 0 };
   private _scratchPerpRight: MutableVector2 = { x: 0, y: 0 };
+  private _scratchSeek: MutableVector2 = { x: 0, y: 0 };
+  private _scratchArrive: MutableVector2 = { x: 0, y: 0 };
+  private _scratchWander: MutableVector2 = { x: 0, y: 0 };
+  private _scratchAvoid: MutableVector2 = { x: 0, y: 0 };
+  private _scratchCombined: MutableVector2 = { x: 0, y: 0 };
 
   protected onUpdate(ctx: SystemContext): void {
     // Periodic stuckTracker cleanup - remove entries for entities no longer active
@@ -139,7 +144,7 @@ export class SteeringSystem extends BaseSystem {
         break;
 
       case 'arrive':
-        steeringForce = this._arrive(position, velocity, steering, entity.id);
+        steeringForce = this._arrive(position, velocity, steering, entity.id, world.tick);
         break;
 
       case 'obstacle_avoidance':
@@ -158,10 +163,10 @@ export class SteeringSystem extends BaseSystem {
     // Add containment force if bounds are set (applies to ALL behaviors)
     if (steering.containmentBounds) {
       const containmentForce = this._containment(position, velocity, steering);
-      steeringForce = {
-        x: steeringForce.x + containmentForce.x,
-        y: steeringForce.y + containmentForce.y,
-      };
+      // Accumulate into _scratchForce to avoid allocating a new {x, y} literal
+      this._scratchForce.x = steeringForce.x + containmentForce.x;
+      this._scratchForce.y = steeringForce.y + containmentForce.y;
+      steeringForce = this._scratchForce;
     }
 
     // Apply steering force (clamped to maxForce)
@@ -197,26 +202,30 @@ export class SteeringSystem extends BaseSystem {
     const target = targetOverride ?? steering.target;
     if (!target) {
       // No target yet (e.g., freshly deserialized, BrainSystem hasn't assigned one) — no force
-      return { x: 0, y: 0 };
+      this._scratchSeek.x = 0;
+      this._scratchSeek.y = 0;
+      return this._scratchSeek;
     }
 
-    const desired = {
-      x: target.x - position.x,
-      y: target.y - position.y,
-    };
+    const dx = target.x - position.x;
+    const dy = target.y - position.y;
 
     // Normalize and scale to max speed
-    const distance = Math.sqrt(desired.x * desired.x + desired.y * desired.y);
-    if (distance === 0) return { x: 0, y: 0 };
+    const distSq = dx * dx + dy * dy;
+    if (distSq === 0) {
+      this._scratchSeek.x = 0;
+      this._scratchSeek.y = 0;
+      return this._scratchSeek;
+    }
+    const distance = Math.sqrt(distSq);
 
-    desired.x = (desired.x / distance) * steering.maxSpeed;
-    desired.y = (desired.y / distance) * steering.maxSpeed;
+    const desiredX = (dx / distance) * steering.maxSpeed;
+    const desiredY = (dy / distance) * steering.maxSpeed;
 
     // Steering = desired - current
-    return {
-      x: desired.x - velocity.vx,
-      y: desired.y - velocity.vy,
-    };
+    this._scratchSeek.x = desiredX - velocity.vx;
+    this._scratchSeek.y = desiredY - velocity.vy;
+    return this._scratchSeek;
   }
 
   /**
@@ -224,30 +233,34 @@ export class SteeringSystem extends BaseSystem {
    * Fixed to prevent jittering/oscillation when reaching target
    * Includes stuck detection for dead-end scenarios
    */
-  private _arrive(position: PositionComponent, velocity: VelocityComponent, steering: SteeringComponent, entityId?: string): Vector2 {
+  private _arrive(position: PositionComponent, velocity: VelocityComponent, steering: SteeringComponent, entityId?: string, currentTick?: number): Vector2 {
     if (!steering.target) {
       // No target yet (e.g., freshly deserialized, BrainSystem hasn't assigned one) — no force
-      return { x: 0, y: 0 };
+      this._scratchArrive.x = 0;
+      this._scratchArrive.y = 0;
+      return this._scratchArrive;
     }
 
-    const desired = {
-      x: steering.target.x - position.x,
-      y: steering.target.y - position.y,
-    };
+    let desiredX = steering.target.x - position.x;
+    let desiredY = steering.target.y - position.y;
 
-    const distanceSquared = desired.x * desired.x + desired.y * desired.y;
-    if (distanceSquared === 0) return { x: 0, y: 0 };
+    const distanceSquared = desiredX * desiredX + desiredY * desiredY;
+    if (distanceSquared === 0) {
+      this._scratchArrive.x = 0;
+      this._scratchArrive.y = 0;
+      return this._scratchArrive;
+    }
 
     // Stuck detection: Check if agent is making progress toward target
-    if (entityId) {
+    // Uses tick-based tracking (60 ticks ≈ 3s at 20 TPS) to avoid Date.now() in hot path
+    if (entityId !== undefined && currentTick !== undefined) {
       const tracker = this.stuckTracker.get(entityId);
-      const now = Date.now();
 
       if (!tracker) {
         // Initialize tracker
         this.stuckTracker.set(entityId, {
           lastPos: { x: position.x, y: position.y },
-          stuckTime: now,
+          lastTick: currentTick,
           target: { x: steering.target.x, y: steering.target.y }
         });
       } else {
@@ -260,13 +273,12 @@ export class SteeringSystem extends BaseSystem {
         if (movedSquared > thresholdSquared) {
           // Made progress, reset stuck timer
           tracker.lastPos = { x: position.x, y: position.y };
-          tracker.stuckTime = now;
-        } else if (now - tracker.stuckTime > 3000) {
-          // Stuck for 3+ seconds - need pathfinding!
-          // For now, just add random jitter to try different angles
-          desired.x += (Math.random() - 0.5) * 2;
-          desired.y += (Math.random() - 0.5) * 2;
-          tracker.stuckTime = now; // Reset to prevent spam
+          tracker.lastTick = currentTick;
+        } else if (currentTick - tracker.lastTick > 60) {
+          // Stuck for 60+ ticks (~3s at 20 TPS) - add random jitter to try different angles
+          desiredX += (Math.random() - 0.5) * 2;
+          desiredY += (Math.random() - 0.5) * 2;
+          tracker.lastTick = currentTick; // Reset to prevent spam
         }
       }
     }
@@ -277,7 +289,9 @@ export class SteeringSystem extends BaseSystem {
       // Within dead zone - apply proportional braking that decays velocity smoothly
       // Using velocity dampening instead of hard negative force to prevent oscillation
       // This returns a force that will zero velocity over ~2-3 frames
-      return { x: -velocity.vx * 2, y: -velocity.vy * 2 };
+      this._scratchArrive.x = -velocity.vx * 2;
+      this._scratchArrive.y = -velocity.vy * 2;
+      return this._scratchArrive;
     }
 
     // Check if already stopped and within tolerance (use squared comparison)
@@ -287,7 +301,9 @@ export class SteeringSystem extends BaseSystem {
 
     if (distanceSquared < arrivalToleranceSquared && speedSquared < 0.01) { // 0.1 * 0.1 = 0.01
       // Already stopped and close enough - apply gentle brake
-      return { x: -velocity.vx, y: -velocity.vy };
+      this._scratchArrive.x = -velocity.vx;
+      this._scratchArrive.y = -velocity.vy;
+      return this._scratchArrive;
     }
 
     // Compute actual distance only when needed for normalization
@@ -309,13 +325,12 @@ export class SteeringSystem extends BaseSystem {
     }
 
     // Normalize and scale
-    desired.x = (desired.x / distance) * targetSpeed;
-    desired.y = (desired.y / distance) * targetSpeed;
+    const scaledX = (desiredX / distance) * targetSpeed;
+    const scaledY = (desiredY / distance) * targetSpeed;
 
-    return {
-      x: desired.x - velocity.vx,
-      y: desired.y - velocity.vy,
-    };
+    this._scratchArrive.x = scaledX - velocity.vx;
+    this._scratchArrive.y = scaledY - velocity.vy;
+    return this._scratchArrive;
   }
 
   /**
@@ -325,9 +340,14 @@ export class SteeringSystem extends BaseSystem {
   private _avoidObstacles(entity: Entity, position: PositionComponent, velocity: VelocityComponent, steering: SteeringComponent, world: World): Vector2 {
     const lookAheadDistance = steering.lookAheadDistance ?? 2.0; // Reduced from 5.0 to 2.0
 
-    // Ray-cast ahead
-    const speed = Math.sqrt(velocity.vx * velocity.vx + velocity.vy * velocity.vy);
-    if (speed === 0) return { x: 0, y: 0 };
+    // Zero-check using squared values before paying for sqrt
+    const speedSq = velocity.vx * velocity.vx + velocity.vy * velocity.vy;
+    if (speedSq < 0.0001) {
+      this._scratchAvoid.x = 0;
+      this._scratchAvoid.y = 0;
+      return this._scratchAvoid;
+    }
+    const speed = Math.sqrt(speedSq);
 
     this._scratchAhead.x = position.x + (velocity.vx / speed) * lookAheadDistance;
     this._scratchAhead.y = position.y + (velocity.vy / speed) * lookAheadDistance;
@@ -370,22 +390,37 @@ export class SteeringSystem extends BaseSystem {
     }
 
     if (obstacles.length === 0) {
-      return { x: 0, y: 0 };
+      this._scratchAvoid.x = 0;
+      this._scratchAvoid.y = 0;
+      return this._scratchAvoid;
     }
 
-    // Find closest obstacle (use squared distance for performance - no sqrt needed for comparison)
-    const closest = obstacles.reduce((prev: Entity, curr: Entity) => {
-      const prevPos = getPosition(prev);
-      const currPos = getPosition(curr);
-      if (!prevPos || !currPos) return prev;
-      const prevDistSq = this._distanceSquared(position, prevPos);
-      const currDistSq = this._distanceSquared(position, currPos);
-      return currDistSq < prevDistSq ? curr : prev;
-    });
+    // Find closest obstacle using a for loop (avoids reduce callback allocation)
+    let closest: Entity | undefined = undefined;
+    let closestDistSq = Infinity;
+    for (let i = 0; i < obstacles.length; i++) {
+      const obs = obstacles[i];
+      if (!obs) continue;
+      const obsPos = getPosition(obs);
+      if (!obsPos) continue;
+      const distSq = this._distanceSquared(position, obsPos);
+      if (distSq < closestDistSq) {
+        closestDistSq = distSq;
+        closest = obs;
+      }
+    }
+
+    if (!closest) {
+      this._scratchAvoid.x = 0;
+      this._scratchAvoid.y = 0;
+      return this._scratchAvoid;
+    }
 
     const obstaclePos = getPosition(closest);
     if (!obstaclePos) {
-      return { x: 0, y: 0 };
+      this._scratchAvoid.x = 0;
+      this._scratchAvoid.y = 0;
+      return this._scratchAvoid;
     }
 
     // Calculate steering force to avoid obstacle
@@ -415,10 +450,9 @@ export class SteeringSystem extends BaseSystem {
     // Steer in the direction opposite to the obstacle
     const steerDir = dotLeft < dotRight ? perpLeft : perpRight;
 
-    return {
-      x: steerDir.x * steering.maxForce,
-      y: steerDir.y * steering.maxForce,
-    };
+    this._scratchAvoid.x = steerDir.x * steering.maxForce;
+    this._scratchAvoid.y = steerDir.y * steering.maxForce;
+    return this._scratchAvoid;
   }
 
   /**
@@ -438,26 +472,26 @@ export class SteeringSystem extends BaseSystem {
     // Jitter the wander angle
     steering.wanderAngle += (Math.random() - 0.5) * wanderJitter;
 
-    // Calculate circle center (ahead of agent)
-    const speed = Math.sqrt(velocity.vx * velocity.vx + velocity.vy * velocity.vy);
-    let circleCenter = { x: 0, y: 0 };
+    // Calculate circle center (ahead of agent) - zero-check before sqrt
+    const speedSq = velocity.vx * velocity.vx + velocity.vy * velocity.vy;
+    let circleCenterX: number;
+    let circleCenterY: number;
 
-    if (speed > 0) {
-      circleCenter = {
-        x: position.x + (velocity.vx / speed) * wanderDistance,
-        y: position.y + (velocity.vy / speed) * wanderDistance,
-      };
+    if (speedSq > 0) {
+      const speed = Math.sqrt(speedSq);
+      circleCenterX = position.x + (velocity.vx / speed) * wanderDistance;
+      circleCenterY = position.y + (velocity.vy / speed) * wanderDistance;
     } else {
-      circleCenter = { x: position.x, y: position.y + wanderDistance };
+      circleCenterX = position.x;
+      circleCenterY = position.y + wanderDistance;
     }
 
-    // Calculate target on circle
-    const target = {
-      x: circleCenter.x + Math.cos(steering.wanderAngle) * wanderRadius,
-      y: circleCenter.y + Math.sin(steering.wanderAngle) * wanderRadius,
-    };
+    // Calculate target on circle using _scratchWander to avoid allocation
+    this._scratchWander.x = circleCenterX + Math.cos(steering.wanderAngle) * wanderRadius;
+    this._scratchWander.y = circleCenterY + Math.sin(steering.wanderAngle) * wanderRadius;
 
-    return this._seek(position, velocity, steering, target);
+    // _seek writes into _scratchSeek and returns it; _scratchWander is already consumed above
+    return this._seek(position, velocity, steering, this._scratchWander);
   }
 
   /**
@@ -519,34 +553,45 @@ export class SteeringSystem extends BaseSystem {
    */
   private _combined(entity: Entity, position: PositionComponent, velocity: VelocityComponent, steering: SteeringComponent, world: World): Vector2 {
     if (!steering.behaviors || steering.behaviors.length === 0) {
-      return { x: 0, y: 0 };
+      this._scratchCombined.x = 0;
+      this._scratchCombined.y = 0;
+      return this._scratchCombined;
     }
 
-    const combined = { x: 0, y: 0 };
+    // Accumulate into _scratchCombined (reset first)
+    this._scratchCombined.x = 0;
+    this._scratchCombined.y = 0;
 
     for (const behavior of steering.behaviors) {
       const weight = behavior.weight ?? 1.0;
-      let force: Vector2 = { x: 0, y: 0 };
+      let force: Vector2;
 
       switch (behavior.type) {
         case 'seek':
+          // _seek writes _scratchSeek; read force.x/y before next sub-call overwrites it
           force = this._seek(position, velocity, steering, behavior.target);
           break;
 
         case 'obstacle_avoidance':
+          // _avoidObstacles writes _scratchAvoid
           force = this._avoidObstacles(entity, position, velocity, steering, world);
           break;
 
         case 'wander':
+          // _wander calls _seek internally and returns _scratchSeek
           force = this._wander(position, velocity, steering);
           break;
+
+        default:
+          continue;
       }
 
-      combined.x += force.x * weight;
-      combined.y += force.y * weight;
+      // Accumulate immediately — before any subsequent sub-call could overwrite the scratch
+      this._scratchCombined.x += force.x * weight;
+      this._scratchCombined.y += force.y * weight;
     }
 
-    return combined;
+    return this._scratchCombined;
   }
 
   /**

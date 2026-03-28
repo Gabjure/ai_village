@@ -89,6 +89,14 @@ export class AgentCombatSystem extends BaseSystem {
   private environmentEntityId: string | null = null;
   private lawsEntityId: string | null = null;
 
+  // Static arrays to avoid per-call allocations in inflictInjury
+  private static readonly INJURY_LOCATIONS: ReadonlyArray<InjuryComponent['location']> = ['head', 'torso', 'arms', 'legs'];
+  private static readonly INJURY_TYPES: ReadonlyArray<InjuryComponent['injuryType']> = ['laceration', 'puncture', 'blunt'];
+
+  // Per-tick cache for nearby agents query (used by resolveCombat)
+  private _cachedNearbyAgents: ReadonlyArray<Entity> | null = null;
+  private _nearbyAgentsCacheTick = -1;
+
   /**
    * Sigmoid lookup table for performance optimization.
    * Pre-calculated for power differences -50 to +50 (101 values).
@@ -314,15 +322,27 @@ export class AgentCombatSystem extends BaseSystem {
     const attackerStats = world.getComponent<CombatStatsComponent>(attacker.id, 'combat_stats')!;
     const defenderStats = world.getComponent<CombatStatsComponent>(defender.id, 'combat_stats')!;
 
-    // Calculate combat power
-    const { attackerPower, defenderPower, modifiers } = this.calculateCombatPower(
-      world,
-      attacker,
-      defender,
-      attackerStats,
-      defenderStats,
-      conflict
-    );
+    // Reuse combat power from the 'initiated' phase if available (avoid redundant recalculation)
+    let attackerPower: number;
+    let defenderPower: number;
+    let modifiers: Array<{ type: string; value: number }>;
+    if (conflict.attackerPower !== undefined && conflict.defenderPower !== undefined && conflict.modifiers) {
+      attackerPower = conflict.attackerPower;
+      defenderPower = conflict.defenderPower;
+      modifiers = conflict.modifiers;
+    } else {
+      const result = this.calculateCombatPower(
+        world,
+        attacker,
+        defender,
+        attackerStats,
+        defenderStats,
+        conflict
+      );
+      attackerPower = result.attackerPower;
+      defenderPower = result.defenderPower;
+      modifiers = result.modifiers;
+    }
 
     // Roll outcome
     const outcome = this.rollOutcome(world, attacker, defender, attackerPower, defenderPower, conflict.lethal);
@@ -330,8 +350,13 @@ export class AgentCombatSystem extends BaseSystem {
     // Apply injuries
     this.applyInjuries(world, attacker, defender, outcome, attackerPower, defenderPower);
 
-    // Cache nearby agents query once for both generateNarrative and applySocialConsequences
-    const cachedNearbyAgents = world.query().with('agent').with('position').executeEntities();
+    // Use per-tick cached nearby agents query (shared across all resolveCombat calls in same tick)
+    const currentTick = world.tick;
+    if (this._nearbyAgentsCacheTick !== currentTick || !this._cachedNearbyAgents) {
+      this._cachedNearbyAgents = world.query().with('agent').with('position').executeEntities();
+      this._nearbyAgentsCacheTick = currentTick;
+    }
+    const cachedNearbyAgents = this._cachedNearbyAgents;
 
     // Generate narrative
     this.generateNarrative(world, attacker, defender, conflict, outcome, cachedNearbyAgents);
@@ -670,10 +695,10 @@ export class AgentCombatSystem extends BaseSystem {
       powerDiff > 2 ? 'major' :
       'minor';
 
-    const locations: Array<InjuryComponent['location']> = ['head', 'torso', 'arms', 'legs'];
+    const locations = AgentCombatSystem.INJURY_LOCATIONS;
     const location = locations[Math.floor(Math.random() * locations.length)]!;
 
-    const types: Array<InjuryComponent['injuryType']> = ['laceration', 'puncture', 'blunt'];
+    const types = AgentCombatSystem.INJURY_TYPES;
     const type = types[Math.floor(Math.random() * types.length)]!;
 
     const injury = createInjuryComponent({
