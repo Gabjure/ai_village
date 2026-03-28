@@ -16,6 +16,7 @@ import type {
   CityDirectorComponent,
   EventBus,
   BuildingBlueprint,
+  ShipExteriorComponent,
 } from '@ai-village/core';
 import type { PlantComponent } from '@ai-village/core';
 import { buildingBlueprintRegistry } from '@ai-village/core';
@@ -28,7 +29,7 @@ import {
   type Tile,
   globalHorizonCalculator,
 } from '@ai-village/world';
-import { Camera } from './Camera.js';
+import { Camera, ViewMode } from './Camera.js';
 import { renderSprite } from './SpriteRenderer.js';
 import { FloatingTextRenderer } from './FloatingTextRenderer.js';
 import { SpeechBubbleRenderer } from './SpeechBubbleRenderer.js';
@@ -47,6 +48,7 @@ import { PixelLabEntityRenderer } from './sprites/PixelLabEntityRenderer.js';
 import { DimensionalControls } from './DimensionalControls.js';
 import { PatronPortraitWidget } from './PatronPortraitWidget.js';
 import { PatronToastRenderer } from './PatronToastRenderer.js';
+import { StarfieldRenderer } from './StarfieldRenderer.js';
 
 /**
  * 2D renderer using Canvas.
@@ -86,6 +88,7 @@ export class Renderer {
   public patronWidget!: PatronPortraitWidget;
   public patronToast!: PatronToastRenderer;
 
+  private _resolutionScale: number = 1;
   private tileSize = 16; // Pixels per tile at zoom=1
   private hasLoggedTilledTile = false; // Debug flag to log first tilled tile rendering
   private hasLoggedWallRender = false; // Debug flag to log first wall rendering
@@ -134,6 +137,9 @@ export class Renderer {
   private boundResizeHandler: (() => void) | null = null;
 
   // 3D renderer for side-view mode
+  private _3dEnabled: boolean = true;
+  private starfieldRenderer: StarfieldRenderer | null = null;
+  private lastRenderTime = 0;
   private renderer3D: Renderer3D | null = null;
   private was3DActive = false; // Track previous state for mode transitions
   private current3DWorld: World | null = null; // Track if world has been set
@@ -225,7 +231,7 @@ export class Renderer {
 
 
   private resize(): void {
-    const dpr = window.devicePixelRatio || 1;
+    const dpr = (window.devicePixelRatio || 1) * this._resolutionScale;
     const rect = this.canvas.getBoundingClientRect();
 
     this.canvas.width = rect.width * dpr;
@@ -236,6 +242,16 @@ export class Renderer {
     this.ctx.scale(dpr, dpr);
 
     this.camera.setViewportSize(rect.width, rect.height);
+  }
+
+  /**
+   * Set the resolution scale factor (0.25 to 1.0).
+   * Lower values reduce canvas resolution for better mobile performance.
+   * Triggers a resize to apply the new scale.
+   */
+  setResolutionScale(scale: number): void {
+    this._resolutionScale = Math.max(0.25, Math.min(1, scale));
+    this.resize();
   }
 
   getCamera(): Camera {
@@ -403,12 +419,16 @@ export class Renderer {
   render(world: World, selectedEntity?: Entity | { id: string }): void {
     // Handle 3D/2D mode switching first
     if (this.camera.isSideView()) {
-      // Activate 3D renderer
-      this.activate3DRenderer(world);
-      // Clear 2D canvas to transparent so UI windows can overlay on 3D
-      this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-      // Skip 2D game rendering - UI windows will be drawn by main.ts after this
-      return;
+      if (this._3dEnabled) {
+        // Activate 3D renderer
+        this.activate3DRenderer(world);
+        // Clear 2D canvas to transparent so UI windows can overlay on 3D
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        // Skip 2D game rendering - UI windows will be drawn by main.ts after this
+        return;
+      }
+      // 3D disabled (mobile low-quality mode): force back to top-down view
+      this.camera.setViewMode(ViewMode.TopDown);
     } else {
       // Deactivate 3D renderer if switching back to 2D mode
       this.deactivate3DRenderer();
@@ -455,6 +475,43 @@ export class Renderer {
 
     // Update camera
     this.camera.update();
+
+    // Render parallax starfield above the ship's top deck (space region)
+    {
+      const now = performance.now();
+      const delta = this.lastRenderTime > 0 ? now - this.lastRenderTime : 16;
+      this.lastRenderTime = now;
+
+      if (!this.starfieldRenderer) {
+        this.starfieldRenderer = new StarfieldRenderer();
+      }
+
+      // Read ship velocity from ShipExteriorComponent if available
+      let vx = 0;
+      let vy = 0;
+      const shipEntities = world.query().with('ship_exterior' as any).executeEntities();
+      if (shipEntities.length > 0) {
+        const ext = shipEntities[0]!.components.get('ship_exterior') as ShipExteriorComponent | undefined;
+        if (ext) {
+          vx = ext.velocity.x;
+          vy = ext.velocity.y;
+        }
+      }
+
+      this.starfieldRenderer.update(vx, vy, delta);
+
+      // Ship top deck starts at world Y=100; space is visible above Y=0
+      const SHIP_TOP_WORLD_Y = 0;
+      this.starfieldRenderer.render(
+        this.ctx,
+        this.camera.x,
+        this.camera.y,
+        this.camera.zoom,
+        this.canvas.width,
+        this.canvas.height,
+        SHIP_TOP_WORLD_Y
+      );
+    }
 
     // Get visible bounds in world coordinates
     const bounds = this.camera.getVisibleBounds();
@@ -888,8 +945,8 @@ export class Renderer {
 
     // Draw aether_manta sky-shadow overlay (eclipse effect across terrain)
     // Rendered after all entities so the shadow falls on everything below
-    const cssWidth = this.canvas.width / (window.devicePixelRatio || 1);
-    const cssHeight = this.canvas.height / (window.devicePixelRatio || 1);
+    const cssWidth = this.canvas.width / ((window.devicePixelRatio || 1) * this._resolutionScale);
+    const cssHeight = this.canvas.height / ((window.devicePixelRatio || 1) * this._resolutionScale);
     this.aetherMantaOverlay.render(cssWidth, cssHeight);
 
     // Draw floating text (resource gathering feedback, etc.)
@@ -1195,6 +1252,17 @@ export class Renderer {
   set3DDrawDistance(distance: number): void {
     if (this.renderer3D) {
       this.renderer3D.setDrawDistance(distance);
+    }
+  }
+
+  /**
+   * Enable or disable the 3D renderer for side-view mode.
+   * When disabled (e.g., mobile low quality), side-view shows a 2D fallback message.
+   */
+  set3DEnabled(enabled: boolean): void {
+    this._3dEnabled = enabled;
+    if (!enabled) {
+      this.deactivate3DRenderer();
     }
   }
 }
