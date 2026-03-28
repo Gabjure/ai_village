@@ -198,6 +198,40 @@ app.post('/api/species/sprite', generateSprite);
 app.post('/api/species/save', saveAlienSpecies);
 app.get('/api/species', getAllAlienSpecies);
 
+// ============================================================
+// POSTCARD GALLERY — in-memory store for universe postcards
+// ============================================================
+
+const postcards: unknown[] = [];
+
+app.get('/api/postcards', (_req, res) => {
+  res.json({ postcards });
+});
+
+app.head('/api/postcards', (_req, res) => {
+  res.sendStatus(200);
+});
+
+app.post('/api/postcards', (req, res) => {
+  const postcard = req.body;
+  if (!postcard || !postcard.title) {
+    res.status(400).json({ error: 'Invalid postcard: title is required' });
+    return;
+  }
+  postcards.push(postcard);
+  res.status(201).json({ success: true, count: postcards.length });
+});
+
+app.get('/api/postcards/:shareCode', (req, res) => {
+  const { shareCode } = req.params;
+  const found = postcards.find((p: any) => p.shareCode === shareCode);
+  if (!found) {
+    res.status(404).json({ error: 'Postcard not found' });
+    return;
+  }
+  res.json(found);
+});
+
 // Universe/Multiverse API routes
 const universeRouter = createUniverseApiRouter();
 app.use('/api/multiverse', universeRouter);

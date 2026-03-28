@@ -632,7 +632,7 @@ describe('PostcardSharingService', () => {
     it('stores in localStorage when server is unavailable', async () => {
       await sharingService.sharePostcard(makePostcard(), defaultAnnotations);
 
-      const stored = JSON.parse(storageMock['mvee_shared_postcards']!);
+      const stored = JSON.parse(storageMock['mvee-shared-postcards']!);
       expect(stored).toHaveLength(1);
       expect(stored[0].playerName).toBe('TestPlayer');
     });
@@ -645,7 +645,7 @@ describe('PostcardSharingService', () => {
         playerName: 'Player2',
       });
 
-      const stored = JSON.parse(storageMock['mvee_shared_postcards']!);
+      const stored = JSON.parse(storageMock['mvee-shared-postcards']!);
       expect(stored).toHaveLength(2);
     });
   });
@@ -670,7 +670,7 @@ describe('PostcardSharingService', () => {
     });
 
     it('returns empty array when localStorage has invalid data', async () => {
-      storageMock['mvee_shared_postcards'] = 'not json';
+      storageMock['mvee-shared-postcards'] = 'not json';
       const result = await sharingService.listSharedPostcards();
       expect(result).toEqual([]);
     });

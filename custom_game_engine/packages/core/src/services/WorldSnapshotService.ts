@@ -349,7 +349,7 @@ export interface GalleryPostcard extends UniversePostcard {
   shareCode: string;
 }
 
-const SHARED_POSTCARDS_STORAGE_KEY = 'mvee_shared_postcards';
+const SHARED_POSTCARDS_STORAGE_KEY = 'mvee-shared-postcards';
 
 /**
  * Handles uploading/downloading universe postcards for the shared gallery.

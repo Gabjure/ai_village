@@ -317,6 +317,17 @@ app.post(`${BASE_PATH}/api/postcards`, (req, res) => {
   res.status(201).json({ success: true, count: postcards.length });
 });
 
+// Get postcard by share code
+app.get(`${BASE_PATH}/api/postcards/:shareCode`, (req, res) => {
+  const { shareCode } = req.params;
+  const found = postcards.find((p: any) => p.shareCode === shareCode);
+  if (!found) {
+    res.status(404).json({ error: 'Postcard not found' });
+    return;
+  }
+  res.json(found);
+});
+
 // Sprite generation — calls PixelLab API directly in production.
 // Mounted at both base-path and root because the client uses bare /api/ paths.
 for (const prefix of [BASE_PATH, '']) {
