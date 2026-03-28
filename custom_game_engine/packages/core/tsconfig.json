@@ -3,6 +3,7 @@
   "compilerOptions": {
     "outDir": "./dist",
     "rootDir": "./src",
+    "baseUrl": ".",
     "types": ["@webgpu/types"],
     "paths": {
       "@multiverse-studios/folkfork-bridge": ["./src/typings/folkfork-bridge.d.ts"]
