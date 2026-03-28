@@ -12,6 +12,16 @@
  */
 
 import type { EventBus } from '@ai-village/core';
+import { mapMythCategory, mapMythStatus, mapPersonality } from '../../packages/core/src/lore/MythExporter.js';
+import type {
+  PortableMyth,
+  PortableDeity,
+  PortableRitual,
+  PortableMythCategory,
+  PortableRitualType,
+  RitualFrequency,
+  DeityPersonalityVector,
+} from '../../packages/core/src/lore/PortableLoreTypes.js';
 
 declare global {
   interface Window {
@@ -40,7 +50,10 @@ export async function initLoreDiscoveryBridge(eventBus: EventBus): Promise<void>
   try {
     // The vendor module is UMD — Vite can't extract named ESM exports from it.
     // Grab the default/namespace and pull LoreDiscoveryEmitter from it.
-    const mod: any = await import('@akashic-records/lib/lore-discovery-emitter.js');
+    // Use a variable so Vite's static import analysis doesn't fail when
+    // @akashic-records is not installed (it's an optional dependency).
+    const emitterPath = '@akashic-records/lib/lore-discovery-emitter.js';
+    const mod: any = await import(/* @vite-ignore */ emitterPath);
     const LoreDiscoveryEmitter = mod.LoreDiscoveryEmitter ?? mod.default?.LoreDiscoveryEmitter ?? mod.default;
     if (typeof LoreDiscoveryEmitter !== 'function') return;
     emitter = new LoreDiscoveryEmitter({
@@ -122,6 +135,123 @@ export async function initLoreDiscoveryBridge(eventBus: EventBus): Promise<void>
         })
       );
     }
+
+    // -------------------------------------------------------------------------
+    // Portable lore exporters — construct PortableMyth/PortableDeity/PortableRitual
+    // from event data and call emitter.emitPortableLore() when available.
+    // -------------------------------------------------------------------------
+
+    function tryMapMythCategory(category: string): PortableMythCategory {
+      try {
+        return mapMythCategory(category);
+      } catch {
+        return 'origin';
+      }
+    }
+
+    function tryMapPersonality(p: unknown): DeityPersonalityVector | undefined {
+      try {
+        return mapPersonality(p as Parameters<typeof mapPersonality>[0]);
+      } catch {
+        return undefined;
+      }
+    }
+
+    const RITUAL_TYPE_MAP: Record<string, PortableRitualType> = {
+      daily_prayer: 'worship',
+      weekly_ceremony: 'communion',
+      seasonal_festival: 'festival',
+      initiation: 'initiation',
+      blessing: 'purification',
+      sacrifice: 'sacrifice',
+      pilgrimage: 'pilgrimage',
+    };
+
+    const RITUAL_FREQ_MAP: Record<string, RitualFrequency> = {
+      daily_prayer: 'daily',
+      weekly_ceremony: 'weekly',
+      seasonal_festival: 'seasonal',
+      initiation: 'lifecycle',
+      blessing: 'crisis',
+      sacrifice: 'weekly',
+      pilgrimage: 'annual',
+    };
+
+    unsubscribers.push(
+      eventBus.on('lore:myth_created' as any, (event: any) => {
+        const d = event.data ?? event;
+        const portableMyth: PortableMyth = {
+          mythId: d.mythId,
+          sourceGame: 'mvee',
+          version: 1,
+          title: d.title,
+          summary: d.summary ?? '',
+          fullText: d.fullText ?? '',
+          category: tryMapMythCategory(d.category),
+          deityDomains: d.deityDomains ?? [],
+          deityPersonality: d.deityPersonality ? tryMapPersonality(d.deityPersonality) : undefined,
+          linguisticMarkers: [],
+          motifs: [],
+          symbols: [],
+          temporalSetting: 'timeless',
+          mutations: [],
+          canonicityScore: d.canonicityScore ?? 0,
+          status: d.status ? mapMythStatus(d.status) : 'oral',
+          exportedAt: new Date().toISOString(),
+          tellingCount: d.tellingCount ?? 1,
+          believerCount: d.believerCount ?? 0,
+        };
+        if (typeof emitter!.emitPortableLore === 'function') {
+          emitter!.emitPortableLore('myth', portableMyth);
+        }
+      })
+    );
+
+    unsubscribers.push(
+      eventBus.on('lore:deity_emerged' as any, (event: any) => {
+        const d = event.data ?? event;
+        const portableDeity: PortableDeity = {
+          deityId: d.deityId,
+          sourceGame: 'mvee',
+          primaryName: d.deityName ?? d.deityId,
+          epithets: [],
+          domain: d.domain ?? 'mystery',
+          secondaryDomains: [],
+          personality: { benevolence: 0.5, interventionism: 0.5, wrathfulness: 0.5, mysteriousness: 0.5, generosity: 0.5, consistency: 0.5 },
+          alignment: 'unknown',
+          believerCount: d.believerCount ?? 0,
+          mythCount: 0,
+          canonicalMythIds: [],
+          exportedAt: new Date().toISOString(),
+        };
+        if (typeof emitter!.emitPortableLore === 'function') {
+          emitter!.emitPortableLore('deity', portableDeity);
+        }
+      })
+    );
+
+    unsubscribers.push(
+      eventBus.on('lore:ritual_performed' as any, (event: any) => {
+        const d = event.data ?? event;
+        const portableRitual: PortableRitual = {
+          ritualId: d.ritualId,
+          sourceGame: 'mvee',
+          version: 1,
+          name: d.name,
+          ritualType: RITUAL_TYPE_MAP[d.type as string] ?? 'worship',
+          associatedDeityId: d.deityId ?? null,
+          description: `A ${(d.type as string).replace(/_/g, ' ')} for the faithful`,
+          frequency: RITUAL_FREQ_MAP[d.type as string] ?? 'weekly',
+          participantRequirements: { minimumParticipants: d.requiredParticipants },
+          beliefGenerated: d.beliefGenerated,
+          status: 'active',
+          exportedAt: new Date().toISOString(),
+        };
+        if (typeof emitter!.emitPortableLore === 'function') {
+          emitter!.emitPortableLore('ritual', portableRitual);
+        }
+      })
+    );
 
     unsubscribe = () => {
       for (const unsub of unsubscribers) {
