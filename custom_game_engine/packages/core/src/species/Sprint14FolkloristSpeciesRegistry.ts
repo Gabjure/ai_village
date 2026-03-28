@@ -129,7 +129,7 @@ export const TRAIT_AMAUTIK_CAPTURE: SpeciesTrait = {
 export const TRAIT_RIGOR_HOP_MOVEMENT: SpeciesTrait = {
   id: 'rigor_hop_movement',
   name: 'Rigor Hop Movement',
-  description: 'Movement restricted to hopping — moves hop_distance tiles per tick but CANNOT cross gap tiles, water tiles, or elevation changes > 1. This creates natural barriers. Movement is audible within hop_sound_range tiles (agents can hear approaching).',
+  description: `In Chinese cosmology, the human soul is dual: the hun (spiritual soul) ascends at death, while the po (somatic soul) remains anchored to the flesh. When the hun departs in disorder — through improper burial, violent death, or ritual contamination — the po becomes trapped in the corpse, unable to release it. The bilateral hop of the Jiangshi is not comic but a marker of profound cosmological disorder: a body driven by a po that cannot let go, locked in full rigor mortis because the spiritual principle that would allow the flesh to relax and dissolve has fled. Movement restricted to hopping — moves hop_distance tiles per tick but CANNOT cross gap tiles, water tiles, or elevation changes > 1. This creates natural barriers. Movement is audible within hop_sound_range tiles (agents can hear approaching).`,
   category: 'physical',
   abilitiesGranted: ['hop_only_movement', 'gap_impassable', 'elevation_restricted', 'audible_movement'],
   skillBonus: { stealth: -0.3 },
@@ -140,7 +140,7 @@ export const TRAIT_RIGOR_HOP_MOVEMENT: SpeciesTrait = {
 export const TRAIT_BREATH_DETECTION: SpeciesTrait = {
   id: 'breath_detection',
   name: 'Breath Detection',
-  description: 'Cannot see — detects living agents ONLY by their breathing within breath_detection_range. Agents performing hold_breath action (drains stamina at breath_hold_stamina_rate/tick) become undetectable. Agents who are exhausted (stamina < breath_hold_minimum) cannot hold breath. Creates stealth-management gameplay.',
+  description: `The Jiangshi does not feed on blood — it absorbs qi, the vital breath that animates all living beings. This is a theologically precise distinction from Western vampirism: qi is not a fluid but a cosmological force, and the Jiangshi's hunger is not corporeal but metaphysical. Because it hunts qi rather than flesh, the Jiangshi senses living agents not by sight, sound, or smell but by the qi-signature of their breathing — exhaled breath carries qi directly into the air, creating a detectable emanation. Holding the breath therefore masks the victim's qi signature entirely, not merely reducing noise or scent. The qi_drain_rate genome flag (0.03 per tick when adjacent) reflects the progressive nature of this predation: proximity drains qi across multiple encounters, and victims who fall below qi_drain_lethal_threshold risk death and secondary reanimation. Cannot see — detects living agents ONLY by their breathing within breath_detection_range. Agents performing hold_breath action (drains stamina at breath_hold_stamina_rate/tick) become undetectable. Agents who are exhausted (stamina < breath_hold_minimum) cannot hold breath. Creates stealth-management gameplay.`,
   category: 'sensory',
   abilitiesGranted: ['breath_sense', 'hold_breath_counter', 'blind_no_visual', 'exhaustion_detection_break'],
   skillBonus: { perception: -0.5 },
@@ -148,14 +148,14 @@ export const TRAIT_BREATH_DETECTION: SpeciesTrait = {
 };
 
 // Mechanic 12: Ward vulnerability (Jiangshi-Vel)
-// Three distinct ward types — talisman paralysis, sticky rice slow, peach wood damage.
+// Five distinct ward/barrier types — talisman paralysis, sticky rice slow, peach wood damage, rooster crow paralysis, running water impassable.
 export const TRAIT_WARD_VULNERABILITY: SpeciesTrait = {
   id: 'ward_vulnerability',
   name: 'Ward Vulnerability',
-  description: 'Paralyzed for ward_paralysis_duration ticks when a Taoist talisman item is applied by adjacent agent. Sticky rice tiles within sticky_rice_range cause movement speed reduction to ward_slow_factor. Peach wood items deal ward_damage bonus damage. Three distinct ward types create crafting/agriculture incentives.',
+  description: `The Jiangshi's vulnerabilities are not generic magical weaknesses but expressions of a coherent cosmological system rooted in Mao Shan Taoist practice. The talismans (fulu) that paralyze the Jiangshi are not mere "magic paper" — they are ritually inscribed documents written in the name of specific Taoist divine authorities, empowered only by ordained Mao Shan practitioners who have received the relevant liturgical transmissions. Their authority over the Jiangshi derives from the same cosmological order that the Jiangshi violates: a properly authorized invocation of heavenly qi against a corrupted po. Sticky rice neutralizes the Jiangshi not through toxicity but through qi-absorption: cooked glutinous rice is considered in Chinese folk medicine and cosmological practice to be particularly receptive to residual qi, drawing the corrupted field out of a space and neutralizing it — making it a qi-specific countermeasure, not a generic ward. Peach wood is cosmologically yang-aligned in Chinese tradition, classified with other yang-saturated materials as inherently hostile to yin entities; the Jiangshi, animated by trapped po-energy in the absence of hun, is maximally yin, and contact with strongly yang materials causes direct cosmological damage. The rooster's crow at dawn is cosmologically associated with the restoration of yang energy — the sun returns, yang reasserts itself over yin, and the Jiangshi enters forced paralysis for rooster_crow_paralysis_duration ticks at the sound of a rooster crow event. Running water cannot be crossed because the Jiangshi's corrupted qi field is disrupted by the movement of water, which carries its own cosmological flow. Paralyzed for ward_paralysis_duration ticks when a Taoist talisman item is applied by adjacent agent. Sticky rice tiles within sticky_rice_range cause movement speed reduction to ward_slow_factor. Peach wood items deal ward_damage bonus damage. Five distinct ward types create crafting/agriculture/ritual incentives.`,
   category: 'magical',
-  abilitiesGranted: ['talisman_paralysis', 'sticky_rice_slow', 'peach_wood_vulnerability'],
-  vulnerabilities: ['talisman_ward', 'sticky_rice_ward', 'peach_wood_ward'],
+  abilitiesGranted: ['talisman_paralysis', 'sticky_rice_slow', 'peach_wood_vulnerability', 'rooster_dawn_paralysis', 'running_water_impassable'],
+  vulnerabilities: ['talisman_ward', 'sticky_rice_ward', 'peach_wood_ward', 'rooster_crow_ward', 'running_water_barrier'],
 };
 
 // ============================================================================
@@ -396,42 +396,39 @@ Reproduction is exclusively via capture and transformation; gestationPeriod is 0
 // ============================================================================
 // JIANGSHI-VEL (Chinese, East Asia)
 // ============================================================================
-// Folklore: Qing dynasty Chinese tradition, East Asia.
-// Reanimated hopping corpse — blind, breath-detecting, warded by rice/talismans/peach wood.
+// Folklore: Chinese pan-regional folk religion, Mao Shan Taoist tradition, Hunan ganshi ren corpse-driving.
+// Qi-absorbing reanimated corpse — Po/Hun soul duality, Mao Shan exorcism lineage, controllable by ritual specialists.
 // Sources: Ji Xiaolan, Yuewei Caotang Biji (1789);
-//          de Groot, The Religious System of China (1892)
+//          de Groot, The Religious System of China (1892-1910);
+//          Kang Xiaofei, The Cult of the Fox (2006);
+//          Poo Mu-chou, In Search of Personal Welfare (1998)
 
 export const JIANGSHI_VEL_SPECIES: SpeciesTemplate = {
   speciesId: 'jiangshi_vel',
   speciesName: 'Jiangshi-Vel',
   commonName: 'Jiangshi',
 
-  description: `The Jiangshi-Vel is a reanimated corpse from Qing dynasty Chinese folklore — 175cm,
-stiff-limbed due to full rigor mortis, arms extended forward, face pallid with a greenish cast,
-wearing the burial robes of its interment. Originating in corpse-driving (xiangxi ganshi) traditions
-where Taoist priests animated bodies to hop in a line back to their home villages, the Jiangshi
-became one of Chinese popular religion's most distinctive undead figures.
+  description: `The Jiangshi-Vel is a qi-absorbing reanimated corpse from Chinese pan-regional folk religion — 175cm, locked in full rigor mortis with arms extended forward, face pallid with a greenish cast, wearing burial robes. Its cosmological foundation is Po/Hun soul duality: at death, the hun (spiritual soul) should ascend while the po (somatic soul) dissolves with the flesh. When this process is disrupted — by improper burial, violent unresolved death, a cat leaping across the corpse before interment, or prolonged exposure to moonlight — the po becomes trapped in the body, unable to release it. The Jiangshi is the result: a corpse animated not by supernatural malice but by cosmological disorder, a po that cannot complete its natural dissolution.
 
-Its defining movement constraint is rigor hop movement: unable to bend its knees, the Jiangshi-Vel
-can only move by hopping hop_distance tiles per tick. It cannot cross gap tiles, water tiles, or
-elevation changes greater than 1 — these become absolute barriers that informed settlement defense
-design in the folklore's communities. Its movement is audible within hop_sound_range tiles, giving
-potential victims acoustic warning of approach. The stealth penalty reflects this unavoidable noise.
+This framing is theologically distinct from Western vampirism in every meaningful respect. The Jiangshi does not drink blood; it absorbs qi, the vital breath that flows through all living things. De Groot's exhaustive survey of Chinese religious practice (The Religious System of China, 1892-1910) documents dozens of regional variations on qi-drainage predation, and Poo Mu-chou (In Search of Personal Welfare, 1998) situates the Jiangshi within a broader tradition of Chinese anxiety about cosmological contamination from the improperly dead. The Jiangshi is not evil in the Western moral sense — it is a cosmological malfunction that must be corrected.
 
-The Jiangshi-Vel is completely blind — its breath detection replaces all visual sensing. It detects
-living agents exclusively by breathing within breath_detection_range. This creates the game's
-primary stealth-management mechanic: agents can perform hold_breath actions, removing themselves
-from detection at the cost of stamina (breath_hold_stamina_rate/tick). Exhausted agents whose
-stamina falls below breath_hold_minimum cannot hold their breath — they become detectable at the
-worst possible moment. The perception penalty represents absent visual processing.
+The ganshi ren (corpse driver) tradition, documented primarily from Hunan province, demonstrates that Jiangshi are not simply mindless predators. Specialist practitioners — typically itinerant Taoist ritualists operating outside the mainstream lineages — possessed techniques for commanding Jiangshi to hop in ordered lines from distant cities back to their home villages, where proper burial could be completed. In game terms this is expressed through the mao_shan_controllability_threshold genome flag: agents with sufficient spiritual skill can issue movement commands within ganshi_ren_command_range, converting the Jiangshi from pure threat to conditional tool. The tradition is recorded with skepticism but consistent ethnographic detail in Kang Xiaofei (The Cult of the Fox, 2006) and earlier sources.
 
-Three distinct ward types define the Jiangshi-Vel's vulnerabilities, each requiring different
-production chains. Taoist talisman items applied by an adjacent agent cause full paralysis for
-ward_paralysis_duration ticks. Sticky rice tiles within sticky_rice_range slow movement to
-ward_slow_factor. Peach wood items deal ward_damage bonus damage on hit. These mechanics create
-agricultural incentives (rice, peach orchards) and a crafting incentive (calligraphy for talismans).
+The canonical exorcism lineage for Jiangshi is Mao Shan Taoism, one of the oldest and most institutionally developed Taoist traditions, with roots in the fourth century CE. Mao Shan practitioners hold ritual authority over the kinds of cosmological disorder the Jiangshi represents — they know which divine authorities to invoke, which liturgical transmissions authorize the relevant fulu (talismans), and how to read the spiritual state of a Jiangshi to determine whether exorcism or guided burial is appropriate. This specialization is mechanically expressed through the talisman ward requiring an agent with Mao Shan credentials rather than generic spiritual skill.
 
-The entity is sapient: false — it operates on pure instinct, with no social cognition.
+The Jiangshi-Vel's defining movement constraint — rigor hop movement — is a direct expression of its Po/Hun cosmology. The po drives the body but cannot bend it; without the hun's animating spiritual principle, the flesh remains locked in the rigidity of death. The bilateral hop is not comic but a visible marker of cosmological disorder. Movement is restricted to hop_distance tiles per tick, cannot cross gap tiles, water tiles, or elevation changes greater than 1, and is audible within hop_sound_range tiles. Running water cannot be crossed because flowing water disrupts the Jiangshi's corrupted qi field (running_water_impassable: true).
+
+Qi-absorption predation is progressive rather than lethal in a single attack. Proximity to living agents drains their qi at qi_drain_rate per tick. Victims whose qi falls below qi_drain_lethal_threshold risk death — and if they die without proper burial rites administered within the correct ritual window, there is a contagion_reanimation_chance of secondary Jiangshi formation. This contagion mechanic reflects the folklore's consistent emphasis on proper burial as preventive cosmological hygiene.
+
+The Jiangshi-Vel originates from specific cosmological failure modes, expressed as genome flags: origin_improper_burial (failure to observe correct rites) and origin_violent_death (unresolved death energy that the po cannot release). In game terms, improper player handling of deceased agents — failing to perform burial rites, leaving bodies in exposed locations under moonlight — can trigger Jiangshi spawning as a consequence mechanic.
+
+Mirrors disrupt the Jiangshi's qi-sensing within mirror_qi_disruption_range by reflecting the qi-signature back toward its source, creating false readings. The rooster's cry at dawn is cosmologically associated with the restoration of yang energy; dawn arrival with an audible rooster crow event triggers rooster_crow_paralysis_duration ticks of forced paralysis.
+
+Five distinct ward types define countermeasures, each requiring different production chains and each cosmologically motivated: Mao Shan fulu talismans (paralysis), sticky rice (qi-absorbing neutralizer), peach wood (yang-aligned material damage), rooster crow (dawn yang paralysis), and running water (qi-field disruption). These create interlocking incentives for agriculture (rice, peach orchards), ritual crafting (calligraphy/talisman production), animal husbandry (roosters), and settlement design (water features as barriers).
+
+The entity is sapient: false — it operates on po-instinct with no hun-derived social cognition. The traveler_epithet reflects its nature as a cosmological disorder made visible.
+
+Sources: Ji Xiaolan, Yuewei Caotang Biji (1789); de Groot, The Religious System of China (1892-1910); Kang Xiaofei, The Cult of the Fox (2006); Poo Mu-chou, In Search of Personal Welfare (1998).
 
 *-vel suffix marks spiritual-grade species in the game taxonomy.*`,
 
@@ -453,10 +450,10 @@ The entity is sapient: false — it operates on pure instinct, with no social co
   lifespan: 0,
   lifespanType: 'ageless',
   maturityAge: 0,
-  gestationPeriod: 0, // Undead — no reproduction
+  gestationPeriod: 0, // Contagion reproduction only — qi-drained victims may reanimate (see contagion_reanimation_chance)
 
   sapient: false,
-  socialStructure: 'solitary_predator',
+  socialStructure: 'solitary',
 
   traveler_epithet: 'a stiff shape that hops through moonlit silence, sensing every breath',
 
@@ -473,6 +470,16 @@ The entity is sapient: false — it operates on pure instinct, with no social co
     sticky_rice_range: 3,
     ward_slow_factor: 0.2,
     ward_damage: 0.3,
+    qi_drain_rate: 0.03,                   // progressive qi drain per tick when adjacent
+    qi_drain_lethal_threshold: 0.1,        // below this qi level, victim risks death
+    rooster_crow_paralysis_duration: 40,   // dawn paralysis from rooster crow
+    running_water_impassable: true,        // cannot cross water tiles (cosmological)
+    contagion_reanimation_chance: 0.15,    // chance drained victim becomes Jiangshi
+    mao_shan_controllability_threshold: 0.7, // spiritual skill needed to command
+    ganshi_ren_command_range: 15,          // range at which specialist can direct movement
+    origin_improper_burial: true,          // spawns from burial rite failures
+    origin_violent_death: true,            // spawns from unresolved violent death
+    mirror_qi_disruption_range: 4,         // mirrors disrupt qi-sensing
   },
 };
 

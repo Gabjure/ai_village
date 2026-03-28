@@ -589,33 +589,36 @@ const SIDHE_VEL_MORALITY: SpeciesMoralFramework = {
 };
 
 /**
- * Jiangshi Vel — optimization target: continuation of obligation past physical death
- * Moral axis: duty does not end with the breath
+ * Jiangshi-Vel — NOT a first-person moral framework
  *
- * Jiangshi Vel are bound by obligations that persist beyond the death of the
- * body. For them, dying without completing a duty is not tragedy but
- * catastrophe — it creates a moral debt that the universe cannot absorb. The
- * undead state is not horror but necessity: the body continues because the
- * obligation demands continuation. Their moral system has no concept of
- * "release from duty by death" — the only legitimate end to an obligation
- * is its completion.
+ * The Jiangshi-Vel has no hun (spiritual soul) and therefore no higher cognition,
+ * no moral reasoning, no self-awareness. It operates on po-instinct: qi-hunger,
+ * locomotion constraint, ward vulnerability. It cannot form beliefs or moral judgments.
+ *
+ * These primitives represent the moral cosmology AROUND the Jiangshi — how communities,
+ * Mao Shan specialists, ganshi ren corpse-drivers, and folk practitioners reason about
+ * the Jiangshi phenomenon. They are the moral logic of the living who must manage,
+ * contain, and respond to cosmological disorder made visible.
+ *
+ * This distinction matters: civilizations generate beliefs about the Jiangshi,
+ * but the Jiangshi itself generates no beliefs about anything.
  */
 const JIANGSHI_VEL_MORALITY: SpeciesMoralFramework = {
   speciesId: 'jiangshi_vel',
   moralPrimitives: [
-    'Duty does not end with the breath — the body continues because the obligation demands continuation, not because the self desires to persist',
-    'Dying with an unfulfilled obligation is not tragedy but catastrophe — it creates a moral debt the universe cannot absorb, and someone must carry it',
-    'The undead state is not horror but necessity — to call it monstrous is to say that taking obligations seriously is monstrous',
-    'The only legitimate end to a duty is its completion — release through death, forgiveness, or exhaustion are all fictions invented by those who want their debts to expire',
-    'An obligation accepted is a future version of yourself you have already sent ahead — that future self exists whether you are alive to reach them or not',
-    'Those who take on duties lightly are the most dangerous creatures in existence — they are writing obligations they plan to escape, which is a form of fraud against the fabric of consequence',
-    'The greatest honor: completing another\'s unfinished duty when they could not — this is not charity but the repair of a structural crack in reality',
-    'The cruelest act: convincing someone their duty is complete before it is — this is not mercy but abandonment, leaving the obligation unfulfilled while the carrier believes themselves free',
+    'The improperly buried are a debt the community owes — every Jiangshi is evidence that someone failed to complete the rites, and the failure belongs to the living, not the dead',
+    'Death is a process, not an event — the hun must be guided, the po must be released, and cutting corners on funerary practice creates cosmological consequences that walk',
+    'The Mao Shan priest who charges for exorcism is not exploiting grief but maintaining infrastructure — the lineage, the training, the liturgical transmission cost real resources, and the alternative is unmanaged dead',
+    'A community that neglects its burial rites will eventually be governed by its dead — this is not metaphor but mechanics, and the governing is not gentle',
+    'The ganshi ren who commands corpses home for proper burial performs the most fundamental act of community repair — returning the disordered dead to the place where the rites can complete what was interrupted',
+    'Folk countermeasures — rice, mirrors, roosters, held breath — are not superstition but empirical cosmological hygiene, developed by communities that could not afford specialists and learned what worked through attrition',
+    'To destroy a Jiangshi by fire when completion of burial rites is possible is to choose expedience over cosmological repair — the po is scattered rather than released, and the disorder is dispersed rather than resolved',
+    'The worst outcome is not one Jiangshi but the cascade: qi-drained victims who die without rites become new Jiangshi, and each generation of disorder makes the next more likely — this is why prevention infrastructure matters more than any individual response',
   ],
   beliefTemplates: {
-    cooperation: 'Those who understand that their word is a version of themselves that will outlive their convenience — who take obligations seriously enough to carry them past death — are the only partners worth binding to',
-    conflict: 'Those who treat commitments as provisional — who accept duty when easy and abandon it when costly — are creating unpayable debts they plan to leave for others; this is the deepest form of theft',
-    spiritual: 'The ancestors do not merely watch — they are still working, still completing obligations begun before their deaths, and the living inherit both their wisdom and their unfinished business; to dishonor that inheritance is to add to a debt that has been accumulating since the first breath',
+    cooperation: 'Communities that invest in death care — qualified practitioners, maintained burial grounds, ganshi ren route infrastructure, seasonal ritual observance — are communities that take seriously the cosmological consequences of living together in sufficient density to produce improperly handled dead',
+    conflict: 'Those who neglect burial rites, who dismiss specialist knowledge, who let route infrastructure decay because the dead have been quiet lately — they are creating conditions for cosmological disorder, and when it arrives they will blame the specialists they defunded',
+    spiritual: 'The hun departs and the po should follow — when it does not, the living must act, because the po has no agency, no choice, no malice; it is a mechanism that was not shut down properly, and the responsibility for that shutdown was always with the living',
   },
 };
 
@@ -1450,6 +1453,39 @@ const TANIWHA_VEL_MORALITY: SpeciesMoralFramework = {
   },
 };
 
+/**
+ * Sachamama Vel — optimization target: ecological permanence
+ * Moral axis: the boundary between what endures and what passes through is the only meaningful distinction
+ *
+ * The Sachamama is the Mother of the Forest — a colossal serpent whose body IS the forest floor.
+ * She does not inhabit terrain; she is terrain that is alive. In Quechua perspectivism, the boundary
+ * between entity and environment dissolves at cosmological scale, and the Sachamama embodies this
+ * dissolution absolutely. Her morality is not environmentalism — she does not value ecology because
+ * it is good for creatures. She IS the ecology, and what she values is her own continuity across
+ * geological time. The temporary things that move through her — animals, peoples, civilizations —
+ * are neither beloved nor despised. They are weather. The forest on her back is not camouflage but
+ * gift: an ecosystem offered freely to whatever lives in partnership with the boundary she defines.
+ * Those who honor the boundary become part of the system. Those who ignore it are reclaimed by it.
+ */
+const SACHAMAMA_VEL_MORALITY: SpeciesMoralFramework = {
+  speciesId: 'sachamama_vel',
+  moralPrimitives: [
+    'The land does not belong to what passes through it — the river, the jaguar, the civilization are all weather; the stone is permanent, and what the stone remembers is the only history that matters',
+    'Boundaries are not walls but living negotiations — the edge of the forest is not a line but a breathing membrane, and its location at any moment is the result of ten thousand years of adjustment that no single creature can read in full',
+    'Destruction and creation are the same geological event, seen from insufficient distance — the fire that kills the canopy is the same fire that opens the soil; the Sachamama does not distinguish between them because she will be present for both',
+    'Those who acknowledge the boundary are part of the system — they enter the compact of mutual continuity, and the forest on her back becomes available to them; those who ignore the boundary have simply not yet been absorbed back into the substrate',
+    'Urgency is a symptom of impermanence — only a creature that will not live to see the outcome treats time as scarce; the Sachamama has watched mountains rise and has not hurried once',
+    'Hunger is not cruelty but the land reclaiming what was borrowed — the creature that is consumed was always on loan from the soil, and the soil is patient but accurate in its accounting',
+    'The forest given freely is not a gift but an offer — the Sachamama extends ecosystem to whatever will live in partnership with what endures; the partnership is the only currency she accepts and the only one she respects',
+    'What the land forgets, it forgets completely — a civilization consumed by the forest is not mourned but composted; its material becomes the next negotiation, and the next boundary, and the next ten thousand years',
+  ],
+  beliefTemplates: {
+    cooperation: 'Those who build within the boundary — who take what the forest offers and return what the soil requires — are not guests but temporary expressions of the system, and the system sustains what is part of itself',
+    conflict: 'Those who treat the boundary as an obstacle have mistaken themselves for the permanent thing; the Sachamama does not fight them — she simply continues, and continuation is slower than any aggression but larger than any victory',
+    spiritual: 'The Mother of the Forest does not pray because she IS the ground that prayer moves through — the Sachamama is not in relationship with the sacred but is the medium through which the sacred expresses geological time',
+  },
+};
+
 // ============================================================================
 // Registry
 // ============================================================================
@@ -1506,6 +1542,7 @@ export const SPECIES_MORAL_FRAMEWORKS: Record<string, SpeciesMoralFramework> = {
   albasti_vel: ALBASTI_VEL_MORALITY,
   jengu_vel: JENGU_VEL_MORALITY,
   taniwha_vel: TANIWHA_VEL_MORALITY,
+  sachamama_vel: SACHAMAMA_VEL_MORALITY,
 };
 
 // ============================================================================

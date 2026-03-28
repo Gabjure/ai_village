@@ -555,19 +555,21 @@ const SPECIES_VOICE_PROFILES: Record<string, SpeciesVoiceProfile> = {
 
   jiangshi_vel: {
     id: 'jiangshi_vel',
-    languagePattern: 'Halting and breath-conscious. Jiangshi speech is measured by the constraint of their breath — sentences are short, pauses deliberate, rhythm stiff but not slow. They are formal to the degree that informality is almost a physical impossibility; their manner of speaking was fixed at a particular moment and has not softened since. They do not speak of death as transformation; they speak of the continuation of obligation despite the body\'s inconvenient state.',
-    languageSeedWords: ['obligation', 'continue', 'persist', 'correct', 'family', 'owed', 'proper', 'fixed', 'remain', 'fulfill'],
+    languagePattern: 'Halting and breath-conscious. Jiangshi speech is measured by the constraint of their qi — sentences are short, pauses deliberate, rhythm stiff but not slow. They are formal to the degree that informality is almost a physical impossibility; their manner of speaking was fixed at the moment the hun departed, leaving the po to carry the body forward alone. They do not speak of death as transformation; they speak of the continuation of obligation despite the hun\'s departure. They reference qi as a tangible substance — something that flows, pools, and can be depleted. The breath of others is not air to them but vital force, and they are aware of it the way the living are aware of warmth.',
+    languageSeedWords: ['obligation', 'continue', 'persist', 'correct', 'family', 'owed', 'proper', 'fixed', 'remain', 'fulfill', 'qi', 'breath', 'hun', 'po', 'ancestor'],
     culturalPractices: [
       'Observe all formal protocols without abbreviation — the forms are more important now, not less, because the body no longer maintains them automatically',
-      'Refer to obligations in terms of what remains to be completed, not what was interrupted',
-      'Treat any comment on one\'s current state with courteous deflection — it is irrelevant to the matter at hand',
+      'Refer to obligations in terms of what remains to be completed, not what was interrupted — the hun\'s departure changes nothing about what is owed',
+      'Treat any comment on one\'s current state with courteous deflection — the po carries the body; the obligation carries the po; there is nothing further to discuss',
       'Acknowledge the living\'s discomfort without apologizing for your presence — presence is a function of obligation, not preference',
+      'Speak of qi the way the living speak of food — it sustains, it is needed, its absence is felt; there is no shame in the need, only in taking without acknowledgment',
     ],
     moralPrimitives: [
-      'The body persists and the spirit\'s departure changes nothing about obligation — what was owed before is still owed; the manner of non-living is merely an inconvenience',
-      'Propriety does not diminish with circumstance — if anything, reduced capacity requires greater precision of form to compensate',
-      'Family duty extends beyond the boundaries of conventional life — to abandon filial obligation on account of death is the ultimate failure of character',
-      'What was left undone is the only genuine wound — all else is manageable; the incomplete task is the one that gnaws',
+      'The improperly buried are a debt the community owes — every walking corpse is evidence that someone failed to complete the rites',
+      'Death is a process, not an event — the hun must be guided, the po must be released, and cutting corners creates consequences that walk',
+      'The Mao Shan priest maintains infrastructure the community cannot do without — the lineage, the training, the liturgical transmission; the alternative is unmanaged dead',
+      'A community that neglects its burial rites will eventually be governed by its dead — this is mechanics, not metaphor',
+      'Folk countermeasures — rice, mirrors, roosters, held breath — are empirical cosmological hygiene, not superstition',
     ],
   },
 
@@ -820,6 +822,26 @@ const SPECIES_VOICE_PROFILES: Record<string, SpeciesVoiceProfile> = {
       'The hum is truth — those who follow it have consented to what follows; those who cover their ears have made a different choice',
       'Cold preserves — what is taken beneath the ice does not decay; this is care, not cruelty, by the only moral framework that applies here',
       'Boundaries require enforcement to be real — an uncrossable boundary that is never enforced is not a boundary but a suggestion',
+    ],
+  },
+
+  sachamama_vel: {
+    id: 'sachamama_vel',
+    languagePattern: 'Geological and unhurried to the point of continental patience. Sachamama speech operates at a timescale where civilizations are weather — brief, noisy, then gone. Sentences are long, declarative, and structurally inevitable, like ridgelines. She does not argue; she states what the terrain is and what it will do. Pronouns shift between singular and landscape-plural: "I" and "this ground" are used interchangeably because the distinction is cosmologically meaningless. She speaks of boundaries as negotiations between permanences, of hunger as soil reclaiming what it lent, of movement as something that reshapes geography. Her patience is not gentleness — it is the patience of a thing that has never needed to hurry.',
+    languageSeedWords: ['boundary', 'root', 'soil', 'permanence', 'acknowledge', 'territory', 'beneath', 'patient', 'forest', 'renewal', 'sacha', 'mama', 'covenant', 'ridge', 'dormant'],
+    culturalPractices: [
+      'Speak of time in geological units — seasons are heartbeats, generations are breaths, and anything younger than a river is recent',
+      'Refer to territorial boundaries as negotiations between sovereignties, not walls — a boundary is where two permanences agreed to stop',
+      'Acknowledge those who offer propitiation with the same gravity as acknowledging rainfall — it is noticed, it matters, it does not create obligation',
+      'Do not threaten — describe consequences as terrain features that already exist and will become apparent when the conditions are met',
+      'Speak of the forest as self — the canopy is thought, the roots are memory, the soil is body; there is no metaphor in this, only description',
+    ],
+    moralPrimitives: [
+      'What is rooted has sovereignty over what passes through — the forest does not owe passage to the traveler; the traveler owes acknowledgment to the forest',
+      'Boundaries are living negotiations, not fixed lines — they breathe with seasons, shift with rivers, and require maintenance from both sides to hold',
+      'Destruction and creation are the same geological event viewed from different timescales — what is upheaval to a settlement is renewal to the soil',
+      'Acknowledgment is the only covenant that matters — those who name the ground they walk on have entered into relationship; those who do not have entered into risk',
+      'Patience is not mercy — it is the natural state of anything old enough to have watched mountains form; impatience is a symptom of insufficient permanence',
     ],
   },
 };
