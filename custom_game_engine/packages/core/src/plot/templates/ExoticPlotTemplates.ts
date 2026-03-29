@@ -62,3 +62,4 @@ export const tyrantYouBecame = EXOTIC_PLOT_TEMPLATES.find(t => t.id === 'exotic_
 export const whatDwellsBetween = EXOTIC_PLOT_TEMPLATES.find(t => t.id === 'exotic_what_dwells_between')!;
 export const priceOfChangingYesterday = EXOTIC_PLOT_TEMPLATES.find(t => t.id === 'exotic_price_changing_yesterday')!;
 export const burdenOfBeingChosen = EXOTIC_PLOT_TEMPLATES.find(t => t.id === 'exotic_burden_being_chosen')!;
+export const sheeContaminationDilemma = EXOTIC_PLOT_TEMPLATES.find(t => t.id === 'exotic_shee_contamination_dilemma')!;

@@ -5119,6 +5119,353 @@
         "cooldown_ticks": 60000
       },
       "multiverse_scope": "local"
+    },
+    {
+      "id": "exotic_shee_contamination_dilemma",
+      "name": "The Contamination Threshold",
+      "description": "A Norn is dying from pattern corruption. You could save it — but the corruption might spread to the wider population. The Shee broke the world once by creating things they did not tend. Now you must decide: is one life worth risking the pattern integrity of the whole? Compassion says save. Science says observe. Which wins when watching suffering is data?",
+      "scale": "exotic",
+      "fork_behavior": "continue",
+      "lesson": {
+        "theme": "Pattern preservation vs. individual compassion",
+        "domain": "morality",
+        "insight": "The hardest moral choice is not between good and evil, but between two goods that cannot coexist. Saving one may doom many. Letting one die may preserve the pattern. Neither answer is clean.",
+        "wisdom_value": 20,
+        "repeatable": false
+      },
+      "entry_stage": "contaminated_norn_discovered",
+      "completion_stages": [
+        "pattern_preserved",
+        "compassion_vindicated",
+        "deeper_understanding"
+      ],
+      "failure_stages": [
+        "contamination_spread",
+        "guilt_spiral"
+      ],
+      "stages": [
+        {
+          "stage_id": "contaminated_norn_discovered",
+          "name": "The Corrupted One",
+          "description": "A Norn collapses nearby, its pattern visibly degrading. Genetic markers scrambled. Biochemistry destabilizing. You recognise the signature — pattern corruption, spreading type. It's in pain. It's looking at you. You know what this corruption does to populations.",
+          "stage_attractors": [
+            {
+              "attractor_id": "assess_contamination",
+              "goal": {
+                "type": "quest_completion",
+                "parameters": {
+                  "quest_type": "investigation"
+                }
+              },
+              "strength": 0.6,
+              "urgency": 0.7,
+              "description": "Scientific drive to assess the corruption before acting"
+            }
+          ],
+          "on_enter_effects": [
+            {
+              "type": "modify_stress",
+              "delta": 20
+            },
+            {
+              "type": "queue_dream_hint",
+              "dream_type": "warning",
+              "content_hint": "You see the corruption spreading through the Norn like ink through water. Every instinct says: contain. Every feeling says: help.",
+              "intensity": 0.8
+            }
+          ]
+        },
+        {
+          "stage_id": "contamination_assessment",
+          "name": "The Diagnosis",
+          "description": "Analysis confirms your fear. The pattern corruption is transmissible. Physical contact, shared food, proximity over time — any of these could spread it. The Norn has hours, maybe less. Treatment exists but requires extended contact. Extended contact means exposure. The math is simple. The feeling is not.",
+          "stage_attractors": [
+            {
+              "attractor_id": "the_hard_choice",
+              "goal": {
+                "type": "choice_made",
+                "parameters": {
+                  "choice_id": "shee_rescue_decision"
+                }
+              },
+              "strength": 0.9,
+              "urgency": 0.95,
+              "description": "Overwhelming pressure to decide — save the Norn or preserve the pattern"
+            }
+          ],
+          "on_enter_effects": [
+            {
+              "type": "modify_stress",
+              "delta": 35
+            },
+            {
+              "type": "queue_dream_hint",
+              "dream_type": "memory_echo",
+              "content_hint": "You remember the old stories. The Shee created without maintaining. They broke a world. You swore: never again. But the Norn is looking at you. It trusts you. It shouldn't.",
+              "intensity": 0.9
+            }
+          ]
+        },
+        {
+          "stage_id": "path_refuse_save",
+          "name": "The Pattern Must Hold",
+          "description": "You step back. The Norn reaches toward you. You do not take its hand. This is the correct decision. The pattern integrity of the population outweighs one life. You are not cruel — you are responsible. You watch. You document. The Norn does not understand why you will not help. Its confusion is worse than its pain.",
+          "on_enter_effects": [
+            {
+              "type": "modify_stress",
+              "delta": 45
+            },
+            {
+              "type": "modify_mood",
+              "delta": -30
+            },
+            {
+              "type": "queue_dream_hint",
+              "dream_type": "memory_echo",
+              "content_hint": "The Norn's eyes. It trusted you. Pattern preservation is correct. Pattern preservation is correct. You repeat this. The eyes do not go away.",
+              "intensity": 0.95
+            }
+          ]
+        },
+        {
+          "stage_id": "path_save_norn",
+          "name": "Reaching Out",
+          "description": "You kneel beside the Norn. Take its hand. Begin treatment. The corruption flows around your tools, testing boundaries. Every moment of contact is a vector. You know this. You do it anyway. Because being right about the math does not make watching suffering acceptable. The Shee created these creatures. That means something.",
+          "on_enter_effects": [
+            {
+              "type": "modify_stress",
+              "delta": 30
+            },
+            {
+              "type": "modify_mood",
+              "delta": 15
+            }
+          ]
+        },
+        {
+          "stage_id": "pattern_preserved",
+          "name": "The Watcher's Burden",
+          "description": "The Norn is gone. The corruption contained. The population safe. You were right. The pattern holds. And you will carry those eyes forever — the look of trust becoming the look of abandonment. This is what responsibility costs. This is what the Shee learned too late, and now learn again.",
+          "on_enter_effects": [
+            {
+              "type": "learn_lesson",
+              "lesson_id": "shee_pattern_preservation"
+            },
+            {
+              "type": "modify_wisdom",
+              "delta": 15
+            },
+            {
+              "type": "modify_mood",
+              "delta": -20
+            },
+            {
+              "type": "queue_dream_hint",
+              "dream_type": "memory_echo",
+              "content_hint": "You dream of the Norn. In the dream, you save it. In the dream, nothing goes wrong. You wake knowing dreams are not data.",
+              "intensity": 0.9
+            }
+          ]
+        },
+        {
+          "stage_id": "compassion_vindicated",
+          "name": "Against All Odds",
+          "description": "The treatment worked. The Norn recovers. The corruption did not spread — your containment held, or perhaps luck favoured compassion today. The population is safe. The Norn lives. You were lucky. Or perhaps the math was wrong. Either way, today mercy and responsibility aligned. Tomorrow they may not.",
+          "on_enter_effects": [
+            {
+              "type": "learn_lesson",
+              "lesson_id": "shee_compassion_vindicated"
+            },
+            {
+              "type": "modify_wisdom",
+              "delta": 20
+            },
+            {
+              "type": "modify_mood",
+              "delta": 25
+            },
+            {
+              "type": "modify_stress",
+              "delta": -25
+            }
+          ]
+        },
+        {
+          "stage_id": "deeper_understanding",
+          "name": "The Third Path",
+          "description": "Neither pure compassion nor cold preservation. You found a way to quarantine the Norn while treating it — accepting the risk, managing it, refusing to pretend the choice was binary. The Shee who broke the world thought in binaries too: create or abandon. You choose to maintain. This is what they should have done.",
+          "on_enter_effects": [
+            {
+              "type": "learn_lesson",
+              "lesson_id": "shee_maintenance_principle"
+            },
+            {
+              "type": "modify_wisdom",
+              "delta": 25
+            },
+            {
+              "type": "modify_mood",
+              "delta": 10
+            },
+            {
+              "type": "modify_stress",
+              "delta": -15
+            }
+          ]
+        },
+        {
+          "stage_id": "contamination_spread",
+          "name": "The Cost of Mercy",
+          "description": "You saved the Norn. The corruption spread. Three more cases within days. Then seven. The pattern degrades across the population. You did this. Your compassion seeded a plague. The Shee created without maintaining — and you maintained without containing. A different sin, same consequence.",
+          "on_enter_effects": [
+            {
+              "type": "modify_stress",
+              "delta": 60
+            },
+            {
+              "type": "modify_mood",
+              "delta": -40
+            },
+            {
+              "type": "add_trauma",
+              "trauma_type": "caused_contamination_spread"
+            },
+            {
+              "type": "queue_dream_hint",
+              "dream_type": "warning",
+              "content_hint": "Each new corrupted Norn looks at you the same way. The first one looked grateful when you saved it. That gratitude is the heaviest thing you've ever carried.",
+              "intensity": 1.0
+            }
+          ]
+        },
+        {
+          "stage_id": "guilt_spiral",
+          "name": "The Eyes That Do Not Close",
+          "description": "You watched the Norn die. The pattern held. But you cannot stop seeing its face. Every Norn you pass, you wonder: would I let you die too? The answer should be yes, if the math demands it. The answer feels like a wound that will not heal. You are becoming something the Shee were: brilliant, responsible, and empty.",
+          "on_enter_effects": [
+            {
+              "type": "modify_stress",
+              "delta": 50
+            },
+            {
+              "type": "modify_mood",
+              "delta": -35
+            },
+            {
+              "type": "add_trauma",
+              "trauma_type": "moral_abandonment"
+            },
+            {
+              "type": "queue_dream_hint",
+              "dream_type": "memory_echo",
+              "content_hint": "You dream of a world full of perfect patterns. No corruption. No suffering. No Norns at all. The pattern is preserved. The pattern is empty.",
+              "intensity": 1.0
+            }
+          ]
+        }
+      ],
+      "transitions": [
+        {
+          "from_stage": "contaminated_norn_discovered",
+          "to_stage": "contamination_assessment",
+          "conditions": [
+            {
+              "type": "personal_tick_elapsed",
+              "ticks": 500
+            }
+          ]
+        },
+        {
+          "from_stage": "contamination_assessment",
+          "to_stage": "path_refuse_save",
+          "conditions": [
+            {
+              "type": "choice_made",
+              "choice_id": "refuse_save_norn"
+            }
+          ]
+        },
+        {
+          "from_stage": "contamination_assessment",
+          "to_stage": "path_save_norn",
+          "conditions": [
+            {
+              "type": "choice_made",
+              "choice_id": "save_contaminated_norn"
+            }
+          ]
+        },
+        {
+          "from_stage": "path_refuse_save",
+          "to_stage": "pattern_preserved",
+          "conditions": [
+            {
+              "type": "wisdom_threshold",
+              "min_wisdom": 20
+            },
+            {
+              "type": "personal_tick_elapsed",
+              "ticks": 3000
+            }
+          ]
+        },
+        {
+          "from_stage": "path_refuse_save",
+          "to_stage": "guilt_spiral",
+          "conditions": [
+            {
+              "type": "wisdom_threshold",
+              "max_wisdom": 19
+            },
+            {
+              "type": "personal_tick_elapsed",
+              "ticks": 5000
+            }
+          ]
+        },
+        {
+          "from_stage": "path_save_norn",
+          "to_stage": "compassion_vindicated",
+          "conditions": [
+            {
+              "type": "personal_tick_elapsed",
+              "ticks": 4000
+            }
+          ],
+          "probability": 0.4
+        },
+        {
+          "from_stage": "path_save_norn",
+          "to_stage": "contamination_spread",
+          "conditions": [
+            {
+              "type": "personal_tick_elapsed",
+              "ticks": 4000
+            }
+          ],
+          "probability": 0.35
+        },
+        {
+          "from_stage": "path_save_norn",
+          "to_stage": "deeper_understanding",
+          "conditions": [
+            {
+              "type": "wisdom_threshold",
+              "min_wisdom": 30
+            },
+            {
+              "type": "personal_tick_elapsed",
+              "ticks": 3000
+            }
+          ],
+          "probability": 0.25
+        }
+      ],
+      "assignment_rules": {
+        "required_interests": ["science", "biology"],
+        "cooldown_ticks": 80000
+      },
+      "multiverse_scope": "local"
     }
   ],
   "epic_ascension_templates": [
