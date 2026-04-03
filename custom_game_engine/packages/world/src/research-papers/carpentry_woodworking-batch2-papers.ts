@@ -1,7 +1,7 @@
 /**
  * Generated Research Papers
  *
- * Auto-generated using AI with Pratchett/Moers/Adams/Gaiman style
+ * Auto-generated using AI with Thornhaven-school humor style
  */
 
 import type { ResearchPaper } from './types.js';
@@ -154,7 +154,7 @@ The floor joist represents one of humanity's most underappreciated achievements:
 
 Modern floor joist construction demands attention to three primary factors: span, spacing, and species‡‡. The relationship between these variables was first properly quantified by Master Builder Trelawney Hobsbottle in 1847***, whose seminal work "On The Perplexing Question of Why Some Floors Hold and Others Most Decidedly Do Not" remains required reading at the Thornhaven Institute of Practical Engineering†††. A 2×10 joist of Douglas Fir, for instance, can span approximately 16 feet at 16-inch centers under standard residential loading‡‡‡, though this assumes the wood is actually Douglas Fir and not, as the Regrettable Incident at Pseudopolis Square demonstrated, very convincing balsa****. Load calculations must account for both dead loads (the weight of the structure itself, which remains remarkably consistent†††† and live loads (everything else, which does not‡‡‡‡.
 
-The attachment of floor joists to their supporting members represents a ritual as ancient as construction itself, though considerably more regulated*****. Joist hangers, those humble metal cradles invented by the Discworld Patent Office in 1823†††††, have prevented more catastrophic failures than any other single innovation‡‡‡‡‡, despite their tendency to be installed backwards by enthusiasts who insist they "know what they're doing"******. The alternative—notching the supporting beam to create a pocket—requires precision that approximately 23.7% of contractors possess†††††† and confidence that approximately 94.3% possess‡‡‡‡‡‡. The mathematical implications of this discrepancy have not escaped the attention of insurance underwriters.
+The attachment of floor joists to their supporting members represents a ritual as ancient as construction itself, though considerably more regulated*****. Joist hangers, those humble metal cradles invented by the Thornhaven Patent Bureau in 1823†††††, have prevented more catastrophic failures than any other single innovation‡‡‡‡‡, despite their tendency to be installed backwards by enthusiasts who insist they "know what they're doing"******. The alternative—notching the supporting beam to create a pocket—requires precision that approximately 23.7% of contractors possess†††††† and confidence that approximately 94.3% possess‡‡‡‡‡‡. The mathematical implications of this discrepancy have not escaped the attention of insurance underwriters.
 
 Bridging and blocking between joists serves multiple purposes, including lateral stability, load distribution, and providing future archaeologists with evidence of changing material preferences*******. Solid blocking—full-dimension lumber cut to fit snugly between joists—represents the traditional approach, though it requires measuring skills that prove elusive after lunch††††††††. Cross-bridging, those elegant X-shaped braces beloved by architects and cursed by installers‡‡‡‡‡‡‡, offers superior performance while demanding considerably more attention than most humans can sustain********. The Great Bridging Controversy of 1923, which nearly split the Builders' Guild into two separate organizations†††††††††, was ultimately resolved by the simple expedient of making both methods acceptable in the building code‡‡‡‡‡‡‡‡.
 
@@ -189,7 +189,7 @@ The subflooring—that which actually touches human feet, albeit through several
 
 *****The Ritual of Joist Attachment, as described in the Tome of Sensible Construction Practices, begins with the ceremonial reading of the span tables, followed by the practical application of fasteners, and concludes with the traditional prayer: "Please let this hold." Success rate: variable.
 
-††††††The Discworld Patent Office, despite the name, exists in our dimension and holds patent #847,291 for "A Device to Keep Timber From Falling, Specifically, Down." The patent application included diagrams that were later used as examples of "before and after" in structural failure analysis courses.
+††††††The Thornhaven Patent Bureau, despite the name, exists in our dimension and holds patent #847,291 for "A Device to Keep Timber From Falling, Specifically, Down." The patent application included diagrams that were later used as examples of "before and after" in structural failure analysis courses.
 
 ‡‡‡‡‡The invention of the joist hanger reduced structural failures by 73%, increased construction speed by 45%, and elevated the frustration levels of do-it-yourself enthusiasts by 238%. These statistics are maintained by the Department of Things We Wish People Would Stop Doing Themselves.
 

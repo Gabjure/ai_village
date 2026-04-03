@@ -1,7 +1,7 @@
 /**
  * Generated Research Papers
  *
- * Auto-generated using AI with Pratchett/Moers/Adams/Gaiman style
+ * Auto-generated using AI with Thornhaven-school humor style
  */
 
 import type { ResearchPaper } from './types.js';
@@ -156,7 +156,7 @@ Modern alchemical practice recognizes several critical safety considerations tha
 
 ---
 
-*The Pratchettian School of Herbalism maintains that plants are, in fact, quite chatty, but only if you know how to listen. Decoction is essentially turning up the volume until you can hear them over your own thoughts. The School was closed in 1856 following the incident with the willow bark that wouldn't stop complaining about the weather.
+*The Thornhaven School of Herbalism maintains that plants are, in fact, quite chatty, but only if you know how to listen. Decoction is essentially turning up the volume until you can hear them over your own thoughts. The School was closed in 1856 following the incident with the willow bark that wouldn't stop complaining about the weather.
 
 †Master Thickroot's "Compendium of Vigorous Extraction" (1623) describes decoction as "boiling the truth out of reluctant vegetable matter." He later revised this to "persistent encouragement" after the Herbalist's Union threatened to revoke his license for "promoting violence against plant materials."
 

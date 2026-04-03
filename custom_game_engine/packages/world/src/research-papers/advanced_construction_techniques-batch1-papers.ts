@@ -1,7 +1,7 @@
 /**
  * Generated Research Papers
  *
- * Auto-generated using AI with Pratchett/Moers/Adams/Gaiman style
+ * Auto-generated using AI with Thornhaven-school humor style
  */
 
 import type { ResearchPaper } from './types.js';
@@ -188,7 +188,7 @@ export const SCAFFOLD_CONSTRUCTION_SAFETY: ResearchPaper = {
   ],
   description: `# Scaffold Construction Safety: A Comprehensive Guide to Not Falling Off Things That Fall Apart
 
-The fundamental principle of scaffold construction safety may be summarized thus: the scaffold must remain more interested in standing up than in falling down*. This seemingly obvious statement has, throughout history, proven remarkably difficult to implement in practice**. The ancient Discworld architect Bloody Stupid Johnson famously declared that "gravity is merely a suggestion"†, a philosophy that influenced scaffold design for approximately three weeks before the Great Collapse of 1789‡, after which the Thornhaven Guild of Scaffolders instituted what they termed "reality-based construction practices"††.
+The fundamental principle of scaffold construction safety may be summarized thus: the scaffold must remain more interested in standing up than in falling down*. This seemingly obvious statement has, throughout history, proven remarkably difficult to implement in practice**. The Notorious Builder Crumblewick famously declared that "gravity is merely a suggestion"†, a philosophy that influenced scaffold design for approximately three weeks before the Great Collapse of 1789‡, after which the Thornhaven Guild of Scaffolders instituted what they termed "reality-based construction practices"††.
 
 Modern scaffold safety begins with the Three Immutable Laws‡‡, which state: first, that all scaffold components must be capable of supporting 4.37 times the intended load§; second, that gravity operates with approximately 98.6% reliability§§; and third, that the probability of someone attempting to stand on the least stable part of any scaffold approaches unity as time progresses***. The application of these laws requires understanding both the physical properties of materials and the psychological properties of construction workers†††, the latter being far less predictable than the former‡‡‡. Load distribution must account not merely for static weight but for what the Department of Improbable Events calls "creative load interpretation"§§§—the tendency of workers to assume that if one person can safely stand somewhere, three people carrying heavy objects definitely can****.
 
@@ -204,7 +204,7 @@ The historical development of scaffold safety reads like a chronicle of expensiv
 
 **The International Database of Scaffolding Failures (IDSF) contains 47,823 entries dating back to 2300 BCE, when the pharaoh's chief architect learned that "because I said so" is not a sufficient replacement for mathematics†.
 
-†Bloody Stupid Johnson once built a scaffold that existed in seventeen dimensions, three of which were new to physics. It fell over in all of them simultaneously.
+†The Notorious Builder Crumblewick once built a scaffold that existed in seventeen dimensions, three of which were new to physics. It fell over in all of them simultaneously.
 
 ‡Not to be confused with the Other Great Collapse of 1789, which involved the French aristocracy rather than scaffolding, though both shared a fundamental misunderstanding of support structures.
 

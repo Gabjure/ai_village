@@ -1,7 +1,7 @@
 /**
  * Generated Research Papers
  *
- * Auto-generated using AI with Pratchett/Moers/Adams/Gaiman style
+ * Auto-generated using AI with Thornhaven-school humor style
  */
 
 import type { ResearchPaper } from './types.js';
@@ -596,7 +596,7 @@ Modern waterproofing represents the culmination of millennia of trial, error, an
 
 ---
 
-*Water possesses what the Discworld philosopher Didactylos called "morphic stupidity"—the ability to mindlessly repeat the same action billions of times until something gives way. Buildings are merely playing a losing game of geological-timescale attrition.
+*Water possesses what the Thornhaven philosopher Didacticus called "morphic stupidity"—the ability to mindlessly repeat the same action billions of times until something gives way. Buildings are merely playing a losing game of geological-timescale attrition.
 
 †The Hanging Gardens of Babylon, one of the Seven Wonders of the Ancient World, required such sophisticated waterproofing that modern archaeologists still argue about whether they could possibly have existed. This is not the triumphant endorsement of Babylonian engineering one might expect, but rather suggests they waterproofed them so thoroughly that all evidence dissolved in the first rain after the civilization collapsed.
 
