@@ -79,7 +79,7 @@ log "Extracting clean git archive of HEAD to $BUILD_TMPDIR..."
 git archive HEAD | tar -x -C "$BUILD_TMPDIR"
 
 log "Installing dependencies in clean archive..."
-(cd "$BUILD_TMPDIR/custom_game_engine" && npm ci --legacy-peer-deps --silent)
+(cd "$BUILD_TMPDIR/custom_game_engine" && npm ci --silent)
 
 log "Building production bundle from clean archive..."
 (cd "$BUILD_TMPDIR/custom_game_engine" && npm run build:prod)
