@@ -97,7 +97,7 @@ log "Building production bundle from clean archive..."
 
 log "Copying demo/dist/ from clean archive back to working tree..."
 rm -rf demo/dist/
-cp -r "$BUILD_TMPDIR/custom_game_engine/demo/dist/" demo/dist/
+cp -r "$BUILD_TMPDIR/demo/dist/" demo/dist/
 
 log "Production bundle ready at demo/dist/ (built from clean git archive)"
 

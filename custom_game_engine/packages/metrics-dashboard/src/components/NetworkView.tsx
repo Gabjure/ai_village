@@ -152,7 +152,7 @@ export function NetworkView({
       } as any,
     });
 
-    cy.on('tap', 'node', (event) => {
+    cy.on('tap', 'node', (event: any) => {
       const node = event.target;
       const agentId = node.data('id') as string;
       onNodeClick(agentId);
