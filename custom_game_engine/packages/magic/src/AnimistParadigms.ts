@@ -5,15 +5,15 @@
  * with the world rather than personal power or divine grant.
  *
  * 1. Shinto/Animist Magic - Everything has a spirit (kami)
- * 2. Sympathy Magic - Like affects like, connections between similar things
- * 3. Allomancy - Consuming metals grants specific powers
+ * 2. Tethermancy Magic - Like affects like, connections between similar things
+ * 3. Ferromancy - Consuming metals grants specific powers
  * 4. Dream Magic - The dream world is real and manipulable
  * 5. Song Magic - Music shapes reality
  * 6. Rune Magic - Symbols have inherent power
  */
 
 import type { MagicParadigm } from './MagicParadigm.js';
-import { loadExampleKami, loadAllomanticMetals, loadAnimistParadigms } from './data-loader.js';
+import { loadExampleKami, loadFerromancyMetals, loadAnimistParadigms } from './data-loader.js';
 
 // ============================================================================
 // Shinto/Animist Magic - The World of Endless Spirits
@@ -112,13 +112,13 @@ export const SHINTO_PARADIGM: MagicParadigm = _loadedParadigms.shinto!;
 export const EXAMPLE_KAMI: Kami[] = loadExampleKami();
 
 // ============================================================================
-// Sympathy Magic (Kingkiller Chronicle inspired)
+// Tethermancy Magic (tethermantic_tradition Chronicle inspired)
 // ============================================================================
 
 /**
  * A sympathetic link between two objects
  */
-export interface SympatheticLink {
+export interface ResonantTether {
   /** Source object */
   source: string;
 
@@ -132,7 +132,7 @@ export interface SympatheticLink {
   linkType: 'identical' | 'similar' | 'part_of' | 'symbolic' | 'named';
 
   /** Energy loss in transfer (percentage) */
-  slippage: number;
+  drift: number;
 
   /** Is the link currently active? */
   active: boolean;
@@ -142,18 +142,18 @@ export interface SympatheticLink {
 }
 
 /**
- * Sympathy Magic Paradigm - Like affects like
+ * Tethermancy Magic Paradigm - Like affects like
  */
-export const SYMPATHY_PARADIGM: MagicParadigm = _loadedParadigms.sympathy!;
+export const TETHERMANCY_PARADIGM: MagicParadigm = _loadedParadigms.tethermancy!;
 
 // ============================================================================
-// Allomancy (Mistborn inspired)
+// Ferromancy (OmniResonant inspired)
 // ============================================================================
 
 /**
  * The metals and their effects
  */
-export interface AllomanticMetal {
+export interface FerromancyMetal {
   id: string;
   name: string;
   type: 'physical' | 'mental' | 'enhancement' | 'temporal';
@@ -163,12 +163,12 @@ export interface AllomanticMetal {
   rarity: 'common' | 'uncommon' | 'rare' | 'legendary';
 }
 
-export const ALLOMANTIC_METALS: AllomanticMetal[] = loadAllomanticMetals();
+export const FERROMANCY_METALS: FerromancyMetal[] = loadFerromancyMetals();
 
 /**
- * Allomancy Paradigm - Burn metals for power
+ * Ferromancy Paradigm - Burn metals for power
  */
-export const ALLOMANCY_PARADIGM: MagicParadigm = _loadedParadigms.allomancy!;
+export const FERROMANCY_PARADIGM: MagicParadigm = _loadedParadigms.ferromancy!;
 
 // ============================================================================
 // Dream Magic
@@ -198,20 +198,20 @@ export const SONG_PARADIGM: MagicParadigm = _loadedParadigms.song!;
 export const RUNE_PARADIGM: MagicParadigm = _loadedParadigms.rune!;
 
 // ============================================================================
-// Daemon/Dust Magic (His Dark Materials inspired)
+// Animus/Aether Motes Magic (spirit-bond inspired)
 // ============================================================================
 
 /**
- * A daemon - external soul in animal form
+ * A animus - external soul in animal form
  */
-export interface Daemon {
-  /** Name of the daemon */
+export interface Animus {
+  /** Name of the animus */
   name: string;
 
   /** Current animal form */
   form: string;
 
-  /** Has the daemon settled (adult) or still shifting (child)? */
+  /** Has the animus settled (adult) or still shifting (child)? */
   settled: boolean;
 
   /** What the settled form suggests about personality */
@@ -220,24 +220,24 @@ export interface Daemon {
   /** Maximum distance from human before pain */
   separationDistance: 'normal' | 'extended' | 'witch_distance' | 'severed';
 
-  /** Personality traits visible through daemon */
+  /** Personality traits visible through animus */
   revealedTraits: string[];
 }
 
 /**
- * Daemon/Dust Magic Paradigm - External souls and conscious particles
+ * Animus/Aether Motes Magic Paradigm - External souls and conscious particles
  */
-export const DAEMON_PARADIGM: MagicParadigm = _loadedParadigms.daemon!;
+export const ANIMUS_PARADIGM: MagicParadigm = _loadedParadigms.animus!;
 
 // ============================================================================
 // Registry
 // ============================================================================
 
 export const ANIMIST_PARADIGM_REGISTRY: Record<string, MagicParadigm> = {
-  daemon: DAEMON_PARADIGM,
+  animus: ANIMUS_PARADIGM,
   shinto: SHINTO_PARADIGM,
-  sympathy: SYMPATHY_PARADIGM,
-  allomancy: ALLOMANCY_PARADIGM,
+  tethermancy: TETHERMANCY_PARADIGM,
+  ferromancy: FERROMANCY_PARADIGM,
   dream: DREAM_PARADIGM,
   song: SONG_PARADIGM,
   rune: RUNE_PARADIGM,
@@ -265,15 +265,15 @@ export function getKamiByType(type: KamiType): Kami[] {
 }
 
 /**
- * Get all allomantic metals.
+ * Get all ferromancy metals.
  */
-export function getAllomanticMetals(): AllomanticMetal[] {
-  return ALLOMANTIC_METALS;
+export function getFerromancyMetals(): FerromancyMetal[] {
+  return FERROMANCY_METALS;
 }
 
 /**
  * Get metals by type (physical, mental, etc.)
  */
-export function getMetalsByType(type: AllomanticMetal['type']): AllomanticMetal[] {
-  return ALLOMANTIC_METALS.filter(m => m.type === type);
+export function getMetalsByType(type: FerromancyMetal['type']): FerromancyMetal[] {
+  return FERROMANCY_METALS.filter(m => m.type === type);
 }

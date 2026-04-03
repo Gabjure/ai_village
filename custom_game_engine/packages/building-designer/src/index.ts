@@ -440,8 +440,8 @@ export {
   PASSION_CHAMBER,
   CATHARSIS_POOL,
 
-  // Sympathy paradigm
-  SYMPATHY_LINK_CHAMBER,
+  // Tethermancy paradigm
+  TETHERMANCY_LINK_CHAMBER,
 
   // Debt paradigm
   DEBT_LEDGER_HALL,
@@ -476,8 +476,8 @@ export {
   // Seasonal paradigm
   SOLSTICE_CIRCLE,
 
-  // Daemon paradigm
-  DAEMON_SANCTUM,
+  // Animus paradigm
+  ANIMUS_SANCTUM,
 
   // Consumption paradigm
   ABSORPTION_CHAMBER,
@@ -508,7 +508,7 @@ export {
   ELEMENTAL_BUILDINGS,
   DIMENSIONAL_BUILDINGS,
   EMOTIONAL_BUILDINGS,
-  SYMPATHY_BUILDINGS,
+  TETHERMANCY_BUILDINGS,
   DEBT_BUILDINGS,
   BUREAUCRATIC_BUILDINGS,
   LUCK_BUILDINGS,

@@ -24,7 +24,7 @@ import { evaluateNode, type EvaluationContext } from '../MagicSkillTreeEvaluator
 /**
  * Manages skill tree progression for magic paradigms.
  *
- * Each paradigm (academic, divine, allomancy, etc.) has its own skill tree.
+ * Each paradigm (academic, divine, ferromancy, etc.) has its own skill tree.
  * Agents earn XP by casting spells, which unlocks nodes that grant new spells/abilities.
  */
 export class SkillTreeManager {

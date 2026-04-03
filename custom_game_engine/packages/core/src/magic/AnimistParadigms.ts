@@ -5,8 +5,8 @@
  * with the world rather than personal power or divine grant.
  *
  * 1. Shinto/Animist Magic - Everything has a spirit (kami)
- * 2. Sympathy Magic - Like affects like, connections between similar things
- * 3. Allomancy - Consuming metals grants specific powers
+ * 2. Tethermancy Magic - Like affects like, connections between similar things
+ * 3. Ferromancy - Consuming metals grants specific powers
  * 4. Dream Magic - The dream world is real and manipulable
  * 5. Song Magic - Music shapes reality
  * 6. Rune Magic - Symbols have inherent power
@@ -423,13 +423,13 @@ export const EXAMPLE_KAMI: Kami[] = [
 ];
 
 // ============================================================================
-// Sympathy Magic (Kingkiller Chronicle inspired)
+// Tethermancy Magic (tethermantic_tradition Chronicle inspired)
 // ============================================================================
 
 /**
  * A sympathetic link between two objects
  */
-export interface SympatheticLink {
+export interface ResonantTether {
   /** Source object */
   source: string;
 
@@ -443,7 +443,7 @@ export interface SympatheticLink {
   linkType: 'identical' | 'similar' | 'part_of' | 'symbolic' | 'named';
 
   /** Energy loss in transfer (percentage) */
-  slippage: number;
+  drift: number;
 
   /** Is the link currently active? */
   active: boolean;
@@ -453,33 +453,33 @@ export interface SympatheticLink {
 }
 
 /**
- * Sympathy Magic Paradigm - Like affects like
+ * Tethermancy Magic Paradigm - Like affects like
  */
-export const SYMPATHY_PARADIGM: MagicParadigm = {
-  id: 'sympathy',
-  name: 'Sympathy',
+export const TETHERMANCY_PARADIGM: MagicParadigm = {
+  id: 'tethermancy',
+  name: 'Tethermancy',
   description: 'Create links between similar things - what affects one affects the other',
-  universeIds: ['sympathy_realms', 'kingkiller'],
+  universeIds: ['tethermancy_realms', 'tethermantic_tradition'],
 
   lore: `Everything is connected. Not metaphorically - literally. A doll made in your
 image is connected to you. A piece of your hair maintains a link to you. Two
-coins from the same mint share a bond. The sympathist learns to feel these
+coins from the same mint share a bond. The tethermancer learns to feel these
 connections and, more importantly, to exploit them.
 
 The First Law: Energy cannot be created. Move heat from a fire to a candle
-through a link, and energy is lost to slippage - the imperfection of the
-connection. The Second Law: The better the link, the less the slippage.
+through a link, and energy is lost to drift - the imperfection of the
+connection. The Second Law: The better the link, the less the drift.
 A mother's link to her child is stronger than a stranger's. A piece of
 someone is better than a symbol of them.
 
-Sympathy is a science, not an art. It can be taught, measured, calculated.
+Tethermancy is a science, not an art. It can be taught, measured, calculated.
 But it is also dangerous. Create a link to the wrong thing, channel too
 much through yourself, and you will burn from the inside out.`,
 
   sources: [
     {
-      id: 'alar',
-      name: 'Alar',
+      id: 'attunement',
+      name: 'Attunement',
       type: 'internal',
       regeneration: 'rest',
       regenRate: 0.02,
@@ -504,8 +504,8 @@ much through yourself, and you will burn from the inside out.`,
 
   costs: [
     {
-      type: 'stamina',  // Mental exhaustion from maintaining alar
-      canBeTerminal: true,  // Binder's chills can kill
+      type: 'stamina',  // Mental exhaustion from maintaining attunement
+      canBeTerminal: true,  // Resonance Drain can kill
       cumulative: true,
       recoverable: true,
       recoveryMethod: 'rest',
@@ -544,7 +544,7 @@ much through yourself, and you will burn from the inside out.`,
       type: 'conservation',
       strictness: 'absolute',
       canBeCircumvented: false,
-      description: 'Energy cannot be created, only moved. Slippage always loses some.',
+      description: 'Energy cannot be created, only moved. Drift always loses some.',
     },
     {
       id: 'similarity',
@@ -552,7 +552,7 @@ much through yourself, and you will burn from the inside out.`,
       type: 'similarity',
       strictness: 'strong',
       canBeCircumvented: false,
-      description: 'Link strength depends on similarity. Better match = less slippage.',
+      description: 'Link strength depends on similarity. Better match = less drift.',
     },
     {
       id: 'parallel_motion',
@@ -566,11 +566,11 @@ much through yourself, and you will burn from the inside out.`,
 
   risks: [
     { trigger: 'overuse', consequence: 'backlash', severity: 'severe', probability: 0.4, mitigatable: true,
-      mitigationSkill: 'alar_training',
-      description: 'Binder\'s chills - drawing too much heat from yourself' },
-    { trigger: 'slippage', consequence: 'mishap', severity: 'minor', probability: 0.3, mitigatable: true,
+      mitigationSkill: 'attunement_training',
+      description: 'Resonance Drain - drawing too much heat from yourself' },
+    { trigger: 'drift', consequence: 'mishap', severity: 'minor', probability: 0.3, mitigatable: true,
       description: 'Energy lost to imperfect links' },
-    { trigger: 'split_alar', consequence: 'backlash', severity: 'moderate', probability: 0.5, mitigatable: true,
+    { trigger: 'split_attunement', consequence: 'backlash', severity: 'moderate', probability: 0.5, mitigatable: true,
       description: 'Maintaining multiple bindings splits focus dangerously' },
   ],
 
@@ -580,7 +580,7 @@ much through yourself, and you will burn from the inside out.`,
       rarity: 'uncommon',
       voluntary: true,
       prerequisites: ['university_admission', 'strong_will'],
-      grantsAccess: ['alar'],
+      grantsAccess: ['attunement'],
       startingProficiency: 15,
       description: 'Formal study at a University',
     },
@@ -596,7 +596,7 @@ much through yourself, and you will burn from the inside out.`,
 
   powerScaling: 'linear',
   powerCeiling: 100,
-  allowsGroupCasting: false,  // Alar is personal
+  allowsGroupCasting: false,  // Attunement is personal
   allowsEnchantment: false,  // That's artificing/sygaldry, different discipline
   persistsAfterDeath: false,
   allowsTeaching: true,
@@ -605,13 +605,13 @@ much through yourself, and you will burn from the inside out.`,
 };
 
 // ============================================================================
-// Allomancy (Mistborn inspired)
+// Ferromancy (OmniResonant inspired)
 // ============================================================================
 
 /**
  * The metals and their effects
  */
-export interface AllomanticMetal {
+export interface FerromancyMetal {
   id: string;
   name: string;
   type: 'physical' | 'mental' | 'enhancement' | 'temporal';
@@ -621,7 +621,7 @@ export interface AllomanticMetal {
   rarity: 'common' | 'uncommon' | 'rare' | 'legendary';
 }
 
-export const ALLOMANTIC_METALS: AllomanticMetal[] = [
+export const FERROMANCY_METALS: FerromancyMetal[] = [
   // Physical - External
   { id: 'steel', name: 'Steel', type: 'physical', direction: 'push',
     effect: 'Push on nearby metals', rarity: 'common' },
@@ -639,33 +639,33 @@ export const ALLOMANTIC_METALS: AllomanticMetal[] = [
     effect: 'Soothe - dampen emotions', rarity: 'uncommon' },
   // Mental - Internal
   { id: 'copper', name: 'Copper', type: 'mental', direction: 'push',
-    effect: 'Hide allomantic pulses (Smoker)', rarity: 'uncommon' },
+    effect: 'Hide ferromancy pulses (Copper-Shroud)', rarity: 'uncommon' },
   { id: 'bronze', name: 'Bronze', type: 'mental', direction: 'pull',
-    effect: 'Detect allomantic pulses (Seeker)', rarity: 'uncommon' },
+    effect: 'Detect ferromancy pulses (Bronze-Finder)', rarity: 'uncommon' },
   // Enhancement
   { id: 'aluminum', name: 'Aluminum', type: 'enhancement', direction: 'push',
     effect: 'Wipe own metal reserves', rarity: 'rare' },
-  { id: 'duralumin', name: 'Duralumin', type: 'enhancement', direction: 'push',
+  { id: 'amplium', name: 'Amplium', type: 'enhancement', direction: 'push',
     effect: 'Massively boost next metal burned', drawback: 'Burns all reserves instantly', rarity: 'rare' },
   // Temporal
   { id: 'gold', name: 'Gold', type: 'temporal', direction: 'pull',
     effect: 'See past self (who you could have been)', drawback: 'Psychologically traumatic', rarity: 'rare' },
-  { id: 'atium', name: 'Atium', type: 'temporal', direction: 'pull',
+  { id: 'temporite', name: 'Temporite', type: 'temporal', direction: 'pull',
     effect: 'See moments into the future', rarity: 'legendary' },
 ];
 
 /**
- * Allomancy Paradigm - Burn metals for power
+ * Ferromancy Paradigm - Burn metals for power
  */
-export const ALLOMANCY_PARADIGM: MagicParadigm = {
-  id: 'allomancy',
-  name: 'Allomancy',
+export const FERROMANCY_PARADIGM: MagicParadigm = {
+  id: 'ferromancy',
+  name: 'Ferromancy',
   description: 'Swallow metals and "burn" them for specific powers',
-  universeIds: ['scadrial', 'metal_realms'],
+  universeIds: ['ferromantic_tradition', 'metal_realms'],
 
-  lore: `Allomancy is genetic, passed through bloodlines descended from the original
-Allomancers. Most Allomancers can burn only one metal - Mistings. Rare
-individuals called Mistborn can burn all of them.
+  lore: `Ferromancy is genetic, passed through bloodlines descended from the original
+Ferromancers. Most Ferromancers can burn only one metal - MonoResonants. Rare
+individuals called OmniResonant can burn all of them.
 
 The process is simple: swallow a metal (purified and prepared properly),
 then burn it internally. The metal is consumed, converted directly into
@@ -673,8 +673,8 @@ power. Each metal grants a specific ability - steel lets you Push on
 metals, tin enhances senses, brass soothes emotions.
 
 The power is hereditary and cannot be learned. Either your blood carries
-the gift, or it doesn't. Snapping - the traumatic event that awakens
-Allomantic potential - is required to access the power, even in those
+the gift, or it doesn't. The Fracture - the traumatic event that awakens
+Ferromancy potential - is required to access the power, even in those
 who carry the genes.`,
 
   sources: [
@@ -719,15 +719,15 @@ who carry the genes.`,
   laws: [
     {
       id: 'hereditary',
-      name: 'Blood of Allomancy',
+      name: 'Blood of Ferromancy',
       type: 'bloodline',
       strictness: 'absolute',
       canBeCircumvented: false,
-      description: 'Allomancy is genetic. You have it or you don\'t.',
+      description: 'Ferromancy is genetic. You have it or you don\'t.',
     },
     {
-      id: 'snapping',
-      name: 'Snapping',
+      id: 'the_fracture',
+      name: 'The Fracture',
       type: 'threshold',
       strictness: 'absolute',
       canBeCircumvented: false,
@@ -735,11 +735,11 @@ who carry the genes.`,
     },
     {
       id: 'one_or_all',
-      name: 'Misting or Mistborn',
+      name: 'MonoResonant or OmniResonant',
       type: 'balance',
       strictness: 'absolute',
       canBeCircumvented: false,
-      description: 'Burn one metal (Misting) or all of them (Mistborn). No in-between.',
+      description: 'Burn one metal (MonoResonant) or all of them (OmniResonant). No in-between.',
     },
     {
       id: 'purity',
@@ -759,28 +759,28 @@ who carry the genes.`,
       description: 'Burning too much pewter leads to pewter drag' },
     { trigger: 'flare', consequence: 'burnout', severity: 'minor', probability: 0.2, mitigatable: true,
       description: 'Flaring burns metal faster for more power, but risks running out' },
-    { trigger: 'duralumin', consequence: 'exhaustion', severity: 'severe', probability: 1.0, mitigatable: false,
-      description: 'Duralumin burns all metal reserves instantly' },
+    { trigger: 'amplium', consequence: 'exhaustion', severity: 'severe', probability: 1.0, mitigatable: false,
+      description: 'Amplium burns all metal reserves instantly' },
   ],
 
   acquisitionMethods: [
     {
       method: 'born',
-      rarity: 'rare',  // Allomantic lines are rare
+      rarity: 'rare',  // Ferromancy lines are rare
       voluntary: false,
-      prerequisites: ['allomantic_bloodline'],
+      prerequisites: ['ferromancy_bloodline'],
       grantsAccess: ['metal_reserves'],
       startingProficiency: 0,  // Must snap first
-      description: 'Born with latent Allomantic potential',
+      description: 'Born with latent Ferromancy potential',
     },
     {
       method: 'awakening',
       rarity: 'rare',
       voluntary: false,
-      prerequisites: ['allomantic_bloodline', 'traumatic_event'],
+      prerequisites: ['ferromancy_bloodline', 'traumatic_event'],
       grantsAccess: ['metal_reserves'],
       startingProficiency: 10,
-      description: 'Snapping - awakening Allomantic potential through trauma',
+      description: 'The Fracture - awakening Ferromancy potential through trauma',
     },
   ],
 
@@ -1279,20 +1279,20 @@ effects. But each additional Rune multiplies the risk of error.`,
 };
 
 // ============================================================================
-// Daemon/Dust Magic (His Dark Materials inspired)
+// Animus/Aether Motes Magic (spirit-bond inspired)
 // ============================================================================
 
 /**
- * A daemon - external soul in animal form
+ * A animus - external soul in animal form
  */
-export interface Daemon {
-  /** Name of the daemon */
+export interface Animus {
+  /** Name of the animus */
   name: string;
 
   /** Current animal form */
   form: string;
 
-  /** Has the daemon settled (adult) or still shifting (child)? */
+  /** Has the animus settled (adult) or still shifting (child)? */
   settled: boolean;
 
   /** What the settled form suggests about personality */
@@ -1301,53 +1301,53 @@ export interface Daemon {
   /** Maximum distance from human before pain */
   separationDistance: 'normal' | 'extended' | 'witch_distance' | 'severed';
 
-  /** Personality traits visible through daemon */
+  /** Personality traits visible through animus */
   revealedTraits: string[];
 }
 
 /**
- * Daemon/Dust Magic Paradigm - External souls and conscious particles
+ * Animus/Aether Motes Magic Paradigm - External souls and conscious particles
  */
-export const DAEMON_PARADIGM: MagicParadigm = {
-  id: 'daemon',
-  name: 'The Dust and the Daemon',
-  description: 'Magic through external souls (daemons) and conscious particles (Dust)',
-  universeIds: ['lyras_world', 'multiverse_realms'],
+export const ANIMUS_PARADIGM: MagicParadigm = {
+  id: 'animus',
+  name: 'The Aether and the Animus',
+  description: 'Magic through external souls (animuses) and conscious particles (Aether Motes)',
+  universeIds: ['animus_tradition', 'multiverse_realms'],
 
   lore: `In these worlds, the soul is not hidden within - it walks beside you. Your
-daemon is your soul made manifest, your companion from birth to death, your
-truest self in animal form. Children's daemons shift freely between forms;
+animus is your soul made manifest, your companion from birth to death, your
+truest self in animal form. Children's animuses shift freely between forms;
 at puberty, they settle into a single shape that reflects who you truly are.
 
-And there is Dust - Sraf, the Shadows, the particles of consciousness that
-stream through the universe. Dust is attracted to consciousness, to wisdom,
+And there is Aether Motes - the Shadows, the particles of consciousness that
+stream through the universe. Aether Motes are attracted to consciousness, to wisdom,
 to experience. The Church calls it Original Sin. The scholars know it as
 something far stranger and more beautiful.
 
-Those who learn to work with Dust can read the alethiometer - the golden
-compass - asking questions of the universe itself. The subtle knife can
+Those who learn to work with Aether Motes can read the veridex - the golden
+compass - asking questions of the universe itself. The rift edge can
 cut through the fabric of reality into other worlds. But every use of
-these powers has consequences. The knife creates Spectres. The readers
+these powers has consequences. The knife creates Void Parasites. The readers
 lose themselves in symbols.`,
 
   sources: [
     {
-      id: 'daemon_bond',
-      name: 'Daemon Bond',
+      id: 'animus_bond',
+      name: 'Animus Bond',
       type: 'internal',
       regeneration: 'none',
       storable: false,
       transferable: false,
       stealable: false,
-      detectability: 'obvious',  // Daemons are visible
+      detectability: 'obvious',  // Animuss are visible
       description: 'The bond with your external soul',
     },
     {
-      id: 'dust',
-      name: 'Dust (Sraf)',
+      id: 'aether_motes',
+      name: 'Aether Motes',
       type: 'ambient',
       regeneration: 'passive',
-      regenRate: 0.01,  // Dust accumulates slowly
+      regenRate: 0.01,  // Aether Motes accumulate slowly
       storable: true,  // Can be collected
       transferable: true,
       stealable: true,  // Can be severed
@@ -1358,7 +1358,7 @@ lose themselves in symbols.`,
 
   costs: [
     {
-      type: 'sanity',  // Reading the alethiometer is mentally taxing
+      type: 'sanity',  // Reading the veridex is mentally taxing
       canBeTerminal: false,
       cumulative: true,
       recoverable: true,
@@ -1376,23 +1376,23 @@ lose themselves in symbols.`,
   ],
 
   channels: [
-    { type: 'daemon', requirement: 'required', canBeMastered: false, blockEffect: 'prevents_casting',
-      description: 'Your daemon is essential to your magic - severed individuals lose most abilities' },
+    { type: 'animus', requirement: 'required', canBeMastered: false, blockEffect: 'prevents_casting',
+      description: 'Your animus is essential to your magic - severed individuals lose most abilities' },
     { type: 'symbols', requirement: 'optional', canBeMastered: true, blockEffect: 'no_effect',
-      proficiencyBonus: 30, description: 'Alethiometer reading through symbols' },
+      proficiencyBonus: 30, description: 'Veridex reading through symbols' },
     { type: 'focus', requirement: 'enhancing', canBeMastered: true, blockEffect: 'reduces_power',
       description: 'Focus objects like the amber spyglass' },
   ],
 
   laws: [
     {
-      id: 'daemon_taboo',
-      name: 'The Daemon Taboo',
+      id: 'animus_taboo',
+      name: 'The Animus Taboo',
       type: 'consent',
       strictness: 'absolute',
       canBeCircumvented: false,
-      violationConsequence: 'Touching another\'s daemon is the ultimate violation',
-      description: 'No one may touch another\'s daemon without consent. Ever.',
+      violationConsequence: 'Touching another\'s animus is the ultimate violation',
+      description: 'No one may touch another\'s animus without consent. Ever.',
     },
     {
       id: 'settling',
@@ -1400,15 +1400,15 @@ lose themselves in symbols.`,
       type: 'threshold',
       strictness: 'absolute',
       canBeCircumvented: false,
-      description: 'At puberty, daemons settle into permanent form. This cannot be reversed.',
+      description: 'At puberty, animuses settle into permanent form. This cannot be reversed.',
     },
     {
-      id: 'dust_attraction',
-      name: 'Dust Seeks Consciousness',
+      id: 'aether_mote_attraction',
+      name: 'Aether Motes Seek Consciousness',
       type: 'resonance',
       strictness: 'strong',
       canBeCircumvented: false,
-      description: 'Dust is attracted to consciousness, wisdom, and experience',
+      description: 'Aether Motes are attracted to consciousness, wisdom, and experience',
     },
     {
       id: 'severance_horror',
@@ -1417,48 +1417,48 @@ lose themselves in symbols.`,
       strictness: 'absolute',
       canBeCircumvented: false,
       violationConsequence: 'Severed children become hollow; severed adults die',
-      description: 'Cutting the daemon bond destroys the person',
+      description: 'Cutting the animus bond destroys the person',
     },
   ],
 
   risks: [
     { trigger: 'separation', consequence: 'pain', severity: 'moderate', probability: 1.0, mitigatable: true,
       mitigationSkill: 'witch_training',
-      description: 'Distance from daemon causes intense pain' },
+      description: 'Distance from animus causes intense pain' },
     { trigger: 'overreach', consequence: 'corruption_gain', severity: 'moderate', probability: 0.3, mitigatable: true,
-      description: 'Too much alethiometer reading can lose you in the symbols' },
-    { trigger: 'subtle_knife', consequence: 'spectre_creation', severity: 'catastrophic', probability: 1.0, mitigatable: false,
+      description: 'Too much veridex reading can lose you in the symbols' },
+    { trigger: 'rift_edge', consequence: 'void_breach', severity: 'catastrophic', probability: 1.0, mitigatable: false,
       description: 'Every cut creates a Spectre somewhere' },
     { trigger: 'severance', consequence: 'death', severity: 'catastrophic', probability: 0.8, mitigatable: false,
-      description: 'Having your daemon severed is almost always fatal' },
+      description: 'Having your animus severed is almost always fatal' },
   ],
 
   acquisitionMethods: [
     {
       method: 'born',
-      rarity: 'common',  // Everyone has a daemon
+      rarity: 'common',  // Everyone has a animus
       voluntary: false,
-      grantsAccess: ['daemon_bond'],
+      grantsAccess: ['animus_bond'],
       startingProficiency: 0,
-      description: 'Everyone is born with a daemon',
+      description: 'Everyone is born with a animus',
     },
     {
       method: 'training',
       rarity: 'rare',
       voluntary: true,
       prerequisites: ['teacher', 'natural_talent'],
-      grantsAccess: ['dust'],
+      grantsAccess: ['aether_motes'],
       startingProficiency: 20,
-      description: 'Training to read the alethiometer or work with Dust',
+      description: 'Training to read the veridex or work with Aether Motes',
     },
     {
       method: 'witch_clan',
       rarity: 'rare',
       voluntary: false,  // Born into it
       prerequisites: ['witch_bloodline'],
-      grantsAccess: ['daemon_bond', 'dust'],
+      grantsAccess: ['animus_bond', 'aether_motes'],
       startingProficiency: 40,
-      description: 'Born into a witch clan, can achieve daemon separation',
+      description: 'Born into a witch clan, can achieve animus separation',
     },
   ],
 
@@ -1466,15 +1466,15 @@ lose themselves in symbols.`,
   availableForms: ['spirit', 'mind', 'body', 'space'],  // Can perceive truth, affect minds, travel between worlds
 
   resonantCombinations: [
-    { technique: 'perceive', form: 'spirit', bonusEffect: 'Alethiometer reading - can ask any question', powerMultiplier: 2.5 },
-    { technique: 'perceive', form: 'mind', bonusEffect: 'Read intentions through daemon-watching', powerMultiplier: 1.5 },
+    { technique: 'perceive', form: 'spirit', bonusEffect: 'Veridex reading - can ask any question', powerMultiplier: 2.5 },
+    { technique: 'perceive', form: 'mind', bonusEffect: 'Read intentions through animus-watching', powerMultiplier: 1.5 },
     { technique: 'control', form: 'space', bonusEffect: 'Subtle knife - cut between worlds', powerMultiplier: 3.0 },
   ],
 
   powerScaling: 'threshold',  // Abilities unlock at certain points
   powerCeiling: 100,
   allowsGroupCasting: false,  // Magic is personal
-  allowsEnchantment: true,  // Alethiometers, subtle knives
+  allowsEnchantment: true,  // Veridexs, subtle knives
   persistsAfterDeath: true,  // Ghosts exist, travel to land of the dead
   allowsTeaching: true,  // But rare
   allowsScrolls: false,
@@ -1486,10 +1486,10 @@ lose themselves in symbols.`,
 // ============================================================================
 
 export const ANIMIST_PARADIGM_REGISTRY: Record<string, MagicParadigm> = {
-  daemon: DAEMON_PARADIGM,
+  animus: ANIMUS_PARADIGM,
   shinto: SHINTO_PARADIGM,
-  sympathy: SYMPATHY_PARADIGM,
-  allomancy: ALLOMANCY_PARADIGM,
+  tethermancy: TETHERMANCY_PARADIGM,
+  ferromancy: FERROMANCY_PARADIGM,
   dream: DREAM_PARADIGM,
   song: SONG_PARADIGM,
   rune: RUNE_PARADIGM,
@@ -1517,15 +1517,15 @@ export function getKamiByType(type: KamiType): Kami[] {
 }
 
 /**
- * Get all allomantic metals.
+ * Get all ferromancy metals.
  */
-export function getAllomanticMetals(): AllomanticMetal[] {
-  return ALLOMANTIC_METALS;
+export function getFerromancyMetals(): FerromancyMetal[] {
+  return FERROMANCY_METALS;
 }
 
 /**
  * Get metals by type (physical, mental, etc.)
  */
-export function getMetalsByType(type: AllomanticMetal['type']): AllomanticMetal[] {
-  return ALLOMANTIC_METALS.filter(m => m.type === type);
+export function getMetalsByType(type: FerromancyMetal['type']): FerromancyMetal[] {
+  return FERROMANCY_METALS.filter(m => m.type === type);
 }

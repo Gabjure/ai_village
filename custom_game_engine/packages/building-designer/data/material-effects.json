@@ -150,7 +150,7 @@
     "durationModifier": 0,
     "protection": 10,
     "paradigmAffinities": {
-      "allomancy": 20,
+      "ferromancy": 20,
       "rune": 10
     },
     "element": "metal",
@@ -159,7 +159,7 @@
     "moodModifier": -5,
     "atmosphere": "neutral",
     "description": "Worked metal, cold and strong",
-    "lore": "Metal channels power. Allomancers feel its pull."
+    "lore": "Metal channels power. Ferromancers feel its pull."
   },
   "glass": {
     "insulation": 10,
@@ -711,7 +711,7 @@
     "durationModifier": 0,
     "protection": 0,
     "paradigmAffinities": {
-      "allomancy": 30
+      "ferromancy": 30
     },
     "element": "metal",
     "elementalStrength": 50,
@@ -719,13 +719,13 @@
       {
         "type": "metal_burning_boost",
         "magnitude": 20,
-        "description": "Enhances Allomantic copper (Smoker)"
+        "description": "Enhances Ferromancy copper (Smoker)"
       }
     ],
     "moodModifier": 0,
     "atmosphere": "neutral",
     "description": "Reddish copper metal",
-    "lore": "Copper clouds Allomantic pulses. Smokers prize pure copper."
+    "lore": "Copper clouds Ferromancy pulses. Smokers prize pure copper."
   },
   "bronze": {
     "insulation": 50,
@@ -747,7 +747,7 @@
     "durationModifier": 0,
     "protection": 0,
     "paradigmAffinities": {
-      "allomancy": 25,
+      "ferromancy": 25,
       "rune": 10
     },
     "element": "metal",
@@ -756,13 +756,13 @@
       {
         "type": "metal_burning_boost",
         "magnitude": 15,
-        "description": "Enhances Allomantic bronze (Seeker)"
+        "description": "Enhances Ferromancy bronze (Seeker)"
       }
     ],
     "moodModifier": 5,
     "atmosphere": "neutral",
     "description": "Bronze alloy",
-    "lore": "Bronze detects Allomantic pulses. Seekers can sense magic through bronze."
+    "lore": "Bronze detects Ferromancy pulses. Seekers can sense magic through bronze."
   },
   "iron": {
     "insulation": 50,
@@ -784,7 +784,7 @@
     "durationModifier": 0,
     "protection": 10,
     "paradigmAffinities": {
-      "allomancy": 35,
+      "ferromancy": 35,
       "rune": 15
     },
     "element": "metal",
@@ -798,7 +798,7 @@
       {
         "type": "metal_burning_boost",
         "magnitude": 25,
-        "description": "Enhances Allomantic iron (Lurcher)"
+        "description": "Enhances Ferromancy iron (Iron-Puller)"
       }
     ],
     "moodModifier": -5,
@@ -826,7 +826,7 @@
     "durationModifier": 0,
     "protection": 15,
     "paradigmAffinities": {
-      "allomancy": 35
+      "ferromancy": 35
     },
     "element": "metal",
     "elementalStrength": 80,
@@ -834,13 +834,13 @@
       {
         "type": "metal_burning_boost",
         "magnitude": 25,
-        "description": "Enhances Allomantic steel (Coinshot)"
+        "description": "Enhances Ferromancy steel (Iron-Puller)"
       }
     ],
     "moodModifier": 0,
     "atmosphere": "neutral",
     "description": "Refined steel",
-    "lore": "Steel pushes. Coinshots hurl steel through the air."
+    "lore": "Steel pushes. Iron-Pullers hurl steel through the air."
   },
   "mithril": {
     "insulation": 50,
@@ -1078,7 +1078,7 @@
     "paradigmAffinities": {
       "shinto": 25,
       "breath": 20,
-      "sympathy": 15
+      "tethermancy": 15
     },
     "element": "wood",
     "elementalStrength": 85,
@@ -1394,7 +1394,7 @@
     "protection": 0,
     "paradigmAffinities": {
       "academic": 15,
-      "sympathy": 20
+      "tethermancy": 20
     },
     "element": null,
     "elementalStrength": 0,
@@ -1408,7 +1408,7 @@
     "moodModifier": 5,
     "atmosphere": "neutral",
     "description": "Common crystalline mineral",
-    "lore": "Quartz remembers. Sympathy mages use quartz to store connections."
+    "lore": "Quartz remembers. Tethermancy mages use quartz to store connections."
   },
   "flesh": {
     "insulation": 70,
@@ -1547,7 +1547,7 @@
     "protection": 0,
     "paradigmAffinities": {
       "shinto": 15,
-      "sympathy": 10
+      "tethermancy": 10
     },
     "element": "water",
     "elementalStrength": 60,
@@ -1656,7 +1656,7 @@
     "protection": 0,
     "paradigmAffinities": {
       "dream": 20,
-      "sympathy": 25
+      "tethermancy": 25
     },
     "element": "wood",
     "elementalStrength": 40,
@@ -3199,7 +3199,7 @@
     "protection": 0,
     "paradigmAffinities": {
       "echo": 30,
-      "daemon": 20
+      "animus": 20
     },
     "element": null,
     "elementalStrength": 0,
@@ -3734,7 +3734,7 @@
     "durationModifier": 0,
     "protection": 15,
     "paradigmAffinities": {
-      "allomancy": 40,
+      "ferromancy": 40,
       "blood": 10
     },
     "element": "metal",
@@ -3754,8 +3754,8 @@
     ],
     "moodModifier": 5,
     "atmosphere": "energizing",
-    "description": "Allomantic pewter",
-    "lore": "Pewter grants physical might. Thugs feel stronger near pure pewter."
+    "description": "Ferromancy pewter",
+    "lore": "Pewter grants physical might. Pewter-Arms feel stronger near pure pewter."
   },
   "tin": {
     "insulation": 50,
@@ -3777,8 +3777,8 @@
     "durationModifier": 0,
     "protection": 0,
     "paradigmAffinities": {
-      "allomancy": 35,
-      "sympathy": 15
+      "ferromancy": 35,
+      "tethermancy": 15
     },
     "element": "metal",
     "elementalStrength": 50,
@@ -3791,8 +3791,8 @@
     ],
     "moodModifier": 0,
     "atmosphere": "neutral",
-    "description": "Allomantic tin",
-    "lore": "Tin sharpens the senses. Tineyes see in darkest night."
+    "description": "Ferromancy tin",
+    "lore": "Tin sharpens the senses. Tin-Senses see in darkest night."
   },
   "zinc": {
     "insulation": 50,
@@ -3814,7 +3814,7 @@
     "durationModifier": 0,
     "protection": 0,
     "paradigmAffinities": {
-      "allomancy": 35,
+      "ferromancy": 35,
       "emotional": 25
     },
     "element": "metal",
@@ -3833,8 +3833,8 @@
     ],
     "moodModifier": 5,
     "atmosphere": "energizing",
-    "description": "Allomantic zinc",
-    "lore": "Zinc inflames emotions. Rioters use it to enrage or terrify."
+    "description": "Ferromancy zinc",
+    "lore": "Zinc inflames emotions. Brass-Kindlers use it to enrage or terrify."
   },
   "brass": {
     "insulation": 50,
@@ -3856,7 +3856,7 @@
     "durationModifier": 0,
     "protection": 0,
     "paradigmAffinities": {
-      "allomancy": 35,
+      "ferromancy": 35,
       "emotional": 25
     },
     "element": "metal",
@@ -3875,8 +3875,8 @@
     ],
     "moodModifier": 10,
     "atmosphere": "calming",
-    "description": "Allomantic brass",
-    "lore": "Brass calms emotions. Soothers bring peace—or apathy."
+    "description": "Ferromancy brass",
+    "lore": "Brass calms emotions. Zinc-Whispers bring peace—or apathy."
   },
   "chromium": {
     "insulation": 50,
@@ -3898,7 +3898,7 @@
     "durationModifier": 0,
     "protection": 0,
     "paradigmAffinities": {
-      "allomancy": 45
+      "ferromancy": 45
     },
     "element": "metal",
     "elementalStrength": 60,
@@ -3906,7 +3906,7 @@
       {
         "type": "metal_burning_boost",
         "magnitude": 35,
-        "description": "Chromium wipes Allomantic reserves"
+        "description": "Chromium wipes Ferromancy reserves"
       },
       {
         "type": "corruption_resistance",
@@ -3916,8 +3916,8 @@
     ],
     "moodModifier": 0,
     "atmosphere": "neutral",
-    "description": "Allomantic chromium",
-    "lore": "Chromium drains Allomantic reserves. Leechers are feared."
+    "description": "Ferromancy chromium",
+    "lore": "Chromium drains Ferromancy reserves. Leechers are feared."
   },
   "nickel": {
     "insulation": 50,
@@ -3939,7 +3939,7 @@
     "durationModifier": 0,
     "protection": 10,
     "paradigmAffinities": {
-      "allomancy": 40
+      "ferromancy": 40
     },
     "element": "metal",
     "elementalStrength": 55,
@@ -3947,13 +3947,13 @@
       {
         "type": "metal_burning_boost",
         "magnitude": 30,
-        "description": "Nickel reveals Allomantic abilities"
+        "description": "Nickel reveals Ferromancy abilities"
       }
     ],
     "moodModifier": 0,
     "atmosphere": "neutral",
-    "description": "Allomantic nicrosil",
-    "lore": "Nicrosil enhances another's Allomantic burn."
+    "description": "Ferromancy nicrosil",
+    "lore": "Nicrosil enhances another's Ferromancy burn."
   },
   "aluminum": {
     "insulation": 50,
@@ -3975,7 +3975,7 @@
     "durationModifier": 0,
     "protection": 0,
     "paradigmAffinities": {
-      "allomancy": -50
+      "ferromancy": -50
     },
     "element": "metal",
     "elementalStrength": 30,
@@ -3983,15 +3983,15 @@
       {
         "type": "corruption_resistance",
         "magnitude": 100,
-        "description": "Blocks all Allomancy"
+        "description": "Blocks all Ferromancy"
       }
     ],
     "moodModifier": 0,
     "atmosphere": "neutral",
-    "description": "Allomancy-blocking aluminum",
-    "lore": "Aluminum is immune to Allomancy. It blocks pushes and pulls."
+    "description": "Ferromancy-blocking aluminum",
+    "lore": "Aluminum is immune to Ferromancy. It blocks pushes and pulls."
   },
-  "duralumin": {
+  "amplium": {
     "insulation": 50,
     "durability": 65,
     "weirdness": 0,
@@ -4011,7 +4011,7 @@
     "durationModifier": 0,
     "protection": 0,
     "paradigmAffinities": {
-      "allomancy": 50
+      "ferromancy": 50
     },
     "element": "metal",
     "elementalStrength": 65,
@@ -4019,15 +4019,15 @@
       {
         "type": "metal_burning_boost",
         "magnitude": 50,
-        "description": "Duralumin explosively boosts burns"
+        "description": "Amplium explosively boosts burns"
       }
     ],
     "moodModifier": 5,
     "atmosphere": "energizing",
-    "description": "Allomantic duralumin",
-    "lore": "Duralumin burns all your metals in one explosive moment."
+    "description": "Ferromancy amplium",
+    "lore": "Amplium burns all your metals in one explosive moment."
   },
-  "atium": {
+  "temporite": {
     "insulation": 50,
     "durability": 80,
     "weirdness": 90,
@@ -4047,7 +4047,7 @@
     "durationModifier": 0,
     "protection": 0,
     "paradigmAffinities": {
-      "allomancy": 100,
+      "ferromancy": 100,
       "dimensional": 30
     },
     "element": null,
@@ -4056,7 +4056,7 @@
       {
         "type": "metal_burning_boost",
         "magnitude": 100,
-        "description": "Atium reveals the future"
+        "description": "Temporite reveals the future"
       },
       {
         "type": "time_dilation",
@@ -4066,10 +4066,10 @@
     ],
     "moodModifier": 10,
     "atmosphere": "dreamy",
-    "description": "The body of a god",
-    "lore": "Atium is Ruin's body. Burning it grants precognition."
+    "description": "A Chorus-shadow relic metal",
+    "lore": "Temporite is a Chorus-shadow relic. Burning it grants precognition."
   },
-  "lerasium": {
+  "chorium": {
     "insulation": 50,
     "durability": 100,
     "weirdness": 100,
@@ -4089,7 +4089,7 @@
     "durationModifier": 0,
     "protection": 0,
     "paradigmAffinities": {
-      "allomancy": 100,
+      "ferromancy": 100,
       "divine": 50
     },
     "element": null,
@@ -4098,13 +4098,13 @@
       {
         "type": "metal_burning_boost",
         "magnitude": 100,
-        "description": "Lerasium grants Allomancy"
+        "description": "Chorium grants Ferromancy"
       }
     ],
     "moodModifier": 30,
     "atmosphere": "euphoric",
-    "description": "The body of a god",
-    "lore": "Lerasium is Preservation's body. Consuming it makes one Mistborn."
+    "description": "A Chorus-light relic metal",
+    "lore": "Chorium is a Chorus-light relic. Consuming it can awaken a Crucible-Born ferromancer."
   },
   "philosophers_stone": {
     "insulation": 50,
@@ -4380,7 +4380,7 @@
     "protection": 0,
     "paradigmAffinities": {
       "emotional": 60,
-      "sympathy": 30,
+      "tethermancy": 30,
       "dream": 20
     },
     "element": "water",
@@ -4720,7 +4720,7 @@
     "protection": 0,
     "paradigmAffinities": {
       "pact": 80,
-      "daemon": 60,
+      "animus": 60,
       "name": 40
     },
     "element": "fire",
@@ -4759,7 +4759,7 @@
     "paradigmAffinities": {
       "academic": 100,
       "literary": 70,
-      "daemon": 40
+      "animus": 40
     },
     "element": "fire",
     "elementalStrength": 0,
@@ -5070,7 +5070,7 @@
     "paradigmAffinities": {
       "emotional": 80,
       "dream": 50,
-      "daemon": 30
+      "animus": 30
     },
     "element": null,
     "elementalStrength": 0,
@@ -5146,7 +5146,7 @@
     "paradigmAffinities": {
       "emotional": 80,
       "dream": 40,
-      "sympathy": 30
+      "tethermancy": 30
     },
     "element": "water",
     "elementalStrength": 0,
@@ -5419,7 +5419,7 @@
     "durationModifier": 0,
     "protection": 30,
     "paradigmAffinities": {
-      "daemon": 80,
+      "animus": 80,
       "blood": 50,
       "pact": 40
     },
@@ -5653,7 +5653,7 @@
     "durationModifier": 0,
     "protection": 0,
     "paradigmAffinities": {
-      "daemon": 60,
+      "animus": 60,
       "craft": 50,
       "echo": 40
     },
@@ -5847,7 +5847,7 @@
     "protection": 30,
     "paradigmAffinities": {
       "divine": 80,
-      "daemon": 40
+      "animus": 40
     },
     "element": "fire",
     "elementalStrength": 0,
@@ -5883,7 +5883,7 @@
     "durationModifier": 0,
     "protection": 35,
     "paradigmAffinities": {
-      "daemon": 80,
+      "animus": 80,
       "blood": 40,
       "pact": 30
     },
@@ -5999,7 +5999,7 @@
     "paradigmAffinities": {
       "wild": 100,
       "dimensional": 70,
-      "daemon": 50
+      "animus": 50
     },
     "element": null,
     "elementalStrength": 0,
@@ -6304,7 +6304,7 @@
     "protection": 0,
     "paradigmAffinities": {
       "divine": 70,
-      "sympathy": 50
+      "tethermancy": 50
     },
     "element": "water",
     "elementalStrength": 0,
@@ -6460,7 +6460,7 @@
     "durationModifier": 0,
     "protection": 0,
     "paradigmAffinities": {
-      "daemon": 100,
+      "animus": 100,
       "blood": 50,
       "pact": 40
     },
@@ -6633,7 +6633,7 @@
     "protection": 30,
     "paradigmAffinities": {
       "blood": 60,
-      "sympathy": 40,
+      "tethermancy": 40,
       "wild": 30
     },
     "element": "earth",
@@ -6677,7 +6677,7 @@
     "paradigmAffinities": {
       "literary": 70,
       "dream": 50,
-      "daemon": 30
+      "animus": 30
     },
     "element": "water",
     "elementalStrength": 0,
@@ -7166,7 +7166,7 @@
     "durationModifier": 0,
     "protection": 0,
     "paradigmAffinities": {
-      "sympathy": 80,
+      "tethermancy": 80,
       "dream": 50,
       "emotional": 40
     },
@@ -7211,7 +7211,7 @@
     "paradigmAffinities": {
       "shinto": 90,
       "dream": 40,
-      "sympathy": 30
+      "tethermancy": 30
     },
     "element": "wood",
     "elementalStrength": 0,
@@ -7253,7 +7253,7 @@
     "protection": 0,
     "paradigmAffinities": {
       "emotional": 80,
-      "sympathy": 60,
+      "tethermancy": 60,
       "dream": 40
     },
     "element": "water",

@@ -24,7 +24,7 @@ import { costRecoveryManager } from '../costs/CostRecoveryManager.js';
  * Different paradigms regenerate differently:
  * - Academic: Passive mana regen
  * - Divine: Faith influences favor regen
- * - Allomancy: Burn metals for power
+ * - Ferromancy: Burn metals for power
  * - Blood: Regenerate with life force
  */
 export class ManaRegenerationManager {

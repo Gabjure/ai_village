@@ -3,10 +3,10 @@
  *
  * Each magic paradigm has its own unique skill tree with custom unlock conditions.
  * Trees can require:
- * - Bloodline/innate ability (Allomancy)
+ * - Bloodline/innate ability (Ferromancy)
  * - Discovery (runes, songs, metals, kami)
  * - Relationships (kami favor, deity standing)
- * - Events (trauma/snapping, rituals)
+ * - Events (trauma/the_fracture, rituals)
  * - Skill progression (traditional XP)
  * - State conditions (purity, corruption, time of day)
  *
@@ -26,9 +26,9 @@ import type { MagicCostType } from './MagicParadigm.js';
 /** What can unlock a magic skill node */
 export type UnlockConditionType =
   // Inherent conditions (birth/nature)
-  | 'bloodline'          // Must have specific lineage (Allomancy)
-  | 'snapping'           // Must have experienced awakening trauma (Allomancy)
-  | 'daemon_settled'     // Daemon must have settled form
+  | 'bloodline'          // Must have specific lineage (Ferromancy)
+  | 'the_fracture'           // Must have experienced awakening trauma (Ferromancy)
+  | 'animus_settled'     // Animus must have settled form
   | 'witch_birth'        // Born into witch clan
   | 'innate_talent'      // Born with specific talent
 
@@ -78,18 +78,18 @@ export type UnlockConditionType =
   | 'health_threshold'   // Health must be above/below threshold
   | 'resource_level'     // Magic resource must be at level
 
-  // Daemon-specific conditions
+  // Animus-specific conditions
   | 'age_range'          // Must be within age range (pre-settling)
   | 'gift_innate'        // Must have innate gift (intuitive reading)
   | 'node_level'         // Must have node at specific level
-  | 'form_category'      // Daemon must have form in category
-  | 'intercision';       // Has been severed (negative condition)
+  | 'form_category'      // Animus must have form in category
+  | 'severance';       // Has been severed (negative condition)
 
 /** Parameters for unlock conditions */
 export interface UnlockConditionParams {
   // Bloodline parameters
   bloodlineId?: string;
-  bloodlineStrength?: number;  // 0-1, e.g., misting (0.1-0.3) vs mistborn (1.0)
+  bloodlineStrength?: number;  // 0-1, e.g., mono_resonant (0.1-0.3) vs omni_resonant (1.0)
 
   // Kami/spirit parameters
   kamiId?: string;
@@ -152,7 +152,7 @@ export interface UnlockConditionParams {
   // Comparison operators for numeric conditions
   comparison?: 'gte' | 'lte' | 'eq' | 'gt' | 'lt' | 'between';
 
-  // Daemon-specific parameters
+  // Animus-specific parameters
   teacherType?: string;     // Type of teacher required
   artifactType?: string;    // Type of artifact required
   level?: number;           // Level requirement for node_level condition
@@ -205,15 +205,15 @@ export type MagicSkillCategory =
   | 'specialization'   // Paradigm-specific abilities
   | 'mastery'          // Advanced/capstone techniques
   | 'discovery'        // Discovered/unlocked elements (runes, songs, kami)
-  | 'relationship'     // Relationships with entities (kami favor, daemon bond)
+  | 'relationship'     // Relationships with entities (kami favor, animus bond)
   | 'resource'         // Expand resource pools (mana, breath, etc.)
   | 'efficiency'       // Reduce costs, improve regeneration
   | 'ritual'           // Learned rituals and ceremonies
   | 'channeling'       // Improve channeling methods
   | 'hybrid'           // Cross-paradigm abilities
-  // Daemon-specific categories
-  | 'dust'             // Dust perception/interaction (Daemon paradigm)
-  | 'separation';      // Daemon separation abilities (witch path)
+  // Animus-specific categories
+  | 'aether_motes'             // Aether Mote perception/interaction (Animus paradigm)
+  | 'separation';      // Animus separation abilities (witch path)
 
 /** Types of effects a skill node can grant */
 export type MagicSkillEffectType =
@@ -237,7 +237,7 @@ export type MagicSkillEffectType =
   | 'unlock_ability'           // Unlock paradigm-specific ability
 
   // Discovery unlocks
-  | 'unlock_metal'             // Can burn this metal (Allomancy)
+  | 'unlock_metal'             // Can burn this metal (Ferromancy)
   | 'unlock_rune'              // Know this rune (Rune magic)
   | 'unlock_song'              // Know this song (Song magic)
   | 'unlock_kami_type'         // Can interact with this kami type (Shinto)
@@ -247,18 +247,18 @@ export type MagicSkillEffectType =
   // Relationship bonuses
   | 'kami_favor_bonus'         // +X to kami favor gains
   | 'kami_favor_decay'         // -X% to favor decay
-  | 'daemon_range'             // +X to daemon separation range
-  | 'daemon_communication'     // Improved daemon communication
+  | 'animus_range'             // +X to animus separation range
+  | 'animus_communication'     // Improved animus communication
   | 'pact_leverage'            // Better pact terms
   | 'deity_favor_bonus'        // +X to deity favor gains
 
-  // Paradigm-specific (Sympathy)
-  | 'alar_strength'            // Mental focus strength
-  | 'alar_split'               // Can split focus X additional ways
+  // Paradigm-specific (Tethermancy)
+  | 'attunement_strength'            // Mental focus strength
+  | 'attunement_split'               // Can split focus X additional ways
   | 'link_strength'            // Sympathetic link power
-  | 'slippage_reduction'       // -X% energy lost in transfers
+  | 'drift_reduction'       // -X% energy lost in transfers
 
-  // Paradigm-specific (Allomancy)
+  // Paradigm-specific (Ferromancy)
   | 'burn_rate_control'        // Control burn rate (slow/fast)
   | 'flare_control'            // Can flare safely
   | 'metal_sense'              // Sense nearby metals
@@ -289,15 +289,15 @@ export type MagicSkillEffectType =
   | 'instrument_mastery'       // Bonus with instruments
   | 'choir_coordination'       // Better group casting
 
-  // Paradigm-specific (Daemon)
-  | 'dust_sensitivity'         // Can sense/read Dust
-  | 'form_flexibility'         // More daemon form options (pre-settling)
-  | 'alethiometer_reading'     // Can read alethiometer
-  | 'intercision_resistance'   // Resist severance attempts
-  | 'bond_strength'            // Daemon bond strength
-  | 'dust_affinity'            // Attract/interact with Dust
-  | 'form_bonus'               // Bonus from daemon form
-  | 'separation_distance'      // Max distance from daemon
+  // Paradigm-specific (Animus)
+  | 'aether_mote_sensitivity'         // Can sense/read Aether Motes
+  | 'form_flexibility'         // More animus form options (pre-settling)
+  | 'veridex_reading'     // Can read veridex
+  | 'severance_resistance'   // Resist severance attempts
+  | 'bond_strength'            // Animus bond strength
+  | 'aether_mote_affinity'            // Attract/interact with Aether Motes
+  | 'form_bonus'               // Bonus from animus form
+  | 'separation_distance'      // Max distance from animus
   | 'lifespan'                 // Extended lifespan (witch blood)
 
   // General combat/stat effects
@@ -499,7 +499,7 @@ export interface MagicDiscoveries {
   /** Kami IDs encountered */
   kami?: string[];
 
-  /** Metals discovered (Allomancy) */
+  /** Metals discovered (Ferromancy) */
   metals?: string[];
 
   /** Runes discovered */

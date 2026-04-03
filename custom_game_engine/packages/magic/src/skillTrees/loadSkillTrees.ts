@@ -6,20 +6,20 @@
  *
  * Usage:
  *   import { loadSkillTree } from './loadSkillTrees.js';
- *   const tree = loadSkillTree('daemon');
+ *   const tree = loadSkillTree('animus');
  */
 
 import type { MagicSkillTree } from '../MagicSkillTree.js';
 
 // Import JSON files directly (Vite/TypeScript handle this)
-import daemonData from '../../data/skill-trees/daemon.json';
+import animusData from '../../data/skill-trees/animus.json';
 import architectureData from '../../data/skill-trees/architecture.json';
 import dreamData from '../../data/skill-trees/dream.json';
 import songData from '../../data/skill-trees/song.json';
 import nameData from '../../data/skill-trees/name.json';
 import pactData from '../../data/skill-trees/pact.json';
-import allomancyData from '../../data/skill-trees/allomancy.json';
-import sympathyData from '../../data/skill-trees/sympathy.json';
+import ferromancyData from '../../data/skill-trees/ferromancy.json';
+import tethermancyData from '../../data/skill-trees/tethermancy.json';
 import runeData from '../../data/skill-trees/rune.json';
 import shintoData from '../../data/skill-trees/shinto.json';
 import breathData from '../../data/skill-trees/breath.json';
@@ -42,14 +42,14 @@ import thresholdData from '../../data/skill-trees/threshold_magic.json';
  * Registry of all skill trees by paradigm ID.
  */
 const SKILL_TREE_REGISTRY: Record<string, MagicSkillTree> = {
-  daemon: daemonData as MagicSkillTree,
+  animus: animusData as MagicSkillTree,
   architecture: architectureData as MagicSkillTree,
   dream: dreamData as MagicSkillTree,
   song: songData as MagicSkillTree,
   name: nameData as MagicSkillTree,
   pact: pactData as MagicSkillTree,
-  allomancy: allomancyData as MagicSkillTree,
-  sympathy: sympathyData as MagicSkillTree,
+  ferromancy: ferromancyData as MagicSkillTree,
+  tethermancy: tethermancyData as MagicSkillTree,
   rune: runeData as MagicSkillTree,
   shinto: shintoData as MagicSkillTree,
   breath: breathData as MagicSkillTree,
@@ -72,7 +72,7 @@ const SKILL_TREE_REGISTRY: Record<string, MagicSkillTree> = {
 /**
  * Load a skill tree by paradigm ID.
  *
- * @param paradigmId - The paradigm identifier (e.g., 'daemon', 'architecture')
+ * @param paradigmId - The paradigm identifier (e.g., 'animus', 'architecture')
  * @returns The skill tree data
  * @throws Error if paradigm not found
  */
@@ -110,14 +110,14 @@ export function hasSkillTreeData(paradigmId: string): boolean {
  * Export individual trees for backward compatibility.
  * These match the original export names from individual files.
  */
-export const DAEMON_SKILL_TREE = SKILL_TREE_REGISTRY.daemon;
+export const ANIMUS_SKILL_TREE = SKILL_TREE_REGISTRY.animus;
 export const ARCHITECTURE_SKILL_TREE = SKILL_TREE_REGISTRY.architecture;
 export const DREAM_SKILL_TREE = SKILL_TREE_REGISTRY.dream;
 export const SONG_SKILL_TREE = SKILL_TREE_REGISTRY.song;
 export const NAME_SKILL_TREE = SKILL_TREE_REGISTRY.name;
 export const PACT_SKILL_TREE = SKILL_TREE_REGISTRY.pact;
-export const ALLOMANCY_SKILL_TREE = SKILL_TREE_REGISTRY.allomancy;
-export const SYMPATHY_SKILL_TREE = SKILL_TREE_REGISTRY.sympathy;
+export const FERROMANCY_SKILL_TREE = SKILL_TREE_REGISTRY.ferromancy;
+export const TETHERMANCY_SKILL_TREE = SKILL_TREE_REGISTRY.tethermancy;
 export const RUNE_SKILL_TREE = SKILL_TREE_REGISTRY.rune;
 export const SHINTO_SKILL_TREE = SKILL_TREE_REGISTRY.shinto;
 export const BREATH_SKILL_TREE = SKILL_TREE_REGISTRY.breath;

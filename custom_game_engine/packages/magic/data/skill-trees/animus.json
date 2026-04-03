@@ -1,0 +1,943 @@
+{
+  "id": "animus-tree",
+  "paradigmId": "animus",
+  "name": "The Animus Bond",
+  "description": "Master the connection with your external soul, perceive Aether Motes, and perhaps learn the witch's secret of separation.",
+  "lore": "Your animus is your soul made visible - an animal companion that is truly\na part of you. In childhood, your animus shifts form constantly; in adulthood,\nthey settle into one form that reflects your true nature. The bond between\nhuman and animus is unbreakable... or so most believe.\n\nAether Motes - the golden particles of consciousness - settles on those with settled\nanimuses. Learn to perceive it, and you may glimpse truths hidden from others.\n\nAnd for those with witch blood, there is another path: the terrible ordeal\nof separation, which allows you to travel apart from your animus. But the\nprice is paid in pain.",
+  "nodes": [
+    {
+      "id": "animus-bond",
+      "name": "Animus Bond",
+      "description": "The fundamental connection between you and your animus",
+      "paradigmId": "animus",
+      "category": "foundation",
+      "tier": 0,
+      "xpCost": 0,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Connected to your external soul",
+          "target": {
+            "abilityId": "animus_sense"
+          }
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Your animus is your soul made visible - an animal companion that is\ntruly a part of you. The bond between human and animus is sacred and unbreakable.\nTo be separated from your animus causes physical pain; to have it touched by\nanother is the deepest violation.",
+      "hidden": false,
+      "icon": "🦊"
+    },
+    {
+      "id": "emotional-sync",
+      "name": "Emotional Synchronization",
+      "description": "Deepen the emotional connection with your animus",
+      "paradigmId": "animus",
+      "category": "foundation",
+      "tier": 1,
+      "xpCost": 25,
+      "maxLevel": 5,
+      "effects": [
+        {
+          "type": "bond_strength",
+          "baseValue": 5,
+          "perLevelValue": 3,
+          "description": "+X% emotional attunement with animus"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "When you feel, your animus feels. Learning to synchronize your emotions allows for clearer communication and mutual support.",
+      "prerequisites": [
+        "animus-bond"
+      ],
+      "levelCostMultiplier": 1.3
+    },
+    {
+      "id": "silent-speech",
+      "name": "Silent Speech",
+      "description": "Learn to communicate with your animus through thought alone",
+      "paradigmId": "animus",
+      "category": "foundation",
+      "tier": 1,
+      "xpCost": 50,
+      "maxLevel": 3,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Communicate with animus without speaking",
+          "target": {
+            "abilityId": "animus_telepathy"
+          }
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "prerequisites": [
+        "animus-bond"
+      ],
+      "levelCostMultiplier": 1.5
+    },
+    {
+      "id": "touch-taboo",
+      "name": "Sacred Boundary",
+      "description": "Your awareness of the sacred boundary around your animus",
+      "paradigmId": "animus",
+      "category": "foundation",
+      "tier": 1,
+      "xpCost": 40,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "defense",
+          "baseValue": 10,
+          "description": "Sense when someone intends to touch your animus"
+        },
+        {
+          "type": "intimidation",
+          "baseValue": 5,
+          "description": "Others sense the taboo instinctively"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "The touch of another human on your animus is the deepest violation possible. Even enemies hesitate at this taboo.",
+      "prerequisites": [
+        "animus-bond"
+      ]
+    },
+    {
+      "id": "form-awareness",
+      "name": "Form Awareness",
+      "description": "Learn to read the meaning in animus forms",
+      "paradigmId": "animus",
+      "category": "relationship",
+      "tier": 1,
+      "xpCost": 35,
+      "maxLevel": 3,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Understand what animus forms mean about personality",
+          "target": {
+            "abilityId": "form_reading"
+          }
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "A person's animus reveals their true nature. A servant with a dog animus\nhas a loyal soul. A person with a snake animus... well, you know to be wary.",
+      "prerequisites": [
+        "animus-bond"
+      ],
+      "levelCostMultiplier": 1.4
+    },
+    {
+      "id": "form-shifting",
+      "name": "Form Flexibility",
+      "description": "In childhood, animuses can take any form",
+      "paradigmId": "animus",
+      "category": "relationship",
+      "tier": 1,
+      "xpCost": 0,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Animus can change forms freely (pre-settling only)",
+          "target": {
+            "abilityId": "form_shift"
+          }
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "age_range",
+          "params": {
+            "maxAge": 14
+          },
+          "description": "Only available before settling"
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "Children's animuses shift constantly - now a moth, now a wildcat, now a bird. This flexibility is the mark of an unsettled soul, full of possibility.",
+      "prerequisites": [
+        "animus-bond"
+      ],
+      "icon": "✨"
+    },
+    {
+      "id": "settling",
+      "name": "The Settling",
+      "description": "Your animus has settled into its final form",
+      "paradigmId": "animus",
+      "category": "relationship",
+      "tier": 2,
+      "xpCost": 0,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Animus has taken its permanent form",
+          "target": {
+            "abilityId": "settled_form"
+          }
+        },
+        {
+          "type": "aether_mote_affinity",
+          "baseValue": 10,
+          "description": "Aether Motes are now attracted to you and your animus"
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "animus_settled",
+          "params": {},
+          "description": "Animus must have naturally settled",
+          "hidden": true
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "The settling comes to all who grow up. One day your animus shifts for\nthe last time, and you know - this is who you are. This is who you've always been.\nSome welcome it with joy; others mourn the loss of possibility.",
+      "prerequisites": [
+        "animus-bond"
+      ],
+      "hidden": true,
+      "icon": "🔒"
+    },
+    {
+      "id": "form-affinity",
+      "name": "Form Affinity",
+      "description": "Embrace the strengths of your animus's form",
+      "paradigmId": "animus",
+      "category": "relationship",
+      "tier": 2,
+      "xpCost": 75,
+      "maxLevel": 5,
+      "effects": [
+        {
+          "type": "form_bonus",
+          "baseValue": 1,
+          "description": "Gain abilities based on animus's settled form"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "A person with a hawk animus sees further. A person with a wolf animus has keener instincts for danger. Your form is your destiny.",
+      "prerequisites": [
+        "settling"
+      ],
+      "levelCostMultiplier": 1.5
+    },
+    {
+      "id": "form-mastery",
+      "name": "Form Mastery",
+      "description": "Master the unique abilities of your animus's form",
+      "paradigmId": "animus",
+      "category": "mastery",
+      "tier": 3,
+      "xpCost": 150,
+      "maxLevel": 5,
+      "effects": [
+        {
+          "type": "form_bonus",
+          "baseValue": 10,
+          "perLevelValue": 5,
+          "description": "+X% effectiveness of form abilities"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "prerequisites": [
+        "form-affinity"
+      ],
+      "levelCostMultiplier": 1.5
+    },
+    {
+      "id": "dust-sense",
+      "name": "Aether Mote Sense",
+      "description": "Learn to perceive the conscious particles called Aether Motes",
+      "paradigmId": "animus",
+      "category": "dust",
+      "tier": 2,
+      "xpCost": 60,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Can perceive Aether Motes particles",
+          "target": {
+            "abilityId": "dust_perception"
+          }
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Aether Motes are consciousness made manifest - golden particles that settle on\nthose who think and feel. Children cannot see it, for Aether Motes are drawn only\nto settled animuses and mature minds.",
+      "prerequisites": [
+        "settling"
+      ],
+      "icon": "✨"
+    },
+    {
+      "id": "dust-vision",
+      "name": "Aether Mote Vision",
+      "description": "See the golden streams of Aether Motes flowing through the world",
+      "paradigmId": "animus",
+      "category": "dust",
+      "tier": 3,
+      "xpCost": 100,
+      "maxLevel": 3,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "See Aether Mote currents and concentrations",
+          "target": {
+            "abilityId": "dust_vision"
+          }
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "prerequisites": [
+        "dust-sense"
+      ],
+      "levelCostMultiplier": 1.5
+    },
+    {
+      "id": "dust-attraction",
+      "name": "Aether Mote Attraction",
+      "description": "Learn to draw Aether Motes toward you through focused consciousness",
+      "paradigmId": "animus",
+      "category": "dust",
+      "tier": 3,
+      "xpCost": 120,
+      "maxLevel": 5,
+      "effects": [
+        {
+          "type": "aether_mote_affinity",
+          "baseValue": 15,
+          "perLevelValue": 5,
+          "description": "Attract more Aether Motes to yourself"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Those who think deeply, who question, who love and hate with passion - they draw Aether Motes like lodestone draws iron.",
+      "prerequisites": [
+        "dust-sense"
+      ],
+      "levelCostMultiplier": 1.4
+    },
+    {
+      "id": "veridex-training",
+      "name": "Veridex Reading",
+      "description": "Learn to read the veridex - the golden compass of truth",
+      "paradigmId": "animus",
+      "category": "dust",
+      "tier": 4,
+      "xpCost": 200,
+      "maxLevel": 10,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Can read the golden compass",
+          "target": {
+            "abilityId": "veridex_read"
+          }
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "teacher_found",
+          "params": {
+            "teacherType": "alethiometrist"
+          },
+          "description": "Must find a teacher of veridex reading"
+        },
+        {
+          "type": "artifact_bonded",
+          "params": {
+            "artifactType": "veridex"
+          },
+          "description": "Must have access to an veridex"
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "The veridex speaks through Aether Motes. Thirty-six symbols, infinite\nmeanings, and truth for those patient enough to learn. Most scholars take\ndecades to master even a portion of its language.",
+      "prerequisites": [
+        "dust-vision"
+      ],
+      "levelCostMultiplier": 2
+    },
+    {
+      "id": "intuitive-reading",
+      "name": "Intuitive Reading",
+      "description": "Read the veridex through pure instinct",
+      "paradigmId": "animus",
+      "category": "dust",
+      "tier": 3,
+      "xpCost": 0,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Read the veridex by instinct",
+          "target": {
+            "abilityId": "intuitive_veridex"
+          }
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "gift_innate",
+          "params": {
+            "giftId": "intuitive_reading"
+          },
+          "description": "Must possess the rare gift of intuitive reading",
+          "hidden": true
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "Some rare individuals - almost always children - can read the veridex\nwithout training. They slip into a trance-like state and the answers come.\nBut this gift fades with settling, with knowledge, with growing up.",
+      "prerequisites": [
+        "dust-sense"
+      ],
+      "hidden": true,
+      "icon": "🔮"
+    },
+    {
+      "id": "dust-navigation",
+      "name": "Aether Mote Navigation",
+      "description": "Learn to sense the currents of Aether Motes that flow between worlds",
+      "paradigmId": "animus",
+      "category": "dust",
+      "tier": 5,
+      "xpCost": 300,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Sense and navigate Aether Mote currents between worlds",
+          "target": {
+            "abilityId": "world_sense"
+          }
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "node_level",
+          "params": {
+            "nodeId": "veridex-training",
+            "level": 5
+          },
+          "description": "Must have significant veridex training"
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "Aether Motes flow between worlds through windows and cracks in reality. Those sensitive enough can feel these currents and follow them.",
+      "prerequisites": [
+        "dust-vision",
+        "veridex-training"
+      ]
+    },
+    {
+      "id": "dust-communion",
+      "name": "Aether Mote Communion",
+      "description": "Achieve direct communion with Aether Motes consciousness",
+      "paradigmId": "animus",
+      "category": "dust",
+      "tier": 5,
+      "xpCost": 350,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Enter deep communion with Aether Motes",
+          "target": {
+            "abilityId": "dust_communion"
+          }
+        },
+        {
+          "type": "wisdom",
+          "baseValue": 20,
+          "description": "Wisdom gained from Aether Mote consciousness"
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "node_level",
+          "params": {
+            "nodeId": "dust-attraction",
+            "level": 5
+          },
+          "description": "Must have strong Aether Mote affinity"
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "Aether Motes are not merely particles - it is consciousness itself, the accumulated wisdom of countless beings. To commune with Aether Motes is to touch something vast and ancient.",
+      "prerequisites": [
+        "dust-attraction",
+        "deep-bond"
+      ]
+    },
+    {
+      "id": "witch-blood",
+      "name": "Witch Blood",
+      "description": "The blood of witches runs in your veins",
+      "paradigmId": "animus",
+      "category": "foundation",
+      "tier": 1,
+      "xpCost": 0,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Potential for animus separation",
+          "target": {
+            "abilityId": "separation_potential"
+          }
+        },
+        {
+          "type": "lifespan",
+          "baseValue": 100,
+          "description": "Extended lifespan potential"
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "bloodline",
+          "params": {
+            "bloodlineId": "witch"
+          },
+          "description": "Must have witch bloodline",
+          "hidden": true
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "Witches are not human - not quite. They live for centuries, fly through\nthe northern skies, and bear a terrible secret: they can separate from\ntheir animuses. This power comes at a price paid in pain.",
+      "prerequisites": [
+        "animus-bond"
+      ],
+      "hidden": true,
+      "icon": "🌙"
+    },
+    {
+      "id": "separation-ordeal",
+      "name": "The Ordeal",
+      "description": "Undergo the terrible ordeal of separation",
+      "paradigmId": "animus",
+      "category": "separation",
+      "tier": 3,
+      "xpCost": 0,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Can begin separation from animus",
+          "target": {
+            "abilityId": "separation_start"
+          }
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "ritual_performed",
+          "params": {
+            "ritualId": "separation_ordeal"
+          },
+          "description": "Must undergo the separation ordeal",
+          "hidden": true
+        },
+        {
+          "type": "trauma_experienced",
+          "params": {
+            "traumaType": "separation_pain"
+          },
+          "description": "Must endure the pain of stretching the bond"
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "Every witch must face the ordeal - walking away from their animus until\nthe bond stretches to the breaking point. The pain is indescribable. Many\ndo not survive. Those who do are forever changed.",
+      "prerequisites": [
+        "witch-blood",
+        "settling"
+      ],
+      "hidden": true,
+      "icon": "💔"
+    },
+    {
+      "id": "basic-separation",
+      "name": "Initial Separation",
+      "description": "Maintain separation at short distances",
+      "paradigmId": "animus",
+      "category": "separation",
+      "tier": 3,
+      "xpCost": 100,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "separation_distance",
+          "baseValue": 50,
+          "description": "Can separate up to 50 meters from animus"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "prerequisites": [
+        "separation-ordeal"
+      ]
+    },
+    {
+      "id": "extended-separation",
+      "name": "Extended Separation",
+      "description": "Extend the distance you can travel from your animus",
+      "paradigmId": "animus",
+      "category": "separation",
+      "tier": 4,
+      "xpCost": 150,
+      "maxLevel": 5,
+      "effects": [
+        {
+          "type": "separation_distance",
+          "baseValue": 100,
+          "perLevelValue": 100,
+          "description": "+X meters separation distance"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "prerequisites": [
+        "basic-separation"
+      ],
+      "levelCostMultiplier": 1.5
+    },
+    {
+      "id": "unlimited-separation",
+      "name": "Unlimited Separation",
+      "description": "Travel any distance from your animus",
+      "paradigmId": "animus",
+      "category": "separation",
+      "tier": 5,
+      "xpCost": 500,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "separation_distance",
+          "baseValue": -1,
+          "description": "Can separate any distance from animus"
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "node_level",
+          "params": {
+            "nodeId": "extended-separation",
+            "level": 5
+          },
+          "description": "Must master extended separation"
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "The greatest witches can send their animuses to the far side of the world while they remain at home. The bond stretches but never breaks.",
+      "prerequisites": [
+        "extended-separation"
+      ]
+    },
+    {
+      "id": "witch-flight",
+      "name": "Cloud-Pine Flight",
+      "description": "Master the art of flying on cloud-pine",
+      "paradigmId": "animus",
+      "category": "separation",
+      "tier": 4,
+      "xpCost": 200,
+      "maxLevel": 5,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Can fly on cloud-pine branch",
+          "target": {
+            "abilityId": "witch_flight"
+          }
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "artifact_bonded",
+          "params": {
+            "artifactType": "cloud_pine"
+          },
+          "description": "Must bond with a cloud-pine branch"
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "Witches fly on branches of cloud-pine, racing through the northern skies faster than any bird. This is their birthright.",
+      "prerequisites": [
+        "separation-ordeal"
+      ],
+      "levelCostMultiplier": 1.5
+    },
+    {
+      "id": "animus-scout",
+      "name": "Animus Scout",
+      "description": "Send your animus ahead to scout while you remain behind",
+      "paradigmId": "animus",
+      "category": "separation",
+      "tier": 4,
+      "xpCost": 175,
+      "maxLevel": 3,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Send animus ahead as a scout",
+          "target": {
+            "abilityId": "animus_scouting"
+          }
+        },
+        {
+          "type": "perception",
+          "baseValue": 20,
+          "description": "See through animus's eyes while separated"
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "node_level",
+          "params": {
+            "nodeId": "silent-speech",
+            "level": 3
+          },
+          "description": "Must have perfected silent communication"
+        }
+      ],
+      "conditionMode": "all",
+      "prerequisites": [
+        "extended-separation",
+        "silent-speech"
+      ],
+      "levelCostMultiplier": 1.5
+    },
+    {
+      "id": "severance-awareness",
+      "name": "Severance Awareness",
+      "description": "Recognize the horror of severance",
+      "paradigmId": "animus",
+      "category": "foundation",
+      "tier": 2,
+      "xpCost": 30,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Recognize severed individuals",
+          "target": {
+            "abilityId": "severed_sense"
+          }
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Severance - the cutting of the bond between human and animus.\nThose who have been severed are empty, dead-eyed, barely human.\nThe Orthodoxy calls it \"performing the separation.\" We call it murder of the soul.",
+      "prerequisites": [
+        "touch-taboo"
+      ],
+      "icon": "⚠️"
+    },
+    {
+      "id": "bond-fortification",
+      "name": "Bond Fortification",
+      "description": "Strengthen your bond against those who would sever it",
+      "paradigmId": "animus",
+      "category": "relationship",
+      "tier": 3,
+      "xpCost": 150,
+      "maxLevel": 5,
+      "effects": [
+        {
+          "type": "defense",
+          "baseValue": 25,
+          "perLevelValue": 10,
+          "description": "Resistance to forced separation attempts"
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "node_level",
+          "params": {
+            "nodeId": "emotional-sync",
+            "level": 3
+          },
+          "description": "Must have strong emotional bond"
+        }
+      ],
+      "conditionMode": "all",
+      "prerequisites": [
+        "severance-awareness",
+        "emotional-sync"
+      ],
+      "levelCostMultiplier": 1.5
+    },
+    {
+      "id": "deep-bond",
+      "name": "Deep Bond",
+      "description": "Achieve a profound unity with your animus",
+      "paradigmId": "animus",
+      "category": "mastery",
+      "tier": 4,
+      "xpCost": 250,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "bond_strength",
+          "baseValue": 25,
+          "description": "Animus is a true extension of yourself"
+        },
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Share sensory input with animus",
+          "target": {
+            "abilityId": "sensory_sharing"
+          }
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "node_level",
+          "params": {
+            "nodeId": "emotional-sync",
+            "level": 5
+          },
+          "description": "Must have perfected emotional synchronization"
+        }
+      ],
+      "conditionMode": "all",
+      "prerequisites": [
+        "form-mastery",
+        "emotional-sync"
+      ]
+    },
+    {
+      "id": "animus-combat",
+      "name": "Animus Combat",
+      "description": "Learn to fight in perfect coordination with your animus",
+      "paradigmId": "animus",
+      "category": "mastery",
+      "tier": 3,
+      "xpCost": 175,
+      "maxLevel": 5,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Fight in coordination with animus",
+          "target": {
+            "abilityId": "animus_assist"
+          }
+        },
+        {
+          "type": "combat",
+          "baseValue": 15,
+          "description": "Bonus when animus assists in combat"
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "form_category",
+          "params": {
+            "category": "predator"
+          },
+          "description": "Animus must have a combat-capable form"
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "Your animus can bite, claw, distract - but more importantly, they can warn you of danger and watch your back. Fighting as one is fighting as two.",
+      "prerequisites": [
+        "form-affinity"
+      ],
+      "levelCostMultiplier": 1.4
+    }
+  ],
+  "entryNodes": [
+    "animus-bond"
+  ],
+  "connections": [],
+  "xpSources": [
+    {
+      "eventType": "animus_interaction",
+      "xpAmount": 5,
+      "description": "Meaningful interaction with your animus"
+    },
+    {
+      "eventType": "form_used",
+      "xpAmount": 10,
+      "description": "Use your animus's form abilities"
+    },
+    {
+      "eventType": "dust_perceived",
+      "xpAmount": 15,
+      "description": "Successfully perceive Aether Motes"
+    },
+    {
+      "eventType": "veridex_reading",
+      "xpAmount": 50,
+      "description": "Successfully read the veridex"
+    },
+    {
+      "eventType": "separation_extended",
+      "xpAmount": 25,
+      "description": "Successfully separate from animus"
+    },
+    {
+      "eventType": "animus_scouting_success",
+      "xpAmount": 30,
+      "description": "Animus successfully scouts ahead"
+    },
+    {
+      "eventType": "bond_threatened",
+      "xpAmount": 20,
+      "description": "Resist a threat to your animus bond"
+    },
+    {
+      "eventType": "form_revelation",
+      "xpAmount": 100,
+      "description": "Your animus settles or reveals a truth about form"
+    },
+    {
+      "eventType": "world_window_found",
+      "xpAmount": 75,
+      "description": "Discover a window between worlds"
+    }
+  ],
+  "rules": {
+    "allowRespec": false,
+    "permanentProgress": true,
+    "requiresInnateAbility": false,
+    "progressLossConditions": [
+      {
+        "type": "severance",
+        "params": {},
+        "description": "Severance permanently destroys all animus abilities"
+      }
+    ]
+  },
+  "version": 1
+}

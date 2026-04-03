@@ -155,7 +155,7 @@ export class SoulAnimationProgressionSystem extends BaseSystem {
 
     this.animationJobs.set(soulId, job);
 
-    // Emit event for external animation generation (daemon or manual process)
+    // Emit event for external animation generation (background or manual process)
     world.eventBus.emit<'soul:animation_requested'>({
       type: 'soul:animation_requested',
       source: 'soul_animation_progression',

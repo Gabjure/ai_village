@@ -563,7 +563,7 @@
       "#.........#",
       "####DDD####"
     ],
-    "// Music = song +60, sound_amplification, emotion_amplification, euphoric\n  // Carpet = sound_dampening (controls echoes), comforting, +10 mood\n  // Bronze = allomancy (Seeker detects magic), metal element\n  materials": {
+    "// Music = song +60, sound_amplification, emotion_amplification, euphoric\n  // Carpet = sound_dampening (controls echoes), comforting, +10 mood\n  // Bronze = ferromancy (Seeker detects magic), metal element\n  materials": {
       "wall": "music",
       "floor": "carpet",
       "door": "bronze"
@@ -899,7 +899,7 @@
   {
     "id": "metal_reserve",
     "name": "Metal Reserve",
-    "description": "A secure facility storing pure allomantic metals for Mistings and Mistborn.",
+    "description": "A secure facility storing pure ferromancy metals for OreAttuneds and CrucibleBorn.",
     "category": "storage",
     "tier": 3,
     "species": "medium",
@@ -938,7 +938,7 @@
         "type": "storage",
         "params": {
           "slots": 200,
-          "type": "allomantic_metals"
+          "type": "ferromancy_metals"
         }
       }
     ],
@@ -947,16 +947,16 @@
         "type": "paradigm_bonus",
         "magnitude": 15,
         "radius": 5,
-        "paradigm": "allomancy"
+        "paradigm": "ferromancy"
       }
     ],
     "paradigmAffinity": [
-      "allomancy"
+      "ferromancy"
     ],
     "elementalAttunement": "metal",
     "capacity": 4,
     "style": "modern",
-    "lore": "Pure metals, properly stored and catalogued. Allomancers know that impure metals can kill—this reserve ensures that never happens."
+    "lore": "Pure metals, properly stored and catalogued. Ferromancers know that impure metals can kill—this reserve ensures that never happens."
   },
   {
     "id": "harmony_garden",
@@ -1045,7 +1045,7 @@
       " #~~~# ",
       "  ###  "
     ],
-    "// Magma = fire +90, light_emission, extreme heat, alive\n  // Obsidian = dimensional_stability, scrying bonus\n  // Bronze = allomancy, conducts magic\n  materials": {
+    "// Magma = fire +90, light_emission, extreme heat, alive\n  // Obsidian = dimensional_stability, scrying bonus\n  // Bronze = ferromancy, conducts magic\n  materials": {
       "wall": "magma",
       "floor": "obsidian",
       "door": "bronze"
@@ -1282,7 +1282,7 @@
       " #~~~~~# ",
       "  ##D##  "
     ],
-    "// Tears = emotional +60, sympathy +30, purifying\n  materials": {
+    "// Tears = emotional +60, tethermancy +30, purifying\n  materials": {
       "wall": "tears",
       "floor": "water",
       "door": "mist"
@@ -1305,7 +1305,7 @@
     ],
     "paradigmAffinity": [
       "emotional",
-      "sympathy"
+      "tethermancy"
     ],
     "elementalAttunement": "water",
     "capacity": 8,
@@ -1313,8 +1313,8 @@
     "lore": "The pool accepts all feelings - joy and sorrow, rage and peace. What you release returns as power, cleansed of its burden."
   },
   {
-    "id": "sympathy_link_chamber",
-    "name": "Sympathy Link Chamber",
+    "id": "tethermancy_link_chamber",
+    "name": "Tethermancy Link Chamber",
     "description": "A workshop for creating and maintaining sympathetic connections between objects.",
     "category": "research",
     "tier": 3,
@@ -1327,7 +1327,7 @@
       "#..T..#",
       "###D###"
     ],
-    "// Amber = echo +30, memory enhancement, time preservation\n  // Copper = allomancy +30 (but conducts sympathy too)\n  materials": {
+    "// Amber = echo +30, memory enhancement, time preservation\n  // Copper = ferromancy +30 (but conducts tethermancy too)\n  materials": {
       "wall": "amber",
       "floor": "copper",
       "door": "bronze"
@@ -1336,7 +1336,7 @@
       {
         "type": "paradigm_amplifier",
         "params": {
-          "paradigm": "sympathy",
+          "paradigm": "tethermancy",
           "bonus": 35
         }
       },
@@ -1345,14 +1345,14 @@
         "params": {
           "bonus": 1.5,
           "fields": [
-            "sympathy",
+            "tethermancy",
             "connections"
           ]
         }
       }
     ],
     "paradigmAffinity": [
-      "sympathy"
+      "tethermancy"
     ],
     "elementalAttunement": "fire",
     "capacity": 3,
@@ -1859,9 +1859,9 @@
     "lore": "Spring brings growth, summer brings fire, autumn brings wisdom, winter brings rest. The circle turns, and so does power."
   },
   {
-    "id": "daemon_sanctum",
-    "name": "Daemon Sanctum",
-    "description": "A sacred space where humans commune with their daemons and Dust flows freely.",
+    "id": "animus_sanctum",
+    "name": "Animus Sanctum",
+    "description": "A sacred space where humans commune with their animuses and Aether Motes flow freely.",
     "category": "research",
     "tier": 4,
     "species": "medium",
@@ -1883,7 +1883,7 @@
       {
         "type": "paradigm_amplifier",
         "params": {
-          "paradigm": "daemon",
+          "paradigm": "animus",
           "bonus": 55
         }
       },
@@ -1893,18 +1893,18 @@
           "bonus": 1.5,
           "fields": [
             "dust",
-            "daemon_bonds",
+            "animus_bonds",
             "multiverse"
           ]
         }
       }
     ],
     "paradigmAffinity": [
-      "daemon"
+      "animus"
     ],
     "capacity": 6,
     "style": "ethereal",
-    "lore": "Here, the bond between human and daemon is strengthened. Dust swirls visibly, and the truth can be read in the Alethiometer."
+    "lore": "Here, the bond between human and animus is strengthened. Aether Motes swirl visibly, and the truth can be read in the Veridex."
   },
   {
     "id": "absorption_chamber",

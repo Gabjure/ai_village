@@ -17,8 +17,8 @@ import {
 
 // Import paradigm-specific trees
 import {
-  ALLOMANCY_SKILL_TREE,
-  getMistingMetals,
+  FERROMANCY_SKILL_TREE,
+  getMonoResonantMetals,
   isMetalAvailable,
 } from '@ai-village/core';
 
@@ -29,16 +29,16 @@ import {
 } from '@ai-village/core';
 
 import {
-  SYMPATHY_SKILL_TREE,
+  TETHERMANCY_SKILL_TREE,
   LINK_TYPES,
   BINDING_PRINCIPLES,
   calculateLinkEfficiency,
   getMaxBindings,
-  calculateSlippage,
+  calculateDrift,
 } from '@ai-village/core';
 
 import {
-  DAEMON_SKILL_TREE,
+  ANIMUS_SKILL_TREE,
   DAEMON_FORM_CATEGORIES,
   getFormBonuses,
   isFormInCategory,
@@ -69,68 +69,68 @@ function createTestContext(
 }
 
 // ============================================================================
-// Allomancy Skill Tree Tests
+// Ferromancy Skill Tree Tests
 // ============================================================================
 
-describe('AllomancySkillTree', () => {
+describe('FerromancySkillTree', () => {
   describe('tree structure', () => {
     it('should have correct paradigm ID', () => {
-      expect(ALLOMANCY_SKILL_TREE.paradigmId).toBe('allomancy');
+      expect(FERROMANCY_SKILL_TREE.paradigmId).toBe('ferromancy');
     });
 
-    it('should have snapped as entry node', () => {
-      expect(ALLOMANCY_SKILL_TREE.entryNodes).toContain('snapped');
+    it('should have fractured as entry node', () => {
+      expect(FERROMANCY_SKILL_TREE.entryNodes).toContain('fractured');
     });
 
     it('should require bloodline for tree access', () => {
-      expect(ALLOMANCY_SKILL_TREE.rules.requiresInnateAbility).toBe(true);
-      expect(ALLOMANCY_SKILL_TREE.rules.innateCondition).toBeDefined();
-      expect(ALLOMANCY_SKILL_TREE.rules.innateCondition?.type).toBe('bloodline');
+      expect(FERROMANCY_SKILL_TREE.rules.requiresInnateAbility).toBe(true);
+      expect(FERROMANCY_SKILL_TREE.rules.innateCondition).toBeDefined();
+      expect(FERROMANCY_SKILL_TREE.rules.innateCondition?.type).toBe('bloodline');
     });
 
     it('should have metal discovery nodes', () => {
-      const discoveryNodes = getNodesByCategory(ALLOMANCY_SKILL_TREE, 'discovery');
+      const discoveryNodes = getNodesByCategory(FERROMANCY_SKILL_TREE, 'discovery');
       expect(discoveryNodes.length).toBeGreaterThan(0);
 
       // Check for basic metals
-      expect(getNodeById(ALLOMANCY_SKILL_TREE, 'metal-steel')).toBeDefined();
-      expect(getNodeById(ALLOMANCY_SKILL_TREE, 'metal-iron')).toBeDefined();
-      expect(getNodeById(ALLOMANCY_SKILL_TREE, 'metal-pewter')).toBeDefined();
-      expect(getNodeById(ALLOMANCY_SKILL_TREE, 'metal-tin')).toBeDefined();
+      expect(getNodeById(FERROMANCY_SKILL_TREE, 'metal-steel')).toBeDefined();
+      expect(getNodeById(FERROMANCY_SKILL_TREE, 'metal-iron')).toBeDefined();
+      expect(getNodeById(FERROMANCY_SKILL_TREE, 'metal-pewter')).toBeDefined();
+      expect(getNodeById(FERROMANCY_SKILL_TREE, 'metal-tin')).toBeDefined();
     });
 
-    it('should have Misting specialization nodes', () => {
-      const specializationNodes = getNodesByCategory(ALLOMANCY_SKILL_TREE, 'specialization');
+    it('should have MonoResonant specialization nodes', () => {
+      const specializationNodes = getNodesByCategory(FERROMANCY_SKILL_TREE, 'specialization');
       expect(specializationNodes.length).toBeGreaterThan(0);
 
-      expect(getNodeById(ALLOMANCY_SKILL_TREE, 'coinshot')).toBeDefined();
-      expect(getNodeById(ALLOMANCY_SKILL_TREE, 'lurcher')).toBeDefined();
+      expect(getNodeById(FERROMANCY_SKILL_TREE, 'iron-puller')).toBeDefined();
+      expect(getNodeById(FERROMANCY_SKILL_TREE, 'steel-launcher')).toBeDefined();
     });
 
-    it('should have Mistborn awakening node', () => {
-      const mistbornNode = getNodeById(ALLOMANCY_SKILL_TREE, 'mistborn-awakening');
-      expect(mistbornNode).toBeDefined();
-      expect(mistbornNode?.unlockConditions).toContainEqual(
+    it('should have OmniResonant awakening node', () => {
+      const omni_resonantNode = getNodeById(FERROMANCY_SKILL_TREE, 'omni_resonant-awakening');
+      expect(omni_resonantNode).toBeDefined();
+      expect(omni_resonantNode?.unlockConditions).toContainEqual(
         expect.objectContaining({ type: 'bloodline' })
       );
     });
   });
 
   describe('helper functions', () => {
-    it('getMistingMetals returns all metals for full Mistborn', () => {
-      const metals = getMistingMetals(1.0);
+    it('getMonoResonantMetals returns all metals for full OmniResonant', () => {
+      const metals = getMonoResonantMetals(1.0);
       expect(metals.length).toBeGreaterThan(8);
     });
 
-    it('getMistingMetals returns basic metals for lower strength', () => {
-      const metals = getMistingMetals(0.25);
+    it('getMonoResonantMetals returns basic metals for lower strength', () => {
+      const metals = getMonoResonantMetals(0.25);
       expect(metals).toContain('steel');
       expect(metals).toContain('iron');
       expect(metals.length).toBe(4); // Basic metals only
     });
 
-    it('getMistingMetals returns empty for no bloodline', () => {
-      const metals = getMistingMetals(0.1);
+    it('getMonoResonantMetals returns empty for no bloodline', () => {
+      const metals = getMonoResonantMetals(0.1);
       expect(metals.length).toBe(0);
     });
 
@@ -142,20 +142,20 @@ describe('AllomancySkillTree', () => {
   });
 
   describe('tree access', () => {
-    it('should require Allomancer bloodline', () => {
-      const progress = createMagicSkillProgress('allomancy');
+    it('should require Ferromancer bloodline', () => {
+      const progress = createMagicSkillProgress('ferromancy');
 
       // Without bloodline
-      const contextNone = createTestContext('allomancy', progress, {
+      const contextNone = createTestContext('ferromancy', progress, {
         custom: { bloodlines: {} },
       });
-      expect(canAccessTree(ALLOMANCY_SKILL_TREE, contextNone).canAccess).toBe(false);
+      expect(canAccessTree(FERROMANCY_SKILL_TREE, contextNone).canAccess).toBe(false);
 
       // With bloodline
-      const contextWith = createTestContext('allomancy', progress, {
-        custom: { bloodlines: { allomancer: 1.0 } },
+      const contextWith = createTestContext('ferromancy', progress, {
+        custom: { bloodlines: { ferromancer: 1.0 } },
       });
-      expect(canAccessTree(ALLOMANCY_SKILL_TREE, contextWith).canAccess).toBe(true);
+      expect(canAccessTree(FERROMANCY_SKILL_TREE, contextWith).canAccess).toBe(true);
     });
   });
 });
@@ -218,40 +218,40 @@ describe('ShintoSkillTree', () => {
 });
 
 // ============================================================================
-// Sympathy Skill Tree Tests
+// Tethermancy Skill Tree Tests
 // ============================================================================
 
-describe('SympathySkillTree', () => {
+describe('TethermancySkillTree', () => {
   describe('tree structure', () => {
     it('should have correct paradigm ID', () => {
-      expect(SYMPATHY_SKILL_TREE.paradigmId).toBe('sympathy');
+      expect(TETHERMANCY_SKILL_TREE.paradigmId).toBe('tethermancy');
     });
 
     it('should not require innate ability', () => {
-      expect(SYMPATHY_SKILL_TREE.rules.requiresInnateAbility).toBe(false);
+      expect(TETHERMANCY_SKILL_TREE.rules.requiresInnateAbility).toBe(false);
     });
 
-    it('should have alar foundation nodes', () => {
-      const basicAlar = getNodeById(SYMPATHY_SKILL_TREE, 'basic-alar');
-      expect(basicAlar).toBeDefined();
-      expect(basicAlar?.category).toBe('foundation');
+    it('should have attunement foundation nodes', () => {
+      const basicAttunement = getNodeById(TETHERMANCY_SKILL_TREE, 'basic-attunement');
+      expect(basicAttunement).toBeDefined();
+      expect(basicAttunement?.category).toBe('foundation');
     });
 
     it('should have link type nodes', () => {
       // Check for link type progression
-      expect(getNodeById(SYMPATHY_SKILL_TREE, 'link-identical')).toBeDefined();
-      expect(getNodeById(SYMPATHY_SKILL_TREE, 'link-similar')).toBeDefined();
+      expect(getNodeById(TETHERMANCY_SKILL_TREE, 'link-identical')).toBeDefined();
+      expect(getNodeById(TETHERMANCY_SKILL_TREE, 'link-similar')).toBeDefined();
     });
 
     it('should have advanced binding nodes', () => {
-      // Body binding and mommet are advanced techniques
-      expect(getNodeById(SYMPATHY_SKILL_TREE, 'body-binding')).toBeDefined();
-      expect(getNodeById(SYMPATHY_SKILL_TREE, 'mommet')).toBeDefined();
+      // Body binding and tether_effigy are advanced techniques
+      expect(getNodeById(TETHERMANCY_SKILL_TREE, 'body-binding')).toBeDefined();
+      expect(getNodeById(TETHERMANCY_SKILL_TREE, 'tether_effigy')).toBeDefined();
     });
 
     it('should have split-focus mastery nodes', () => {
-      expect(getNodeById(SYMPATHY_SKILL_TREE, 'dual-binding')).toBeDefined();
-      expect(getNodeById(SYMPATHY_SKILL_TREE, 'triple-binding')).toBeDefined();
+      expect(getNodeById(TETHERMANCY_SKILL_TREE, 'dual-binding')).toBeDefined();
+      expect(getNodeById(TETHERMANCY_SKILL_TREE, 'triple-binding')).toBeDefined();
     });
   });
 
@@ -283,53 +283,53 @@ describe('SympathySkillTree', () => {
       expect(identicalEff).toBeGreaterThan(similarEff);
     });
 
-    it('calculateSlippage returns energy loss percentage', () => {
-      // Function signature: (baseSlippage, slippageControlLevel, hasPerfectLink, linkType)
-      const slippage = calculateSlippage(0.3, 0, false, 'similar');
-      expect(slippage).toBeGreaterThan(0);
-      expect(slippage).toBeLessThan(1);
+    it('calculateDrift returns energy loss percentage', () => {
+      // Function signature: (baseDrift, driftControlLevel, hasPerfectLink, linkType)
+      const drift = calculateDrift(0.3, 0, false, 'similar');
+      expect(drift).toBeGreaterThan(0);
+      expect(drift).toBeLessThan(1);
     });
   });
 });
 
 // ============================================================================
-// Daemon Skill Tree Tests
+// Animus Skill Tree Tests
 // ============================================================================
 
-describe('DaemonSkillTree', () => {
+describe('AnimusSkillTree', () => {
   describe('tree structure', () => {
     it('should have correct paradigm ID', () => {
-      expect(DAEMON_SKILL_TREE.paradigmId).toBe('daemon');
+      expect(ANIMUS_SKILL_TREE.paradigmId).toBe('animus');
     });
 
-    it('should not require innate ability (everyone has a daemon)', () => {
-      expect(DAEMON_SKILL_TREE.rules.requiresInnateAbility).toBe(false);
+    it('should not require innate ability (everyone has an animus)', () => {
+      expect(ANIMUS_SKILL_TREE.rules.requiresInnateAbility).toBe(false);
     });
 
-    it('should have daemon-bond as entry node', () => {
-      expect(DAEMON_SKILL_TREE.entryNodes).toContain('daemon-bond');
+    it('should have animus-bond as entry node', () => {
+      expect(ANIMUS_SKILL_TREE.entryNodes).toContain('animus-bond');
     });
 
     it('should have settling node', () => {
-      const settlingNode = getNodeById(DAEMON_SKILL_TREE, 'settling');
+      const settlingNode = getNodeById(ANIMUS_SKILL_TREE, 'settling');
       expect(settlingNode).toBeDefined();
       expect(settlingNode?.hidden).toBe(true); // Hidden until it happens
     });
 
     it('should have dust category nodes', () => {
-      const dustNodes = getNodesByCategory(DAEMON_SKILL_TREE, 'dust');
-      expect(dustNodes.length).toBeGreaterThan(0);
-      expect(getNodeById(DAEMON_SKILL_TREE, 'dust-sense')).toBeDefined();
+      const aetherMoteNodes = getNodesByCategory(ANIMUS_SKILL_TREE, 'aether_motes');
+      expect(aetherMoteNodes.length).toBeGreaterThan(0);
+      expect(getNodeById(ANIMUS_SKILL_TREE, 'dust-sense')).toBeDefined();
     });
 
     it('should have separation category nodes', () => {
-      const separationNodes = getNodesByCategory(DAEMON_SKILL_TREE, 'separation');
+      const separationNodes = getNodesByCategory(ANIMUS_SKILL_TREE, 'separation');
       expect(separationNodes.length).toBeGreaterThan(0);
-      expect(getNodeById(DAEMON_SKILL_TREE, 'basic-separation')).toBeDefined();
+      expect(getNodeById(ANIMUS_SKILL_TREE, 'basic-separation')).toBeDefined();
     });
 
     it('should have witch blood node with bloodline requirement', () => {
-      const witchNode = getNodeById(DAEMON_SKILL_TREE, 'witch-blood');
+      const witchNode = getNodeById(ANIMUS_SKILL_TREE, 'witch-blood');
       expect(witchNode).toBeDefined();
       expect(witchNode?.unlockConditions).toContainEqual(
         expect.objectContaining({ type: 'bloodline' })
@@ -394,53 +394,53 @@ describe('DaemonSkillTree', () => {
   });
 
   describe('tree access', () => {
-    it('should be accessible to anyone (everyone has a daemon)', () => {
-      const progress = createMagicSkillProgress('daemon');
-      const context = createTestContext('daemon', progress);
-      expect(canAccessTree(DAEMON_SKILL_TREE, context).canAccess).toBe(true);
+    it('should be accessible to anyone (everyone has an animus)', () => {
+      const progress = createMagicSkillProgress('animus');
+      const context = createTestContext('animus', progress);
+      expect(canAccessTree(ANIMUS_SKILL_TREE, context).canAccess).toBe(true);
     });
   });
 
   describe('condition evaluators', () => {
     it('should evaluate age_range condition', () => {
-      const progress = createMagicSkillProgress('daemon');
-      const formNode = getNodeById(DAEMON_SKILL_TREE, 'form-shifting');
+      const progress = createMagicSkillProgress('animus');
+      const formNode = getNodeById(ANIMUS_SKILL_TREE, 'form-shifting');
       expect(formNode).toBeDefined();
 
       // Child (can shift forms)
-      const childContext = createTestContext('daemon', progress, {
+      const childContext = createTestContext('animus', progress, {
         custom: { age: 10 },
       });
-      const childResult = evaluateNode(formNode!, DAEMON_SKILL_TREE, childContext);
+      const childResult = evaluateNode(formNode!, ANIMUS_SKILL_TREE, childContext);
       expect(childResult.conditions.some(r => r.condition.type === 'age_range' && r.met)).toBe(true);
 
       // Adult (cannot shift forms)
-      const adultContext = createTestContext('daemon', progress, {
+      const adultContext = createTestContext('animus', progress, {
         custom: { age: 25 },
       });
-      const adultResult = evaluateNode(formNode!, DAEMON_SKILL_TREE, adultContext);
+      const adultResult = evaluateNode(formNode!, ANIMUS_SKILL_TREE, adultContext);
       expect(adultResult.conditions.some(r => r.condition.type === 'age_range' && !r.met)).toBe(true);
     });
 
     it('should evaluate form_category condition', () => {
-      const progress = createMagicSkillProgress('daemon');
+      const progress = createMagicSkillProgress('animus');
       progress.unlockedNodes['form-affinity'] = 1;
 
-      const combatNode = getNodeById(DAEMON_SKILL_TREE, 'daemon-combat');
+      const combatNode = getNodeById(ANIMUS_SKILL_TREE, 'animus-combat');
       expect(combatNode).toBeDefined();
 
-      // With predator daemon
-      const predatorContext = createTestContext('daemon', progress, {
-        custom: { daemonFormCategory: 'predator' },
+      // With predator animus
+      const predatorContext = createTestContext('animus', progress, {
+        custom: { animusFormCategory: 'predator' },
       });
-      const predatorResult = evaluateNode(combatNode!, DAEMON_SKILL_TREE, predatorContext);
+      const predatorResult = evaluateNode(combatNode!, ANIMUS_SKILL_TREE, predatorContext);
       expect(predatorResult.conditions.some(r => r.condition.type === 'form_category' && r.met)).toBe(true);
 
-      // With companion daemon
-      const companionContext = createTestContext('daemon', progress, {
-        custom: { daemonFormCategory: 'companion' },
+      // With companion animus
+      const companionContext = createTestContext('animus', progress, {
+        custom: { animusFormCategory: 'companion' },
       });
-      const companionResult = evaluateNode(combatNode!, DAEMON_SKILL_TREE, companionContext);
+      const companionResult = evaluateNode(combatNode!, ANIMUS_SKILL_TREE, companionContext);
       expect(companionResult.conditions.some(r => r.condition.type === 'form_category' && !r.met)).toBe(true);
     });
   });
@@ -452,10 +452,10 @@ describe('DaemonSkillTree', () => {
 
 describe('Cross-tree consistency', () => {
   const ALL_TREES = [
-    { name: 'Allomancy', tree: ALLOMANCY_SKILL_TREE },
+    { name: 'Ferromancy', tree: FERROMANCY_SKILL_TREE },
     { name: 'Shinto', tree: SHINTO_SKILL_TREE },
-    { name: 'Sympathy', tree: SYMPATHY_SKILL_TREE },
-    { name: 'Daemon', tree: DAEMON_SKILL_TREE },
+    { name: 'Tethermancy', tree: TETHERMANCY_SKILL_TREE },
+    { name: 'Animus', tree: ANIMUS_SKILL_TREE },
   ];
 
   it('all trees should have unique IDs', () => {

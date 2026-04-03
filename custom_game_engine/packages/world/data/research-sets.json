@@ -2040,114 +2040,114 @@
     ]
   },
   {
-    "setId": "basic_daemon_theory",
-    "name": "Daemon Nature and Bonding Fundamentals",
-    "description": "Study the fundamental nature of daemons and their bond with humans",
-    "field": "daemon_magic",
+    "setId": "basic_animus_theory",
+    "name": "Animus Nature and Bonding Fundamentals",
+    "description": "Study the fundamental nature of animuses and their bond with humans",
+    "field": "animus_magic",
     "allPapers": [
-      "daemon_physical_manifestation",
-      "daemon_consciousness_theory",
-      "human_daemon_soul_bond",
-      "daemon_shape_shifting_mechanics",
+      "animus_physical_manifestation",
+      "animus_consciousness_theory",
+      "human_animus_soul_bond",
+      "animus_shape_shifting_mechanics",
       "settling_process_observation",
-      "daemon_touch_taboo_theory",
-      "intercision_trauma_study",
-      "daemon_separation_distance_limits",
-      "daemon_communication_methods",
-      "daemon_emotional_reflection",
-      "child_daemon_flexibility",
-      "adult_daemon_fixation",
-      "daemon_animal_forms_cataloging",
+      "animus_touch_taboo_theory",
+      "severance_trauma_study",
+      "animus_separation_distance_limits",
+      "animus_communication_methods",
+      "animus_emotional_reflection",
+      "child_animus_flexibility",
+      "adult_animus_fixation",
+      "animus_animal_forms_cataloging",
       "true_form_determination_theory",
-      "daemon_naming_practices",
-      "daemon_death_mechanics",
-      "witches_daemon_separation_basics",
-      "shamanic_daemon_traditions",
-      "daemon_cultural_variations",
-      "daemon_less_beings_theory",
-      "daemon_perception_abilities",
-      "daemon_instinct_vs_human_reason",
-      "daemon_gender_correspondence",
-      "daemon_symbolic_meaning",
-      "daemon_bond_strength_measurement"
+      "animus_naming_practices",
+      "animus_death_mechanics",
+      "witches_animus_separation_basics",
+      "shamanic_animus_traditions",
+      "animus_cultural_variations",
+      "animus_less_beings_theory",
+      "animus_perception_abilities",
+      "animus_instinct_vs_human_reason",
+      "animus_gender_correspondence",
+      "animus_symbolic_meaning",
+      "animus_bond_strength_measurement"
     ],
     "unlocks": [
       {
-        "technologyId": "daemon_awareness",
+        "technologyId": "animus_awareness",
         "papersRequired": 8,
         "mandatoryPapers": [
-          "daemon_physical_manifestation",
-          "human_daemon_soul_bond",
+          "animus_physical_manifestation",
+          "human_animus_soul_bond",
           "settling_process_observation"
         ],
         "grants": [
           {
             "type": "building",
-            "buildingId": "daemon_study_hall"
+            "buildingId": "animus_study_hall"
           },
           {
             "type": "ability",
-            "abilityId": "understand_daemon_nature"
+            "abilityId": "understand_animus_nature"
           }
         ]
       },
       {
-        "technologyId": "daemon_bond_mastery",
+        "technologyId": "animus_bond_mastery",
         "papersRequired": 15,
         "mandatoryPapers": [
-          "daemon_communication_methods",
+          "animus_communication_methods",
           "true_form_determination_theory",
-          "daemon_bond_strength_measurement"
+          "animus_bond_strength_measurement"
         ],
         "grants": [
           {
             "type": "ability",
-            "abilityId": "strengthen_daemon_bond"
+            "abilityId": "strengthen_animus_bond"
           }
         ]
       }
     ]
   },
   {
-    "setId": "daemon_separation_training",
-    "name": "Daemon Separation and Extended Distance",
-    "description": "Master the painful but necessary art of daemon separation",
-    "field": "daemon_magic",
+    "setId": "animus_separation_training",
+    "name": "Animus Separation and Extended Distance",
+    "description": "Master the painful but necessary art of animus separation",
+    "field": "animus_magic",
     "allPapers": [
-      "intercision_ethical_analysis",
+      "severance_ethical_analysis",
       "voluntary_separation_protocols",
       "witch_separation_techniques",
       "separation_pain_management",
       "gradual_distance_increase_training",
       "separation_meditation_methods",
-      "daemon_separation_psychological_effects",
+      "animus_separation_psychological_effects",
       "reconnection_after_separation",
       "shamanic_separation_rituals",
       "cloud_pine_branch_travel",
       "separation_distance_measurement",
-      "extreme_distance_daemon_communication",
+      "extreme_distance_animus_communication",
       "separation_trauma_healing",
       "forced_separation_consequences",
-      "separation_vs_intercision_differences",
-      "daemon_autonomy_after_separation",
-      "separated_daemon_independent_action",
-      "witch_daemon_miles_apart",
+      "separation_vs_severance_differences",
+      "animus_autonomy_after_separation",
+      "separated_animus_independent_action",
+      "witch_animus_miles_apart",
       "separation_endurance_training",
-      "daemon_location_sensing",
+      "animus_location_sensing",
       "separated_combat_coordination",
       "reunion_emotional_intensity",
       "permanent_separation_theory",
       "separation_soul_damage_prevention",
       "advanced_separation_techniques",
       "multi_day_separation_protocols",
-      "cross_world_daemon_coherence",
-      "daemon_quantum_entanglement",
-      "separated_daemon_perception_sharing",
+      "cross_world_animus_coherence",
+      "animus_quantum_entanglement",
+      "separated_animus_perception_sharing",
       "separation_mastery_achievement"
     ],
     "unlocks": [
       {
-        "technologyId": "basic_daemon_separation",
+        "technologyId": "basic_animus_separation",
         "papersRequired": 10,
         "mandatoryPapers": [
           "voluntary_separation_protocols",
@@ -2161,26 +2161,26 @@
           },
           {
             "type": "ability",
-            "abilityId": "separate_from_daemon_short_distance"
+            "abilityId": "separate_from_animus_short_distance"
           }
         ]
       },
       {
-        "technologyId": "advanced_daemon_separation",
+        "technologyId": "advanced_animus_separation",
         "papersRequired": 20,
         "mandatoryPapers": [
-          "witch_daemon_miles_apart",
-          "cross_world_daemon_coherence",
+          "witch_animus_miles_apart",
+          "cross_world_animus_coherence",
           "separation_mastery_achievement"
         ],
         "grants": [
           {
             "type": "ability",
-            "abilityId": "separate_from_daemon_extreme_distance"
+            "abilityId": "separate_from_animus_extreme_distance"
           },
           {
             "type": "ability",
-            "abilityId": "daemon_enhanced_perception"
+            "abilityId": "animus_enhanced_perception"
           }
         ]
       }
@@ -2188,9 +2188,9 @@
   },
   {
     "setId": "dust_navigation_fundamentals",
-    "name": "Dust Perception and Navigation",
-    "description": "Learn to see and navigate the Dust currents that flow between worlds",
-    "field": "daemon_magic",
+    "name": "Aether Mote Perception and Navigation",
+    "description": "Learn to see and navigate the Aether Mote currents that flow between worlds",
+    "field": "animus_magic",
     "allPapers": [
       "dust_elementary_particle_theory",
       "conscious_dust_hypothesis",
@@ -2206,17 +2206,17 @@
       "church_dust_suppression_study",
       "dust_child_adult_differential",
       "puberty_dust_attraction_increase",
-      "dust_daemon_interaction",
+      "dust_animus_interaction",
       "dust_consciousness_feedback_loop",
       "dust_between_worlds_flow",
       "world_boundary_dust_accumulation",
       "dust_current_mapping_methods",
       "dust_navigation_theory",
       "dust_enhanced_perception",
-      "alethiometer_dust_mechanics",
+      "veridex_dust_mechanics",
       "symbol_reader_dust_channeling",
       "dust_truth_revelation",
-      "amber_spyglass_dust_vision",
+      "aether_lens_dust_vision",
       "multiverse_dust_currents",
       "dust_window_detection",
       "natural_world_crossing_points",
@@ -2271,14 +2271,14 @@
         "technologyId": "advanced_dust_sensing",
         "papersRequired": 28,
         "mandatoryPapers": [
-          "amber_spyglass_dust_vision",
+          "aether_lens_dust_vision",
           "dust_branching_timeline_signature",
           "advanced_dust_navigation_techniques"
         ],
         "grants": [
           {
             "type": "item",
-            "itemId": "amber_spyglass"
+            "itemId": "aether_lens"
           },
           {
             "type": "ability",
@@ -2289,22 +2289,22 @@
     ]
   },
   {
-    "setId": "subtle_knife_mastery",
-    "name": "The Subtle Knife and Reality Cutting",
+    "setId": "rift_edge_mastery",
+    "name": "The Rift Edge and Reality Cutting",
     "description": "Learn to cut through the fabric of reality itself",
-    "field": "daemon_magic",
+    "field": "animus_magic",
     "allPapers": [
-      "subtle_knife_origin_study",
+      "rift_edge_origin_study",
       "torre_degli_angeli_history",
       "guild_of_philosophers_research",
       "reality_fabric_structure",
       "edge_atom_sharpness_theory",
-      "spectre_creation_mechanics",
+      "void_breach_mechanics",
       "window_cutting_technique",
       "reality_wound_theory",
       "bearer_hand_scarring",
       "knife_bearer_selection_criteria",
-      "subtle_knife_focus_requirements",
+      "rift_edge_focus_requirements",
       "will_parry_technique_analysis",
       "knife_target_visualization",
       "reality_resistance_measurement",
@@ -2330,7 +2330,7 @@
         "technologyId": "basic_reality_cutting",
         "papersRequired": 10,
         "mandatoryPapers": [
-          "subtle_knife_origin_study",
+          "rift_edge_origin_study",
           "window_cutting_technique",
           "reality_fabric_structure"
         ],
@@ -2356,7 +2356,7 @@
         "grants": [
           {
             "type": "item",
-            "itemId": "subtle_knife"
+            "itemId": "rift_edge"
           },
           {
             "type": "ability",
@@ -2386,38 +2386,38 @@
     ]
   },
   {
-    "setId": "daemon_dust_navigation",
-    "name": "Daemon Dust Navigation",
-    "description": "Navigate between worlds via Dust currents and the Subtle Knife",
-    "field": "daemon_magic",
+    "setId": "animus_dust_navigation",
+    "name": "Animus Aether Mote Navigation",
+    "description": "Navigate between worlds via Aether Mote currents and the Rift Edge",
+    "field": "animus_magic",
     "allPapers": [
-      "daemon_nature_theory",
+      "animus_nature_theory",
       "dust_particles_observation",
       "dust_consciousness_hypothesis",
       "multiverse_dust_flows",
       "dust_vision_training",
       "dust_current_mapping",
       "world_boundary_detection",
-      "subtle_knife_theory",
+      "rift_edge_theory",
       "reality_cutting_mechanics",
       "window_creation_techniques",
-      "daemon_separation_mastery",
+      "animus_separation_mastery",
       "witch_distance_achievement",
       "cross_world_coherence",
-      "daemon_guided_navigation",
+      "animus_guided_navigation",
       "multiverse_cartography",
       "dust_beta_space_correspondence",
-      "daemon_quantum_coupling",
+      "animus_quantum_coupling",
       "cross_timeline_dust_flow",
       "spectres_and_timeline_contamination",
-      "alethiometer_truth_navigation"
+      "veridex_truth_navigation"
     ],
     "unlocks": [
       {
-        "technologyId": "daemon_dust_vision",
+        "technologyId": "animus_dust_vision",
         "papersRequired": 5,
         "mandatoryPapers": [
-          "daemon_nature_theory",
+          "animus_nature_theory",
           "dust_particles_observation"
         ],
         "grants": [
@@ -2432,17 +2432,17 @@
         ]
       },
       {
-        "technologyId": "subtle_knife_mastery",
+        "technologyId": "rift_edge_mastery",
         "papersRequired": 10,
         "mandatoryPapers": [
-          "subtle_knife_theory",
+          "rift_edge_theory",
           "reality_cutting_mechanics",
           "window_creation_techniques"
         ],
         "grants": [
           {
             "type": "item",
-            "itemId": "subtle_knife"
+            "itemId": "rift_edge"
           },
           {
             "type": "ability",
@@ -2450,26 +2450,26 @@
           },
           {
             "type": "building",
-            "buildingId": "daemon_world_walker_ship"
+            "buildingId": "animus_world_walker_ship"
           }
         ]
       },
       {
-        "technologyId": "daemon_beta_navigation",
+        "technologyId": "animus_beta_navigation",
         "papersRequired": 15,
         "mandatoryPapers": [
           "dust_beta_space_correspondence",
-          "daemon_quantum_coupling",
+          "animus_quantum_coupling",
           "cross_timeline_dust_flow"
         ],
         "grants": [
           {
             "type": "ability",
-            "abilityId": "daemon_navigate_beta_space"
+            "abilityId": "animus_navigate_beta_space"
           },
           {
             "type": "ability",
-            "abilityId": "alethiometer_navigation"
+            "abilityId": "veridex_navigation"
           }
         ]
       }

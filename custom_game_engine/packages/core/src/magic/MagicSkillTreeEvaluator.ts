@@ -182,23 +182,23 @@ const conditionEvaluators: Record<UnlockConditionType, ConditionEvaluator> = {
     };
   },
 
-  snapping: (condition, context) => {
-    const hasSnapped = context.progress.milestones['snapped'] !== undefined ||
-                       context.custom?.snapped === true;
+  the_fracture: (condition, context) => {
+    const hasFractured = context.progress.milestones['fractured'] !== undefined ||
+                       context.custom?.fractured === true;
     return {
-      met: hasSnapped,
+      met: hasFractured,
       condition,
-      message: hasSnapped ? 'Has experienced snapping' : 'Has not snapped (requires trauma event)',
-      hidden: condition.hidden && !hasSnapped,
+      message: hasFractured ? 'Has experienced the_fracture' : 'Has not fractured (requires trauma event)',
+      hidden: condition.hidden && !hasFractured,
     };
   },
 
-  daemon_settled: (condition, context) => {
-    const settled = context.custom?.daemonSettled === true;
+  animus_settled: (condition, context) => {
+    const settled = context.custom?.animusSettled === true;
     return {
       met: settled,
       condition,
-      message: settled ? 'Daemon has settled' : 'Daemon has not settled yet',
+      message: settled ? 'Animus has settled' : 'Animus has not settled yet',
     };
   },
 
@@ -843,7 +843,7 @@ const conditionEvaluators: Record<UnlockConditionType, ConditionEvaluator> = {
     };
   },
 
-  // ========== Daemon-Specific Conditions ==========
+  // ========== Animus-Specific Conditions ==========
 
   age_range: (condition, context) => {
     const minAge = condition.params.minAge ?? 0;
@@ -899,28 +899,28 @@ const conditionEvaluators: Record<UnlockConditionType, ConditionEvaluator> = {
 
   form_category: (condition, context) => {
     const requiredCategory = condition.params.category;
-    const daemonFormCategory = (context.custom?.daemonFormCategory ?? '') as string;
-    const met = requiredCategory ? daemonFormCategory === requiredCategory : true;
+    const animusFormCategory = (context.custom?.animusFormCategory ?? '') as string;
+    const met = requiredCategory ? animusFormCategory === requiredCategory : true;
 
     return {
       met,
       condition,
       message: met
-        ? `Daemon form is in ${requiredCategory} category`
-        : `Daemon form not in required category (need ${requiredCategory}, have ${daemonFormCategory || 'none'})`,
+        ? `Animus form is in ${requiredCategory} category`
+        : `Animus form not in required category (need ${requiredCategory}, have ${animusFormCategory || 'none'})`,
     };
   },
 
-  intercision: (condition, context) => {
-    // This is a negative condition - being severed disables daemon abilities
+  severance: (condition, context) => {
+    // This is a negative condition - being severed disables animus abilities
     const isSevered = (context.custom?.isSevered ?? false) as boolean;
 
     return {
       met: isSevered,
       condition,
       message: isSevered
-        ? 'Has been severed from daemon'
-        : 'Daemon bond is intact',
+        ? 'Has been severed from animus'
+        : 'Animus bond is intact',
     };
   },
 };

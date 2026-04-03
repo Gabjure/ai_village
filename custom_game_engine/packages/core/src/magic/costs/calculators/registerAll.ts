@@ -20,9 +20,9 @@ import { ShintoCostCalculator } from './ShintoCostCalculator.js';
 import { DreamCostCalculator } from './DreamCostCalculator.js';
 import { SongCostCalculator } from './SongCostCalculator.js';
 import { RuneCostCalculator } from './RuneCostCalculator.js';
-import { SympathyCostCalculator } from './SympathyCostCalculator.js';
-import { AllomancyCostCalculator } from './AllomancyCostCalculator.js';
-import { DaemonCostCalculator } from './DaemonCostCalculator.js';
+import { TethermancyCostCalculator } from './TethermancyCostCalculator.js';
+import { FerromancyCostCalculator } from './FerromancyCostCalculator.js';
+import { AnimusCostCalculator } from './AnimusCostCalculator.js';
 // Dimensional/Void paradigms
 import { VoidCostCalculator } from './VoidCostCalculator.js';
 // Creative paradigms
@@ -59,9 +59,9 @@ export function registerAllCostCalculators(): void {
   costCalculatorRegistry.registerOrReplace(new DreamCostCalculator());
   costCalculatorRegistry.registerOrReplace(new SongCostCalculator());
   costCalculatorRegistry.registerOrReplace(new RuneCostCalculator());
-  costCalculatorRegistry.registerOrReplace(new SympathyCostCalculator());
-  costCalculatorRegistry.registerOrReplace(new AllomancyCostCalculator());
-  costCalculatorRegistry.registerOrReplace(new DaemonCostCalculator());
+  costCalculatorRegistry.registerOrReplace(new TethermancyCostCalculator());
+  costCalculatorRegistry.registerOrReplace(new FerromancyCostCalculator());
+  costCalculatorRegistry.registerOrReplace(new AnimusCostCalculator());
 
   // Dimensional/Void paradigms
   costCalculatorRegistry.registerOrReplace(new VoidCostCalculator());
@@ -112,9 +112,9 @@ export function verifyAnimistParadigmsRegistered(): boolean {
     'dream',
     'song',
     'rune',
-    'sympathy',
-    'allomancy',
-    'daemon',
+    'tethermancy',
+    'ferromancy',
+    'animus',
   ];
 
   return animistParadigms.every(id => costCalculatorRegistry.has(id));

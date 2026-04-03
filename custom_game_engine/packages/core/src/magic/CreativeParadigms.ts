@@ -5,7 +5,7 @@
  * Each paradigm has distinct mechanics, costs, and thematic coherence.
  *
  * Categories:
- * - Fiction-inspired: Sympathy, Allomancy, Dream, Song, Rune
+ * - Fiction-inspired: Tethermancy, Ferromancy, Dream, Song, Rune
  * - Conceptually weird: Debt, Bureaucratic, Luck, Threshold, Belief, Consumption,
  *                      Silence, Paradox, Echo, Game, Craft, Commerce
  * - Seasonal/Cyclical: Lunar, Seasonal, Age
@@ -164,7 +164,7 @@ function createForeignMagicConfig(effect: ForeignMagicConfig['effect']): Foreign
 // ============================================================================
 
 /**
- * SYMPATHY PARADIGM (Kingkiller Chronicle)
+ * TETHERMANCY PARADIGM (tethermantic_tradition Chronicle)
  *
  * Magic based on creating connections between similar objects.
  * What affects one affects the other through sympathetic links.
@@ -173,16 +173,16 @@ function createForeignMagicConfig(effect: ForeignMagicConfig['effect']): Foreign
  * Cost: Mental energy, binding strain
  * Danger: Link backlash, feedback loops
  */
-export const SYMPATHY_PARADIGM: MagicParadigm = {
-  id: 'sympathy',
-  name: 'Sympathy',
+export const TETHERMANCY_PARADIGM: MagicParadigm = {
+  id: 'tethermancy',
+  name: 'Tethermancy',
   description: 'Create connections between similar objects; what affects one affects the other',
-  universeIds: ['kingkiller'],
+  universeIds: ['tethermantic_tradition'],
   lore: 'The art of creating sympathetic links between objects based on similarity. The more similar two things are, the stronger the connection. Hair and blood create the strongest links to their owners.',
 
   sources: [
     {
-      id: 'sympathy_source',
+      id: 'tethermancy_source',
       name: 'Sympathetic Will',
       type: 'internal',
       regeneration: 'rest',
@@ -217,15 +217,15 @@ export const SYMPATHY_PARADIGM: MagicParadigm = {
   ],
 
   acquisitionMethods: [
-    createAcquisition('study', 'common', { grantsAccess: ['sympathy_source'] }),
-    createAcquisition('apprenticeship', 'common', { grantsAccess: ['sympathy_source'] }),
+    createAcquisition('study', 'common', { grantsAccess: ['tethermancy_source'] }),
+    createAcquisition('apprenticeship', 'common', { grantsAccess: ['tethermancy_source'] }),
   ],
 
   availableTechniques: ['create', 'destroy', 'transform', 'control'],
   availableForms: ['fire', 'water', 'earth', 'air', 'body', 'mind'],
 
   forbiddenCombinations: [
-    { technique: 'create', form: 'spirit', reason: 'Cannot create sympathy with souls' },
+    { technique: 'create', form: 'spirit', reason: 'Cannot create tethermancy with souls' },
   ],
 
   resonantCombinations: [
@@ -247,7 +247,7 @@ export const SYMPATHY_PARADIGM: MagicParadigm = {
 };
 
 /**
- * ALLOMANCY PARADIGM (Mistborn)
+ * FERROMANCY PARADIGM (OmniResonant)
  *
  * Magic from swallowing and "burning" specific metals for powers.
  * Each metal grants a unique, specific ability.
@@ -256,12 +256,12 @@ export const SYMPATHY_PARADIGM: MagicParadigm = {
  * Cost: Metal reserves, genetic compatibility
  * Danger: Metal toxicity, flaring exhaustion
  */
-export const ALLOMANCY_PARADIGM: MagicParadigm = {
-  id: 'allomancy',
-  name: 'Allomancy',
+export const FERROMANCY_PARADIGM: MagicParadigm = {
+  id: 'ferromancy',
+  name: 'Ferromancy',
   description: 'Swallow metals and burn them internally for specific powers',
-  universeIds: ['scadrial'],
-  lore: 'The Metallic Arts. Mistings burn a single metal; Mistborn burn all sixteen. Iron Pulls, Steel Pushes, Tin enhances senses, Pewter grants strength. Flaring intensifies effects but depletes reserves.',
+  universeIds: ['ferromantic_tradition'],
+  lore: 'The Resonant Arts. MonoResonants burn a single metal; OmniResonant burn all twelve. Iron Pulls, Steel Pushes, Tin enhances senses, Pewter grants strength. Flaring intensifies effects but depletes reserves.',
 
   sources: [
     {
@@ -374,7 +374,7 @@ export const DREAM_PARADIGM: MagicParadigm = {
 
   risks: [
     createRisk('overuse', 'coma', 'catastrophic', 0.15, true),
-    createRisk('failure', 'spectre_creation', 'severe', 0.3, false),
+    createRisk('failure', 'void_breach', 'severe', 0.3, false),
     createRisk('exhaustion', 'memory_loss', 'moderate', 0.4, true),
   ],
 
@@ -1832,8 +1832,8 @@ export const SHINTO_PARADIGM: MagicParadigm = {
 
 export const ALL_CREATIVE_PARADIGMS = [
   // Fiction
-  SYMPATHY_PARADIGM,
-  ALLOMANCY_PARADIGM,
+  TETHERMANCY_PARADIGM,
+  FERROMANCY_PARADIGM,
   DREAM_PARADIGM,
   SONG_PARADIGM,
   RUNE_PARADIGM,

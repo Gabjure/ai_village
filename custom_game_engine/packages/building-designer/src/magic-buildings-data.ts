@@ -44,7 +44,7 @@ export const DIMENSIONAL_ANCHOR = buildingMap.get('dimensional_anchor')!;
 export const CHAOS_NEXUS = buildingMap.get('chaos_nexus')!;
 export const PASSION_CHAMBER = buildingMap.get('passion_chamber')!;
 export const CATHARSIS_POOL = buildingMap.get('catharsis_pool')!;
-export const SYMPATHY_LINK_CHAMBER = buildingMap.get('sympathy_link_chamber')!;
+export const TETHERMANCY_LINK_CHAMBER = buildingMap.get('tethermancy_link_chamber')!;
 export const DEBT_LEDGER_HALL = buildingMap.get('debt_ledger_hall')!;
 export const BUREAU_OF_FORMS = buildingMap.get('bureau_of_forms')!;
 export const FORTUNES_WHEEL = buildingMap.get('fortunes_wheel')!;
@@ -56,7 +56,7 @@ export const MAKERS_SANCTUM = buildingMap.get('makers_sanctum')!;
 export const MERCHANTS_EXCHANGE = buildingMap.get('merchants_exchange')!;
 export const MOON_TEMPLE = buildingMap.get('moon_temple')!;
 export const SOLSTICE_CIRCLE = buildingMap.get('solstice_circle')!;
-export const DAEMON_SANCTUM = buildingMap.get('daemon_sanctum')!;
+export const ANIMUS_SANCTUM = buildingMap.get('animus_sanctum')!;
 export const ABSORPTION_CHAMBER = buildingMap.get('absorption_chamber')!;
 export const TALENT_REGISTRY = buildingMap.get('talent_registry')!;
 export const STORY_CIRCLE = buildingMap.get('story_circle')!;
@@ -107,8 +107,8 @@ export const EMOTIONAL_BUILDINGS = buildings.filter(b =>
   b.paradigmAffinity?.includes('emotional')
 );
 
-export const SYMPATHY_BUILDINGS = buildings.filter(b =>
-  b.paradigmAffinity?.includes('sympathy')
+export const TETHERMANCY_BUILDINGS = buildings.filter(b =>
+  b.paradigmAffinity?.includes('tethermancy')
 );
 
 export const DEBT_BUILDINGS = buildings.filter(b =>
@@ -156,7 +156,7 @@ export const SEASONAL_BUILDINGS = buildings.filter(b =>
 );
 
 export const DAEMON_BUILDINGS = buildings.filter(b =>
-  b.paradigmAffinity?.includes('daemon')
+  b.paradigmAffinity?.includes('animus')
 );
 
 export const CONSUMPTION_BUILDINGS = buildings.filter(b =>

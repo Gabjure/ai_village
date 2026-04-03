@@ -548,7 +548,7 @@ export const HARMONY_HALL: VoxelBuildingDefinition = createMagicBuilding({
   ],
   // Music = song +60, sound_amplification, emotion_amplification, euphoric
   // Carpet = sound_dampening (controls echoes), comforting, +10 mood
-  // Bronze = allomancy (Seeker detects magic), metal element
+  // Bronze = ferromancy (Seeker detects magic), metal element
   materials: { wall: 'music', floor: 'carpet', door: 'bronze' },
   functionality: [
     { type: 'song_amplifier', params: { powerBonus: 40, harmonyBonus: 25 } },
@@ -790,16 +790,16 @@ export const TRUE_NAME_VAULT: VoxelBuildingDefinition = {
 };
 
 // =============================================================================
-// ALLOMANCY BUILDINGS
+// FERROMANCY BUILDINGS
 // =============================================================================
 
 /**
- * Metal Reserve - Allomantic metal storage
+ * Metal Reserve - Ferromancy metal storage
  */
 export const METAL_RESERVE: VoxelBuildingDefinition = {
   id: 'metal_reserve',
   name: 'Metal Reserve',
-  description: 'A secure facility storing pure allomantic metals for Mistings and Mistborn.',
+  description: 'A secure facility storing pure ferromancy metals for OreAttuneds and CrucibleBorn.',
   category: 'storage',
   tier: 3,
   species: 'medium',
@@ -816,16 +816,16 @@ export const METAL_RESERVE: VoxelBuildingDefinition = {
   materials: { wall: 'metal', floor: 'stone', door: 'metal' },
   functionality: [
     { type: 'metal_reserve', params: { metals: ['iron', 'steel', 'tin', 'pewter', 'copper', 'bronze', 'zinc', 'brass'] } },
-    { type: 'storage', params: { slots: 200, type: 'allomantic_metals' } },
+    { type: 'storage', params: { slots: 200, type: 'ferromancy_metals' } },
   ],
   magicalEffects: [
-    { type: 'paradigm_bonus', magnitude: 15, radius: 5, paradigm: 'allomancy' },
+    { type: 'paradigm_bonus', magnitude: 15, radius: 5, paradigm: 'ferromancy' },
   ],
-  paradigmAffinity: ['allomancy'],
+  paradigmAffinity: ['ferromancy'],
   elementalAttunement: 'metal',
   capacity: 4,
   style: 'modern',
-  lore: 'Pure metals, properly stored and catalogued. Allomancers know that impure metals can kill—this reserve ensures that never happens.',
+  lore: 'Pure metals, properly stored and catalogued. Ferromancers know that impure metals can kill—this reserve ensures that never happens.',
 };
 
 // =============================================================================
@@ -893,7 +893,7 @@ export const FIRE_FOUNT: VoxelBuildingDefinition = createMagicBuilding({
   ],
   // Magma = fire +90, light_emission, extreme heat, alive
   // Obsidian = dimensional_stability, scrying bonus
-  // Bronze = allomancy, conducts magic
+  // Bronze = ferromancy, conducts magic
   materials: { wall: 'magma', floor: 'obsidian', door: 'bronze' },
   functionality: [
     { type: 'harmony_resonator', params: { elements: ['fire'], strength: 50 } },
@@ -1075,13 +1075,13 @@ export const CATHARSIS_POOL: VoxelBuildingDefinition = createMagicBuilding({
     ' #~~~~~# ',
     '  ##D##  ',
   ],
-  // Tears = emotional +60, sympathy +30, purifying
+  // Tears = emotional +60, tethermancy +30, purifying
   materials: { wall: 'tears', floor: 'water', door: 'mist' },
   functionality: [
     { type: 'mood_aura', params: { bonus: 30, radius: 20 } },
     { type: 'healing', params: { type: 'emotional', strength: 50 } },
   ],
-  paradigmAffinity: ['emotional', 'sympathy'],
+  paradigmAffinity: ['emotional', 'tethermancy'],
   elementalAttunement: 'water',
   capacity: 8,
   style: 'ethereal',
@@ -1089,17 +1089,17 @@ export const CATHARSIS_POOL: VoxelBuildingDefinition = createMagicBuilding({
 });
 
 // =============================================================================
-// SYMPATHY MAGIC BUILDINGS
+// TETHERMANCY MAGIC BUILDINGS
 // =============================================================================
 
 /**
- * Sympathy Link Chamber - Connection magic
+ * Tethermancy Link Chamber - Connection magic
  *
- * Materials: Amber preserves connections, copper conducts sympathy links.
+ * Materials: Amber preserves connections, copper conducts tethermancy links.
  */
-export const SYMPATHY_LINK_CHAMBER: VoxelBuildingDefinition = createMagicBuilding({
-  id: 'sympathy_link_chamber',
-  name: 'Sympathy Link Chamber',
+export const TETHERMANCY_LINK_CHAMBER: VoxelBuildingDefinition = createMagicBuilding({
+  id: 'tethermancy_link_chamber',
+  name: 'Tethermancy Link Chamber',
   description: 'A workshop for creating and maintaining sympathetic connections between objects.',
   category: 'research',
   tier: 3,
@@ -1113,13 +1113,13 @@ export const SYMPATHY_LINK_CHAMBER: VoxelBuildingDefinition = createMagicBuildin
     '###D###',
   ],
   // Amber = echo +30, memory enhancement, time preservation
-  // Copper = allomancy +30 (but conducts sympathy too)
+  // Copper = ferromancy +30 (but conducts tethermancy too)
   materials: { wall: 'amber', floor: 'copper', door: 'bronze' },
   functionality: [
-    { type: 'paradigm_amplifier', params: { paradigm: 'sympathy', bonus: 35 } },
-    { type: 'research', params: { bonus: 1.5, fields: ['sympathy', 'connections'] } },
+    { type: 'paradigm_amplifier', params: { paradigm: 'tethermancy', bonus: 35 } },
+    { type: 'research', params: { bonus: 1.5, fields: ['tethermancy', 'connections'] } },
   ],
-  paradigmAffinity: ['sympathy'],
+  paradigmAffinity: ['tethermancy'],
   elementalAttunement: 'fire',
   capacity: 3,
   style: 'academic',
@@ -1543,12 +1543,12 @@ export const SOLSTICE_CIRCLE: VoxelBuildingDefinition = createMagicBuilding({
 // =============================================================================
 
 /**
- * Daemon Sanctum - Soul-daemon communion
+ * Animus Sanctum - Soul-animus communion
  */
-export const DAEMON_SANCTUM: VoxelBuildingDefinition = createMagicBuilding({
-  id: 'daemon_sanctum',
-  name: 'Daemon Sanctum',
-  description: 'A sacred space where humans commune with their daemons and Dust flows freely.',
+export const ANIMUS_SANCTUM: VoxelBuildingDefinition = createMagicBuilding({
+  id: 'animus_sanctum',
+  name: 'Animus Sanctum',
+  description: 'A sacred space where humans commune with their animuses and Aether Motes flow freely.',
   category: 'research',
   tier: 4,
   species: 'medium',
@@ -1564,13 +1564,13 @@ export const DAEMON_SANCTUM: VoxelBuildingDefinition = createMagicBuilding({
   // Soul stuff = breath +50, emotional +40, spirit_attraction
   materials: { wall: 'soul_stuff', floor: 'starlight', door: 'silver' },
   functionality: [
-    { type: 'paradigm_amplifier', params: { paradigm: 'daemon', bonus: 55 } },
-    { type: 'research', params: { bonus: 1.5, fields: ['dust', 'daemon_bonds', 'multiverse'] } },
+    { type: 'paradigm_amplifier', params: { paradigm: 'animus', bonus: 55 } },
+    { type: 'research', params: { bonus: 1.5, fields: ['aether_motes', 'animus_bonds', 'multiverse'] } },
   ],
-  paradigmAffinity: ['daemon'],
+  paradigmAffinity: ['animus'],
   capacity: 6,
   style: 'ethereal',
-  lore: 'Here, the bond between human and daemon is strengthened. Dust swirls visibly, and the truth can be read in the Alethiometer.',
+  lore: 'Here, the bond between human and animus is strengthened. Aether Motes swirl visibly, and the truth can be read in the Veridex.',
 });
 
 // =============================================================================
@@ -1836,8 +1836,8 @@ export const EMOTIONAL_BUILDINGS = [
   CATHARSIS_POOL,
 ];
 
-export const SYMPATHY_BUILDINGS = [
-  SYMPATHY_LINK_CHAMBER,
+export const TETHERMANCY_BUILDINGS = [
+  TETHERMANCY_LINK_CHAMBER,
 ];
 
 export const DEBT_BUILDINGS = [
@@ -1885,7 +1885,7 @@ export const SEASONAL_BUILDINGS = [
 ];
 
 export const DAEMON_BUILDINGS = [
-  DAEMON_SANCTUM,
+  ANIMUS_SANCTUM,
 ];
 
 export const CONSUMPTION_BUILDINGS = [
@@ -1924,7 +1924,7 @@ export const ALL_MAGIC_BUILDINGS = [
   ...DIMENSIONAL_BUILDINGS,
   // New paradigm buildings
   ...EMOTIONAL_BUILDINGS,
-  ...SYMPATHY_BUILDINGS,
+  ...TETHERMANCY_BUILDINGS,
   ...DEBT_BUILDINGS,
   ...BUREAUCRATIC_BUILDINGS,
   ...LUCK_BUILDINGS,

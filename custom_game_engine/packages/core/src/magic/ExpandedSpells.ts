@@ -2119,7 +2119,7 @@ export const NAME_SPELLS: SpellDefinition[] = [
 ];
 
 // ============================================================================
-// BREATH PARADIGM SPELLS - Awakening and Commands (Warbreaker-inspired)
+// BREATH PARADIGM SPELLS - Awakening and Commands (Animus-inspired)
 // ============================================================================
 
 export const BREATH_SPELLS: SpellDefinition[] = [

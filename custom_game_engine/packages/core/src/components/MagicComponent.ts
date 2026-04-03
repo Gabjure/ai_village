@@ -55,7 +55,7 @@ export type MagicForm =
   | 'void'        // Emptiness, entropy
   | 'time'        // Temporal effects (rare)
   | 'space'       // Spatial effects (rare)
-  | 'metal'       // Metallic substances (allomancy)
+  | 'metal'       // Metallic substances (ferromancy)
   | 'sound'       // Audio, resonance, vibration
   | 'text'        // Written word, language, narrative
   | 'emotion';    // Feelings, moods, psychological states
@@ -319,69 +319,69 @@ export interface ParadigmSpecificState {
   preferredMaterial?: string;
 
   // =========================================================================
-  // Sympathy paradigm state (Kingkiller Chronicle)
+  // Tethermancy paradigm state (resonance_realms Chronicle)
   // =========================================================================
 
-  /** For sympathy magic: quality of sympathetic link (0-1) */
+  /** For tethermancy magic: quality of sympathetic link (0-1) */
   linkQuality?: number;
 
-  /** For sympathy magic: current alar split count */
+  /** For tethermancy magic: current attunement split count */
   alarSplits?: number;
 
-  /** For sympathy magic: temperature differential for heat transfer */
+  /** For tethermancy magic: temperature differential for heat transfer */
   temperatureDifferential?: number;
 
-  /** For sympathy magic: currently active bindings */
+  /** For tethermancy magic: currently active bindings */
   activeBindings?: number;
 
-  /** For sympathy magic: current link IDs */
+  /** For tethermancy magic: current link IDs */
   currentLinks?: string[];
 
   // =========================================================================
-  // Allomancy paradigm state (Mistborn)
+  // Ferromancy paradigm state (CrucibleBorn)
   // =========================================================================
 
-  /** For allomancy: current burn rate */
-  burnRate?: 'gentle' | 'normal' | 'flared' | 'duralumin_boosted';
+  /** For ferromancy: current burn rate */
+  burnRate?: 'gentle' | 'normal' | 'flared' | 'amplium_boosted';
 
-  /** For allomancy: is savant (addicted to specific metal) */
+  /** For ferromancy: is savant (addicted to specific metal) */
   isSavant?: boolean;
 
-  /** For allomancy: which metal is savant for */
+  /** For ferromancy: which metal is savant for */
   savantMetal?: string;
 
-  /** For allomancy: metal reserves (type -> amount) */
+  /** For ferromancy: metal reserves (type -> amount) */
   metalReserves?: Record<string, number>;
 
-  /** For allomancy: type of misting (single metal allomancer) */
-  mistingType?: string;
+  /** For ferromancy: type of ore_attuned (single metal ferromancer) */
+  ore_attunedType?: string;
 
-  /** For allomancy: savant level per metal (addiction level) */
+  /** For ferromancy: savant level per metal (addiction level) */
   savantLevels?: Record<string, number>;
 
   // =========================================================================
-  // Daemon paradigm state (His Dark Materials)
+  // Animus paradigm state (spirit-bond tradition)
   // =========================================================================
 
-  /** For daemon magic: daemon entity ID */
-  daemonId?: string;
+  /** For animus magic: animus entity ID */
+  animusId?: string;
 
-  /** For daemon magic: has daemon settled (fixed form) */
-  daemonSettled?: boolean;
+  /** For animus magic: has animus settled (fixed form) */
+  animusSettled?: boolean;
 
-  /** For daemon magic: distance from daemon */
-  daemonDistance?: number;
+  /** For animus magic: distance from animus */
+  animusDistance?: number;
 
-  /** For daemon magic: is witch (can separate from daemon) */
+  /** For animus magic: is witch (can separate from animus) */
   isWitch?: boolean;
 
-  /** For daemon magic: daemon's name */
-  daemonName?: string;
+  /** For animus magic: animus's name */
+  animusName?: string;
 
-  /** For daemon magic: daemon's current form */
-  daemonForm?: string;
+  /** For animus magic: animus's current form */
+  animusForm?: string;
 
-  /** For daemon magic: settlement status */
+  /** For animus magic: settlement status */
   settlementStatus?: 'unsettled' | 'settling' | 'settled' | 'severed';
 
   /** Generic key-value storage */

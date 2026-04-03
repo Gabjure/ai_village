@@ -1,34 +1,34 @@
 import { describe, it, expect } from 'vitest';
 import {
   SHINTO_PARADIGM,
-  SYMPATHY_PARADIGM,
-  ALLOMANCY_PARADIGM,
+  TETHERMANCY_PARADIGM,
+  FERROMANCY_PARADIGM,
   DREAM_PARADIGM,
   SONG_PARADIGM,
   RUNE_PARADIGM,
-  DAEMON_PARADIGM,
+  ANIMUS_PARADIGM,
   ANIMIST_PARADIGM_REGISTRY,
   getAnimistParadigm,
   EXAMPLE_KAMI,
   getKamiTypes,
   getKamiByType,
-  ALLOMANTIC_METALS,
-  getAllomanticMetals,
+  FERROMANCY_METALS,
+  getFerromancyMetals,
   getMetalsByType,
 } from '../AnimistParadigms.js';
-import type { Kami, AllomanticMetal, Daemon } from '../AnimistParadigms.js';
+import type { Kami, FerromancyMetal, Animus } from '../AnimistParadigms.js';
 import { validateParadigm } from '../MagicParadigm.js';
 
 describe('AnimistParadigms', () => {
   describe('Individual Paradigms', () => {
     const paradigms = [
       { name: 'shinto', paradigm: SHINTO_PARADIGM },
-      { name: 'sympathy', paradigm: SYMPATHY_PARADIGM },
-      { name: 'allomancy', paradigm: ALLOMANCY_PARADIGM },
+      { name: 'tethermancy', paradigm: TETHERMANCY_PARADIGM },
+      { name: 'ferromancy', paradigm: FERROMANCY_PARADIGM },
       { name: 'dream', paradigm: DREAM_PARADIGM },
       { name: 'song', paradigm: SONG_PARADIGM },
       { name: 'rune', paradigm: RUNE_PARADIGM },
-      { name: 'daemon', paradigm: DAEMON_PARADIGM },
+      { name: 'animus', paradigm: ANIMUS_PARADIGM },
     ];
 
     paradigms.forEach(({ name, paradigm }) => {
@@ -118,72 +118,72 @@ describe('AnimistParadigms', () => {
     });
   });
 
-  describe('SYMPATHY_PARADIGM (Kingkiller Chronicle style)', () => {
-    it('should have alar (mental focus) source', () => {
-      const alar = SYMPATHY_PARADIGM.sources.find(s => s.id === 'alar');
-      expect(alar).toBeDefined();
-      expect(alar!.type).toBe('internal');
+  describe('TETHERMANCY_PARADIGM (resonance_realms Chronicle style)', () => {
+    it('should have attunement (mental focus) source', () => {
+      const attunement = TETHERMANCY_PARADIGM.sources.find(s => s.id === 'attunement');
+      expect(attunement).toBeDefined();
+      expect(attunement!.type).toBe('internal');
     });
 
     it('should have conservation law', () => {
-      const conservation = SYMPATHY_PARADIGM.laws.find(l => l.type === 'conservation');
+      const conservation = TETHERMANCY_PARADIGM.laws.find(l => l.type === 'conservation');
       expect(conservation).toBeDefined();
       expect(conservation!.strictness).toBe('absolute');
     });
 
     it('should have similarity law', () => {
-      const similarity = SYMPATHY_PARADIGM.laws.find(l => l.type === 'similarity');
+      const similarity = TETHERMANCY_PARADIGM.laws.find(l => l.type === 'similarity');
       expect(similarity).toBeDefined();
     });
 
     it('should require binding channel', () => {
-      const bindingChannel = SYMPATHY_PARADIGM.channels.find(c => c.type === 'binding');
+      const bindingChannel = TETHERMANCY_PARADIGM.channels.find(c => c.type === 'binding');
       expect(bindingChannel).toBeDefined();
       expect(bindingChannel!.requirement).toBe('required');
     });
 
-    it('should have backlash risk (binder\'s chills)', () => {
-      const backlashRisk = SYMPATHY_PARADIGM.risks.find(r => r.consequence === 'backlash');
+    it('should have backlash risk (Resonance Drain)', () => {
+      const backlashRisk = TETHERMANCY_PARADIGM.risks.find(r => r.consequence === 'backlash');
       expect(backlashRisk).toBeDefined();
     });
 
-    it('should not allow group casting (alar is personal)', () => {
-      expect(SYMPATHY_PARADIGM.allowsGroupCasting).toBe(false);
+    it('should not allow group casting (attunement is personal)', () => {
+      expect(TETHERMANCY_PARADIGM.allowsGroupCasting).toBe(false);
     });
   });
 
-  describe('ALLOMANCY_PARADIGM (Mistborn style)', () => {
+  describe('FERROMANCY_PARADIGM (CrucibleBorn style)', () => {
     it('should have metal_reserves source', () => {
-      const metalReserves = ALLOMANCY_PARADIGM.sources.find(s => s.id === 'metal_reserves');
+      const metalReserves = FERROMANCY_PARADIGM.sources.find(s => s.id === 'metal_reserves');
       expect(metalReserves).toBeDefined();
       expect(metalReserves!.type).toBe('material');
       expect(metalReserves!.regeneration).toBe('consumption');
     });
 
     it('should have bloodline law', () => {
-      const bloodlineLaw = ALLOMANCY_PARADIGM.laws.find(l => l.type === 'bloodline');
+      const bloodlineLaw = FERROMANCY_PARADIGM.laws.find(l => l.type === 'bloodline');
       expect(bloodlineLaw).toBeDefined();
       expect(bloodlineLaw!.strictness).toBe('absolute');
     });
 
     it('should require will channel', () => {
-      const willChannel = ALLOMANCY_PARADIGM.channels.find(c => c.type === 'will');
+      const willChannel = FERROMANCY_PARADIGM.channels.find(c => c.type === 'will');
       expect(willChannel).toBeDefined();
       expect(willChannel!.requirement).toBe('required');
     });
 
     it('should have impure_metal risk', () => {
-      const impureRisk = ALLOMANCY_PARADIGM.risks.find(r => r.trigger === 'impure_metal');
+      const impureRisk = FERROMANCY_PARADIGM.risks.find(r => r.trigger === 'impure_metal');
       expect(impureRisk).toBeDefined();
       expect(impureRisk!.severity).toBe('severe');
     });
 
     it('should not allow teaching (genetic power)', () => {
-      expect(ALLOMANCY_PARADIGM.allowsTeaching).toBe(false);
+      expect(FERROMANCY_PARADIGM.allowsTeaching).toBe(false);
     });
 
     it('should have metal as available form', () => {
-      expect(ALLOMANCY_PARADIGM.availableForms).toContain('metal');
+      expect(FERROMANCY_PARADIGM.availableForms).toContain('metal');
     });
   });
 
@@ -270,39 +270,39 @@ describe('AnimistParadigms', () => {
     });
   });
 
-  describe('DAEMON_PARADIGM (His Dark Materials style)', () => {
-    it('should have daemon_bond source', () => {
-      const daemonBond = DAEMON_PARADIGM.sources.find(s => s.id === 'daemon_bond');
-      expect(daemonBond).toBeDefined();
-      expect(daemonBond!.detectability).toBe('obvious');
+  describe('ANIMUS_PARADIGM (Animus paradigm style)', () => {
+    it('should have animus_bond source', () => {
+      const animusBond = ANIMUS_PARADIGM.sources.find(s => s.id === 'animus_bond');
+      expect(animusBond).toBeDefined();
+      expect(animusBond!.detectability).toBe('obvious');
     });
 
     it('should have dust source', () => {
-      const dustSource = DAEMON_PARADIGM.sources.find(s => s.id === 'dust');
-      expect(dustSource).toBeDefined();
-      expect(dustSource!.type).toBe('ambient');
+      const aetherMoteSource = ANIMUS_PARADIGM.sources.find(s => s.id === 'aether_motes');
+      expect(aetherMoteSource).toBeDefined();
+      expect(aetherMoteSource!.type).toBe('ambient');
     });
 
-    it('should require daemon channel', () => {
-      const daemonChannel = DAEMON_PARADIGM.channels.find(c => c.type === 'daemon');
-      expect(daemonChannel).toBeDefined();
-      expect(daemonChannel!.requirement).toBe('required');
+    it('should require animus channel', () => {
+      const animusChannel = ANIMUS_PARADIGM.channels.find(c => c.type === 'animus');
+      expect(animusChannel).toBeDefined();
+      expect(animusChannel!.requirement).toBe('required');
     });
 
-    it('should have consent law (daemon taboo)', () => {
-      const consentLaw = DAEMON_PARADIGM.laws.find(l => l.type === 'consent');
+    it('should have consent law (animus taboo)', () => {
+      const consentLaw = ANIMUS_PARADIGM.laws.find(l => l.type === 'consent');
       expect(consentLaw).toBeDefined();
       expect(consentLaw!.strictness).toBe('absolute');
     });
 
     it('should have severance risk', () => {
-      const severanceRisk = DAEMON_PARADIGM.risks.find(r => r.trigger === 'severance');
+      const severanceRisk = ANIMUS_PARADIGM.risks.find(r => r.trigger === 'severance');
       expect(severanceRisk).toBeDefined();
       expect(severanceRisk!.consequence).toBe('death');
     });
 
     it('should have separation risk', () => {
-      const separationRisk = DAEMON_PARADIGM.risks.find(r => r.trigger === 'separation');
+      const separationRisk = ANIMUS_PARADIGM.risks.find(r => r.trigger === 'separation');
       expect(separationRisk).toBeDefined();
       expect(separationRisk!.probability).toBe(1.0);
     });
@@ -311,12 +311,12 @@ describe('AnimistParadigms', () => {
   describe('ANIMIST_PARADIGM_REGISTRY', () => {
     it('should contain all animist paradigms', () => {
       expect(ANIMIST_PARADIGM_REGISTRY.shinto).toBe(SHINTO_PARADIGM);
-      expect(ANIMIST_PARADIGM_REGISTRY.sympathy).toBe(SYMPATHY_PARADIGM);
-      expect(ANIMIST_PARADIGM_REGISTRY.allomancy).toBe(ALLOMANCY_PARADIGM);
+      expect(ANIMIST_PARADIGM_REGISTRY.tethermancy).toBe(TETHERMANCY_PARADIGM);
+      expect(ANIMIST_PARADIGM_REGISTRY.ferromancy).toBe(FERROMANCY_PARADIGM);
       expect(ANIMIST_PARADIGM_REGISTRY.dream).toBe(DREAM_PARADIGM);
       expect(ANIMIST_PARADIGM_REGISTRY.song).toBe(SONG_PARADIGM);
       expect(ANIMIST_PARADIGM_REGISTRY.rune).toBe(RUNE_PARADIGM);
-      expect(ANIMIST_PARADIGM_REGISTRY.daemon).toBe(DAEMON_PARADIGM);
+      expect(ANIMIST_PARADIGM_REGISTRY.animus).toBe(ANIMUS_PARADIGM);
     });
 
     it('should have 7 paradigms', () => {
@@ -388,14 +388,14 @@ describe('AnimistParadigms', () => {
     });
   });
 
-  describe('Allomantic Metals System', () => {
-    describe('ALLOMANTIC_METALS', () => {
+  describe('Ferromancy Metals System', () => {
+    describe('FERROMANCY_METALS', () => {
       it('should have multiple metals', () => {
-        expect(ALLOMANTIC_METALS.length).toBeGreaterThanOrEqual(8);
+        expect(FERROMANCY_METALS.length).toBeGreaterThanOrEqual(8);
       });
 
       it('should have properly structured metals', () => {
-        ALLOMANTIC_METALS.forEach(metal => {
+        FERROMANCY_METALS.forEach(metal => {
           expect(metal.id).toBeTruthy();
           expect(metal.name).toBeTruthy();
           expect(['physical', 'mental', 'enhancement', 'temporal']).toContain(metal.type);
@@ -406,25 +406,25 @@ describe('AnimistParadigms', () => {
       });
 
       it('should include the base metals', () => {
-        const metalNames = ALLOMANTIC_METALS.map(m => m.id);
+        const metalNames = FERROMANCY_METALS.map(m => m.id);
         expect(metalNames).toContain('steel');
         expect(metalNames).toContain('iron');
         expect(metalNames).toContain('pewter');
         expect(metalNames).toContain('tin');
       });
 
-      it('should include atium (legendary temporal metal)', () => {
-        const atium = ALLOMANTIC_METALS.find(m => m.id === 'atium');
-        expect(atium).toBeDefined();
-        expect(atium!.type).toBe('temporal');
-        expect(atium!.rarity).toBe('legendary');
+      it('should include temporite (legendary temporal metal)', () => {
+        const temporite = FERROMANCY_METALS.find(m => m.id === 'temporite');
+        expect(temporite).toBeDefined();
+        expect(temporite!.type).toBe('temporal');
+        expect(temporite!.rarity).toBe('legendary');
       });
     });
 
-    describe('getAllomanticMetals', () => {
+    describe('getFerromancyMetals', () => {
       it('should return all metals', () => {
-        const metals = getAllomanticMetals();
-        expect(metals).toEqual(ALLOMANTIC_METALS);
+        const metals = getFerromancyMetals();
+        expect(metals).toEqual(FERROMANCY_METALS);
       });
     });
 

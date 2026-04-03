@@ -25,7 +25,7 @@ import researchSetsData from './data/research-sets.json';
  * This includes:
  * - Basic research sets (agriculture, metallurgy, alchemy, etc.)
  * - Tech expansion sets (engineering, power, computing, etc.)
- * - Magic path sets (daemon, rune, pact, divine, etc.)
+ * - Magic path sets (animus, rune, pact, divine, etc.)
  */
 export const ALL_RESEARCH_SETS: ResearchSet[] = researchSetsData as ResearchSet[];
 
@@ -89,12 +89,12 @@ export const ADVANCED_CHAOS_THEORY_SET = setsById.get('advanced_chaos_theory')!;
 export const NARRATIVE_PLOT_HOLE_EXPLOITATION_SET = setsById.get('narrative_plot_hole_exploitation')!;
 export const WILD_CHAOS_BETA_NAVIGATION_SET = setsById.get('wild_chaos_beta_navigation')!;
 
-// Magic path sets - Daemon magic (140 papers)
-export const BASIC_DAEMON_THEORY_SET = setsById.get('basic_daemon_theory')!;
-export const DAEMON_SEPARATION_TRAINING_SET = setsById.get('daemon_separation_training')!;
+// Magic path sets - Animus magic (140 papers)
+export const BASIC_ANIMUS_THEORY_SET = setsById.get('basic_animus_theory')!;
+export const ANIMUS_SEPARATION_TRAINING_SET = setsById.get('animus_separation_training')!;
 export const DUST_NAVIGATION_FUNDAMENTALS_SET = setsById.get('dust_navigation_fundamentals')!;
-export const SUBTLE_KNIFE_MASTERY_SET = setsById.get('subtle_knife_mastery')!;
-export const DAEMON_DUST_NAVIGATION_SET = setsById.get('daemon_dust_navigation')!;
+export const SUBTLE_KNIFE_MASTERY_SET = setsById.get('rift_edge_mastery')!;
+export const ANIMUS_AETHER_MOTE_NAVIGATION_SET = setsById.get('animus_aether_mote_navigation')!;
 
 // Magic path sets - Rune magic (140 papers)
 export const BASIC_RUNE_THEORY_SET = setsById.get('basic_rune_theory')!;

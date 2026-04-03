@@ -86,9 +86,9 @@ export type Material =
   | 'fire' | 'water' | 'air' | 'earth' | 'lightning' | 'magma' | 'steam' | 'frost'
   // Technological materials
   | 'circuitry' | 'data' | 'plasma' | 'force_field' | 'nanomaterial'
-  // Allomantic metals (Mistborn)
+  // Ferromancy metals (CrucibleBorn)
   | 'pewter' | 'tin' | 'zinc' | 'brass' | 'chromium' | 'nickel'
-  | 'aluminum' | 'duralumin' | 'atium' | 'lerasium'
+  | 'aluminum' | 'amplium' | 'temporite' | 'chorium'
   // Fantasy metals (various universes)
   | 'valyrian_steel' | 'dragonglass' | 'starmetal' | 'moonsilver'
   | 'soulsteel' | 'oathgold' | 'cold_iron' | 'meteoric_iron'
@@ -281,12 +281,12 @@ export type MagicParadigm =
   | 'emotional'     // Feelings-based casting
   // Animist paradigms
   | 'shinto'        // Kami relationships
-  | 'sympathy'      // Like affects like
-  | 'allomancy'     // Metal-burning powers
+  | 'tethermancy'      // Like affects like
+  | 'ferromancy'     // Metal-burning powers
   | 'dream'         // Oneiromancy
   | 'song'          // Bardic magic
   | 'rune'          // Inscription magic
-  | 'daemon'        // Soul-bonded spirits
+  | 'animus'        // Soul-bonded spirits
   // Creative paradigms
   | 'debt'          // Fae favor economy
   | 'bureaucratic'  // Stamps and forms
@@ -344,7 +344,7 @@ export interface BuildingFunction {
     | 'summoning_circle'    // Summon entities
     | 'ward'                // Protective barrier
     | 'leyline_tap'         // Draws power from leylines
-    | 'spirit_anchor'       // Attracts/houses spirits (kami, daemons)
+    | 'spirit_anchor'       // Attracts/houses spirits (kami, animuses)
     | 'dream_anchor'        // Stabilizes dream realm access
     | 'pact_altar'          // Facilitates entity contracts
     | 'true_name_vault'     // Stores and protects true names
@@ -355,7 +355,7 @@ export interface BuildingFunction {
     | 'belief_focus'        // Concentrates collective belief
     | 'song_amplifier'      // Bardic magic enhancement
     | 'rune_forge'          // Inscription crafting
-    | 'metal_reserve';      // Allomantic metal storage
+    | 'metal_reserve';      // Ferromancy metal storage
   params: Record<string, unknown>;
 }
 

@@ -103,7 +103,7 @@ export type MagicCostType =
   | 'taboo'          // Accepting behavioral restrictions
   | 'breath'         // Breathing/singing capacity
   | 'sleep'          // Rest/sleep time or quality
-  | 'separation_pain' // Pain from daemon/soul separation
+  | 'separation_pain' // Pain from animus/soul separation
   | 'belief'         // Divine power from mortal belief (gods only)
   // Shinto/Animist costs
   | 'purity'         // Ritual cleanliness (Shinto)
@@ -117,11 +117,11 @@ export type MagicCostType =
   | 'runic_power'    // Power stored in runes
   | 'materials'      // Physical materials for inscribing
   | 'inscription_time' // Time to carve/inscribe runes
-  // Sympathy magic costs (Kingkiller Chronicle)
-  | 'alar'           // Mental focus/will for bindings
-  | 'slippage'       // Heat/energy lost in sympathetic transfer
+  // Tethermancy magic costs (resonance_realms Chronicle)
+  | 'attunement'           // Mental focus/will for bindings
+  | 'drift'       // Heat/energy lost in sympathetic transfer
   | 'link_material'  // Physical link material quality
-  // Allomancy costs (Mistborn)
+  // Ferromancy costs (CrucibleBorn)
   | 'metal_iron'     // Iron reserves
   | 'metal_steel'    // Steel reserves
   | 'metal_tin'      // Tin reserves
@@ -137,17 +137,17 @@ export type MagicCostType =
   | 'metal_cadmium'  // Cadmium reserves
   | 'metal_bendalloy' // Bendalloy reserves
   | 'metal_aluminum' // Aluminum reserves
-  | 'metal_duralumin' // Duralumin reserves
-  | 'metal_atium'    // Atium reserves (god metal)
-  | 'metal_lerasium' // Lerasium reserves (god metal)
-  | 'metal_malatium' // Malatium reserves
-  // Daemon costs (His Dark Materials)
-  | 'daemon_bond'    // Connection to external soul
-  | 'separation_trauma' // Pain from daemon separation
-  | 'dust'
+  | 'metal_amplium' // Amplium reserves
+  | 'metal_temporite'    // Temporite reserves (god metal)
+  | 'metal_chorium' // Chorium reserves (god metal)
+  | 'metal_maltemporite' // Maltemporite reserves
+  // Animus costs (spirit-bond tradition)
+  | 'animus_bond'    // Connection to external soul
+  | 'separation_trauma' // Pain from animus separation
+  | 'aether_motes'
   // Physical/strain costs
   | 'strain'         // Physical strain from intense magic use
-  | 'metal';         // Generic metal cost for allomancy
+  | 'metal';         // Generic metal cost for ferromancy
 
 /** How a cost can be recovered */
 export type CostRecoveryMethod =
@@ -156,7 +156,7 @@ export type CostRecoveryMethod =
   | 'time'           // Naturally over time
   | 'sacrifice'      // By sacrificing something
   | 'quest'          // By completing a task
-  | 'reunion';       // Reuniting with separated part (daemon, etc.)
+  | 'reunion';       // Reuniting with separated part (animus, etc.)
 
 /** How visible a cost is to observers */
 export type CostVisibility =
@@ -215,7 +215,7 @@ export type MagicChannelType =
   | 'binding'        // Mental act of creating links
   | 'rhythm'         // Musical rhythm/beat structure
   | 'instrument'     // Musical instruments
-  | 'daemon'         // External soul connection
+  | 'animus'         // External soul connection
   | 'symbols'        // Reading/interpreting symbols
   | 'sleep';         // Sleep/dream state as channel
 
@@ -265,7 +265,7 @@ export type MagicLawType =
   | 'true_names'           // Names have power over things
   | 'belief'               // Collective faith makes real
   | 'equivalent_exchange'  // Must give equal value to receive
-  | 'sympathy'             // Linked things share fate
+  | 'tethermancy'             // Linked things share fate
   | 'paradox'              // Reality fights impossible changes
   | 'iron_vulnerability'   // Magic weakened by cold iron
   | 'threshold'            // Permission/invitation required
@@ -341,20 +341,20 @@ export type MagicRiskTrigger =
   | 'pollution'        // Accumulated spiritual pollution
   | 'disrespect'       // Showed disrespect to spirits/entities
   | 'wrong_kami'       // Appealed to wrong spirit
-  | 'slippage'         // Energy lost in sympathetic transfer
-  | 'split_alar'       // Split mental focus too many ways
+  | 'drift'         // Energy lost in sympathetic transfer
+  | 'split_attunement'       // Split mental focus too many ways
   | 'impure_metal'     // Used impure/wrong metal
   | 'burnout'          // Burned too much power at once
   | 'flare'            // Flared power beyond safe limits
-  | 'duralumin'        // Massive power burst (Mistborn)
+  | 'amplium'        // Massive power burst (CrucibleBorn)
   | 'discord'          // Musical dissonance/wrong notes
   | 'nightmare'        // Encountered nightmare in dreams
   | 'lost'             // Got lost (in dreams, spirit world)
   | 'entity_encounter' // Encountered powerful entity
   | 'death'            // Died (in dream, etc.)
-  | 'separation'       // Separated from daemon/soul
-  | 'subtle_knife'     // Used the subtle knife
-  | 'severance'        // Daemon/soul bond was severed
+  | 'separation'       // Separated from animus/soul
+  | 'rift_edge'     // Used the subtle knife
+  | 'severance'        // Animus/soul bond was severed
   | 'imprecision'      // Carved runes imprecisely
   | 'bindrune_failure' // Complex bindrune failed
   | 'wrong_material';  // Used wrong material for magic
@@ -385,7 +385,7 @@ export type MagicRiskConsequence =
   | 'exhaustion'          // Severe fatigue/depletion
   | 'trapped'             // Trapped in alternate realm
   | 'coma'                // Fall into coma
-  | 'spectre_creation'    // Create dangerous entity
+  | 'void_breach'    // Create dangerous entity
   | 'pain'                // Intense pain
   | 'death';              // Fatal consequence
 

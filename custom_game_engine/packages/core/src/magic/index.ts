@@ -237,20 +237,20 @@ export type {
   Kami,
   PurityState,
   PollutionSource,
-  SympatheticLink,
-  AllomanticMetal,
-  Daemon,
+  ResonantTether,
+  FerromancyMetal,
+  Animus,
 } from './AnimistParadigms.js';
 
 export {
   // Paradigms
   SHINTO_PARADIGM,
-  SYMPATHY_PARADIGM,
-  ALLOMANCY_PARADIGM,
+  TETHERMANCY_PARADIGM,
+  FERROMANCY_PARADIGM,
   DREAM_PARADIGM,
   SONG_PARADIGM,
   RUNE_PARADIGM,
-  DAEMON_PARADIGM,
+  ANIMUS_PARADIGM,
 
   // Registry
   ANIMIST_PARADIGM_REGISTRY,
@@ -261,9 +261,9 @@ export {
   getKamiTypes,
   getKamiByType,
 
-  // Allomancy helpers
-  ALLOMANTIC_METALS,
-  getAllomanticMetals,
+  // Ferromancy helpers
+  FERROMANCY_METALS,
+  getFerromancyMetals,
   getMetalsByType,
 } from './AnimistParadigms.js';
 
@@ -354,12 +354,12 @@ export {
 // Paradigm-Specific Skill Trees
 // ============================================================================
 
-// Allomancy (Mistborn-inspired)
+// Ferromancy (OmniResonant-inspired)
 export {
-  ALLOMANCY_SKILL_TREE,
-  getMistingMetals,
+  FERROMANCY_SKILL_TREE,
+  getMonoResonantMetals,
   isMetalAvailable,
-} from './skillTrees/AllomancySkillTree.js';
+} from './skillTrees/FerromancySkillTree.js';
 
 // Shinto (Kami relationships)
 export {
@@ -368,19 +368,19 @@ export {
   isPuritySufficient,
 } from './skillTrees/ShintoSkillTree.js';
 
-// Sympathy (Name of the Wind inspired)
+// Tethermancy (Chorus of Resonance inspired)
 export {
-  SYMPATHY_SKILL_TREE,
+  TETHERMANCY_SKILL_TREE,
   LINK_TYPES,
   BINDING_PRINCIPLES,
   calculateLinkEfficiency,
   getMaxBindings,
-  calculateSlippage,
-} from './skillTrees/SympathySkillTree.js';
+  calculateDrift,
+} from './skillTrees/TethermancySkillTree.js';
 
-// Daemon (His Dark Materials inspired)
+// Animus (spirit-bond inspired)
 export {
-  DAEMON_SKILL_TREE,
+  ANIMUS_SKILL_TREE,
   DAEMON_FORM_CATEGORIES,
   DUST_INTERACTIONS,
   getFormBonuses,
@@ -389,7 +389,7 @@ export {
   getSeparationDistance,
   canSeparate,
   hasSettled,
-} from './skillTrees/DaemonSkillTree.js';
+} from './skillTrees/AnimusSkillTree.js';
 
 // Dream (Lucid dreaming, oneiromancy)
 export {
@@ -430,7 +430,7 @@ export {
   hasMasterNaming,
 } from './skillTrees/NameSkillTree.js';
 
-// Breath (Warbreaker-inspired Awakening)
+// Breath (Animus-inspired Awakening)
 export {
   BREATH_SKILL_TREE,
   HEIGHTENINGS,
@@ -717,10 +717,10 @@ export {
   generateRuneSource,
 
   // Paradigm-specific generators - Animist paradigms
-  generateAllomancySource,
+  generateFerromancySource,
   generateShintoSource,
-  generateSympathySource,
-  generateDaemonSource,
+  generateTethermancySource,
+  generateAnimusSource,
   generateDreamSource,
   generateSongSource,
 
