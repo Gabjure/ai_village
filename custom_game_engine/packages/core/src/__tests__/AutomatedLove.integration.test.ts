@@ -109,7 +109,7 @@ describe('AutomatedLove Integration Tests', () => {
     it('creates flux cyclical sexuality', () => {
       const sexuality = createFluxSexuality();
 
-      expect(sexuality.labels).toContain('flux');
+      expect(sexuality.labels).toContain('flux_cycle');
       expect(sexuality.attractionCondition.type).toBe('flux');
       expect(sexuality.onset).toBe('cyclical');
       expect(sexuality.fluidity).toBe('rapid_change');
@@ -174,7 +174,7 @@ describe('AutomatedLove Integration Tests', () => {
       const morph = createFluxMorph();
 
       expect(morph.sexSystem).toBe('flux');
-      expect(morph.currentMorph.id).toBe('stable_phase');
+      expect(morph.currentMorph.id).toBe('somer');
       expect(morph.currentMorph.reproductiveRole).toBe('neither');
       expect(morph.canChangeMorph).toBe(true);
       expect(morph.determination).toBe('partner');
@@ -262,8 +262,8 @@ describe('AutomatedLove Integration Tests', () => {
       expect(flux1.isCompatibleWith(flux2)).toBe(false);
 
       // Put them in complementary flux states
-      flux1.enterFlux('flux_spawner', 100);
-      flux2.enterFlux('flux_fertilizer', 100);
+      flux1.enterFlux('flux_gestator', 100);
+      flux2.enterFlux('flux_catalyst', 100);
 
       expect(flux1.isCompatibleWith(flux2)).toBe(true);
     });
@@ -354,13 +354,13 @@ describe('AutomatedLove Integration Tests', () => {
     it('enters and exits flux correctly', () => {
       const fluxMorph = createFluxMorph();
 
-      expect(fluxMorph.currentMorph.id).toBe('stable_phase');
+      expect(fluxMorph.currentMorph.id).toBe('somer');
       expect(fluxMorph.fertility.fertile).toBe(false);
 
-      // Enter flux as spawner
-      fluxMorph.enterFlux('flux_spawner', 100);
+      // Enter flux as gestator
+      fluxMorph.enterFlux('flux_gestator', 100);
 
-      expect(fluxMorph.currentMorph.id).toBe('flux_spawner');
+      expect(fluxMorph.currentMorph.id).toBe('flux_gestator');
       expect(fluxMorph.currentMorph.reproductiveRole).toBe('spawner');
       expect(fluxMorph.fertility.fertile).toBe(true);
       expect(fluxMorph.fertility.cyclePhase).toBe('flux');
@@ -368,9 +368,9 @@ describe('AutomatedLove Integration Tests', () => {
       // Exit flux
       fluxMorph.exitFlux();
 
-      expect(fluxMorph.currentMorph.id).toBe('stable_phase');
+      expect(fluxMorph.currentMorph.id).toBe('somer');
       expect(fluxMorph.fertility.fertile).toBe(false);
-      expect(fluxMorph.fertility.cyclePhase).toBe('stable_phase');
+      expect(fluxMorph.fertility.cyclePhase).toBe('somer');
     });
 
     it('flux partners manifest complementary sexes', () => {
@@ -379,8 +379,8 @@ describe('AutomatedLove Integration Tests', () => {
 
       // Both enter flux - one becomes spawner, one fertilizer
       // In real system, this would be determined by interaction
-      flux1.enterFlux('flux_spawner', 100);
-      flux2.enterFlux('flux_fertilizer', 100);
+      flux1.enterFlux('flux_gestator', 100);
+      flux2.enterFlux('flux_catalyst', 100);
 
       expect(flux1.isCompatibleWith(flux2)).toBe(true);
 
@@ -781,7 +781,7 @@ describe('AutomatedLove Integration Tests', () => {
       expect(paradigm.biologicalSex.sexes.length).toBe(3);
       expect(paradigm.biologicalSex.canChange).toBe(true);
 
-      const stablePhase = paradigm.biologicalSex.sexes.find(s => s.id === 'stable_phase');
+      const stablePhase = paradigm.biologicalSex.sexes.find(s => s.id === 'somer');
       expect(stablePhase?.reproductiveRole).toBe('neither');
       expect(stablePhase?.prevalence).toBe(0.9); // Most of the time in stable phase
     });
@@ -800,7 +800,7 @@ describe('AutomatedLove Integration Tests', () => {
       expect(paradigm.reproduction.frequency).toBe('cyclical');
       expect(paradigm.lifeStages?.length).toBe(2);
       expect(paradigm.lifeStages?.find(s => s.name === 'flux')?.canReproduce).toBe(true);
-      expect(paradigm.lifeStages?.find(s => s.name === 'stable_phase')?.canReproduce).toBe(false);
+      expect(paradigm.lifeStages?.find(s => s.name === 'somer')?.canReproduce).toBe(false);
     });
 
     it('is isolated - cannot hybridize', () => {
@@ -1252,10 +1252,10 @@ describe('AutomatedLove Integration Tests', () => {
 
       // Flux comes (tick 500)
       estraven.sexuality.enterReceptiveCycle(500);
-      estraven.morph.enterFlux('flux_spawner', 500);
+      estraven.morph.enterFlux('flux_gestator', 500);
 
       genly.sexuality.enterReceptiveCycle(500);
-      genly.morph.enterFlux('flux_fertilizer', 500);
+      genly.morph.enterFlux('flux_catalyst', 500);
 
       // Now attraction is possible
       expect(estraven.sexuality.canExperienceAttraction()).toBe(true);
@@ -1284,7 +1284,7 @@ describe('AutomatedLove Integration Tests', () => {
       genly.morph.exitFlux();
       // Estraven stays in spawner form due to pregnancy
 
-      expect(genly.morph.currentMorph.id).toBe('stable_phase');
+      expect(genly.morph.currentMorph.id).toBe('somer');
       expect(estraven.morph.gestation.pregnant).toBe(true);
     });
   });
