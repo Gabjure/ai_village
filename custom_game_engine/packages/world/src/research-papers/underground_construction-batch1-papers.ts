@@ -1,7 +1,7 @@
 /**
  * Generated Research Papers
  *
- * Auto-generated using AI with Pratchett/Moers/Adams/Gaiman style
+ * Auto-generated using AI with Thornhaven-school humor style
  */
 
 import type { ResearchPaper } from './types.js';
@@ -233,17 +233,17 @@ export const TIMBER_SHORING_TECHNIQUES: ResearchPaper = {
 
 The art of timber shoring represents humanity's persistent belief that wood, when properly arranged, can convince gravity to reconsider its options*. At its most fundamental level, timber shoring involves the strategic placement of wooden members—typically beams, posts, and wedges—to support unstable structures during excavation, renovation, or the awkward period after someone removes a load-bearing wall without consulting an engineer†. The technique operates on principles that would seem intuitive to anyone who has ever propped up a sagging bookshelf, yet the International Bureau of Construction Incidents estimates that approximately 73.6% of shoring failures involve someone saying "that should hold it" moments before it demonstrably doesn't‡.
 
-Modern timber shoring employs three primary configurations: raking shores, flying shores, and dead shores**, each named with the sort of grim optimism that characterizes the construction industry††. Raking shores lean at an angle against a wall, transferring loads to the ground through what physicists call "the same principle that keeps drunk people from falling over when they lean against things"‡‡. Flying shores span horizontally between two structures, creating what the Moers-Ankh Manual of Improbable Engineering describes as "a wooden handshake between buildings that don't particularly like each other"***. Dead shores, despite their ominous nomenclature†††, simply support loads vertically and have the lowest mortality rate of any shoring technique‡‡‡, though the Guild of Nomenclature Revision has been trying to rename them "Upright Load-Transfer Assemblies" for three decades with limited success****.
+Modern timber shoring employs three primary configurations: raking shores, flying shores, and dead shores**, each named with the sort of grim optimism that characterizes the construction industry††. Raking shores lean at an angle against a wall, transferring loads to the ground through what physicists call "the same principle that keeps drunk people from falling over when they lean against things"‡‡. Flying shores span horizontally between two structures, creating what the Thornhaven Manual of Improbable Engineering describes as "a wooden handshake between buildings that don't particularly like each other"***. Dead shores, despite their ominous nomenclature†††, simply support loads vertically and have the lowest mortality rate of any shoring technique‡‡‡, though the Guild of Nomenclature Revision has been trying to rename them "Upright Load-Transfer Assemblies" for three decades with limited success****.
 
 The practical execution of timber shoring demands attention to detail that borders on the obsessive††††. Each timber must be precisely cut, sized, and positioned‡‡‡‡, with wedges driven at calculated intervals to ensure even load distribution*****. The ancient Mesopotamian Tablet of Things We Learned the Hard Way†††††, discovered beneath a collapsed grain warehouse, contains seventeen separate warnings about checking timber for rot before installing it as structural support‡‡‡‡‡, suggesting this particular lesson required multiple demonstrations before achieving consensus******. Modern practitioners must also account for factors their predecessors never considered: the compressive strength of various timber species†††††††, the effects of moisture on load-bearing capacity‡‡‡‡‡‡, and the probability that someone will use the shoring as an impromptu ladder despite explicit instructions not to********. The Department of Preventable Calamities maintains that proper timber shoring, when executed with due diligence, can support structures indefinitely—or at least until someone decides to remove "just one piece" to see what happens†††††††††.
 
-Safety considerations in timber shoring represent less a checklist and more a philosophical commitment to remaining un-crushed*********. The essential rule, as articulated by Dame Weatherwax's Principle of Applied Common Sense‡‡‡‡‡‡‡, states: "If you must ask whether the shoring is strong enough, it isn't"**********. Historical records contain numerous cautionary tales, including the Incident of '87††††††††††, the Great Berlin Miscalculation of 1923‡‡‡‡‡‡‡‡, and the event that caused the city of Thornhaven to legally classify "temporary" as "anything less than fifty years"***********. Modern standards require not only proper installation but also daily inspection††††††††††††, documented load calculations‡‡‡‡‡‡‡‡‡, and what the British Standards Institute calls "an appropriate level of paranoia"************. The timber must be checked for splits, checks, shakes, wane, and approximately forty-seven other defects, each with its own technical definition and each capable of transforming "adequate support" into "expensive lawsuit"†††††††††††††.
+Safety considerations in timber shoring represent less a checklist and more a philosophical commitment to remaining un-crushed*********. The essential rule, as articulated by Dame Ironwood's Principle of Applied Common Sense‡‡‡‡‡‡‡, states: "If you must ask whether the shoring is strong enough, it isn't"**********. Historical records contain numerous cautionary tales, including the Incident of '87††††††††††, the Great Berlin Miscalculation of 1923‡‡‡‡‡‡‡‡, and the event that caused the city of Thornhaven to legally classify "temporary" as "anything less than fifty years"***********. Modern standards require not only proper installation but also daily inspection††††††††††††, documented load calculations‡‡‡‡‡‡‡‡‡, and what the British Standards Institute calls "an appropriate level of paranoia"************. The timber must be checked for splits, checks, shakes, wane, and approximately forty-seven other defects, each with its own technical definition and each capable of transforming "adequate support" into "expensive lawsuit"†††††††††††††.
 
 ---
 
 **FOOTNOTES:**
 
-*The Pratchett Institute for Gravitational Resistance notes that gravity has never once reconsidered, but remains diplomatically silent on this point to avoid discouraging students.
+*The Thornhaven Institute for Gravitational Resistance notes that gravity has never once reconsidered, but remains diplomatically silent on this point to avoid discouraging students.
 
 †According to the Archive of Regrettable Decisions, the phrase "it's not load-bearing" ranks third in last words spoken before structural failure, just behind "watch this" and "the engineer was probably exaggerating."
 
@@ -257,7 +257,7 @@ Safety considerations in timber shoring represent less a checklist and more a ph
 
 ***The Manual, weighing approximately forty-two pounds†, contains this and 1,847 other metaphors, none of which have improved anyone's understanding of engineering principles but all of which sound impressive at dinner parties.
 
-†Exactly forty-two pounds. The Moers-Ankh Guild of Technical Writers considers this "cosmically appropriate" but refuses to explain why.
+†Exactly forty-two pounds. The Thornhaven Guild of Technical Writers considers this "cosmically appropriate" but refuses to explain why.
 
 †††The term dates from the 1700s when the Worshipful Company of Carpenters decided that "vertical shores" sounded insufficiently dramatic. Death rates among shore installers that year suggest the new name was considered motivational.
 
@@ -291,7 +291,7 @@ Safety considerations in timber shoring represent less a checklist and more a ph
 
 *********The Society for Un-Crushedness (founded 1842, currently 127 members, all still un-crushed) considers this the foundation of all construction safety philosophy.
 
-‡‡‡‡‡‡‡Dame Weatherwax was not actually involve`,
+‡‡‡‡‡‡‡Dame Ashworth was not actually involve`,
   abstract: 'Research paper on Understanding timber shoring techniques in the context of construction',
   published: false
 };
