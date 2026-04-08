@@ -13,6 +13,7 @@ import type { World } from '../../ecs/World.js';
 import type { EntityImpl } from '../../ecs/Entity.js';
 import type { AnimalComponent, AnimalState } from '../../components/AnimalComponent.js';
 import type { IAnimalBehavior, AnimalBehaviorResult } from './AnimalBehavior.js';
+import { getSpeciesTemplate, type SpeciesBehaviorProfile, type SpeciesUniqueBehavior } from '../../species/SpeciesRegistry.js';
 
 import { GrazeBehavior } from './GrazeBehavior.js';
 import { FleeBehavior } from './FleeBehavior.js';
@@ -115,17 +116,7 @@ export class AnimalBrainSystem extends BaseSystem {
         isDomesticated: current.isDomesticated,
       }));
 
-      // Emit state change event
-      world.eventBus.emit({
-        type: 'animal:behavior_changed',
-        source: entity.id,
-        data: {
-          animalId: animal.id,
-          from: animal.state,
-          to: newState,
-          reason: 'priority_switch',
-        },
-      });
+      this.emitBehaviorEvents(world, entity, animal, animal.state, newState, 'priority_switch');
     }
 
     // Execute current behavior
@@ -183,16 +174,14 @@ export class AnimalBrainSystem extends BaseSystem {
         isDomesticated: current.isDomesticated,
       }));
 
-      world.eventBus.emit({
-        type: 'animal:behavior_changed',
-        source: entity.id,
-        data: {
-          animalId: animal.id,
-          from: animal.state,
-          to: result.newState,
-          reason: result.reason ?? 'behavior_complete',
-        },
-      });
+      this.emitBehaviorEvents(
+        world,
+        entity,
+        animal,
+        animal.state,
+        result.newState,
+        result.reason ?? 'behavior_complete',
+      );
     }
 
     // If behavior is not complete but suggests a state change, apply it
@@ -203,6 +192,87 @@ export class AnimalBrainSystem extends BaseSystem {
         isDomesticated: current.isDomesticated,
       }));
     }
+  }
+
+  private emitBehaviorEvents(
+    world: World,
+    entity: EntityImpl,
+    animal: AnimalComponent,
+    fromState: AnimalState,
+    toState: AnimalState,
+    reason: string,
+  ): void {
+    world.eventBus.emit({
+      type: 'animal:behavior_changed',
+      source: entity.id,
+      data: {
+        animalId: animal.id,
+        from: fromState,
+        to: toState,
+        reason,
+      },
+    });
+
+    const profile = this.resolveSpeciesBehaviorProfile(animal.speciesId);
+    if (!profile) return;
+
+    for (const behavior of profile.uniqueBehaviors) {
+      if (!this.matchesTriggerHint(behavior, toState)) {
+        continue;
+      }
+
+      world.eventBus.emit({
+        type: 'species:unique_behavior_triggered',
+        source: entity.id,
+        data: {
+          entityId: entity.id,
+          speciesId: animal.speciesId,
+          behaviorId: behavior.behaviorId,
+          triggerHint: behavior.triggerHint,
+          behaviorState: toState,
+          reason,
+        },
+      });
+    }
+  }
+
+  private resolveSpeciesBehaviorProfile(speciesId: string): SpeciesBehaviorProfile | undefined {
+    const direct = getSpeciesTemplate(speciesId);
+    if (direct?.speciesBehaviorProfile) return direct.speciesBehaviorProfile;
+
+    if (speciesId.startsWith('folkfork_')) {
+      const unprefixed = getSpeciesTemplate(speciesId.slice('folkfork_'.length));
+      return unprefixed?.speciesBehaviorProfile;
+    }
+
+    const prefixed = getSpeciesTemplate(`folkfork_${speciesId}`);
+    return prefixed?.speciesBehaviorProfile;
+  }
+
+  private matchesTriggerHint(behavior: SpeciesUniqueBehavior, state: AnimalState): boolean {
+    const hint = behavior.triggerHint.toLowerCase();
+    const normalizedState = state.toLowerCase();
+
+    if (hint.includes(normalizedState)) {
+      return true;
+    }
+
+    if (hint.includes('gradient') && (state === 'foraging' || state === 'fleeing')) {
+      return true;
+    }
+
+    if ((hint.includes('melatonin') || hint.includes('sleep')) && state === 'sleeping') {
+      return true;
+    }
+
+    if (
+      (hint.includes('bioluminescent') || hint.includes('relay')) &&
+      (state === 'idle' || state === 'foraging')
+    ) {
+      return true;
+    }
+
+    return false;
   }
 
   /**

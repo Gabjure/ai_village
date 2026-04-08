@@ -402,7 +402,7 @@ export class SoulSpriteRenderer {
         throw new Error(`Invalid image data format for direction: ${direction}`);
       }
 
-      await fs.writeFile(filepath, Buffer.from(base64Data, 'base64'));
+      await fs.writeFile(filepath, new Uint8Array(Buffer.from(base64Data, 'base64')));
     }
 
     // Save animations
@@ -434,7 +434,7 @@ export class SoulSpriteRenderer {
 
             const filename = `frame_${String(i).padStart(3, '0')}.png`;
             const filepath = path.join(dirSubDir, filename);
-            await fs.writeFile(filepath, Buffer.from(base64Data, 'base64'));
+            await fs.writeFile(filepath, new Uint8Array(Buffer.from(base64Data, 'base64')));
           }
         }
       }

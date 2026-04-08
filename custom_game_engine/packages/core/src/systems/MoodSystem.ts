@@ -263,7 +263,9 @@ export class MoodSystem extends BaseSystem {
     if (flavors && flavors.length > 0) {
       preferences = updateFlavorPreferences(preferences, flavors, experience, 0.05);
     }
-    impl.updateComponent(CT.Preference, () => preferences);
+    const updatedPreferences = preferences;
+    if (!updatedPreferences) throw new Error(`Expected preferences to be defined for agent ${agentId}`);
+    impl.updateComponent(CT.Preference, () => updatedPreferences);
 
     // Check if this should become a favorite (eaten 5+ times with positive experience)
     const positiveCount = preferences.foodMemories.filter(
@@ -377,7 +379,9 @@ export class MoodSystem extends BaseSystem {
         mood = updateMoodFactor(mood, factor as keyof typeof mood.factors, currentValue + amount);
       }
 
-      impl.updateComponent(CT.Mood, () => mood);
+      const finalMood = mood;
+      if (!finalMood) throw new Error(`Expected mood to be defined for agent ${agentId}`);
+      impl.updateComponent(CT.Mood, () => finalMood);
     }
 
     this.pendingBoosts.clear();
@@ -421,10 +425,12 @@ export class MoodSystem extends BaseSystem {
     mood = applyMoodChange(mood, 0, world.tick);
 
     // Update the component
-    entity.updateComponent(CT.Mood, () => mood);
+    const updatedMood = mood;
+    if (!updatedMood) throw new Error(`Expected mood to be defined for entity ${entity.id}`);
+    entity.updateComponent(CT.Mood, () => updatedMood);
 
     // Emit mood changed event if significant change
-    this.emitMoodEvent(entity.id, mood);
+    this.emitMoodEvent(entity.id, updatedMood);
   }
 
   /**

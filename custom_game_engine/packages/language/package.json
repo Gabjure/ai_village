@@ -23,6 +23,16 @@
     "@ai-village/core": "*",
     "react": "^18.2.0"
   },
-  "keywords": ["language", "phonemes", "translation", "alien", "procedural", "ecs"],
-  "license": "MIT"
+  "keywords": [
+    "language",
+    "phonemes",
+    "translation",
+    "alien",
+    "procedural",
+    "ecs"
+  ],
+  "license": "MIT",
+  "devDependencies": {
+    "@types/react": "^18.3.27"
+  }
 }

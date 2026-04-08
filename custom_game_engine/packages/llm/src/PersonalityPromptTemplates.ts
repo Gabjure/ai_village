@@ -19,11 +19,13 @@ import {
   type DeityInterfaceConfig,
 } from './DeityInterfaceTemplates.js';
 import { getPersonalityVariation } from './PersonalityVariationsLibrary.js';
+import { buildSpeciesVoiceGuidance } from './SpeciesVoiceProfiles.js';
 
 export interface PersonalityPromptOptions {
   name: string;
   personality: PersonalityComponent;
   entityId?: string; // For consistent variation selection
+  species?: string;
 }
 
 /**
@@ -88,6 +90,14 @@ function generateSpiritualPersonalityPrompt(options: PersonalityPromptOptions): 
   }
 
   prompt += '\n';
+
+  if (options.species) {
+    const speciesGuidance = buildSpeciesVoiceGuidance(options.species);
+    if (speciesGuidance) {
+      prompt += speciesGuidance;
+    }
+  }
+
   return prompt;
 }
 
@@ -123,6 +133,14 @@ function generateMundanePersonalityPrompt(options: PersonalityPromptOptions): st
   }
 
   prompt += '\n';
+
+  if (options.species) {
+    const speciesGuidance = buildSpeciesVoiceGuidance(options.species);
+    if (speciesGuidance) {
+      prompt += speciesGuidance;
+    }
+  }
+
   return prompt;
 }
 

@@ -601,7 +601,9 @@ function executeQuery(world: World, intent: QueryIntent): string {
         const behavior = agent?.behavior ?? 'idle';
 
         if (!activities[behavior]) activities[behavior] = [];
-        activities[behavior].push(name);
+        const behaviorList = activities[behavior];
+        if (!behaviorList) throw new Error(`Expected activities["${behavior}"] to be initialized`);
+        behaviorList.push(name);
       }
 
       let result = 'everyone rn:\n';

@@ -483,7 +483,7 @@ export class CombatAnimator {
     for (const [id, sprite] of replay.characters) {
       const filename = `${id.toLowerCase().replace(/\s+/g, '_')}.png`;
       const filepath = path.join(spritesDir, filename);
-      await fs.writeFile(filepath, Buffer.from(sprite.imageBase64, 'base64'));
+      await fs.writeFile(filepath, new Uint8Array(Buffer.from(sprite.imageBase64, 'base64')));
     }
 
     // Save animation frames
@@ -499,7 +499,7 @@ export class CombatAnimator {
         if (!frame) continue;
         const filename = `frame_${String(i).padStart(3, '0')}.png`;
         const filepath = path.join(animDir, filename);
-        await fs.writeFile(filepath, Buffer.from(frame, 'base64'));
+        await fs.writeFile(filepath, new Uint8Array(Buffer.from(frame, 'base64')));
       }
     }
 

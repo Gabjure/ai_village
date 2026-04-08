@@ -162,7 +162,7 @@ export function getAvailableIngredients(
     if (!byCategory[category]) {
       byCategory[category] = [];
     }
-    byCategory[category].push(ing);
+    byCategory[category]!.push(ing);
   }
 
   return {

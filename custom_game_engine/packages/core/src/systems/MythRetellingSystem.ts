@@ -274,8 +274,9 @@ export class MythRetellingSystem extends BaseSystem {
     }
 
     // Spread to listeners
-    const mythologyToUpdate = mutationResult?.attributionChanged && mutationResult.newDeityId
-      ? allDeities.find(d => d.id === mutationResult.newDeityId)?.components.get(CT.Mythology) as MythologyComponent
+    const resolvedMutation = mutationResult;
+    const mythologyToUpdate = resolvedMutation !== null && resolvedMutation.attributionChanged && resolvedMutation.newDeityId
+      ? allDeities.find(d => d.id === resolvedMutation.newDeityId)?.components.get(CT.Mythology) as MythologyComponent
       : mythology;
 
     if (mythologyToUpdate) {

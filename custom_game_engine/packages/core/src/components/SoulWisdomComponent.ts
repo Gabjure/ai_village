@@ -223,7 +223,8 @@ export function updatePeakSkills(
   const peakSkills = component.peakSkills ?? {};
 
   for (const [skillId, level] of Object.entries(currentSkills)) {
-    if (!peakSkills[skillId] || level > peakSkills[skillId]) {
+    const peakLevel = peakSkills[skillId];
+    if (peakLevel === undefined || level > peakLevel) {
       peakSkills[skillId] = level;
     }
   }

@@ -464,7 +464,7 @@ export function executeQuery(world: World, intent: QueryIntent): string {
         const behavior = agent?.behavior ?? 'idle';
 
         if (!activities[behavior]) activities[behavior] = [];
-        activities[behavior].push(name);
+        activities[behavior]!.push(name);
       }
 
       let result = 'everyone rn:\n';

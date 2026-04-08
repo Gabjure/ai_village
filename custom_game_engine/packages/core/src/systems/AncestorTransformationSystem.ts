@@ -136,11 +136,13 @@ export class AncestorTransformationSystem extends BaseSystem {
         .slice(0, 3);
 
       for (const [skillName] of skillEntries) {
-        if (SKILL_BLESSINGS[skillName]) {
-          blessings.push(SKILL_BLESSINGS[skillName]);
+        const blessing = SKILL_BLESSINGS[skillName];
+        if (blessing) {
+          blessings.push(blessing);
         }
-        if (SKILL_CURSES[skillName]) {
-          curses.push(SKILL_CURSES[skillName]);
+        const curse = SKILL_CURSES[skillName];
+        if (curse) {
+          curses.push(curse);
         }
       }
     }

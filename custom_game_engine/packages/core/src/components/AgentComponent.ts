@@ -955,7 +955,7 @@ export function visitLocation(
     return agent;
   }
 
-  const existing = locations[locationType];
+  const existing = locations[locationType]!;
   return {
     ...agent,
     assignedLocations: {

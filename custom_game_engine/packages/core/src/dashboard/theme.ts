@@ -76,7 +76,7 @@ export const resourceIcons: Record<string, string> = {
 export function getResourceColor(itemId: string): string {
   // Check exact match
   if (resourceColors[itemId]) {
-    return resourceColors[itemId];
+    return resourceColors[itemId]!;
   }
 
   // Check partial matches
@@ -98,7 +98,7 @@ export function getResourceColor(itemId: string): string {
 export function getResourceIcon(itemId: string): string {
   // Check exact match
   if (resourceIcons[itemId]) {
-    return resourceIcons[itemId];
+    return resourceIcons[itemId]!;
   }
 
   // Check partial matches

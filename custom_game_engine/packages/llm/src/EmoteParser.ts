@@ -150,14 +150,14 @@ function getEmoteGlyph(emoteText: string, emoteType: EmoteType): string {
 
   // Try exact match first, then first word
   if (firstWord && EMOTE_GLYPHS[firstWord]) {
-    return EMOTE_GLYPHS[firstWord];
+    return EMOTE_GLYPHS[firstWord]!;
   }
 
   // Try any word in the emote text
   const words = lower.split(/\s+/);
   for (const word of words) {
     if (EMOTE_GLYPHS[word]) {
-      return EMOTE_GLYPHS[word];
+      return EMOTE_GLYPHS[word]!;
     }
   }
 

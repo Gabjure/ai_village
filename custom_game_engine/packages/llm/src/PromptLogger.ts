@@ -129,14 +129,14 @@ export class PromptLogger {
       if (!instructionToAction[instrKey]) {
         instructionToAction[instrKey] = {};
       }
-      instructionToAction[instrKey][actionType] = (instructionToAction[instrKey][actionType] || 0) + 1;
+      instructionToAction[instrKey]![actionType] = (instructionToAction[instrKey]![actionType] || 0) + 1;
 
       // Track per-agent actions
       const name = entry.agentName || entry.agentId.substring(0, 8);
       if (!agentActions[name]) {
         agentActions[name] = [];
       }
-      agentActions[name].push(actionType);
+      agentActions[name]!.push(actionType);
     }
 
     // Build agent behavior summary

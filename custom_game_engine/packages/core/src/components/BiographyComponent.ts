@@ -238,7 +238,8 @@ export function getRecommendedSkills(
   // Collect skills from all milestones
   for (const milestone of biography.careerPath.milestones) {
     for (const [skill, level] of Object.entries(milestone.requiredSkills)) {
-      if (!skills[skill] || skills[skill] < level) {
+      const current = skills[skill];
+      if (current === undefined || current < level) {
         skills[skill] = level;
       }
     }

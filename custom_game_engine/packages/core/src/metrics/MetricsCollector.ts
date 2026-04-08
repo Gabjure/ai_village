@@ -591,7 +591,7 @@ export class MetricsCollector {
       };
     }
 
-    this.spatialMetrics.agents[agentId].totalDistanceTraveled += distance;
+    this.spatialMetrics.agents[agentId]!.totalDistanceTraveled += distance;
   }
 
   /**
@@ -611,7 +611,7 @@ export class MetricsCollector {
       };
     }
 
-    const metrics = this.economicMetrics.resourcesGathered[resourceType];
+    const metrics = this.economicMetrics.resourcesGathered[resourceType]!;
     const prevTotal = metrics.totalGathered;
     metrics.totalGathered += amount;
 
@@ -640,7 +640,7 @@ export class MetricsCollector {
       };
     }
 
-    const metrics = this.economicMetrics.resourcesConsumed[resourceType];
+    const metrics = this.economicMetrics.resourcesConsumed[resourceType]!;
     metrics.totalConsumed += amount;
 
     if (!metrics.purposeBreakdown[purpose]) {
@@ -670,7 +670,7 @@ export class MetricsCollector {
       this.economicMetrics.stockpiles[resourceType] = [];
     }
 
-    this.addBoundedSample(this.economicMetrics.stockpiles[resourceType], { timestamp, value: amount });
+    this.addBoundedSample(this.economicMetrics.stockpiles[resourceType]!, { timestamp, value: amount });
   }
 
   // Wealth tracking for Gini calculation
@@ -776,11 +776,11 @@ export class MetricsCollector {
     if (!this.spatialMetrics.heatmap[x]) {
       this.spatialMetrics.heatmap[x] = {};
     }
-    if (!this.spatialMetrics.heatmap[x][y]) {
-      this.spatialMetrics.heatmap[x][y] = 0;
+    if (!this.spatialMetrics.heatmap[x]![y]) {
+      this.spatialMetrics.heatmap[x]![y] = 0;
     }
 
-    this.spatialMetrics.heatmap[x][y]++;
+    this.spatialMetrics.heatmap[x]![y]!++;
 
     // Update territory center for agent
     const agentId = event.agentId as string;
@@ -807,7 +807,7 @@ export class MetricsCollector {
     if (visits.length > 0) {
       const sumX = visits.reduce((sum, pos) => sum + pos.x, 0);
       const sumY = visits.reduce((sum, pos) => sum + pos.y, 0);
-      this.spatialMetrics.agents[agentId].territoryCenter = {
+      this.spatialMetrics.agents[agentId]!.territoryCenter = {
         x: sumX / visits.length,
         y: sumY / visits.length,
       };

@@ -38,7 +38,7 @@ export async function compress(data: string): Promise<string> {
       const util = await import('util');
       const gzip = util.promisify(zlib.gzip);
 
-      const compressed = await gzip(Buffer.from(data, 'utf-8'));
+      const compressed = await gzip(new Uint8Array(Buffer.from(data, 'utf-8')));
       return compressed.toString('base64');
     } catch (err) {
       console.warn('[Compression] Node.js zlib not available, storing uncompressed');
@@ -89,7 +89,7 @@ export async function decompress(compressedData: string): Promise<string> {
       const gunzip = util.promisify(zlib.gunzip);
 
       const buffer = Buffer.from(compressedData, 'base64');
-      const decompressed = await gunzip(buffer);
+      const decompressed = await gunzip(new Uint8Array(buffer));
       return decompressed.toString('utf-8');
     } catch (err) {
       throw new Error(`Failed to decompress data: ${err instanceof Error ? err.message : String(err)}`);

@@ -79,7 +79,7 @@ async function sha256(data: string): Promise<string> {
   }
 
   const encoded = new TextEncoder().encode(data);
-  const hashBuffer = await subtle.digest('SHA-256', encoded as Uint8Array<ArrayBuffer>);
+  const hashBuffer = await subtle.digest('SHA-256', encoded.buffer as ArrayBuffer);
   const hashArray = Array.from(new Uint8Array(hashBuffer));
   return hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
 }

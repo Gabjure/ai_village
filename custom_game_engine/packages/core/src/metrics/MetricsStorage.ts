@@ -337,8 +337,8 @@ export class MetricsStorage {
 
     const archivePath = path.join(this.storagePath, 'archive', `${archiveName}.gz`);
     const data = JSON.stringify(metrics);
-    const compressed = await gzip(Buffer.from(data));
-    await fs.writeFile(archivePath, compressed);
+    const compressed = await gzip(new Uint8Array(Buffer.from(data)));
+    await fs.writeFile(archivePath, new Uint8Array(compressed));
   }
 
   /**
@@ -359,7 +359,7 @@ export class MetricsStorage {
 
     try {
       const compressed = await fs.readFile(archivePath);
-      const decompressed = await gunzip(compressed);
+      const decompressed = await gunzip(new Uint8Array(compressed));
       return JSON.parse(decompressed.toString());
     } catch (error) {
       throw new Error(`Failed to load archive: ${archiveName}`);
@@ -427,7 +427,7 @@ export class MetricsStorage {
     if (!RETENTION_POLICIES[category]) {
       throw new Error(`Unknown retention policy category: ${category}`);
     }
-    return RETENTION_POLICIES[category];
+    return RETENTION_POLICIES[category]!;
   }
 
   /**

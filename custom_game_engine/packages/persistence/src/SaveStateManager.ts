@@ -8,6 +8,7 @@
  */
 
 import type { World, WorldMutator } from '@ai-village/core';
+import type { InputType } from 'zlib';
 import { WorldImpl, EventBusImpl } from '@ai-village/core';
 import { worldSerializer } from './WorldSerializer.js';
 
@@ -21,8 +22,8 @@ let zlib: typeof import('zlib') | null = null;
 let util: typeof import('util') | null = null;
 
 // Promisified functions (initialized when modules are loaded)
-let gzip: ((buffer: string | Buffer) => Promise<Buffer>) | null = null;
-let gunzip: ((buffer: Buffer) => Promise<Buffer>) | null = null;
+let gzip: ((buffer: InputType) => Promise<Buffer>) | null = null;
+let gunzip: ((buffer: InputType) => Promise<Buffer>) | null = null;
 let writeFile: ((path: string, data: any) => Promise<void>) | null = null;
 let readFile: ((path: string) => Promise<Buffer>) | null = null;
 let mkdir: ((path: string, options?: any) => Promise<void>) | null = null;
@@ -209,7 +210,7 @@ export class SaveStateManager {
     }
 
     const compressed = await readFile(filePath);
-    const json = await gunzip(compressed);
+    const json = await gunzip(new Uint8Array(compressed));
     const saveState: SaveState = JSON.parse(json.toString());
 
 

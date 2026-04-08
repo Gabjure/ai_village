@@ -394,10 +394,10 @@ export function getParadigmRelationship(
   const key2 = `${paradigmB}_${paradigmA}`;
 
   if (PARADIGM_RELATIONSHIPS[key1]) {
-    return PARADIGM_RELATIONSHIPS[key1];
+    return PARADIGM_RELATIONSHIPS[key1]!;
   }
   if (PARADIGM_RELATIONSHIPS[key2]) {
-    return PARADIGM_RELATIONSHIPS[key2];
+    return PARADIGM_RELATIONSHIPS[key2]!;
   }
 
   // Default: isolated relationship

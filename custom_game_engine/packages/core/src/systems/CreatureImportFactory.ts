@@ -24,6 +24,7 @@ import { MigrationProvenanceComponent, type MigrationProvenanceData, type Migrat
 import { QuarantineStatusComponent, createQuarantineStatus } from '../components/QuarantineStatusComponent.js';
 import { createPositionComponent } from '../components/PositionComponent.js';
 import { mapCoreTraitsToGenetics, mapDrivesToNeeds, mapDrivesToPersonality, computeGDI } from '../genetics/MigrationGenetics.js';
+import { getSpeciesTemplate, type SpeciesBehaviorProfile, type SpeciesTemplate } from '../species/SpeciesRegistry.js';
 
 // ============================================================================
 // Public Interfaces
@@ -58,6 +59,79 @@ export class CreatureImportError extends Error {
     super(message);
     this.name = 'CreatureImportError';
   }
+}
+
+function clamp01(value: number): number {
+  if (value < 0) return 0;
+  if (value > 1) return 1;
+  return value;
+}
+
+function resolveSpeciesTemplate(speciesId: string | null | undefined): SpeciesTemplate | undefined {
+  if (!speciesId) return undefined;
+  const direct = getSpeciesTemplate(speciesId);
+  if (direct) return direct;
+
+  if (speciesId.startsWith('folkfork_')) {
+    return getSpeciesTemplate(speciesId.slice('folkfork_'.length));
+  }
+
+  return getSpeciesTemplate(`folkfork_${speciesId}`);
+}
+
+function enforceCognitiveCeiling(genetics: AnimalGenetics, profile: SpeciesBehaviorProfile): number | null {
+  const cap = Math.round(clamp01(profile.cognitiveCeiling) * 100);
+  const trait = genetics.intelligence;
+
+  const nextAllele1 = Math.min(trait.allele1, cap);
+  const nextAllele2 = Math.min(trait.allele2, cap);
+  const nextExpression = Math.min(trait.expression, cap);
+  const nextMeanExpression = (nextAllele1 + nextAllele2) / 2;
+
+  const applied =
+    nextAllele1 !== trait.allele1 ||
+    nextAllele2 !== trait.allele2 ||
+    nextExpression !== trait.expression;
+
+  trait.allele1 = nextAllele1;
+  trait.allele2 = nextAllele2;
+  trait.expression = Math.min(nextExpression, nextMeanExpression, cap);
+
+  return applied ? cap : null;
+}
+
+function seedPersonalityFromBaseline(
+  personality: AnimalPersonality,
+  profile: SpeciesBehaviorProfile,
+  rng: () => number = Math.random,
+): { personality: AnimalPersonality; applied: boolean } {
+  const baseline = profile.personalityBaseline;
+  if (!baseline) {
+    return { personality, applied: false };
+  }
+
+  const map: Record<keyof AnimalPersonality, number | undefined> = {
+    curiosity: baseline.curiosity,
+    aggressiveness: baseline.aggression,
+    sociability: baseline.sociability,
+    fearfulness: baseline.fearfulness,
+  };
+
+  let applied = false;
+  const next: AnimalPersonality = { ...personality };
+  const variance = 0.16;
+
+  (Object.keys(map) as Array<keyof AnimalPersonality>).forEach((key) => {
+    const center = map[key];
+    if (typeof center !== 'number') return;
+
+    const sample = clamp01(center + (rng() - 0.5) * variance);
+    const blended = clamp01((personality[key] + sample) / 2);
+    next[key] = blended;
+    applied = true;
+  });
+
+  return { personality: next, applied };
 }
 
 // ============================================================================
@@ -167,10 +241,31 @@ export class CreatureImportFactory {
     const needsResult = mapDrivesToNeeds(payload.drive_mapping);
 
     // Translate drives + D_cc profile to MVEE personality.
-    const personality: AnimalPersonality = mapDrivesToPersonality(
+    let personality: AnimalPersonality = mapDrivesToPersonality(
       payload.drive_mapping,
       payload.dcc_profile,
     );
+
+    const speciesTemplate = resolveSpeciesTemplate(payload.identity.species_id);
+    const speciesBehaviorProfile = speciesTemplate?.speciesBehaviorProfile;
+    if (speciesBehaviorProfile) {
+      const cappedAt = enforceCognitiveCeiling(genetics, speciesBehaviorProfile);
+      if (cappedAt !== null) {
+        warnings.push({
+          code: 'cognitive_ceiling_enforced',
+          message: `Species cognitive ceiling enforced at ${cappedAt} for ${speciesTemplate?.speciesId ?? payload.identity.species_id}`,
+        });
+      }
+
+      const seeded = seedPersonalityFromBaseline(personality, speciesBehaviorProfile);
+      personality = seeded.personality;
+      if (seeded.applied) {
+        warnings.push({
+          code: 'personality_baseline_seeded',
+          message: `Species personality baseline seeded with variance for ${speciesTemplate?.speciesId ?? payload.identity.species_id}`,
+        });
+      }
+    }
 
     // Compute Genetic Distance Index.
     const gdi = computeGDI(payload.core_traits, genetics);
@@ -333,8 +428,40 @@ export class CreatureImportFactory {
         sourceGame: payload.provenance.source_game,
         migrationType: migrationContext.migrationType,
         speciesId: payload.identity.species_id,
+        intelligenceExpression: genetics.intelligence.expression,
+        cognitiveCeiling: speciesBehaviorProfile?.cognitiveCeiling,
       },
     });
+
+    if (speciesBehaviorProfile) {
+      for (const uniqueBehavior of speciesBehaviorProfile.uniqueBehaviors) {
+        world.eventBus.emit({
+          type: 'species:unique_behavior_registered',
+          source: entity.id,
+          data: {
+            entityId: entity.id,
+            speciesId: payload.identity.species_id,
+            behaviorId: uniqueBehavior.behaviorId,
+            triggerHint: uniqueBehavior.triggerHint,
+            description: uniqueBehavior.description,
+          },
+        });
+      }
+
+      for (const relation of speciesBehaviorProfile.interspeciesRelations) {
+        world.eventBus.emit({
+          type: 'species:interspecies_relation_registered',
+          source: entity.id,
+          data: {
+            entityId: entity.id,
+            sourceSpeciesId: payload.identity.species_id,
+            targetSpeciesId: relation.targetSpeciesId,
+            disposition: relation.disposition,
+            description: relation.description ?? '',
+          },
+        });
+      }
+    }
 
     return {
       success: true,

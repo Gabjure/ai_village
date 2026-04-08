@@ -7,6 +7,7 @@
  * Browser-compatible: Save/load operations are no-ops in browser, only work in Node.js.
  */
 
+import type { InputType as ZlibInputType } from 'zlib';
 import { World, WorldImpl, WorldMutator } from '../ecs/World.js';
 import { EventBusImpl } from '../events/EventBus.js';
 import { worldSerializer } from './WorldSerializer.js';
@@ -21,8 +22,8 @@ let zlib: typeof import('zlib') | null = null;
 let util: typeof import('util') | null = null;
 
 // Promisified functions (initialized when modules are loaded)
-let gzip: ((buffer: string | Buffer) => Promise<Buffer>) | null = null;
-let gunzip: ((buffer: Buffer) => Promise<Buffer>) | null = null;
+let gzip: ((buffer: ZlibInputType) => Promise<Buffer>) | null = null;
+let gunzip: ((buffer: ZlibInputType) => Promise<Buffer>) | null = null;
 let writeFile: ((path: string, data: any) => Promise<void>) | null = null;
 let readFile: ((path: string) => Promise<Buffer>) | null = null;
 let mkdir: ((path: string, options?: any) => Promise<void>) | null = null;
@@ -209,7 +210,7 @@ export class SaveStateManager {
     }
 
     const compressed = await readFile(filePath);
-    const json = await gunzip(compressed);
+    const json = await gunzip(new Uint8Array(compressed));
     const saveState: SaveState = JSON.parse(json.toString());
 
 

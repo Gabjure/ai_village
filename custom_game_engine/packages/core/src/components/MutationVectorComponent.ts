@@ -205,7 +205,7 @@ export function addMutationRate(
   }
 
   // Add to existing rate
-  const existing = mv.fields[fieldPath];
+  const existing = mv.fields[fieldPath]!;
   existing.rate += rate;
 
   // Update bounds if provided and more restrictive

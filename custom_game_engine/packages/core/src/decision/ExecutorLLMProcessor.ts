@@ -650,9 +650,10 @@ export class ExecutorLLMProcessor {
 
     if (behavior) {
       // Apply the decision with optional behavior queue
+      const resolvedBehavior = behavior;
       entity.updateComponent<AgentComponent>(ComponentType.Agent, (current) => ({
         ...current,
-        behavior,
+        behavior: resolvedBehavior,
         behaviorState,
         behaviorQueue,
         currentQueueIndex: behaviorQueue ? 0 : undefined,

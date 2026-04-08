@@ -473,17 +473,18 @@ export class WorldContextBuilder {
       if (!plantsBySpecies[species]) {
         plantsBySpecies[species] = { total: 0, withSeeds: 0, withFruit: 0, stages: [] };
       }
-      plantsBySpecies[species].total += 1;
+      const speciesData = plantsBySpecies[species]!;
+      speciesData.total += 1;
       if (plantComp.seedsProduced > 0) {
-        plantsBySpecies[species].withSeeds += 1;
+        speciesData.withSeeds += 1;
       }
       if ((plantComp.fruitCount || 0) > 0) {
-        plantsBySpecies[species].withFruit += 1;
+        speciesData.withFruit += 1;
         const resourceName = speciesResourceMap[species] || 'fruit';
         gatherableFoods.push(resourceName);
       }
-      if (!plantsBySpecies[species].stages.includes(plantComp.stage)) {
-        plantsBySpecies[species].stages.push(plantComp.stage);
+      if (!speciesData.stages.includes(plantComp.stage)) {
+        speciesData.stages.push(plantComp.stage);
       }
     }
 

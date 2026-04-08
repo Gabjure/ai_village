@@ -559,6 +559,9 @@ export class BuildBehavior extends BaseBehavior {
       entity.id // createdBy
     );
 
+    // Start the task to transition from 'planned' to 'in_progress'
+    constructionSystem.startTask(world, task.id);
+
     // Emit event
     world.eventBus.emit({
       type: 'construction:task_created',
@@ -571,13 +574,21 @@ export class BuildBehavior extends BaseBehavior {
       },
     });
 
+    // Get the first tile needing materials
+    const firstTile = constructionSystem.getNextTileNeedingMaterials(task.id);
+    if (!firstTile) {
+      throw new Error(`[BuildBehavior] No tiles need materials after startTask for ${task.id}`);
+    }
+
     // Switch agent to material_transport behavior to gather materials
     entity.updateComponent<AgentComponent>(ComponentType.Agent, (current) => ({
       ...current,
       behavior: 'material_transport',
       behaviorState: {
         taskId: task.id,
-        phase: 'find_task',
+        tileIndex: firstTile.index,
+        materialId: firstTile.tile.materialId,
+        transportState: 'finding_storage',
       },
     }));
 

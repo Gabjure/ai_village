@@ -537,6 +537,7 @@ export class NationSystem extends BaseSystem {
     // Check cached modifiers
     if (nation.policyModifiers?.[target]) {
       const mods = nation.policyModifiers[target];
+      if (!mods) throw new Error(`Expected policyModifiers["${target}"] to be defined`);
       return mods.reduce((acc, mod) => acc * mod, 1);
     }
 

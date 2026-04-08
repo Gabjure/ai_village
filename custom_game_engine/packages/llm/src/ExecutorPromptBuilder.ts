@@ -103,7 +103,7 @@ export class ExecutorPromptBuilder {
     const schemaPrompt = this.buildSchemaPrompt(agent, world);
 
     // System Prompt: Who you are (personality, identity)
-    const systemPrompt = this.buildSystemPrompt(identity?.name || 'Agent', personality, agent.id);
+    const systemPrompt = this.buildSystemPrompt(identity?.name || 'Agent', personality, agent.id, identity?.species);
 
     // Skills: What you're good at
     const skillsText = this.buildSkillsSection(skills);
@@ -155,12 +155,12 @@ export class ExecutorPromptBuilder {
    * Build system prompt with personality.
    * Uses enhanced personality templates.
    */
-  private buildSystemPrompt(name: string, personality: PersonalityComponent | undefined, entityId?: string): string {
+  private buildSystemPrompt(name: string, personality: PersonalityComponent | undefined, entityId?: string, species?: string): string {
     if (!personality) {
       return `You are ${name}, a villager in a forest village.\n\n`;
     }
 
-    return generatePersonalityPrompt({ name, personality, entityId });
+    return generatePersonalityPrompt({ name, personality, entityId, species });
   }
 
   /**

@@ -438,7 +438,7 @@ export class MetricsAPI {
           for (const metricName of params.metrics) {
             const value = (metric.data as Record<string, unknown>)[metricName];
             if (typeof value === 'number' && bucket[metricName]) {
-              bucket[metricName].push(value);
+              bucket[metricName]!.push(value);
             }
           }
         }

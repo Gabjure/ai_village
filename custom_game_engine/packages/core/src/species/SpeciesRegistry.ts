@@ -16,6 +16,116 @@ import type { GeneticComponent } from '../components/GeneticComponent.js';
 // Species Template
 // ============================================================================
 
+export type MigrationStatus =
+  | 'candidate'
+  | 'reviewed'
+  | 'approved'
+  | 'migrated'
+  | 'active_in_target';
+
+export interface MigrationStatusTransition {
+  from: MigrationStatus;
+  to: MigrationStatus;
+  changedAt: string;
+}
+
+export interface CulturalProtocolComponent {
+  livingTradition: boolean;
+  respectNotes?: string;
+  avoidances: string[];
+}
+
+export interface EcologyProfileComponent {
+  ecologicalRole: string;
+  diet: string;
+  biomePreferences: string[];
+  socialStructure?: string;
+  activityPattern?: string;
+  populationDensity?: string;
+}
+
+export interface SpeciesVisualIdentity {
+  primaryHueRange: [number, number];
+  secondaryHueRange: [number, number];
+  bioluminescent: boolean;
+  distinctiveFeatures?: string[];
+  spriteSheetRef?: string;
+}
+
+export interface SpeciesLoreDepth {
+  hasCanonicalFolklore: boolean;
+  hasCultureDoc: boolean;
+  hasSongCorpus: boolean;
+  hasLanguageDoc: boolean;
+  mythCount: number;
+  waveNumber: number;
+  akashicRecordsPath: string;
+}
+
+export interface SpeciesMigrationMetadata {
+  migrationStatus: MigrationStatus;
+  sourceGameVersion: string;
+  exportedAt?: string;
+  reviewedBy?: string | null;
+  reviewNotes?: string | null;
+  scheherazadeSignoff: boolean;
+  sylviaSignoff: boolean;
+  targetGameAdaptations?: Record<string, string>;
+}
+
+export interface SpeciesLineageSnapshot {
+  formatVersion: '1.0.0';
+  speciesId: string;
+  canonicalName: string;
+  sourceGame: 'precursors' | 'mvee' | 'nel' | 'cotb';
+  folkloreTradition: Record<string, unknown>;
+  ecologicalProfile: Record<string, unknown>;
+  behavioralArchetype: Record<string, unknown>;
+  visualIdentity: Record<string, unknown>;
+  migrationMetadata: SpeciesMigrationMetadata;
+  patronCredits?: Record<string, unknown>;
+  loreDepth?: SpeciesLoreDepth;
+}
+
+export type InterspeciesDisposition =
+  | 'predatory'
+  | 'parasitic'
+  | 'symbiotic'
+  | 'fearful'
+  | 'neutral'
+  | 'competitive'
+  | 'protective';
+
+export interface SpeciesPersonalityBaseline {
+  curiosity?: number;
+  aggression?: number;
+  sociability?: number;
+  fearfulness?: number;
+  playfulness?: number;
+  empathy?: number;
+  stubbornness?: number;
+  creativity?: number;
+}
+
+export interface SpeciesUniqueBehavior {
+  behaviorId: string;
+  description: string;
+  triggerHint: string;
+}
+
+export interface SpeciesInterspeciesRelation {
+  targetSpeciesId: string;
+  disposition: InterspeciesDisposition;
+  description?: string;
+}
+
+export interface SpeciesBehaviorProfile {
+  cognitiveCeiling: number;
+  personalityBaseline?: SpeciesPersonalityBaseline;
+  uniqueBehaviors: SpeciesUniqueBehavior[];
+  interspeciesRelations: SpeciesInterspeciesRelation[];
+}
+
 export interface SpeciesTemplate {
   speciesId: string;
   speciesName: string;
@@ -60,6 +170,16 @@ export interface SpeciesTemplate {
     sapience_date: string; // Approximate date (e.g. '~1.8 Bya', '~3.5 Bya', 'shee_created')
     chorus_connection: string; // Brief description of species' relationship to the Chorus
   };
+
+  // Species lineage v1 migration metadata (MUL-4696)
+  culturalProtocol?: CulturalProtocolComponent;
+  ecologyProfile?: EcologyProfileComponent;
+  visualIdentity?: SpeciesVisualIdentity;
+  loreDepth?: SpeciesLoreDepth;
+  migrationMetadata?: SpeciesMigrationMetadata;
+  migrationStatusHistory?: MigrationStatusTransition[];
+  lineageContractV1?: SpeciesLineageSnapshot;
+  speciesBehaviorProfile?: SpeciesBehaviorProfile;
 }
 
 // ============================================================================

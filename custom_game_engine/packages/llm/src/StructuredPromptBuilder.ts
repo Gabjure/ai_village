@@ -109,7 +109,7 @@ export class StructuredPromptBuilder {
     const schemaPrompt = this.buildSchemaPrompt(agent, world);
 
     // System Prompt: Role and personality (who you are)
-    const systemPrompt = this.buildSystemPrompt(identity?.name || 'Agent', personality, agent.id);
+    const systemPrompt = this.buildSystemPrompt(identity?.name || 'Agent', personality, agent.id, identity?.species);
 
     // Skills: What you're good at
     const skillsText = this.buildSkillsSection(skills);
@@ -231,14 +231,14 @@ export class StructuredPromptBuilder {
    * Uses enhanced personality templates that blend multiple writer voices.
    * Just identity and personality traits - who you are at your core.
    */
-  private buildSystemPrompt(name: string, personality: PersonalityComponent | undefined, entityId?: string): string {
+  private buildSystemPrompt(name: string, personality: PersonalityComponent | undefined, entityId?: string, species?: string): string {
     // If no personality component, use basic identity
     if (!personality) {
       return `You are ${name}, a villager in a forest village.\n\n`;
     }
 
     // Use enhanced personality prompt templates with entityId for consistent variations
-    return generatePersonalityPrompt({ name, personality, entityId });
+    return generatePersonalityPrompt({ name, personality, entityId, species });
   }
 
   /**
@@ -909,19 +909,20 @@ export class StructuredPromptBuilder {
               if (!plantsBySpecies[species]) {
                 plantsBySpecies[species] = { total: 0, withSeeds: 0, withFruit: 0, stages: [] };
               }
-              plantsBySpecies[species].total += 1;
+              const speciesData = plantsBySpecies[species]!;
+              speciesData.total += 1;
               if (plantComp.seedsProduced > 0) {
-                plantsBySpecies[species].withSeeds += 1;
+                speciesData.withSeeds += 1;
               }
               if ((plantComp.fruitCount || 0) > 0) {
-                plantsBySpecies[species].withFruit += 1;
+                speciesData.withFruit += 1;
 
                 // Add gatherable food resource name
                 const resourceName = speciesResourceMap[species] || 'fruit';
                 gatherableFoods.push(resourceName);
               }
-              if (!plantsBySpecies[species].stages.includes(plantComp.stage)) {
-                plantsBySpecies[species].stages.push(plantComp.stage);
+              if (!speciesData.stages.includes(plantComp.stage)) {
+                speciesData.stages.push(plantComp.stage);
               }
             }
           }

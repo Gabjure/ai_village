@@ -120,6 +120,9 @@ export class TalkerPromptBuilder {
 
     // Journal/diary entries
     'journal',
+
+    // Self-reflection (Eighth Scroll insight)
+    'eighth_child_insight',
   ]);
 
   /**
@@ -143,7 +146,7 @@ export class TalkerPromptBuilder {
     const schemaPrompt = this.buildSchemaPrompt(agent, world);
 
     // System Prompt: Who you are (personality, identity)
-    const systemPrompt = this.buildSystemPrompt(identity?.name || 'Agent', personality, agent.id);
+    const systemPrompt = this.buildSystemPrompt(identity?.name || 'Agent', personality, agent.id, identity?.species);
 
     // Social Context: Conversations, relationships, nearby agents
     const socialContext = this.buildSocialContext(conversation, relationships, vision, world, agent.id);
@@ -183,12 +186,12 @@ export class TalkerPromptBuilder {
    * Build system prompt with personality.
    * Uses enhanced personality templates.
    */
-  private buildSystemPrompt(name: string, personality: PersonalityComponent | undefined, entityId?: string): string {
+  private buildSystemPrompt(name: string, personality: PersonalityComponent | undefined, entityId?: string, species?: string): string {
     if (!personality) {
       return `You are ${name}, a villager in a forest village.\n\n`;
     }
 
-    return generatePersonalityPrompt({ name, personality, entityId });
+    return generatePersonalityPrompt({ name, personality, entityId, species });
   }
 
   /**

@@ -175,7 +175,7 @@ export class CachedDevRenderer {
       if (!groups[group]) {
         groups[group] = {};
       }
-      groups[group][fieldName] = fieldDef;
+      groups[group]![fieldName] = fieldDef;
     }
 
     return groups;

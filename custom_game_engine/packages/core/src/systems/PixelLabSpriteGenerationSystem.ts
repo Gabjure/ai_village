@@ -378,7 +378,7 @@ export class PixelLabSpriteGenerationSystem extends BaseSystem {
         // If sharp is not available, just copy the file for now
         // TODO: Implement proper mirroring without sharp
         console.warn(`[PixelLabSprite] Sharp not available, copying image instead of mirroring`);
-        fs.writeFileSync(targetPath, sourceBuffer);
+        fs.writeFileSync(targetPath, new Uint8Array(sourceBuffer));
       }
 
     } catch (error) {
@@ -604,7 +604,7 @@ export class PixelLabSpriteGenerationSystem extends BaseSystem {
 
       // Save the image
       const filePath = path.join(spritesDir, `${direction}.png`);
-      fs.writeFileSync(filePath, Buffer.from(imageBuffer));
+      fs.writeFileSync(filePath, new Uint8Array(Buffer.from(imageBuffer)));
 
     } catch (error) {
       console.error(`[PixelLabSprite] Failed to download ${direction} image:`, error);

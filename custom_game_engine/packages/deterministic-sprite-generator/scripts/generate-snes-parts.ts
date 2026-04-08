@@ -28,7 +28,7 @@ const API_BASE = 'https://api.pixellab.ai/v1';
 const DELAY_MS = 5000; // 5 seconds between generations
 
 const SNES_REFERENCE_ID = '762d156d-60dc-4822-915b-af55bc06fb49';
-const STYLE = '16-bit SNES era pixel art, RPG style like Chrono Trigger';
+const STYLE = '16-bit SNES era pixel art, detailed RPG aesthetic';
 const OUTPUT_DIR = path.join(__dirname, '../assets/parts/snes');
 
 interface PartSpec {
@@ -228,7 +228,7 @@ async function main(): Promise<void> {
 
       // Save to file
       const outputPath = path.join(OUTPUT_DIR, part.category, `${part.id}.png`);
-      fs.writeFileSync(outputPath, Buffer.from(base64, 'base64'));
+      fs.writeFileSync(outputPath, new Uint8Array(Buffer.from(base64, 'base64')));
 
       console.log(`   ✅ Saved to ${part.category}/${part.id}.png`);
       completed++;
