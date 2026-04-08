@@ -1,0 +1,1164 @@
+{
+  "id": "ferromancy-tree",
+  "paradigmId": "ferromancy",
+  "name": "The Art of Ferromancy",
+  "description": "Burn metals to gain supernatural powers. Bloodline determines which metals you can burn.",
+  "lore": "Ferromancy is genetic - you either have the blood, or you don't. Those with\nFerromancer ancestry may be MonoResonants (one metal) or OmniResonant (all metals).\nBut the power lies dormant until The Fracture - a moment of intense trauma\nthat breaks the barriers and lets the power through.",
+  "nodes": [
+    {
+      "id": "fractured",
+      "name": "Fractured",
+      "description": "The breaking point that awakens Ferromancy potential",
+      "paradigmId": "ferromancy",
+      "category": "foundation",
+      "tier": 0,
+      "xpCost": 0,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Can feel metal reserves",
+          "target": {
+            "abilityId": "metal_sense_internal"
+          }
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "the_fracture",
+          "params": {},
+          "description": "Must experience a the_fracture event (severe trauma that awakens powers)",
+          "hidden": true
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "The Fracture is the moment of trauma that unlocks Ferromancy. For many, it happens\nin childhood - a moment of intense fear, pain, or grief that breaks something inside\nand lets the power through. Not all with the bloodline will Snap. Some go their\nwhole lives never knowing what they could have been.",
+      "hidden": true,
+      "icon": "💔"
+    },
+    {
+      "id": "metal-awareness",
+      "name": "Metal Awareness",
+      "description": "Learn to sense metals around you",
+      "paradigmId": "ferromancy",
+      "category": "foundation",
+      "tier": 1,
+      "xpCost": 50,
+      "maxLevel": 3,
+      "effects": [
+        {
+          "type": "metal_sense",
+          "baseValue": 1,
+          "description": "Sense nearby metals"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "prerequisites": [
+        "fractured"
+      ],
+      "levelCostMultiplier": 1.5
+    },
+    {
+      "id": "burn-control",
+      "name": "Burn Control",
+      "description": "Control how quickly you burn metals",
+      "paradigmId": "ferromancy",
+      "category": "technique",
+      "tier": 1,
+      "xpCost": 75,
+      "maxLevel": 5,
+      "effects": [
+        {
+          "type": "burn_rate_control",
+          "baseValue": 1,
+          "perLevelValue": 0.2,
+          "description": "Control burn rate from slow to fast"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "lore": "Burning slowly conserves metal but provides weaker effects. Burning quickly is more powerful but depletes reserves faster.",
+      "prerequisites": [
+        "fractured"
+      ],
+      "levelCostMultiplier": 1.5
+    },
+    {
+      "id": "reserve-efficiency",
+      "name": "Efficient Reserves",
+      "description": "Extract more power from your metal reserves",
+      "paradigmId": "ferromancy",
+      "category": "efficiency",
+      "tier": 2,
+      "xpCost": 100,
+      "maxLevel": 5,
+      "effects": [
+        {
+          "type": "reserve_efficiency",
+          "baseValue": 5,
+          "perLevelValue": 3,
+          "description": "+X% metal duration"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "prerequisites": [
+        "burn-control"
+      ],
+      "levelCostMultiplier": 1.5
+    },
+    {
+      "id": "flaring",
+      "name": "Flaring",
+      "description": "Learn to flare metals for a dangerous burst of power",
+      "paradigmId": "ferromancy",
+      "category": "mastery",
+      "tier": 2,
+      "xpCost": 150,
+      "maxLevel": 3,
+      "effects": [
+        {
+          "type": "flare_control",
+          "baseValue": 1,
+          "description": "Can flare metals for burst power"
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "magic_proficiency",
+          "params": {
+            "techniqueId": "enhance",
+            "proficiencyLevel": 2
+          },
+          "description": "Must have practiced burning metals extensively"
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "Flaring burns metals at an extreme rate, providing a massive boost at the cost of rapid depletion and physical strain.",
+      "prerequisites": [
+        "burn-control"
+      ],
+      "levelCostMultiplier": 2
+    },
+    {
+      "id": "safe-flaring",
+      "name": "Controlled Flaring",
+      "description": "Flare metals with reduced physical strain",
+      "paradigmId": "ferromancy",
+      "category": "mastery",
+      "tier": 3,
+      "xpCost": 200,
+      "maxLevel": 3,
+      "effects": [
+        {
+          "type": "flare_control",
+          "baseValue": 1,
+          "perLevelValue": 1,
+          "description": "Reduce flaring side effects"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "prerequisites": [
+        "flaring"
+      ],
+      "levelCostMultiplier": 2
+    },
+    {
+      "id": "metal-steel",
+      "name": "Steel",
+      "description": "Push on nearby metals",
+      "paradigmId": "ferromancy",
+      "category": "discovery",
+      "tier": 1,
+      "xpCost": 50,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_metal",
+          "baseValue": 1,
+          "target": {
+            "metalId": "steel"
+          },
+          "description": "Can burn Steel: Push on nearby metals"
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "metal_consumed",
+          "params": {
+            "metalId": "steel"
+          },
+          "description": "Must have consumed and survived burning Steel",
+          "hidden": true
+        }
+      ],
+      "conditionMode": "all",
+      "prerequisites": [
+        "fractured"
+      ],
+      "hidden": true,
+      "tags": [
+        "physical",
+        "push",
+        "common"
+      ]
+    },
+    {
+      "id": "metal-iron",
+      "name": "Iron",
+      "description": "Pull on nearby metals",
+      "paradigmId": "ferromancy",
+      "category": "discovery",
+      "tier": 1,
+      "xpCost": 50,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_metal",
+          "baseValue": 1,
+          "target": {
+            "metalId": "iron"
+          },
+          "description": "Can burn Iron: Pull on nearby metals"
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "metal_consumed",
+          "params": {
+            "metalId": "iron"
+          },
+          "description": "Must have consumed and survived burning Iron",
+          "hidden": true
+        }
+      ],
+      "conditionMode": "all",
+      "prerequisites": [
+        "fractured"
+      ],
+      "hidden": true,
+      "tags": [
+        "physical",
+        "pull",
+        "common"
+      ]
+    },
+    {
+      "id": "metal-pewter",
+      "name": "Pewter",
+      "description": "Enhanced strength, speed, durability",
+      "paradigmId": "ferromancy",
+      "category": "discovery",
+      "tier": 1,
+      "xpCost": 50,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_metal",
+          "baseValue": 1,
+          "target": {
+            "metalId": "pewter"
+          },
+          "description": "Can burn Pewter: Enhanced strength, speed, durability"
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "metal_consumed",
+          "params": {
+            "metalId": "pewter"
+          },
+          "description": "Must have consumed and survived burning Pewter",
+          "hidden": true
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "Drawback: Pewter drag after",
+      "prerequisites": [
+        "fractured"
+      ],
+      "hidden": true,
+      "tags": [
+        "physical",
+        "push",
+        "common"
+      ]
+    },
+    {
+      "id": "metal-tin",
+      "name": "Tin",
+      "description": "Enhanced senses",
+      "paradigmId": "ferromancy",
+      "category": "discovery",
+      "tier": 1,
+      "xpCost": 50,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_metal",
+          "baseValue": 1,
+          "target": {
+            "metalId": "tin"
+          },
+          "description": "Can burn Tin: Enhanced senses"
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "metal_consumed",
+          "params": {
+            "metalId": "tin"
+          },
+          "description": "Must have consumed and survived burning Tin",
+          "hidden": true
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "Drawback: Sensory overload risk",
+      "prerequisites": [
+        "fractured"
+      ],
+      "hidden": true,
+      "tags": [
+        "physical",
+        "pull",
+        "common"
+      ]
+    },
+    {
+      "id": "metal-zinc",
+      "name": "Zinc",
+      "description": "Riot - inflame emotions",
+      "paradigmId": "ferromancy",
+      "category": "discovery",
+      "tier": 2,
+      "xpCost": 100,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_metal",
+          "baseValue": 1,
+          "target": {
+            "metalId": "zinc"
+          },
+          "description": "Can burn Zinc: Riot - inflame emotions"
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "metal_consumed",
+          "params": {
+            "metalId": "zinc"
+          },
+          "description": "Must have consumed and survived burning Zinc",
+          "hidden": true
+        }
+      ],
+      "conditionMode": "all",
+      "prerequisites": [
+        "fractured"
+      ],
+      "hidden": true,
+      "tags": [
+        "mental",
+        "push",
+        "uncommon"
+      ]
+    },
+    {
+      "id": "metal-brass",
+      "name": "Brass",
+      "description": "Soothe - dampen emotions",
+      "paradigmId": "ferromancy",
+      "category": "discovery",
+      "tier": 2,
+      "xpCost": 100,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_metal",
+          "baseValue": 1,
+          "target": {
+            "metalId": "brass"
+          },
+          "description": "Can burn Brass: Soothe - dampen emotions"
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "metal_consumed",
+          "params": {
+            "metalId": "brass"
+          },
+          "description": "Must have consumed and survived burning Brass",
+          "hidden": true
+        }
+      ],
+      "conditionMode": "all",
+      "prerequisites": [
+        "fractured"
+      ],
+      "hidden": true,
+      "tags": [
+        "mental",
+        "pull",
+        "uncommon"
+      ]
+    },
+    {
+      "id": "metal-copper",
+      "name": "Copper",
+      "description": "Hide ferromancy pulses (Copper-Shroud)",
+      "paradigmId": "ferromancy",
+      "category": "discovery",
+      "tier": 2,
+      "xpCost": 100,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_metal",
+          "baseValue": 1,
+          "target": {
+            "metalId": "copper"
+          },
+          "description": "Can burn Copper: Hide ferromancy pulses (Copper-Shroud)"
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "metal_consumed",
+          "params": {
+            "metalId": "copper"
+          },
+          "description": "Must have consumed and survived burning Copper",
+          "hidden": true
+        }
+      ],
+      "conditionMode": "all",
+      "prerequisites": [
+        "fractured"
+      ],
+      "hidden": true,
+      "tags": [
+        "mental",
+        "push",
+        "uncommon"
+      ]
+    },
+    {
+      "id": "metal-bronze",
+      "name": "Bronze",
+      "description": "Detect ferromancy pulses (Bronze-Finder)",
+      "paradigmId": "ferromancy",
+      "category": "discovery",
+      "tier": 2,
+      "xpCost": 100,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_metal",
+          "baseValue": 1,
+          "target": {
+            "metalId": "bronze"
+          },
+          "description": "Can burn Bronze: Detect ferromancy pulses (Bronze-Finder)"
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "metal_consumed",
+          "params": {
+            "metalId": "bronze"
+          },
+          "description": "Must have consumed and survived burning Bronze",
+          "hidden": true
+        }
+      ],
+      "conditionMode": "all",
+      "prerequisites": [
+        "fractured"
+      ],
+      "hidden": true,
+      "tags": [
+        "mental",
+        "pull",
+        "uncommon"
+      ]
+    },
+    {
+      "id": "metal-aluminum",
+      "name": "Aluminum",
+      "description": "Wipe own metal reserves",
+      "paradigmId": "ferromancy",
+      "category": "discovery",
+      "tier": 3,
+      "xpCost": 200,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_metal",
+          "baseValue": 1,
+          "target": {
+            "metalId": "aluminum"
+          },
+          "description": "Can burn Aluminum: Wipe own metal reserves"
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "metal_consumed",
+          "params": {
+            "metalId": "aluminum"
+          },
+          "description": "Must have consumed and survived burning Aluminum",
+          "hidden": true
+        }
+      ],
+      "conditionMode": "all",
+      "prerequisites": [
+        "fractured"
+      ],
+      "hidden": true,
+      "tags": [
+        "enhancement",
+        "push",
+        "rare"
+      ]
+    },
+    {
+      "id": "metal-amplium",
+      "name": "Amplium",
+      "description": "Massively boost next metal burned",
+      "paradigmId": "ferromancy",
+      "category": "discovery",
+      "tier": 3,
+      "xpCost": 200,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_metal",
+          "baseValue": 1,
+          "target": {
+            "metalId": "amplium"
+          },
+          "description": "Can burn Amplium: Massively boost next metal burned"
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "metal_consumed",
+          "params": {
+            "metalId": "amplium"
+          },
+          "description": "Must have consumed and survived burning Amplium",
+          "hidden": true
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "Drawback: Burns all reserves instantly",
+      "prerequisites": [
+        "fractured",
+        "reserve-efficiency"
+      ],
+      "hidden": true,
+      "tags": [
+        "enhancement",
+        "push",
+        "rare"
+      ]
+    },
+    {
+      "id": "metal-gold",
+      "name": "Gold",
+      "description": "See past self (who you could have been)",
+      "paradigmId": "ferromancy",
+      "category": "discovery",
+      "tier": 4,
+      "xpCost": 300,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_metal",
+          "baseValue": 1,
+          "target": {
+            "metalId": "gold"
+          },
+          "description": "Can burn Gold: See past self (who you could have been)"
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "metal_consumed",
+          "params": {
+            "metalId": "gold"
+          },
+          "description": "Must have consumed and survived burning Gold",
+          "hidden": true
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "Drawback: Psychologically traumatic",
+      "prerequisites": [
+        "fractured"
+      ],
+      "hidden": true,
+      "tags": [
+        "temporal",
+        "pull",
+        "rare"
+      ]
+    },
+    {
+      "id": "metal-temporite",
+      "name": "Temporite",
+      "description": "See moments into the future",
+      "paradigmId": "ferromancy",
+      "category": "discovery",
+      "tier": 4,
+      "xpCost": 300,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_metal",
+          "baseValue": 1,
+          "target": {
+            "metalId": "temporite"
+          },
+          "description": "Can burn Temporite: See moments into the future"
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "metal_consumed",
+          "params": {
+            "metalId": "temporite"
+          },
+          "description": "Must have consumed and survived burning Temporite",
+          "hidden": true
+        }
+      ],
+      "conditionMode": "all",
+      "prerequisites": [
+        "fractured"
+      ],
+      "hidden": true,
+      "tags": [
+        "temporal",
+        "pull",
+        "legendary"
+      ]
+    },
+    {
+      "id": "mastery-steel",
+      "name": "Steel Mastery",
+      "description": "Master the use of Steel",
+      "paradigmId": "ferromancy",
+      "category": "mastery",
+      "tier": 2,
+      "xpCost": 150,
+      "maxLevel": 5,
+      "effects": [
+        {
+          "type": "technique_proficiency",
+          "baseValue": 5,
+          "perLevelValue": 3,
+          "target": {
+            "metalId": "steel"
+          },
+          "description": "+X% effectiveness when burning Steel"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "prerequisites": [
+        "metal-steel"
+      ],
+      "levelCostMultiplier": 1.5
+    },
+    {
+      "id": "mastery-iron",
+      "name": "Iron Mastery",
+      "description": "Master the use of Iron",
+      "paradigmId": "ferromancy",
+      "category": "mastery",
+      "tier": 2,
+      "xpCost": 150,
+      "maxLevel": 5,
+      "effects": [
+        {
+          "type": "technique_proficiency",
+          "baseValue": 5,
+          "perLevelValue": 3,
+          "target": {
+            "metalId": "iron"
+          },
+          "description": "+X% effectiveness when burning Iron"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "prerequisites": [
+        "metal-iron"
+      ],
+      "levelCostMultiplier": 1.5
+    },
+    {
+      "id": "mastery-pewter",
+      "name": "Pewter Mastery",
+      "description": "Master the use of Pewter",
+      "paradigmId": "ferromancy",
+      "category": "mastery",
+      "tier": 2,
+      "xpCost": 150,
+      "maxLevel": 5,
+      "effects": [
+        {
+          "type": "technique_proficiency",
+          "baseValue": 5,
+          "perLevelValue": 3,
+          "target": {
+            "metalId": "pewter"
+          },
+          "description": "+X% effectiveness when burning Pewter"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "prerequisites": [
+        "metal-pewter"
+      ],
+      "levelCostMultiplier": 1.5
+    },
+    {
+      "id": "mastery-tin",
+      "name": "Tin Mastery",
+      "description": "Master the use of Tin",
+      "paradigmId": "ferromancy",
+      "category": "mastery",
+      "tier": 2,
+      "xpCost": 150,
+      "maxLevel": 5,
+      "effects": [
+        {
+          "type": "technique_proficiency",
+          "baseValue": 5,
+          "perLevelValue": 3,
+          "target": {
+            "metalId": "tin"
+          },
+          "description": "+X% effectiveness when burning Tin"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "prerequisites": [
+        "metal-tin"
+      ],
+      "levelCostMultiplier": 1.5
+    },
+    {
+      "id": "iron-puller",
+      "name": "Iron-Puller",
+      "description": "Specialize in steel pushing, the art of the Iron-Puller",
+      "paradigmId": "ferromancy",
+      "category": "specialization",
+      "tier": 3,
+      "xpCost": 250,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "technique_proficiency",
+          "baseValue": 10,
+          "target": {
+            "metalId": "steel"
+          },
+          "description": "Expert steel pusher"
+        },
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "coin_salvo"
+          },
+          "description": "Can push multiple coins simultaneously"
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "bloodline",
+          "params": {
+            "bloodlineStrength": 0.1
+          },
+          "description": "Must have MonoResonant bloodline for steel",
+          "bypassable": true,
+          "bypassCost": 500
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "Iron-Pullers are the assassins and warriors of Ferromancy, using steel to push on metals with deadly precision.",
+      "prerequisites": [
+        "mastery-steel"
+      ]
+    },
+    {
+      "id": "steel-launcher",
+      "name": "Steel-Launcher",
+      "description": "Specialize in iron pulling, the art of the Steel-Launcher",
+      "paradigmId": "ferromancy",
+      "category": "specialization",
+      "tier": 3,
+      "xpCost": 250,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "technique_proficiency",
+          "baseValue": 10,
+          "target": {
+            "metalId": "iron"
+          },
+          "description": "Expert iron puller"
+        },
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "iron_grapple"
+          },
+          "description": "Can pull yourself to heavy metal objects"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "prerequisites": [
+        "mastery-iron"
+      ]
+    },
+    {
+      "id": "pewter-arm",
+      "name": "Pewter Arm (Pewter-Arm)",
+      "description": "Specialize in pewter burning, becoming a living weapon",
+      "paradigmId": "ferromancy",
+      "category": "specialization",
+      "tier": 3,
+      "xpCost": 250,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "technique_proficiency",
+          "baseValue": 10,
+          "target": {
+            "metalId": "pewter"
+          },
+          "description": "Expert pewter burner"
+        },
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "pewter_drag_resistance"
+          },
+          "description": "Reduced pewter drag after burning"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "prerequisites": [
+        "mastery-pewter"
+      ]
+    },
+    {
+      "id": "tin-sense",
+      "name": "Tin-Sense",
+      "description": "Specialize in tin burning, becoming a master of senses",
+      "paradigmId": "ferromancy",
+      "category": "specialization",
+      "tier": 3,
+      "xpCost": 250,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "technique_proficiency",
+          "baseValue": 10,
+          "target": {
+            "metalId": "tin"
+          },
+          "description": "Expert tin burner"
+        },
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "sensory_filter"
+          },
+          "description": "Can filter sensory overload"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "prerequisites": [
+        "mastery-tin"
+      ]
+    },
+    {
+      "id": "zinc-whisper",
+      "name": "Zinc-Whisper",
+      "description": "Master the art of calming and dampening emotions",
+      "paradigmId": "ferromancy",
+      "category": "specialization",
+      "tier": 3,
+      "xpCost": 300,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "technique_proficiency",
+          "baseValue": 10,
+          "target": {
+            "metalId": "brass"
+          },
+          "description": "Expert emotion dampener"
+        },
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "targeted_soothing"
+          },
+          "description": "Can target specific emotions"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "prerequisites": [
+        "metal-brass"
+      ]
+    },
+    {
+      "id": "brass-kindler",
+      "name": "Brass-Kindler",
+      "description": "Master the art of inflaming and inciting emotions",
+      "paradigmId": "ferromancy",
+      "category": "specialization",
+      "tier": 3,
+      "xpCost": 300,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "technique_proficiency",
+          "baseValue": 10,
+          "target": {
+            "metalId": "zinc"
+          },
+          "description": "Expert emotion inflamer"
+        },
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "targeted_rioting"
+          },
+          "description": "Can target specific emotions to inflame"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "prerequisites": [
+        "metal-zinc"
+      ]
+    },
+    {
+      "id": "copper-shroud",
+      "name": "Copper-Shroud",
+      "description": "Master the coppercloud, hiding Ferromancy pulses",
+      "paradigmId": "ferromancy",
+      "category": "specialization",
+      "tier": 3,
+      "xpCost": 300,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "technique_proficiency",
+          "baseValue": 10,
+          "target": {
+            "metalId": "copper"
+          },
+          "description": "Expert coppercloud creator"
+        },
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "extended_coppercloud"
+          },
+          "description": "Coppercloud covers larger area"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "prerequisites": [
+        "metal-copper"
+      ]
+    },
+    {
+      "id": "bronze-finder",
+      "name": "Bronze-Finder",
+      "description": "Master the art of detecting Ferromancy pulses",
+      "paradigmId": "ferromancy",
+      "category": "specialization",
+      "tier": 3,
+      "xpCost": 300,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "technique_proficiency",
+          "baseValue": 10,
+          "target": {
+            "metalId": "bronze"
+          },
+          "description": "Expert Ferromancy detector"
+        },
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "target": {
+            "abilityId": "pulse_identification"
+          },
+          "description": "Can identify which metal is being burned"
+        }
+      ],
+      "unlockConditions": [],
+      "conditionMode": "all",
+      "prerequisites": [
+        "metal-bronze"
+      ]
+    },
+    {
+      "id": "omni_resonant-awakening",
+      "name": "OmniResonant Awakening",
+      "description": "Awaken as a full OmniResonant, able to burn all metals",
+      "paradigmId": "ferromancy",
+      "category": "mastery",
+      "tier": 2,
+      "xpCost": 0,
+      "maxLevel": 1,
+      "effects": [
+        {
+          "type": "unlock_ability",
+          "baseValue": 1,
+          "description": "Can burn all metals",
+          "target": {
+            "abilityId": "full_ferromancy"
+          }
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "bloodline",
+          "params": {
+            "bloodlineId": "omni_resonant",
+            "bloodlineStrength": 1
+          },
+          "description": "Must have full OmniResonant bloodline"
+        }
+      ],
+      "conditionMode": "all",
+      "lore": "True OmniResonant are exceedingly rare - perhaps one in a hundred thousand with any Ferromancy blood will be born with the ability to burn all metals.",
+      "prerequisites": [
+        "fractured"
+      ],
+      "hidden": true
+    },
+    {
+      "id": "metal-synergy",
+      "name": "Metal Synergy",
+      "description": "Gain bonuses when burning multiple metals simultaneously",
+      "paradigmId": "ferromancy",
+      "category": "mastery",
+      "tier": 4,
+      "xpCost": 400,
+      "maxLevel": 3,
+      "effects": [
+        {
+          "type": "technique_proficiency",
+          "baseValue": 5,
+          "description": "Bonus when burning multiple metals"
+        }
+      ],
+      "unlockConditions": [
+        {
+          "type": "nodes_unlocked",
+          "params": {
+            "nodesRequired": 4
+          },
+          "description": "Must have discovered at least 4 metals"
+        }
+      ],
+      "conditionMode": "all",
+      "prerequisites": [
+        "omni_resonant-awakening"
+      ],
+      "levelCostMultiplier": 2
+    }
+  ],
+  "entryNodes": [
+    "fractured"
+  ],
+  "connections": [],
+  "xpSources": [
+    {
+      "eventType": "metal_burned",
+      "xpAmount": 5,
+      "description": "Burn any metal"
+    },
+    {
+      "eventType": "metal_discovered",
+      "xpAmount": 100,
+      "description": "Discover you can burn a new metal"
+    },
+    {
+      "eventType": "metal_flared",
+      "xpAmount": 15,
+      "description": "Flare a metal"
+    },
+    {
+      "eventType": "push_pull_success",
+      "xpAmount": 10,
+      "description": "Successfully push or pull on metal"
+    },
+    {
+      "eventType": "combat_with_ferromancy",
+      "xpAmount": 25,
+      "description": "Use Ferromancy in combat"
+    },
+    {
+      "eventType": "emotion_manipulation",
+      "xpAmount": 20,
+      "description": "Successfully manipulate emotions with zinc/brass"
+    },
+    {
+      "eventType": "detection_avoided",
+      "xpAmount": 30,
+      "description": "Hide from a Bronze-Finder using copper"
+    },
+    {
+      "eventType": "bronze-finder_detection",
+      "xpAmount": 20,
+      "description": "Detect Ferromancy with bronze"
+    }
+  ],
+  "rules": {
+    "allowRespec": false,
+    "permanentProgress": true,
+    "requiresInnateAbility": true,
+    "innateCondition": {
+      "type": "bloodline",
+      "params": {
+        "bloodlineId": "ferromancer"
+      },
+      "description": "Must have Ferromancer bloodline"
+    }
+  },
+  "version": 1
+}
