@@ -22,6 +22,7 @@ import type { MoodComponent } from '../components/MoodComponent.js';
 import { ComponentType } from '../types/ComponentType.js';
 import { isCriticalThreat } from '../components/ThreatDetectionComponent.js';
 import { HUNGER_THRESHOLD_SEEK_FOOD, ENERGY_THRESHOLD_SEEK_SLEEP } from '../constants/NeedsConstants.js';
+import { calculateFarmingContext, calculateFarmingUtilities, shouldFarm } from './FarmingUtilityCalculator.js';
 
 /**
  * Result of autonomic check
@@ -92,6 +93,22 @@ export class AutonomicSystem {
       mood || undefined
     );
     if (needsResult) return needsResult;
+
+    // Proactive farming: when hunger is dropping (below 0.5) but not yet critical,
+    // and farming conditions exist, trigger farming to prevent starvation.
+    // Priority 25: low enough that it won't override active work, but ensures
+    // agents farm before they get desperate and wander off seeking food.
+    if (world && needs.hunger < 0.5 && needs.hunger >= HUNGER_THRESHOLD_SEEK_FOOD) {
+      const farmingContext = calculateFarmingContext(entity, world);
+      const farmingUtilities = calculateFarmingUtilities(farmingContext);
+      if (shouldFarm(farmingUtilities)) {
+        return {
+          behavior: 'farm',
+          priority: 25,
+          reason: `Proactive farming (hunger: ${(needs.hunger * 100).toFixed(0)}%, farming utility available)`,
+        };
+      }
+    }
 
     return null;
   }

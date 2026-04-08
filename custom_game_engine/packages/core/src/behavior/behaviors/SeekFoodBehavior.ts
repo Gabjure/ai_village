@@ -18,7 +18,7 @@ import type { NeedsComponent } from '../../components/NeedsComponent.js';
 import type { PositionComponent } from '../../components/PositionComponent.js';
 import type { BuildingComponent } from '../../components/BuildingComponent.js';
 import type { MovementComponent } from '../../components/MovementComponent.js';
-import type { AgentComponent } from '../../components/AgentComponent.js';
+import type { AgentComponent, AgentBehavior } from '../../components/AgentComponent.js';
 import type { SpatialMemoryComponent } from '../../components/SpatialMemoryComponent.js';
 import { getSpatialMemoriesByType } from '../../components/SpatialMemoryComponent.js';
 import { itemRegistry } from '../../items/index.js';
@@ -31,6 +31,7 @@ import { BuildingType } from '../../types/BuildingType.js';
 import { CHUNK_SIZE } from '../../types.js';
 import type { BehaviorContext, BehaviorResult as ContextBehaviorResult } from '../BehaviorContext.js';
 import { isPlantComponent } from '../../components/typeGuards.js';
+import { calculateFarmingContext, calculateFarmingUtilities, shouldFarm, getBestFarmingAction } from '../../decision/FarmingUtilityCalculator.js';
 
 /**
  * ChunkSpatialQuery is now available via world.spatialQuery
@@ -139,29 +140,38 @@ export class SeekFoodBehavior extends BaseBehavior {
       }
     }
 
-    // No food found and no memories - wander to explore for food
-    // Instead of switching to 'wander' behavior (which gets overridden by autonomic system),
-    // wander directly as part of seeking food (exploring to find food)
+    // No food found and no memories — check if farming can produce food
+    // This prevents agents from wandering into the wilderness when hungry
+    const farmingContext = calculateFarmingContext(entity, world);
+    const farmingUtilities = calculateFarmingUtilities(farmingContext);
+
+    if (shouldFarm(farmingUtilities)) {
+      const bestAction = getBestFarmingAction(farmingUtilities);
+      if (bestAction) {
+        // Switch to the appropriate farming behavior to produce food
+        // harvest > gather_seeds > plant > till > water (food-production priority)
+        const farmingBehaviorMap: Record<string, AgentBehavior> = {
+          harvest: 'harvest',
+          gather_seeds: 'gather',
+          plant: 'plant',
+          till: 'till',
+          water: 'water',
+        };
+        const targetBehavior: AgentBehavior = farmingBehaviorMap[bestAction.action] || 'till';
+        return { complete: true, reason: `No food available, switching to farming: ${targetBehavior}`, nextBehavior: targetBehavior };
+      }
+    }
+
+    // No food and no farming opportunity — wander to explore
     const movement = entity.getComponent(ComponentType.Movement);
     if (movement && agentPosition) {
-      // Get or initialize wander angle
       let wanderAngle = agent.behaviorState?.wanderAngle as number | undefined;
       if (wanderAngle === undefined) {
         wanderAngle = Math.random() * Math.PI * 2;
       }
-
-      // Add small random jitter for natural exploration
-      wanderAngle += (Math.random() - 0.5) * (Math.PI / 18); // ~10 degrees
-
-      // Calculate velocity
+      wanderAngle += (Math.random() - 0.5) * (Math.PI / 18);
       const speed = movement.speed;
-      const velocityX = Math.cos(wanderAngle) * speed;
-      const velocityY = Math.sin(wanderAngle) * speed;
-
-      // Set velocity
-      this.setVelocity(entity, velocityX, velocityY);
-
-      // Save wander angle for next tick
+      this.setVelocity(entity, Math.cos(wanderAngle) * speed, Math.sin(wanderAngle) * speed);
       this.updateState(entity, { wanderAngle });
     }
 
