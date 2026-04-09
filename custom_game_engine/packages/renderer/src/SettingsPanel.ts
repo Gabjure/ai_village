@@ -60,8 +60,8 @@ function getDefaultLLMSettings(): LLMSettings {
   if (isProduction) {
     return {
       provider: 'openai-compat',
-      baseUrl: 'https://api.groq.com/openai/v1',
-      model: 'qwen/qwen3-32b',
+      baseUrl: 'https://api.cerebras.ai/v1',
+      model: 'qwen-3-235b-a22b-instruct-2507',
       apiKey: '',
     };
   }
@@ -245,8 +245,8 @@ export class SettingsPanel implements IWindowPanel {
           render: { ...DEFAULT_SETTINGS.render, ...parsed.render },
           sound: { ...DEFAULT_SETTINGS.sound, ...parsed.sound },
         };
-        // Migrate: in production, override cached localhost LLM URLs with Groq
-        if (isProduction && merged.llm.baseUrl.includes('localhost')) {
+        // Migrate: in production, override cached localhost or rate-limited Groq URLs with Cerebras
+        if (isProduction && (merged.llm.baseUrl.includes('localhost') || merged.llm.baseUrl.includes('groq.com'))) {
           merged.llm = getDefaultLLMSettings();
         }
         return merged;
