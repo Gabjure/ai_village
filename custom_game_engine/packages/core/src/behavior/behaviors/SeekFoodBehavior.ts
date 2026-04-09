@@ -641,7 +641,27 @@ export function seekFoodBehaviorWithContext(ctx: BehaviorContext): ContextBehavi
     }
   }
 
-  // No food found and no memories - wander to explore for food
+  // No food found and no memories — check if farming can produce food
+  // This prevents agents from wandering into the wilderness when hungry
+  const farmingContext = calculateFarmingContext(ctx.entity as EntityImpl, ctx.world);
+  const farmingUtilities = calculateFarmingUtilities(farmingContext);
+
+  if (shouldFarm(farmingUtilities)) {
+    const bestAction = getBestFarmingAction(farmingUtilities);
+    if (bestAction) {
+      const farmingBehaviorMap: Record<string, AgentBehavior> = {
+        harvest: 'harvest',
+        gather_seeds: 'gather',
+        plant: 'plant',
+        till: 'till',
+        water: 'water',
+      };
+      const targetBehavior = farmingBehaviorMap[bestAction.action] || 'till';
+      return { complete: true, reason: `No food available, switching to farming: ${targetBehavior}`, nextBehavior: targetBehavior as AgentBehavior };
+    }
+  }
+
+  // No food and no farming opportunity — wander to explore for food
   if (!ctx.movement) return;
 
   let wanderAngle = ctx.getState<number>('wanderAngle');
@@ -649,10 +669,8 @@ export function seekFoodBehaviorWithContext(ctx: BehaviorContext): ContextBehavi
     wanderAngle = Math.random() * Math.PI * 2;
   }
 
-  // Add small random jitter for natural exploration
-  wanderAngle += (Math.random() - 0.5) * (Math.PI / 18); // ~10 degrees
+  wanderAngle += (Math.random() - 0.5) * (Math.PI / 18);
 
-  // Calculate velocity
   const speed = ctx.movement.speed;
   const velocityX = Math.cos(wanderAngle) * speed;
   const velocityY = Math.sin(wanderAngle) * speed;
