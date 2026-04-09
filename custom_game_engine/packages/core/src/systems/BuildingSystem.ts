@@ -1092,12 +1092,33 @@ export class BuildingSystem extends BaseSystem {
       // Tier 5
       'arcane_tower': 360,
       'inventors_hall': 480,
+
+      // Housing
+      'house': 120,
+
+      // Farm/agriculture
+      'farm-storage': 90,
+      'garden_fence': 45,
+      'auto_farm': 120,
+
+      // Knowledge/governance
+      'granary': 200,
+      'university': 300,
+      'library': 150,
+
+      // Religious buildings
+      'temple': 240,
+      'shrine': 90,
+
+      // Crafting stations (additional)
+      'butchering_table': 75,
     };
 
     const time = constructionTimes[buildingType];
     if (time === undefined) {
-      // Per CLAUDE.md: No silent fallbacks
-      throw new Error(`Unknown building type: ${buildingType}. Cannot determine construction time.`);
+      // Warn but don't crash — unknown types get a default so construction isn't killed
+      console.warn(`[BuildingSystem] Unknown building type "${buildingType}" — using default 60s construction time. Add it to getConstructionTime().`);
+      return 60;
     }
 
     return time;

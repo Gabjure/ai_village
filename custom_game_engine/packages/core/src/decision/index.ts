@@ -254,8 +254,8 @@ export class DecisionProcessor {
   /**
    * Process only autonomic decisions.
    */
-  processAutonomic(entity: EntityImpl): AutonomicResultType | null {
-    return this.autonomicSystem.check(entity);
+  processAutonomic(entity: EntityImpl, world?: World): AutonomicResultType | null {
+    return this.autonomicSystem.check(entity, world);
   }
 
   /**

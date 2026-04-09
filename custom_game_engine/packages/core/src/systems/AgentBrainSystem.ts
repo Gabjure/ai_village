@@ -501,7 +501,7 @@ export class AgentBrainSystem extends BaseSystem {
     agent: AgentComponent
   ): { behavior: string; execute: boolean } {
     // Layer 1: Autonomic check
-    const autonomicResult = this.decision.processAutonomic(entity);
+    const autonomicResult = this.decision.processAutonomic(entity, world);
 
     if (autonomicResult) {
       const temperature = entity.getComponent(CT.Temperature) as TemperatureComponent | undefined;

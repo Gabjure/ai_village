@@ -504,8 +504,8 @@ export class ScheduledDecisionProcessor {
   /**
    * Process only autonomic decisions (synchronous).
    */
-  processAutonomic(entity: EntityImpl): AutonomicResult | null {
-    return this.autonomicSystem.check(entity);
+  processAutonomic(entity: EntityImpl, world?: World): AutonomicResult | null {
+    return this.autonomicSystem.check(entity, world);
   }
 
   /**
