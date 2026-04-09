@@ -1468,7 +1468,7 @@
           "natural_talent"
         ],
         "grantsAccess": [
-          "dust"
+          "aether_motes"
         ],
         "startingProficiency": 20,
         "description": "Training to read the veridex or work with Aether Motes"
@@ -1482,7 +1482,7 @@
         ],
         "grantsAccess": [
           "animus_bond",
-          "dust"
+          "aether_motes"
         ],
         "startingProficiency": 40,
         "description": "Born into a witch clan, can achieve animus separation"

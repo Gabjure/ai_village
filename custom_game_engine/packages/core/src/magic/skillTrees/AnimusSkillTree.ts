@@ -289,6 +289,30 @@ const FORM_MASTERY_NODE = createSkillNode(
 // Aether Motes Sensitivity Nodes
 // ============================================================================
 
+/** Dust sense - earliest awareness of Aether Motes as "dust in the air" */
+const DUST_SENSE_NODE = createSkillNode(
+  'dust-sense',
+  'Dust Sense',
+  PARADIGM_ID,
+  'aether_motes',
+  1,
+  20,
+  [
+    createSkillEffect('perception', 5, {
+      description: 'Vaguely aware of glittering particles in the air',
+    }),
+  ],
+  {
+    description: 'Notice the faint shimmer of Aether Motes without fully understanding what you see',
+    lore: `Before you can truly see Aether Motes, you notice them as dust — motes
+of gold that drift near people who think deeply. Children near settling often
+first notice the dust before they understand it.`,
+    prerequisites: ['animus-bond'],
+    maxLevel: 1,
+    icon: '🌟',
+  }
+);
+
 /** Basic Aether Motes awareness */
 const AETHER_SENSE_NODE = createSkillNode(
   'aether-sense',
@@ -903,6 +927,7 @@ const ALL_NODES: MagicSkillNode[] = [
   FORM_MASTERY_NODE,
 
   // Aether Motes
+  DUST_SENSE_NODE,
   AETHER_SENSE_NODE,
   AETHER_VISION_NODE,
   AETHER_ATTRACTION_NODE,

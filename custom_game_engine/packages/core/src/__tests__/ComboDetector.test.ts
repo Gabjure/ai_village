@@ -184,9 +184,9 @@ describe('ComboDetector - Mind Control', () => {
 });
 
 describe('ComboDetector - Duplication', () => {
-  it('should detect Sympathy + Craft sympathetic enhancement', () => {
+  it('should detect Tethermancy + Craft sympathetic enhancement', () => {
     const mage = createMagicComponent();
-    mage.knownParadigmIds = ['sympathy', 'craft'];
+    mage.knownParadigmIds = ['tethermancy', 'craft'];
 
     const analysis = analyzeCombo(mage);
 
@@ -202,9 +202,9 @@ describe('ComboDetector - Duplication', () => {
     expect(analysis.threats.some(t => t.threat === 'Enhancement Echo')).toBe(true);
   });
 
-  it('should detect Sympathy + Echo network apocalypse', () => {
+  it('should detect Tethermancy + Echo network apocalypse', () => {
     const mage = createMagicComponent();
-    mage.knownParadigmIds = ['sympathy', 'echo'];
+    mage.knownParadigmIds = ['tethermancy', 'echo'];
 
     const analysis = analyzeCombo(mage);
 
