@@ -341,7 +341,8 @@ export class PlanetStorage {
       return JSON.parse(content);
     } catch (error: any) {
       if (error.code === 'ENOENT') return null;
-      throw error;
+      console.error(`[PlanetStorage] Corrupted biosphere data for ${planetId}, treating as empty:`, error.message);
+      return null;
     }
   }
 
@@ -399,7 +400,8 @@ export class PlanetStorage {
       return JSON.parse(content);
     } catch (error: any) {
       if (error.code === 'ENOENT') return null;
-      throw error;
+      console.error(`[PlanetStorage] Corrupted chunk data for ${planetId} (${x},${y}), treating as empty:`, error.message);
+      return null;
     }
   }
 
@@ -665,14 +667,20 @@ export class PlanetStorage {
   private async decompressAndRead(filePath: string): Promise<string> {
     const chunks: Buffer[] = [];
 
-    const readable = createReadStream(filePath);
-    const gunzip = createGunzip();
+    try {
+      const readable = createReadStream(filePath);
+      const gunzip = createGunzip();
 
-    gunzip.on('data', (chunk) => chunks.push(chunk));
+      gunzip.on('data', (chunk: Buffer) => chunks.push(chunk));
 
-    await pipeline(readable, gunzip);
+      await pipeline(readable, gunzip);
 
-    return Buffer.concat(chunks).toString('utf-8');
+      return Buffer.concat(chunks).toString('utf-8');
+    } catch (err: unknown) {
+      const code = (err as NodeJS.ErrnoException).code;
+      console.error(`[PlanetStorage] Failed to decompress ${filePath} (${code ?? 'unknown'}): ${err}`);
+      throw new Error(`Corrupted gz file: ${filePath}`);
+    }
   }
 
   /**
