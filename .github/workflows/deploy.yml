@@ -43,7 +43,13 @@ jobs:
           mkdir -p "$PKG"
           cp packages/core/src/typings/folkfork-bridge.d.ts "$PKG/index.d.ts"
           echo '{"name":"@multiverse-studios/folkfork-bridge","version":"0.0.0","types":"index.d.ts","main":"index.js"}' > "$PKG/package.json"
-          echo 'module.exports = {};' > "$PKG/index.js"
+          cat > "$PKG/index.js" << 'STUB'
+          module.exports = {
+            validateGenome(data) { return { valid: true, findings: [], genome: data }; },
+            migrateGenome(genome) { return { success: true, source_game: 'precursors', target_game: 'mvee', field_reports: [], lossless_count: 0, low_loss_count: 0, medium_loss_count: 0, lossy_count: 0, target_genome: genome }; },
+            validateSpeciesExchange(data) { return { valid: true, findings: [], species: data }; },
+          };
+          STUB
 
       - name: Type check
         run: npm run build
