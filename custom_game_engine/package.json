@@ -57,13 +57,13 @@
     "jsdom": "^27.3.0",
     "madge": "^8.0.0",
     "playwright": "^1.57.0",
-    "tsx": "^4.21.0",
     "typescript": "^5.3.3",
     "vitest": "^4.0.16",
     "ws": "^8.18.3"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.71.2",
+    "tsx": "^4.21.0",
     "@sentry/browser": "^10.45.0",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
