@@ -41,6 +41,10 @@ export interface GameSettings {
 // Detect macOS for MLX default
 const isMacOS = navigator.platform.toLowerCase().includes('mac');
 
+// Detect production: any non-localhost hostname means we're deployed
+const isProduction = typeof window !== 'undefined' &&
+  !['localhost', '127.0.0.1', '0.0.0.0'].includes(window.location.hostname);
+
 function isMobileDevice(): boolean {
   if (typeof window === 'undefined') return false;
   const hasTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
@@ -50,18 +54,35 @@ function isMobileDevice(): boolean {
 
 const _isMobile = isMobileDevice();
 
-const DEFAULT_SETTINGS: GameSettings = {
-  llm: isMacOS ? {
-    provider: 'openai-compat',
-    baseUrl: 'http://localhost:8080/v1',
-    model: 'mlx-community/Qwen3-4B-Instruct-4bit',
-    apiKey: '',
-  } : {
+// In production, default to Groq cloud (backend proxy handles API key).
+// Locally, default to MLX (macOS) or Ollama (Linux/Windows).
+function getDefaultLLMSettings(): LLMSettings {
+  if (isProduction) {
+    return {
+      provider: 'openai-compat',
+      baseUrl: 'https://api.groq.com/openai/v1',
+      model: 'qwen/qwen3-32b',
+      apiKey: '',
+    };
+  }
+  if (isMacOS) {
+    return {
+      provider: 'openai-compat',
+      baseUrl: 'http://localhost:8080/v1',
+      model: 'mlx-community/Qwen3-4B-Instruct-4bit',
+      apiKey: '',
+    };
+  }
+  return {
     provider: 'ollama',
     baseUrl: 'http://localhost:11434',
     model: 'qwen3:1.7b',
     apiKey: '',
-  },
+  };
+}
+
+const DEFAULT_SETTINGS: GameSettings = {
+  llm: getDefaultLLMSettings(),
   agentBehavior: {
     minThinkCadenceSeconds: 300,  // 5 minutes when busy
     idleThinkDelaySeconds: 5,     // 5 seconds when idle
@@ -216,7 +237,7 @@ export class SettingsPanel implements IWindowPanel {
       const saved = localStorage.getItem('ai-village-settings');
       if (saved) {
         const parsed = JSON.parse(saved);
-        return {
+        const merged = {
           ...DEFAULT_SETTINGS,
           ...parsed,
           llm: { ...DEFAULT_SETTINGS.llm, ...parsed.llm },
@@ -224,6 +245,11 @@ export class SettingsPanel implements IWindowPanel {
           render: { ...DEFAULT_SETTINGS.render, ...parsed.render },
           sound: { ...DEFAULT_SETTINGS.sound, ...parsed.sound },
         };
+        // Migrate: in production, override cached localhost LLM URLs with Groq
+        if (isProduction && merged.llm.baseUrl.includes('localhost')) {
+          merged.llm = getDefaultLLMSettings();
+        }
+        return merged;
       }
     } catch (e) {
       console.warn('[SettingsPanel] Failed to load settings:', e);
