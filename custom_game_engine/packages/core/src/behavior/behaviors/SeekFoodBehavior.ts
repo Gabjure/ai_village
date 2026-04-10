@@ -173,8 +173,9 @@ export class SeekFoodBehavior extends BaseBehavior {
 
       // Apply home bias to prevent agents from drifting into wilderness
       const homeRadius = agent.homePreferences?.homeRadius ?? 20;
-      // Use assigned bed or origin as home anchor
-      let homeX = 0, homeY = 0;
+      // Use assigned bed as home anchor, or current position if homeless
+      // (never fall back to origin — that pulls agents away from the village)
+      let homeX = agentPosition.x, homeY = agentPosition.y;
       if (agent.assignedBed) {
         const bedEntity = world.getEntity(agent.assignedBed);
         if (bedEntity) {

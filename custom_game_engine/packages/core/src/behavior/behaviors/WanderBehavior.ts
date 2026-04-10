@@ -140,19 +140,36 @@ export class WanderBehavior extends BaseBehavior {
       return this.applyHomeBias(wanderAngle, position, agent, world);
     }
 
-    // Find closest frontier sector
+    // Respect home radius — only target frontiers within reachable distance
+    // If no bed assigned, use current position as anchor (don't pull to origin)
+    const home = this.getHomePosition(agent, world) || { x: position.x, y: position.y };
+    const homeRadius = agent.homePreferences?.homeRadius ?? DEFAULT_HOME_PREFERENCES.homeRadius;
+    const homeRadiusSquared = homeRadius * homeRadius;
+
+    // Find closest frontier sector that is within home radius
     const currentSector = exploration.worldToSector(position);
-    let closestFrontier = frontiers[0]!; // Safe: we checked frontiers.length > 0 above
+    let closestFrontier: { x: number; y: number } | null = null;
     let closestDist = Infinity;
 
     for (const frontier of frontiers) {
+      const frontierWorld = exploration.sectorToWorld({ x: frontier.x, y: frontier.y });
+      // Skip frontiers outside home radius
+      const dhx = frontierWorld.x - home.x;
+      const dhy = frontierWorld.y - home.y;
+      if (dhx * dhx + dhy * dhy > homeRadiusSquared) continue;
+
       const dx = frontier.x - currentSector.x;
       const dy = frontier.y - currentSector.y;
-      const dist = dx * dx + dy * dy; // squared distance is fine for comparison
+      const dist = dx * dx + dy * dy;
       if (dist < closestDist) {
         closestDist = dist;
         closestFrontier = frontier;
       }
+    }
+
+    if (!closestFrontier) {
+      // No reachable frontiers within home radius — use home bias
+      return this.applyHomeBias(wanderAngle, position, agent, world);
     }
 
     // Calculate angle to closest frontier (convert sector to world coords)
@@ -195,8 +212,11 @@ export class WanderBehavior extends BaseBehavior {
     agent: AgentComponent,
     world: World
   ): number {
-    // Get home position (assigned bed or fallback to origin)
-    const home = this.getHomePosition(agent, world) || { x: 0, y: 0 };
+    // Get home position (assigned bed) — if no home, wander freely without bias
+    const home = this.getHomePosition(agent, world);
+    if (!home) {
+      return wanderAngle + (Math.random() - 0.5) * WANDER_JITTER * 2;
+    }
     const homeRadius = agent.homePreferences?.homeRadius ?? DEFAULT_HOME_PREFERENCES.homeRadius;
 
     // Calculate distance from home - use squared distance for comparison
