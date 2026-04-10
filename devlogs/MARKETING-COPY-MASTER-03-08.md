@@ -145,7 +145,7 @@ As generations pass, communities develop their own names, customs, and histories
 
 **The galactic lore:**
 
-Precursors is set in a galaxy where all sapient life shares a common origin: a signal broadcast 4.2 billion years ago by a pre-biological intelligence called the Gardeners, encoded into spacetime itself. Every species the Norns encounter — from the chaotic Grendels to the incomprehensible Void-Band entities — is following the same signal to the same question. What does it want from us? What happens when we answer?
+Precursors is set in a galaxy where all sapient life seems connected by something ancient — a mystery woven into the fabric of spacetime itself. Every species the Norns encounter — from the chaotic Grendels to the incomprehensible Void-Band entities — is drawn toward the same unanswered question. What binds them together? What happens when they find out?
 
 **Technical:**
 
