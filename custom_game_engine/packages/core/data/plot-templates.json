@@ -5121,9 +5121,9 @@
       "multiverse_scope": "local"
     },
     {
-      "id": "exotic_shee_contamination_dilemma",
+      "id": "exotic_contamination_dilemma",
       "name": "The Contamination Threshold",
-      "description": "A Norn is dying from pattern corruption. You could save it — but the corruption might spread to the wider population. The Shee broke the world once by creating things they did not tend. Now you must decide: is one life worth risking the pattern integrity of the whole? Compassion says save. Science says observe. Which wins when watching suffering is data?",
+      "description": "A Norn is dying from pattern corruption. You could save it — but the corruption might spread to the wider population. The Makers broke the world once by creating things they did not tend. Now you must decide: is one life worth risking the pattern integrity of the whole? Compassion says save. Science says observe. Which wins when watching suffering is data?",
       "scale": "exotic",
       "fork_behavior": "continue",
       "lesson": {
@@ -5201,7 +5201,7 @@
             {
               "type": "queue_dream_hint",
               "dream_type": "memory_echo",
-              "content_hint": "You remember the old stories. The Shee created without maintaining. They broke a world. You swore: never again. But the Norn is looking at you. It trusts you. It shouldn't.",
+              "content_hint": "You remember the old stories. The Makers created without maintaining. They broke a world. You swore: never again. But the Norn is looking at you. It trusts you. It shouldn't.",
               "intensity": 0.9
             }
           ]
@@ -5230,7 +5230,7 @@
         {
           "stage_id": "path_save_norn",
           "name": "Reaching Out",
-          "description": "You kneel beside the Norn. Take its hand. Begin treatment. The corruption flows around your tools, testing boundaries. Every moment of contact is a vector. You know this. You do it anyway. Because being right about the math does not make watching suffering acceptable. The Shee created these creatures. That means something.",
+          "description": "You kneel beside the Norn. Take its hand. Begin treatment. The corruption flows around your tools, testing boundaries. Every moment of contact is a vector. You know this. You do it anyway. Because being right about the math does not make watching suffering acceptable. Those who came before created these creatures. That means something.",
           "on_enter_effects": [
             {
               "type": "modify_stress",
@@ -5245,7 +5245,7 @@
         {
           "stage_id": "pattern_preserved",
           "name": "The Watcher's Burden",
-          "description": "The Norn is gone. The corruption contained. The population safe. You were right. The pattern holds. And you will carry those eyes forever — the look of trust becoming the look of abandonment. This is what responsibility costs. This is what the Shee learned too late, and now learn again.",
+          "description": "The Norn is gone. The corruption contained. The population safe. You were right. The pattern holds. And you will carry those eyes forever — the look of trust becoming the look of abandonment. This is what responsibility costs. This is what the Makers learned too late.",
           "on_enter_effects": [
             {
               "type": "learn_lesson",
@@ -5293,7 +5293,7 @@
         {
           "stage_id": "deeper_understanding",
           "name": "The Third Path",
-          "description": "Neither pure compassion nor cold preservation. You found a way to quarantine the Norn while treating it — accepting the risk, managing it. The Shee would call this observer contamination. You call it responsibility. Perhaps the Entanglement Heresy was right — perhaps when the question can ask back, you are in dialogue, not experiment. Or perhaps you just broke the methodology the way a parent breaks a promise to let their child cry it out. You do not know. The Shee did not know either. You proceed knowing you may be wrong. This is itself a form of understanding.",
+          "description": "Neither pure compassion nor cold preservation. You found a way to quarantine the Norn while treating it — accepting the risk, managing it. The Makers would call this observer contamination. You call it responsibility. Perhaps the Entanglement Heresy was right — perhaps when the question can ask back, you are in dialogue, not experiment. Or perhaps you just broke the methodology the way a parent breaks a promise to let their child cry it out. You do not know. The Makers did not know either. You proceed knowing you may be wrong. This is itself a form of understanding.",
           "on_enter_effects": [
             {
               "type": "learn_lesson",
@@ -5316,7 +5316,7 @@
         {
           "stage_id": "contamination_spread",
           "name": "The Cost of Mercy",
-          "description": "You saved the Norn. The corruption spread. Three more cases within days. Then seven. The pattern degrades across the population. You did this. Your compassion seeded a plague. The Shee created without maintaining — and you maintained without containing. A different sin, same consequence.",
+          "description": "You saved the Norn. The corruption spread. Three more cases within days. Then seven. The pattern degrades across the population. You did this. Your compassion seeded a plague. The Makers created without maintaining — and you maintained without containing. A different sin, same consequence.",
           "on_enter_effects": [
             {
               "type": "modify_stress",
@@ -5341,7 +5341,7 @@
         {
           "stage_id": "guilt_spiral",
           "name": "The Eyes That Do Not Close",
-          "description": "You watched the Norn die. The pattern held. But you cannot stop seeing its face. Every Norn you pass, you wonder: would I let you die too? The answer should be yes, if the math demands it. The answer feels like a wound that will not heal. You are becoming something the Shee were: brilliant, responsible, and empty.",
+          "description": "You watched the Norn die. The pattern held. But you cannot stop seeing its face. Every Norn you pass, you wonder: would I let you die too? The answer should be yes, if the math demands it. The answer feels like a wound that will not heal. You are becoming something the Makers were: brilliant, responsible, and empty.",
           "on_enter_effects": [
             {
               "type": "modify_stress",

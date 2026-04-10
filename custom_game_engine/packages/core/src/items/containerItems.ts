@@ -61,7 +61,7 @@ export const CONTAINER_ITEMS: ItemDefinition[] = [
       container: { capacity: 10, preserves: true, acceptedCategories: ['tool', 'consumable'] },
     },
   }),
-  defineItem('shee_archive', 'Shee Archive', 'misc', {
+  defineItem('shee_archive', 'Ancient Archive', 'misc', {
     weight: 10,
     stackSize: 1,
     isStorable: false,
