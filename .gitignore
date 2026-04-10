@@ -83,6 +83,8 @@ custom_game_engine/test-*.sh
 !custom_game_engine/env.d.ts
 !custom_game_engine/packages/core/src/typings/*.d.ts
 !custom_game_engine/demo/admin/*.js
+!custom_game_engine/demo/public/pwyc.js
+!custom_game_engine/demo/public/support-prompt.js
 !custom_game_engine/.env.production
 *.tsbuildinfo
 
