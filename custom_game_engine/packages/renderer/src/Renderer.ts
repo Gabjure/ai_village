@@ -888,8 +888,14 @@ export class Renderer {
       }
 
       // Register agent speech for speech bubble rendering
+      // Filter out emotes/vocalizations — speech bubbles are for spoken words only
       if (agent?.recentSpeech) {
-        this.getSpeechBubbleRenderer().registerSpeech(entity.id, agent.recentSpeech, agent.speechSource === 'fallback');
+        const speech = agent.recentSpeech;
+        const isEmote = /^\*[^*]+\*$/.test(speech.trim());
+        const isVocalization = /^[*_]*(?:coo|gurgle|hum|sigh|grunt|groan|moan|yawn|snore|hiss|growl|purr|chirp|squeak|whimper|gasp|cough|sneeze|hiccup|burp|mumble|murmur|whisper|babble|giggle|chuckle|sob|wail|screech|yelp|howl|bark|mew|trill|click|cluck|buzz|croak|ribbit|bleat|neigh|moo|oink|quack|hoot|caw|squawk|roar|bellow|whine|pant|sniff|snort|wheeze|rasp|gurgling|cooing|humming|sighing|grunting)s?[!.]*[*_]*$/i.test(speech.trim());
+        if (!isEmote && !isVocalization) {
+          this.getSpeechBubbleRenderer().registerSpeech(entity.id, speech, agent.speechSource === 'fallback');
+        }
       }
 
       // Draw Z's above sleeping agents
