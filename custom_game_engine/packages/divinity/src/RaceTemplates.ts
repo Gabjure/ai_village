@@ -707,9 +707,9 @@ export const SIDHE_RACE: RaceTemplate = {
   typicalAlignment: 'chaotic',
   societyType: 'feudal_courts',
   precursorsLineage: {
-    precursors_species_id: 'high_fae',
+    precursors_species_id: 'peri_veil',
     emergence_band: 'void',
-    lineage_note: 'The noble Fae — Void Band beings who retained material-interface capability. Celtic Aos Si tradition.',
+    lineage_note: 'The noble Fae — Peri-Veil who retained material-interface capability. Celtic Aos Si tradition.',
   },
 };
 
@@ -743,9 +743,9 @@ export const PIXIE_RACE: RaceTemplate = {
   typicalAlignment: 'chaotic',
   societyType: 'swarm',
   precursorsLineage: {
-    precursors_species_id: 'high_fae',
+    precursors_species_id: 'peri_veil',
     emergence_band: 'void',
-    lineage_note: 'Lesser Fae sub-lineage. Diminished Void Band presence expressed as tiny winged form.',
+    lineage_note: 'Lesser Fae sub-lineage. Diminished Peri-Veil presence expressed as tiny winged form.',
   },
 };
 
@@ -785,9 +785,9 @@ export const REDCAP_RACE: RaceTemplate = {
   typicalAlignment: 'chaotic',
   societyType: 'solitary',
   precursorsLineage: {
-    precursors_species_id: 'high_fae',
+    precursors_species_id: 'peri_veil',
     emergence_band: 'void',
-    lineage_note: 'Corrupted Fae sub-lineage. Blood requirement reflects degraded Chorus reception in Void Band descendants.',
+    lineage_note: 'Corrupted Fae sub-lineage. Blood requirement reflects degraded Chorus reception in Peri-Veil descendants.',
   },
 };
 

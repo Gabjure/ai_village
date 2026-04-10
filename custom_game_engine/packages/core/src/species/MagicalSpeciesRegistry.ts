@@ -233,7 +233,7 @@ in three dimensions.`,
   socialStructure: 'fae_courts', // Seelie/Unseelie court system
 
   precursors_lineage: {
-    precursors_species_id: 'high_fae',
+    precursors_species_id: 'peri_veil',
     emergence_band: 'void',
     sapience_date: 'unknown',
     chorus_connection: 'Consciousness from near-silence at the Emergence Frequency boundary. Timeline-walking grants unique multi-branch perspective on the Chorus.',
