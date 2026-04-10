@@ -939,7 +939,7 @@
       "mortalWorldWeakness": "Water causes pain",
       "typicalAlignment": "lawful",
       "societyType": "sultanate",
-      "precursorsLineage": {"precursors_species_id": "djinn_ahl", "emergence_band": "core", "lineage_note": "Fire-aspect Djinn-Ahl — oldest extant sapient species, Gardener-adjacent"}
+      "precursorsLineage": {"precursors_species_id": "djinn_ahl", "emergence_band": "core", "lineage_note": "Fire-aspect Djinn-Ahl — oldest extant sapient species"}
     },
     {
       "id": "djinn",

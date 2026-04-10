@@ -2065,7 +2065,7 @@ Player zooms in to ship level:
 **5th Fleet Composition:**
 ```
 Fleet "5th Fleet" (FleetTier):
-  - Admiral Kara (soul agent, captain of flagship *Emperor's Will*)
+  - Fleet Admiral (soul agent, commanding flagship *Emperor's Will*)
   - 5 squadrons (SquadronTier):
     - Alpha Squadron (SquadronTier):
       - 5 threshold_ships (SpaceshipComponent)
@@ -2138,12 +2138,12 @@ if (battleResult.victor === fleet5th.id) {
   // 5th Fleet loses
   console.log(`5th Fleet defeated. Lost ${battleResult.shipsLost1} ships.`);
 
-  // Admiral Kara (soul agent) survives? (if flagship intact)
+  // Fleet Admiral (soul agent) survives? (if flagship intact)
   if (fleet5th.flagshipShipId && !isDestroyed(fleet5th.flagshipShipId)) {
-    console.log('Admiral Kara survived on damaged flagship.');
+    console.log('Fleet Admiral survived on damaged flagship.');
   } else {
-    console.log('Flagship destroyed. Admiral Kara status unknown.');
-    // Kara is soul agent, so she persists (possibly in afterlife, reincarnation queue)
+    console.log('Flagship destroyed. Fleet Admiral status unknown.');
+    // Soul agent persists (possibly in afterlife, reincarnation queue)
   }
 }
 ```
@@ -2164,7 +2164,7 @@ const crew = instantiateCrewForShip(flagship);
 
 // Player can now:
 // - See individual crew members walking around ship
-// - See Admiral Kara in captain's chair (soul agent)
+// - See Fleet Admiral on the bridge (soul agent)
 // - See crew working in Heart Chamber, VR systems, etc.
 // - Give individual orders to crew
 
