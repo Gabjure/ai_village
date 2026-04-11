@@ -50,6 +50,9 @@ export class NeedsSystem extends BaseSystem {
   // Track previous critical state for each entity to detect threshold crossings
   private wasEnergyCritical = new Map<string, boolean>();
 
+  // Guard: track entities that have already emitted agent:starved so it only fires once
+  private hasStarvedEmitted = new Set<string>();
+
   protected onUpdate(ctx: SystemContext): void {
     // Performance: Only update mutation rates once per game minute
     const currentTick = ctx.tick;
@@ -210,12 +213,15 @@ export class NeedsSystem extends BaseSystem {
       this.wasEnergyCritical.set(entity.id, isEnergyCritical);
 
       // Check for death (starvation after 5 game days at 0% hunger)
-      if (ticksAtZeroHunger >= STARVATION_DEATH_DAYS * TICKS_PER_GAME_DAY) {
+      if (ticksAtZeroHunger >= STARVATION_DEATH_DAYS * TICKS_PER_GAME_DAY &&
+          !this.hasStarvedEmitted.has(entity.id)) {
+        this.hasStarvedEmitted.add(entity.id);
         // Type-safe emission - compile error if data shape is wrong
         ctx.emit('agent:starved', {
           agentId: entity.id,
           survivalRelevance: 1.0,
         }, entity.id);
+        comps.update<NeedsComponent>(CT.Needs, (current) => new NeedsComponent({ ...current, health: 0 }));
       }
     }
 
