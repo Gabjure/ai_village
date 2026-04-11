@@ -329,19 +329,34 @@ function applyFrontierBias(
     return applyHomeBias(wanderAngle, position, agent, ctx);
   }
 
-  // Find closest frontier sector
+  // Find closest frontier sector within home radius
+  const home = getHomePosition(agent, ctx) || { x: position.x, y: position.y };
+  const homeRadius = agent.homePreferences?.homeRadius ?? DEFAULT_HOME_PREFERENCES.homeRadius;
+  const homeRadiusSquared = homeRadius * homeRadius;
+
   const currentSector = exploration.worldToSector(position);
-  let closestFrontier = frontiers[0]!;
+  let closestFrontier: { x: number; y: number } | null = null;
   let closestDist = Infinity;
 
   for (const frontier of frontiers) {
+    // Only consider frontiers within home radius
+    const frontierWorld = exploration.sectorToWorld({ x: frontier.x, y: frontier.y });
+    const dhx = frontierWorld.x - home.x;
+    const dhy = frontierWorld.y - home.y;
+    if (dhx * dhx + dhy * dhy > homeRadiusSquared) continue;
+
     const dx = frontier.x - currentSector.x;
     const dy = frontier.y - currentSector.y;
-    const dist = dx * dx + dy * dy; // squared distance is fine for comparison
+    const dist = dx * dx + dy * dy;
     if (dist < closestDist) {
       closestDist = dist;
       closestFrontier = frontier;
     }
+  }
+
+  if (!closestFrontier) {
+    // No reachable frontiers within home radius - fall back to home bias
+    return applyHomeBias(wanderAngle, position, agent, ctx);
   }
 
   // Calculate angle to closest frontier (convert sector to world coords)
@@ -383,8 +398,8 @@ function applyHomeBias(
   agent: AgentComponent,
   ctx: import('../BehaviorContext.js').BehaviorContext
 ): number {
-  // Get home position (assigned bed or fallback to origin)
-  const home = getHomePosition(agent, ctx) || { x: 0, y: 0 };
+  // Get home position (assigned bed or current position for homeless agents)
+  const home = getHomePosition(agent, ctx) || { x: position.x, y: position.y };
   const homeRadius = agent.homePreferences?.homeRadius ?? DEFAULT_HOME_PREFERENCES.homeRadius;
 
   // Calculate distance from home - use squared distance for comparison

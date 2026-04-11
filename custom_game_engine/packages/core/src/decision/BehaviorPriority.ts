@@ -112,6 +112,13 @@ export function getBehaviorPriority(
     }
   }
 
+  // Elevate farming when hungry — agents should grow food before starving
+  if ((behavior === 'farm' || behavior === 'till' || behavior === 'plant' || behavior === 'harvest' || behavior === 'gather_seeds') && needs) {
+    if (needs.hunger < 0.2) {
+      priority = 85; // Pre-critical: start farming before starvation threshold
+    }
+  }
+
   if (behavior === 'seek_water' && needs) {
     // Elevate priority when critically dehydrated
     if (needs.thirst < 0.1) {
