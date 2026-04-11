@@ -486,6 +486,13 @@ export const SPECIES_REGISTRY: Record<string, SpeciesTemplate> = {
   aquatic: AQUATIC_SPECIES,
 };
 
+/**
+ * Register a new species template at runtime (used by AkashicSpeciesRegistry and mods)
+ */
+export function registerSpecies(id: string, template: SpeciesTemplate): void {
+  SPECIES_REGISTRY[id] = template;
+}
+
 // ============================================================================
 // Factory Functions
 // ============================================================================

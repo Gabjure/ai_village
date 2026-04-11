@@ -3,6 +3,7 @@
  */
 
 export * from './SpeciesRegistry.js';
+import './AkashicSpeciesRegistry.js'; // Side-effect: registers Akashic Records canonical species
 export * from './FolkloristSpeciesRegistry.js';
 export * from './Sprint13FolkloristSpeciesRegistry.js';
 export * from './Sprint14FolkloristSpeciesRegistry.js';
