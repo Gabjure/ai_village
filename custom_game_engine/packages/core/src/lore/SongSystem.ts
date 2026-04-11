@@ -20,6 +20,9 @@
 import { BaseSystem } from '../ecs/SystemContext.js';
 import type { SystemContext } from '../ecs/SystemContext.js';
 import type { SystemId } from '../types.js';
+import { SongFilterStore } from './SongFilterStore.js';
+import { SongMemorySystem } from './SongMemorySystem.js';
+import { RadioBridge } from './RadioBridge.js';
 
 // ============================================================================
 // Song Catalogue
@@ -28,9 +31,16 @@ import type { SystemId } from '../types.js';
 export interface SongEntry {
   filename: string;
   occasion: SongOccasion;
+  /** Tags for emotion-weighted scoring (e.g. ['courage', 'combat', 'driving']). */
+  tags?: string[];
+  /** Which species this track belongs to. Tracks without speciesId are universal. */
+  speciesId?: string;
+  /** Cognitohazard — replays unbidden once heard. */
+  earworm?: boolean;
 }
 
-export type SongOccasion = 'grief' | 'elder' | 'warning' | 'ambient' | 'hearth' | 'birth';
+export type SongOccasion = 'grief' | 'elder' | 'warning' | 'ambient' | 'hearth' | 'birth'
+  | 'naming' | 'gathering' | 'journey' | 'romance' | 'celebration' | 'wonder' | 'night';
 
 export interface SongSystemConfig {
   /** Base path for audio files (e.g. '/audio/norn/' or '/audio/mvee/'). Must end with '/'. */
@@ -39,6 +49,10 @@ export interface SongSystemConfig {
   songCatalogue: readonly SongEntry[];
   /** Whether audio playback is enabled. When false, lore tracking still runs but no audio plays. */
   musicEnabled?: boolean;
+  /** Callback to get living agent IDs (for song memory tracking). If omitted, song memory is disabled. */
+  getLivingAgents?: () => string[];
+  /** Enable cross-tab radio coordination. Default: true in browser. */
+  enableRadioBridge?: boolean;
 }
 
 /**
@@ -96,10 +110,12 @@ export class SongSystem extends BaseSystem {
   private songsByOccasion = new Map<SongOccasion, SongEntry[]>();
   private currentAudio: HTMLAudioElement | null = null;
   private currentOccasion: SongOccasion | null = null;
+  private currentSong: SongEntry | null = null;
   private lastSwitchTime = 0;
   private isFading = false;
   private fadeTimer: ReturnType<typeof setInterval> | null = null;
   private initialized = false;
+  private paused = false;
 
   /** Tracks when each occasion tag was last played (ms timestamp) */
   private tagLastPlayed = new Map<SongOccasion, number>();
@@ -114,6 +130,16 @@ export class SongSystem extends BaseSystem {
   private queuedCrossfade: { url: string; occasion: SongOccasion } | null = null;
   /** Unsubscribe functions for all event subscriptions */
   private unsubscribers: (() => void)[] = [];
+
+  // ── Subsystems (unlock-on-hear, playlists, radio) ──────────────────────────
+  /** Tracks per-agent song hearings and comprehension levels. */
+  readonly songMemory: SongMemorySystem | null;
+  /** Manages song/species filtering, manual queue, and saved playlists. */
+  readonly filterStore: SongFilterStore;
+  /** Cross-tab music coordination (only one tab plays at a time). */
+  private radioBridge: RadioBridge | null = null;
+  private readonly enableRadioBridge: boolean;
+
   /** Bound handler so we can remove it after first gesture */
   private readonly onUserGesture = (): void => {
     this.audioUnlocked = true;
@@ -130,6 +156,13 @@ export class SongSystem extends BaseSystem {
     this.audioBasePath = config?.audioBasePath ?? DEFAULT_AUDIO_BASE_PATH;
     this.songCatalogue = config?.songCatalogue ?? NORN_SONG_CATALOGUE;
     this.musicEnabled = config?.musicEnabled ?? true;
+    this.enableRadioBridge = config?.enableRadioBridge ?? true;
+
+    // Initialize subsystems
+    this.filterStore = new SongFilterStore();
+    this.songMemory = config?.getLivingAgents
+      ? new SongMemorySystem(config.getLivingAgents)
+      : null;
   }
 
   protected onInitialize(): void {
@@ -143,6 +176,13 @@ export class SongSystem extends BaseSystem {
     this.subscribeToEvents();
     if (this.musicEnabled) {
       this.addGestureListeners();
+      // Set up cross-tab radio coordination
+      if (this.enableRadioBridge) {
+        this.radioBridge = new RadioBridge({
+          pause: () => this.pause(),
+          resume: () => this.resume(),
+        });
+      }
     }
     this.initialized = true;
   }
@@ -205,7 +245,42 @@ export class SongSystem extends BaseSystem {
     this.unsubscribers = [];
     this.removeGestureListeners();
     this.stopCurrent();
+    this.radioBridge?.destroy();
+    this.radioBridge = null;
+    this.songMemory?.onSongChanged(null);
     this.initialized = false;
+  }
+
+  // ============================================================================
+  // Pause / Resume (used by RadioBridge for cross-tab coordination)
+  // ============================================================================
+
+  /** Pause audio playback (keeps lore tracking active). */
+  pause(): void {
+    this.paused = true;
+    if (this.currentAudio && !this.currentAudio.paused) {
+      this.currentAudio.pause();
+    }
+  }
+
+  /** Resume audio playback after pause. */
+  resume(): void {
+    this.paused = false;
+    if (this.currentAudio && this.currentAudio.paused && this.currentAudio.src) {
+      this.currentAudio.play().catch(() => {
+        // Autoplay policy may block resume — that's fine
+      });
+    }
+  }
+
+  /** Get the currently playing song entry, if any. */
+  getCurrentSong(): SongEntry | null {
+    return this.currentSong;
+  }
+
+  /** Get the full song catalogue for UI display. */
+  getCatalogue(): readonly SongEntry[] {
+    return this.songCatalogue;
   }
 
   // ============================================================================
@@ -233,22 +308,46 @@ export class SongSystem extends BaseSystem {
   }
 
   private playSongForOccasion(occasion: SongOccasion): void {
+    // In manual mode, dequeue from the player's playlist instead
+    if (this.filterStore.getMode() === 'manual') {
+      const next = this.filterStore.dequeue();
+      if (!next) return; // Queue empty — nothing to play
+      const entry = this.songCatalogue.find(s => s.filename === next);
+      if (entry) {
+        this.playSpecificSong(entry);
+        return;
+      }
+    }
+
     const pool = this.songsByOccasion.get(occasion);
     if (!pool || pool.length === 0) return;
 
-    const song = this.selectBestSong(pool, occasion);
+    // Filter pool through SongFilterStore (species + individual song toggles)
+    const allowed = pool.filter(s => this.filterStore.isSongAllowed(s.filename, s.speciesId));
+    if (allowed.length === 0) return;
+
+    const song = this.selectBestSong(allowed, occasion);
     if (!song) return;
-    this.recordPlay(song, occasion);
+    this.playSpecificSong(song);
+  }
+
+  /** Play a specific song entry (used by both adaptive and manual modes). */
+  private playSpecificSong(song: SongEntry): void {
+    this.recordPlay(song, song.occasion);
+    this.currentSong = song;
+
+    // Notify song memory system (unlock-on-hear tracking)
+    this.songMemory?.onSongChanged(song.filename);
 
     // When music is disabled, track lore (above) but skip audio playback
-    if (!this.musicEnabled) return;
+    if (!this.musicEnabled || this.paused) return;
 
     const url = this.audioBasePath + encodeURIComponent(song.filename);
 
     if (this.currentAudio && !this.currentAudio.paused) {
-      this.crossfadeTo(url, occasion);
+      this.crossfadeTo(url, song.occasion);
     } else {
-      this.startFresh(url, occasion);
+      this.startFresh(url, song.occasion);
     }
   }
 

@@ -251,6 +251,7 @@ import { PrayerAnsweringSystem } from './PrayerAnsweringSystem.js';
 import { SpiritualResponseSystem } from './SpiritualResponseSystem.js';
 import { MythGenerationSystem } from './MythGenerationSystem.js';
 import { MythRetellingSystem } from './MythRetellingSystem.js';
+import { MythPersonalitySystem } from './MythPersonalitySystem.js';
 import { ChatRoomSystem } from '../communication/ChatRoomSystem.js';
 import { CompanionSystem } from './CompanionSystem.js';
 // import { AttributionSystem } from '../divinity/AttributionSystem.js'; // TODO: Not a System class, utility functions only
@@ -957,6 +958,7 @@ export function registerAllSystems(
       gameLoop.systemRegistry.register(new MythGenerationSystem(llmQueue));
       gameLoop.systemRegistry.register(new MythRetellingSystem());
     }
+    gameLoop.systemRegistry.register(new MythPersonalitySystem());
     gameLoop.systemRegistry.register(new CompanionSystem());
 
     // Institutions
@@ -1203,6 +1205,12 @@ export function registerAllSystems(
     audioBasePath: '/mvee/audio/',
     songCatalogue: MVEE_SONG_CATALOGUE,
     musicEnabled: false, // Disabled until MVEE has its own generated soundtrack
+    getLivingAgents: () => {
+      // Get all living agent entity IDs for song memory tracking
+      const agents = gameLoop.world.query().with('agent').executeEntities();
+      return agents.map((e: { id: string }) => e.id);
+    },
+    enableRadioBridge: true,
   }));
 
   // ============================================================================

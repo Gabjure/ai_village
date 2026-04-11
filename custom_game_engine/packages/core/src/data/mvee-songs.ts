@@ -12,20 +12,20 @@ import type { SongEntry } from '../lore/SongSystem.js';
 
 export const MVEE_SONG_CATALOGUE: readonly SongEntry[] = [
   // Ambient (4 tracks)
-  { filename: 'Void Garden.mp3', occasion: 'ambient' },
-  { filename: 'Stardust Whisper.mp3', occasion: 'ambient' },
-  { filename: 'Cosmic Drift.mp3', occasion: 'ambient' },
-  { filename: 'Eternal Hum.mp3', occasion: 'ambient' },
+  { filename: 'Void Garden.mp3', occasion: 'ambient', tags: ['hope', 'wonder', 'reflective'] },
+  { filename: 'Stardust Whisper.mp3', occasion: 'ambient', tags: ['dreaming', 'heritage', 'journey'] },
+  { filename: 'Cosmic Drift.mp3', occasion: 'ambient', tags: ['reflective', 'deep-time', 'wonder'] },
+  { filename: 'Eternal Hum.mp3', occasion: 'ambient', tags: ['communal', 'warmth', 'heritage'] },
   // Grief (2 tracks)
-  { filename: 'Last Light.mp3', occasion: 'grief' },
-  { filename: 'Fading Echo.mp3', occasion: 'grief' },
+  { filename: 'Last Light.mp3', occasion: 'grief', tags: ['grief', 'loss', 'ancestors'] },
+  { filename: 'Fading Echo.mp3', occasion: 'grief', tags: ['grief', 'mourning', 'loss'] },
   // Elder (2 tracks)
-  { filename: 'Ancient Wisdom.mp3', occasion: 'elder' },
-  { filename: 'Starborn Memory.mp3', occasion: 'elder' },
+  { filename: 'Ancient Wisdom.mp3', occasion: 'elder', tags: ['elder', 'wisdom', 'sacred', 'deep-time'] },
+  { filename: 'Starborn Memory.mp3', occasion: 'elder', tags: ['elder', 'heritage', 'triumphant'] },
   // Warning (1 track)
-  { filename: 'Dark Horizon.mp3', occasion: 'warning' },
+  { filename: 'Dark Horizon.mp3', occasion: 'warning', tags: ['combat', 'courage', 'intense'] },
   // Hearth (1 track)
-  { filename: 'Hearthglow.mp3', occasion: 'hearth' },
+  { filename: 'Hearthglow.mp3', occasion: 'hearth', tags: ['love', 'bonding', 'communal', 'warmth'] },
   // Birth (1 track)
-  { filename: 'New Dawn.mp3', occasion: 'birth' },
+  { filename: 'New Dawn.mp3', occasion: 'birth', tags: ['baby', 'hatchling', 'comfort', 'hope'] },
 ] as const;
