@@ -135,24 +135,32 @@ jobs:
           username: ${{ secrets.HETZNER_USER }}
           key: ${{ secrets.HETZNER_SSH_KEY }}
           script: |
-            # Hit container directly, bypass Traefik/CDN
+            # Verify container is running and healthy via docker exec
+            # (container port 3000 is not published to host — only reachable via Traefik network)
             for i in $(seq 1 10); do
-              STATUS=$(curl -s -o /dev/null -w '%{http_code}' --max-time 5 http://localhost:3000/mvee/)
-              if [ "$STATUS" = "200" ]; then
-                echo "Container serving directly: HTTP 200"
-                # Verify JS bundle exists in response
-                BODY=$(curl -s --max-time 10 http://localhost:3000/mvee/)
+              HEALTH=$(docker inspect --format='{{.State.Health.Status}}' mvee-game 2>/dev/null || echo "missing")
+              RUNNING=$(docker inspect --format='{{.State.Running}}' mvee-game 2>/dev/null || echo "false")
+              if [ "$HEALTH" = "healthy" ] && [ "$RUNNING" = "true" ]; then
+                echo "Container running and healthy"
+                # Verify it serves HTML with script tags from inside the container
+                BODY=$(docker exec mvee-game node -e "
+                  const http = require('http');
+                  http.get('http://localhost:3000/mvee/', r => {
+                    let d=''; r.on('data', c => d+=c);
+                    r.on('end', () => { console.log(d); process.exit(r.statusCode === 200 ? 0 : 1); });
+                  }).on('error', e => { console.error(e); process.exit(1); });
+                " 2>/dev/null)
                 if echo "$BODY" | grep -q '<script'; then
                   echo "HTML contains script tags — canary PASSED"
                   exit 0
                 else
-                  echo "WARNING: No script tags in response"
+                  echo "WARNING: No script tags in response from container"
                 fi
               fi
-              echo "Attempt $i: HTTP $STATUS, retrying in 3s..."
+              echo "Attempt $i: health=$HEALTH running=$RUNNING, retrying in 3s..."
               sleep 3
             done
-            echo "ERROR: Container not serving after 30s"
+            echo "ERROR: Container not healthy after 30s"
             exit 1
 
       - name: Wait for container startup
