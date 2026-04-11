@@ -95,6 +95,7 @@ import {
   tameAnimalBehaviorWithContext,
   houseAnimalBehaviorWithContext,
   prayBehaviorWithContext,
+  groupPrayBehaviorWithContext,
 } from '../behavior/behaviors/index.js';
 
 // Reporter-specific behaviors
@@ -271,6 +272,7 @@ export class AgentBrainSystem extends BaseSystem {
 
     // Spiritual behaviors
     this.behaviors.registerWithContext('pray', prayBehaviorWithContext, { description: 'Pray to deity' });
+    this.behaviors.registerWithContext('group_pray', groupPrayBehaviorWithContext, { description: 'Group prayer at shrines' });
 
     // Navigation & Exploration behaviors
     this.behaviors.registerWithContext('navigate', navigateBehaviorWithContext, { description: 'Navigate to coordinates' });
