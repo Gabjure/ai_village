@@ -61,6 +61,9 @@ export class SongMemorySystem {
     }
   }
 
+  /** Track which songs have been unlocked on the cross-game radio this session. */
+  private radioUnlockedThisSession = new Set<string>();
+
   /** Record that all living agents heard a song. */
   private recordHearingForAllAgents(filename: string): void {
     const now = Date.now();
@@ -85,6 +88,48 @@ export class SongMemorySystem {
         });
       }
     }
+
+    // Unlock on cross-game radio (once per session per song)
+    if (!this.radioUnlockedThisSession.has(filename)) {
+      this.radioUnlockedThisSession.add(filename);
+      SongMemorySystem.unlockSongOnRadio(filename);
+    }
+  }
+
+  /**
+   * Write a song to the shared mv-radio-unlocked localStorage key.
+   * The website radio widget reads this to filter its playlist to songs
+   * the player has actually heard in-game.
+   */
+  static unlockSongOnRadio(songFilename: string): void {
+    const LS_KEY = 'mv-radio-unlocked';
+    try {
+      const raw = localStorage.getItem(LS_KEY);
+      const arr: string[] = raw ? JSON.parse(raw) : [];
+      if (!Array.isArray(arr)) return;
+
+      const normalized = songFilename
+        .replace(/\.mp3$/i, '')
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-|-$/g, '');
+
+      let changed = false;
+      if (!arr.includes(songFilename)) { arr.push(songFilename); changed = true; }
+      if (normalized && !arr.includes(normalized)) { arr.push(normalized); changed = true; }
+
+      if (changed) {
+        localStorage.setItem(LS_KEY, JSON.stringify(arr));
+        try {
+          const ch = new BroadcastChannel('mv-radio');
+          ch.postMessage({ type: 'song-unlocked', trackId: songFilename });
+          if (normalized !== songFilename) {
+            ch.postMessage({ type: 'song-unlocked', trackId: normalized });
+          }
+          ch.close();
+        } catch (_) { /* BroadcastChannel not available */ }
+      }
+    } catch (_) { /* localStorage not available */ }
   }
 
   /** Get comprehension level for an agent and a specific song. */
