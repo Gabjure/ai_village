@@ -11,7 +11,6 @@
  *   Wave 3 (Spoken)
  *   Wave 4 (Learned)
  *   Wave 5 (Enlightened)
- *   Wave 6 (Void)
  *   Ambient
  */
 
@@ -275,9 +274,9 @@ const GRENDEL_SPECIES: SpeciesTemplate = {
   speciesId: 'grendel',
   speciesName: 'Grendel',
   commonName: 'Grendel',
-  description: 'Medium humanoid secondary consumers; territorial and predatory by instinct, sapient by evolution',
+  description: 'Medium humanoid secondary consumers; evolved independently on Urd Prime before the Shee arrived, territorial and predatory',
   bodyPlanId: 'humanoid_standard',
-  innateTraits: [TRAIT_SHEE_DESIGNED, TRAIT_PACK_HUNTER],
+  innateTraits: [TRAIT_PACK_HUNTER, TRAIT_KEEN_SENSES],
   compatibleSpecies: ['norn'],
   mutationRate: 0.018,
   averageHeight: 165,
@@ -304,9 +303,9 @@ const ETTIN_SPECIES: SpeciesTemplate = {
   speciesId: 'ettin',
   speciesName: 'Ettin',
   commonName: 'Ettin',
-  description: 'Large mutualist humanoids; gentle giants who form bonds with their ecosystem',
+  description: 'Large mutualist humanoids; generation-ship migrants from Kemm-Vor, gentle engineers who form bonds with their ecosystem',
   bodyPlanId: 'humanoid_standard',
-  innateTraits: [TRAIT_SHEE_DESIGNED, TRAIT_MUTUALIST_BOND, TRAIT_STURDY],
+  innateTraits: [TRAIT_MUTUALIST_BOND, TRAIT_STURDY, TRAIT_LONG_MEMORY],
   compatibleSpecies: ['norn'],
   mutationRate: 0.012,
   averageHeight: 220,
@@ -395,7 +394,7 @@ const VENTHARI_SPECIES: SpeciesTemplate = {
   speciesId: 'venthari',
   speciesName: 'Ven\'thari',
   commonName: 'Ven\'thari',
-  description: 'Large quadruped secondary consumers; fast, pack-coordinated hunters of open ranges',
+  description: 'Large quadruped secondary consumers; cave predators from the dying geothermal world Keth-Ra, pack-coordinated hunters',
   bodyPlanId: 'quadruped',
   innateTraits: [TRAIT_PACK_HUNTER, TRAIT_KEEN_SENSES],
   compatibleSpecies: [],
@@ -414,7 +413,7 @@ const VENTHARI_SPECIES: SpeciesTemplate = {
   ecologyProfile: {
     ecologicalRole: 'secondary_consumer',
     diet: 'carnivore',
-    biomePreferences: ['savanna', 'plains', 'steppe'],
+    biomePreferences: ['cave', 'geothermal', 'deep_underground'],
     socialStructure: 'pack',
     activityPattern: 'crepuscular',
   },
@@ -424,9 +423,9 @@ const CHER_KHAN_SPECIES: SpeciesTemplate = {
   speciesId: 'cher_khan',
   speciesName: 'Cher-Khan',
   commonName: 'Cher-Khan',
-  description: 'Apex keystone predators; solitary and territorial, their presence shapes entire ecosystems',
+  description: 'Threshold guardians of biome boundaries; facilitate biome crossing via biochemical broadcast, aggression 0.05',
   bodyPlanId: 'quadruped',
-  innateTraits: [TRAIT_APEX_PREDATOR, TRAIT_KEEN_SENSES],
+  innateTraits: [TRAIT_MUTUALIST_BOND, TRAIT_KEEN_SENSES],
   compatibleSpecies: [],
   mutationRate: 0.015,
   averageHeight: 230,
@@ -454,7 +453,7 @@ const TIKBALI_SPECIES: SpeciesTemplate = {
   speciesName: 'Tikbali',
   commonName: 'Tikbali',
   description: 'Large humanoid mutualists; mediators and bridge-builders between species communities',
-  bodyPlanId: 'humanoid_standard',
+  bodyPlanId: 'quadruped',
   innateTraits: [TRAIT_MUTUALIST_BOND, TRAIT_LONG_MEMORY],
   compatibleSpecies: ['norn', 'ettin'],
   mutationRate: 0.014,
@@ -494,7 +493,7 @@ const ADZEFIRE_SPECIES: SpeciesTemplate = {
   lifespanType: 'mortal',
   maturityAge: 0,
   gestationPeriod: 3,
-  sapient: true,
+  sapient: false,
   socialStructure: 'swarm',
   cross_game_compatible: true,
   native_game: 'precursors',
@@ -561,7 +560,7 @@ const NYK_SPECIES: SpeciesTemplate = {
   cross_game_compatible: true,
   native_game: 'precursors',
   ecologyProfile: {
-    ecologicalRole: 'omnivore_generalist',
+    ecologicalRole: 'mutualist',
     diet: 'omnivore',
     biomePreferences: ['ruins', 'forest_edge', 'underground'],
     socialStructure: 'guild_based',
@@ -590,7 +589,7 @@ const RUSALYN_SPECIES: SpeciesTemplate = {
   cross_game_compatible: true,
   native_game: 'precursors',
   ecologyProfile: {
-    ecologicalRole: 'omnivore_generalist',
+    ecologicalRole: 'mutualist',
     diet: 'omnivore',
     biomePreferences: ['river', 'lake', 'coastal_forest'],
     socialStructure: 'river_communities',
@@ -602,9 +601,9 @@ const AUKI_VEL_SPECIES: SpeciesTemplate = {
   speciesId: 'auki_vel',
   speciesName: 'Auki-Vel',
   commonName: 'Auki-Vel',
-  description: 'Huge quadruped grazers; slow-moving living landscapes that reshape terrain as they migrate',
+  description: 'Huge mountain-sessile sages; one per peak for millions of years, mineral metabolism, geological patience',
   bodyPlanId: 'quadruped',
-  innateTraits: [TRAIT_COLOSSAL_PRESENCE, TRAIT_MUTUALIST_BOND],
+  innateTraits: [TRAIT_COLOSSAL_PRESENCE, TRAIT_LONG_MEMORY],
   compatibleSpecies: [],
   mutationRate: 0.008,
   averageHeight: 500,
@@ -615,14 +614,14 @@ const AUKI_VEL_SPECIES: SpeciesTemplate = {
   maturityAge: 50,
   gestationPeriod: 365,
   sapient: true,
-  socialStructure: 'migratory_herds',
+  socialStructure: 'solitary_sessile',
   cross_game_compatible: true,
   native_game: 'precursors',
   ecologyProfile: {
-    ecologicalRole: 'megaherbivore',
-    diet: 'herbivore',
-    biomePreferences: ['plains', 'savanna', 'highland'],
-    socialStructure: 'migratory_herds',
+    ecologicalRole: 'keystone',
+    diet: 'mineral_metabolism',
+    biomePreferences: ['mountain_peak', 'alpine', 'highland'],
+    socialStructure: 'solitary_sessile',
     activityPattern: 'diurnal',
   },
 };
@@ -722,9 +721,9 @@ const KELPATHI_SPECIES: SpeciesTemplate = {
   speciesId: 'kelpathi',
   speciesName: 'Kelpathi',
   commonName: 'Kelpathi',
-  description: 'Large aquatic-adjacent quadrupeds that travel waterways; their migration maps waterway health',
+  description: 'Large aquatic ambush predators; lure prey with equine silhouette, adhesive dermal secretion bonds on contact, drowns prey',
   bodyPlanId: 'quadruped',
-  innateTraits: [TRAIT_WATER_AFFINITY, TRAIT_MUTUALIST_BOND],
+  innateTraits: [TRAIT_WATER_AFFINITY, TRAIT_KEEN_SENSES],
   compatibleSpecies: [],
   mutationRate: 0.016,
   averageHeight: 230,
@@ -739,8 +738,8 @@ const KELPATHI_SPECIES: SpeciesTemplate = {
   cross_game_compatible: true,
   native_game: 'precursors',
   ecologyProfile: {
-    ecologicalRole: 'keystone',
-    diet: 'herbivore',
+    ecologicalRole: 'territorial_predator',
+    diet: 'carnivore',
     biomePreferences: ['river', 'estuary', 'coastal'],
     socialStructure: 'migratory_pods',
     activityPattern: 'diurnal',
@@ -809,8 +808,8 @@ const SELKIEBORN_SPECIES: SpeciesTemplate = {
   speciesId: 'selkieborn',
   speciesName: 'Selkie-Born',
   commonName: 'Selkie-Born',
-  description: 'Medium aquatic-tentacled shapeshifters; can walk land or swim sea depending on phase',
-  bodyPlanId: 'aquatic_tentacled',
+  description: 'Medium seal-form marine beings from Roan-Mor; biological sel-coat enables deep-ocean locomotion, bipedal on land',
+  bodyPlanId: 'marine_mammal_dual',
   innateTraits: [TRAIT_AQUATIC_ADAPTED, TRAIT_SHAPESHIFTING],
   compatibleSpecies: ['nommo', 'rusalyn'],
   mutationRate: 0.018,
@@ -1068,7 +1067,7 @@ const NAGA_VEL_SPECIES: SpeciesTemplate = {
   ecologyProfile: {
     ecologicalRole: 'cultural_keystone',
     diet: 'omnivore',
-    biomePreferences: ['jungle', 'temple_ruins', 'subterranean'],
+    biomePreferences: ['jungle', 'river', 'temple_ruins', 'subterranean'],
     socialStructure: 'threshold_temples',
     activityPattern: 'crepuscular',
   },
@@ -1132,17 +1131,15 @@ const QUETZALI_SPECIES: SpeciesTemplate = {
   },
 };
 
-// ============================================================================
-// Wave 6 — Void
-// ============================================================================
+// Wave 5 — Enlightened (continued)
 
 const DJINN_AHL_SPECIES: SpeciesTemplate = {
   speciesId: 'djinn_ahl',
   speciesName: 'Djinn-Ahl',
   commonName: 'Djinn-Ahl',
-  description: 'Medium amorphous wish-bound beings; their form is shaped by desire and obligation',
+  description: 'Medium plasma-substrate beings of the Core Band; oldest civilization, bound by negotiated contracts',
   bodyPlanId: 'amorphous',
-  innateTraits: [TRAIT_SHAPESHIFTING, TRAIT_VOID_TOUCHED, TRAIT_LONG_MEMORY],
+  innateTraits: [TRAIT_SHAPESHIFTING, TRAIT_AGELESS, TRAIT_LONG_MEMORY],
   compatibleSpecies: [],
   mutationRate: 0.0,
   averageHeight: 170,
@@ -1169,7 +1166,7 @@ const PERI_VEIL_SPECIES: SpeciesTemplate = {
   speciesId: 'peri_veil',
   speciesName: 'Peri-Veil',
   commonName: 'Peri-Veil',
-  description: 'Medium amorphous beings of light and mist; drift between states, carrying blessings',
+  description: 'Post-material Void-Band beings who transcended too early; perceive reality with exquisite precision but cannot touch it',
   bodyPlanId: 'amorphous',
   innateTraits: [TRAIT_BIOLUMINESCENT, TRAIT_PHANTOM_FORM, TRAIT_CHORUS_ATTUNED],
   compatibleSpecies: [],
@@ -1198,9 +1195,9 @@ const RAKSHA_SPECIES: SpeciesTemplate = {
   speciesId: 'raksha',
   speciesName: 'Raksha',
   commonName: 'Raksha',
-  description: 'Large humanoid shapeshifters from the void margins; ancient and fearsome, bound by complex codes of honor',
+  description: 'Large humanoid warrior-scholars from Raksha-Vor; somatic plasticity, volcanic metabolism, bound by complex codes of honor',
   bodyPlanId: 'humanoid_standard',
-  innateTraits: [TRAIT_SHAPESHIFTING, TRAIT_VOID_TOUCHED, TRAIT_APEX_PREDATOR],
+  innateTraits: [TRAIT_SHAPESHIFTING, TRAIT_KEEN_SENSES, TRAIT_LONG_MEMORY],
   compatibleSpecies: [],
   mutationRate: 0.005,
   averageHeight: 280,
@@ -1211,14 +1208,14 @@ const RAKSHA_SPECIES: SpeciesTemplate = {
   maturityAge: 0,
   gestationPeriod: 0,
   sapient: true,
-  socialStructure: 'void_courts',
+  socialStructure: 'honor_clans',
   cross_game_compatible: true,
   native_game: 'precursors',
   ecologyProfile: {
     ecologicalRole: 'apex_predator',
     diet: 'carnivore',
-    biomePreferences: ['void_margin', 'jungle', 'ancient_ruins'],
-    socialStructure: 'void_courts',
+    biomePreferences: ['jungle', 'savanna', 'ancient_ruins'],
+    socialStructure: 'honor_clans',
     activityPattern: 'nocturnal',
   },
 };
@@ -1402,6 +1399,358 @@ const HULDRYN_SPECIES: SpeciesTemplate = {
 };
 
 // ============================================================================
+// Additional Canonical Species
+// ============================================================================
+
+const DRAGON_SPECIES: SpeciesTemplate = {
+  speciesId: 'dragon',
+  speciesName: 'Dragon',
+  commonName: 'Dragon',
+  description: 'Post-temporal elder beings who inhabit time as tapestry; anchor probability against Fae maximization, observe civilizational patterns across epochs',
+  bodyPlanId: 'serpentine',
+  innateTraits: [TRAIT_LONG_MEMORY, TRAIT_COLOSSAL_PRESENCE, TRAIT_DREAM_WEAVER, TRAIT_ANCESTRAL_ECHO, TRAIT_AGELESS],
+  compatibleSpecies: [],
+  mutationRate: 0.0,
+  averageHeight: 800,
+  averageWeight: 5000,
+  sizeCategory: 'huge',
+  lifespan: 0,
+  lifespanType: 'ageless',
+  maturityAge: 0,
+  gestationPeriod: 0,
+  sapient: true,
+  socialStructure: 'solitary_temporal',
+  cross_game_compatible: true,
+  native_game: 'precursors',
+  ecologyProfile: {
+    ecologicalRole: 'keystone',
+    diet: 'temporal_perception',
+    biomePreferences: ['mountain', 'deep_river_valley', 'dimensional_threshold', 'cave'],
+    socialStructure: 'solitary_temporal',
+    activityPattern: 'continuous',
+  },
+};
+
+const DRAUGRN_SPECIES: SpeciesTemplate = {
+  speciesId: 'draugrn',
+  speciesName: 'Draugrn',
+  commonName: 'Draugrn',
+  description: 'Dense bipedal archivists from high-gravity Niflar who enter geological-time cryo-suspension with crystalline memory archives embedded in their bodies',
+  bodyPlanId: 'humanoid_standard',
+  innateTraits: [TRAIT_LONG_MEMORY, TRAIT_ANCESTRAL_ECHO, TRAIT_STURDY, TRAIT_AGELESS],
+  compatibleSpecies: [],
+  mutationRate: 0.008,
+  averageHeight: 155,
+  averageWeight: 200,
+  sizeCategory: 'medium',
+  lifespan: 0,
+  lifespanType: 'ageless',
+  maturityAge: 0,
+  gestationPeriod: 0,
+  sapient: true,
+  socialStructure: 'archive_individualist',
+  cross_game_compatible: true,
+  native_game: 'precursors',
+  ecologyProfile: {
+    ecologicalRole: 'cultural_keystone',
+    diet: 'omnivore',
+    biomePreferences: ['barrow_mound', 'subterranean', 'cold_environment', 'high_gravity'],
+    socialStructure: 'archive_individualist',
+    activityPattern: 'geological_cycle',
+  },
+};
+
+const ADARO_VEL_SPECIES: SpeciesTemplate = {
+  speciesId: 'adaro_vel',
+  speciesName: 'Adaro-Vel',
+  commonName: 'Adaro',
+  description: 'Melanesian aerial aquatic hunters who anchor to solar radiation in clear weather and descend via rainbow-paths during rain to hunt with venomous flying-fish volleys',
+  bodyPlanId: 'humanoid_standard',
+  innateTraits: [TRAIT_APEX_PREDATOR, TRAIT_WINGED_FLIGHT, TRAIT_WATER_AFFINITY, TRAIT_KEEN_SENSES],
+  compatibleSpecies: [],
+  mutationRate: 0.015,
+  averageHeight: 180,
+  averageWeight: 75,
+  sizeCategory: 'medium',
+  lifespan: 0,
+  lifespanType: 'ageless',
+  maturityAge: 0,
+  gestationPeriod: 0,
+  sapient: true,
+  socialStructure: 'solitary_hunter',
+  cross_game_compatible: true,
+  native_game: 'mvee',
+  ecologyProfile: {
+    ecologicalRole: 'apex_predator',
+    diet: 'carnivore',
+    biomePreferences: ['coast', 'river_corridor', 'rain_region', 'high_elevation'],
+    socialStructure: 'solitary_hunter',
+    activityPattern: 'rain_driven',
+  },
+};
+
+const SACHAMAMA_VEL_SPECIES: SpeciesTemplate = {
+  speciesId: 'sachamama_vel',
+  speciesName: 'Sachamama-Vel',
+  commonName: 'Sachamama',
+  description: 'Colossal serpent so vast the forest grows upon her back; the living instantiation of forest sovereignty who swallows those who linger on her body tiles',
+  bodyPlanId: 'serpentine',
+  innateTraits: [TRAIT_COLOSSAL_PRESENCE, TRAIT_FOREST_BOND, TRAIT_SERPENTINE_GRACE, TRAIT_LONG_MEMORY, TRAIT_AGELESS],
+  compatibleSpecies: [],
+  mutationRate: 0.0,
+  averageHeight: 1200,
+  averageWeight: 8000,
+  sizeCategory: 'huge',
+  lifespan: 0,
+  lifespanType: 'immortal',
+  maturityAge: 0,
+  gestationPeriod: 0,
+  sapient: true,
+  socialStructure: 'solitary_territorial',
+  cross_game_compatible: true,
+  native_game: 'mvee',
+  ecologyProfile: {
+    ecologicalRole: 'keystone',
+    diet: 'carnivore',
+    biomePreferences: ['tropical_rainforest', 'old_growth_forest', 'amazonian_basin'],
+    socialStructure: 'solitary_territorial',
+    activityPattern: 'dormant_ambush',
+  },
+};
+
+const JIANGSHI_VEL_SPECIES: SpeciesTemplate = {
+  speciesId: 'jiangshi_vel',
+  speciesName: 'Jiangshi-Vel',
+  commonName: 'Jiangshi',
+  description: 'Reanimated beings driven by stranded po-spirit seeking qi equilibrium; bilateral hopping locomotion, breath-based detection, controllable by ritual specialist',
+  bodyPlanId: 'humanoid_standard',
+  innateTraits: [TRAIT_PHANTOM_FORM, TRAIT_PARASITIC_DRAIN, TRAIT_ANCESTRAL_ECHO],
+  compatibleSpecies: [],
+  mutationRate: 0.0,
+  averageHeight: 170,
+  averageWeight: 70,
+  sizeCategory: 'medium',
+  lifespan: 0,
+  lifespanType: 'ageless',
+  maturityAge: 0,
+  gestationPeriod: 0,
+  sapient: false,
+  socialStructure: 'solitary',
+  cross_game_compatible: true,
+  native_game: 'mvee',
+  ecologyProfile: {
+    ecologicalRole: 'environmental_hazard',
+    diet: 'qi_absorption',
+    biomePreferences: ['burial_ground', 'road', 'abandoned_structure', 'mountain_pass'],
+    socialStructure: 'solitary',
+    activityPattern: 'nocturnal',
+  },
+};
+
+const FYLGJA_SPECIES: SpeciesTemplate = {
+  speciesId: 'fylgja',
+  speciesName: 'Fylgja',
+  commonName: 'Fylgja',
+  description: 'Emotional mirror-companions that bond to a single individual and reflect their inner state; they do not obey, they attend',
+  bodyPlanId: 'quadruped',
+  innateTraits: [TRAIT_CHORUS_ATTUNED, TRAIT_DREAM_WEAVER, TRAIT_MUTUALIST_BOND, TRAIT_KEEN_SENSES],
+  compatibleSpecies: ['norn', 'ettin', 'grendel'],
+  mutationRate: 0.01,
+  averageHeight: 50,
+  averageWeight: 8,
+  sizeCategory: 'small',
+  lifespan: 0,
+  lifespanType: 'ageless',
+  maturityAge: 0,
+  gestationPeriod: 0,
+  sapient: true,
+  socialStructure: 'bonded_pair',
+  cross_game_compatible: true,
+  native_game: 'precursors',
+  ecologyProfile: {
+    ecologicalRole: 'mutualist',
+    diet: 'omnivore',
+    biomePreferences: ['any'],
+    socialStructure: 'bonded_pair',
+    activityPattern: 'companion_driven',
+  },
+};
+
+const ASWALI_SPECIES: SpeciesTemplate = {
+  speciesId: 'aswali',
+  speciesName: 'Aswali',
+  commonName: 'Aswali',
+  description: 'Refugee shapeshifters from ecological warzone Liwanag; genuine cellular-level morphological transformation, hiding in communities for generations until the shape became the truth',
+  bodyPlanId: 'amorphous',
+  innateTraits: [TRAIT_SHAPESHIFTING, TRAIT_ADAPTABLE, TRAIT_KEEN_SENSES],
+  compatibleSpecies: ['norn'],
+  mutationRate: 0.02,
+  averageHeight: 170,
+  averageWeight: 65,
+  sizeCategory: 'medium',
+  lifespan: 120,
+  lifespanType: 'long_lived',
+  maturityAge: 15,
+  gestationPeriod: 60,
+  sapient: true,
+  socialStructure: 'integrated_hidden',
+  cross_game_compatible: true,
+  native_game: 'mvee',
+  ecologyProfile: {
+    ecologicalRole: 'mutualist',
+    diet: 'omnivore',
+    biomePreferences: ['settlement', 'village', 'any_inhabited'],
+    socialStructure: 'integrated_hidden',
+    activityPattern: 'diurnal',
+  },
+};
+
+const SIROCCS_SPECIES: SpeciesTemplate = {
+  speciesId: 'siroccs',
+  speciesName: 'Siroccs',
+  commonName: 'Siroccs',
+  description: 'Electromagnetic pattern beings without bodies who evolved in a pulsar magnetosphere; intelligence as pattern, not substrate; communication manifests as localized storms',
+  bodyPlanId: 'amorphous',
+  innateTraits: [TRAIT_STORM_AFFINITY, TRAIT_CHORUS_ATTUNED, TRAIT_DREAM_WEAVER, TRAIT_AGELESS, TRAIT_COLOSSAL_PRESENCE],
+  compatibleSpecies: [],
+  mutationRate: 0.0,
+  averageHeight: 0,
+  averageWeight: 0,
+  sizeCategory: 'huge',
+  lifespan: 0,
+  lifespanType: 'ageless',
+  maturityAge: 0,
+  gestationPeriod: 0,
+  sapient: true,
+  socialStructure: 'resonance_collective',
+  cross_game_compatible: true,
+  native_game: 'precursors',
+  ecologyProfile: {
+    ecologicalRole: 'cosmic_messenger',
+    diet: 'electromagnetic_energy',
+    biomePreferences: ['storm_system', 'pulsar_magnetosphere', 'electrical_node'],
+    socialStructure: 'resonance_collective',
+    activityPattern: 'electromagnetic_driven',
+  },
+};
+
+const PELAGIS_SPECIES: SpeciesTemplate = {
+  speciesId: 'pelagis',
+  speciesName: 'Pelagis',
+  commonName: 'Pelagis',
+  description: 'Bioluminescent deep-ocean cetacean analogues from Verdania; marine ecosystem stabilizers who release biochemical catalysts to restore collapsing fisheries',
+  bodyPlanId: 'marine_mammal_dual',
+  innateTraits: [TRAIT_BIOLUMINESCENT, TRAIT_AQUATIC_ADAPTED, TRAIT_WATER_AFFINITY, TRAIT_LONG_MEMORY, TRAIT_CHORUS_ATTUNED, TRAIT_MUTUALIST_BOND],
+  compatibleSpecies: ['selkieborn', 'nommo'],
+  mutationRate: 0.005,
+  averageHeight: 400,
+  averageWeight: 2000,
+  sizeCategory: 'huge',
+  lifespan: 0,
+  lifespanType: 'ageless',
+  maturityAge: 0,
+  gestationPeriod: 0,
+  sapient: true,
+  socialStructure: 'pod_based',
+  cross_game_compatible: true,
+  native_game: 'precursors',
+  ecologyProfile: {
+    ecologicalRole: 'keystone',
+    diet: 'carnivore',
+    biomePreferences: ['deep_ocean', 'all_ocean', 'freshwater_transit'],
+    socialStructure: 'pod_based',
+    activityPattern: 'continuous',
+  },
+};
+
+const YOWIE_SPECIES: SpeciesTemplate = {
+  speciesId: 'yowie',
+  speciesName: 'Yowie',
+  commonName: 'Yowie',
+  description: 'Enormous shy forest guardians from Warra-Deep; choose invisibility via phase-shift as courtesy, break silence only to warn of immediate lethal danger',
+  bodyPlanId: 'humanoid_standard',
+  innateTraits: [TRAIT_FOREST_BOND, TRAIT_PHANTOM_FORM, TRAIT_LONG_MEMORY, TRAIT_ANCESTRAL_ECHO, TRAIT_COLOSSAL_PRESENCE],
+  compatibleSpecies: [],
+  mutationRate: 0.005,
+  averageHeight: 275,
+  averageWeight: 350,
+  sizeCategory: 'huge',
+  lifespan: 0,
+  lifespanType: 'ageless',
+  maturityAge: 0,
+  gestationPeriod: 0,
+  sapient: true,
+  socialStructure: 'solitary_guardian',
+  cross_game_compatible: true,
+  native_game: 'precursors',
+  ecologyProfile: {
+    ecologicalRole: 'keystone',
+    diet: 'omnivore',
+    biomePreferences: ['old_growth_forest', 'riparian_zone', 'ancient_stone', 'waterhole'],
+    socialStructure: 'solitary_guardian',
+    activityPattern: 'nocturnal',
+  },
+};
+
+const UKTEN_SPECIES: SpeciesTemplate = {
+  speciesId: 'ukten',
+  speciesName: 'Ukten',
+  commonName: 'Ukten',
+  description: 'Serpentiform data custodians from mineral-cave world Amoye; piezoelectric crest stores 10,000 years of crystalline memory, guards territory through induced biochemical fear as ethical warning',
+  bodyPlanId: 'serpentine',
+  innateTraits: [TRAIT_LONG_MEMORY, TRAIT_ANCESTRAL_ECHO, TRAIT_SERPENTINE_GRACE, TRAIT_AQUATIC_ADAPTED, TRAIT_BIOLUMINESCENT, TRAIT_COLOSSAL_PRESENCE],
+  compatibleSpecies: [],
+  mutationRate: 0.005,
+  averageHeight: 1500,
+  averageWeight: 3000,
+  sizeCategory: 'huge',
+  lifespan: 10000,
+  lifespanType: 'long_lived',
+  maturityAge: 200,
+  gestationPeriod: 365,
+  sapient: true,
+  socialStructure: 'territorial_data_custodian',
+  cross_game_compatible: true,
+  native_game: 'precursors',
+  ecologyProfile: {
+    ecologicalRole: 'keystone',
+    diet: 'lithophilic',
+    biomePreferences: ['deep_freshwater_lake', 'subterranean_waterway', 'crystalline_cave', 'mountain_lake'],
+    socialStructure: 'territorial_data_custodian',
+    activityPattern: 'continuous',
+  },
+};
+
+const PIASARI_SPECIES: SpeciesTemplate = {
+  speciesId: 'piasari',
+  speciesName: 'Piasari',
+  commonName: 'Piasari',
+  description: 'River-canyon apex predators from Skara-Cliff who hunt via irreversible metabolic dive-commits and mark cliff faces with biochemical self-portraits as territorial claims',
+  bodyPlanId: 'avian_winged',
+  innateTraits: [TRAIT_APEX_PREDATOR, TRAIT_WINGED_FLIGHT, TRAIT_AQUATIC_ADAPTED, TRAIT_KEEN_SENSES],
+  compatibleSpecies: [],
+  mutationRate: 0.015,
+  averageHeight: 200,
+  averageWeight: 120,
+  sizeCategory: 'large',
+  lifespan: 300,
+  lifespanType: 'long_lived',
+  maturityAge: 20,
+  gestationPeriod: 90,
+  sapient: true,
+  socialStructure: 'territorial_cliff_nesting',
+  cross_game_compatible: true,
+  native_game: 'precursors',
+  ecologyProfile: {
+    ecologicalRole: 'secondary_consumer',
+    diet: 'carnivore',
+    biomePreferences: ['river_canyon', 'cliff_face', 'river_corridor'],
+    socialStructure: 'territorial_cliff_nesting',
+    activityPattern: 'diurnal',
+  },
+};
+
+// ============================================================================
 // Registration
 // ============================================================================
 
@@ -1452,7 +1801,7 @@ export function registerAkashicSpecies(): void {
   registerSpecies('garuda_vel', GARUDA_VEL_SPECIES);
   registerSpecies('quetzali', QUETZALI_SPECIES);
 
-  // Wave 6 — Void
+  // Wave 5 — Enlightened (continued)
   registerSpecies('djinn_ahl', DJINN_AHL_SPECIES);
   registerSpecies('peri_veil', PERI_VEIL_SPECIES);
   registerSpecies('raksha', RAKSHA_SPECIES);
@@ -1464,6 +1813,20 @@ export function registerAkashicSpecies(): void {
   registerSpecies('taniwha', TANIWHA_SPECIES);
   registerSpecies('curupali', CURUPALI_SPECIES);
   registerSpecies('huldryn', HULDRYN_SPECIES);
+
+  // Additional Canonical Species
+  registerSpecies('dragon', DRAGON_SPECIES);
+  registerSpecies('draugrn', DRAUGRN_SPECIES);
+  registerSpecies('adaro_vel', ADARO_VEL_SPECIES);
+  registerSpecies('sachamama_vel', SACHAMAMA_VEL_SPECIES);
+  registerSpecies('jiangshi_vel', JIANGSHI_VEL_SPECIES);
+  registerSpecies('fylgja', FYLGJA_SPECIES);
+  registerSpecies('aswali', ASWALI_SPECIES);
+  registerSpecies('siroccs', SIROCCS_SPECIES);
+  registerSpecies('pelagis', PELAGIS_SPECIES);
+  registerSpecies('yowie', YOWIE_SPECIES);
+  registerSpecies('ukten', UKTEN_SPECIES);
+  registerSpecies('piasari', PIASARI_SPECIES);
 }
 
 // Auto-register on import (side-effect module pattern)
