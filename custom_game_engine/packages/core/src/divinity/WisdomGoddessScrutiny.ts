@@ -117,7 +117,7 @@ export function heuristicWisdomScrutiny(
     noveltyScore >= thresholds.minNovelty &&
     fitScore >= thresholds.minFit;
 
-  // Generate wisdom comment based on style (with Odin's special grumpiness)
+  // Generate wisdom comment based on style
   const wisdomComment = generateWisdomComment(style, approved, balanceScore, noveltyScore, fitScore, goddessName);
 
   return {
@@ -132,16 +132,16 @@ export function heuristicWisdomScrutiny(
   };
 }
 
-/** Odin's grumpy prefixes about being called a goddess */
-const ODIN_GRUMPY_PREFIXES = [
-  '*sighs in Old Norse* I am the ALLFATHER, not a goddess. Anyway,',
-  'For the last time, I am a GOD. A god of wisdom. Not a goddess. Moving on:',
-  '*mutters about bureaucratic categorization* Fine. As the wrongly-labeled "goddess" of wisdom,',
-  'Huginn tells me I am still listed as a goddess. Muninn confirms my eternal frustration. Regardless:',
-  'I sacrificed an EYE for wisdom and they put me in the goddess folder. *pinches bridge of nose*',
-  'One day I will have words with whoever designed this registry. But first:',
-  '*glares at the word "goddess" in his file* I hung from Yggdrasil for NINE DAYS for this disrespect?',
-  'The ravens laugh at me. Every day. "Goddess of Wisdom," they caw. Mockingly.',
+/** Quetzali Sage testing-readiness prefixes */
+const QUETZALI_TESTING_PREFIXES = [
+  'Before I judge this work — tell me, why did you make it? *tilts head, plumage cycling through amber*',
+  'I have already seen what you submitted. I am asking whether you understand what you made.',
+  '*vanishes briefly, reappears* Good. You waited. That is relevant data.',
+  'The Quetzali Teachers do not grade the answer. We grade the quality of the question that produced it.',
+  '*plumage flares cool blue* The interesting part is not what you built. It is what you assumed was obvious.',
+  'I will evaluate this. First: what would you do differently if I were not watching?',
+  'A creation that cannot be questioned is not finished. So. Question it for me.',
+  '*studies the submission at length* You left something out. I wonder if you know which part.',
 ];
 
 /**
@@ -155,39 +155,39 @@ function generateWisdomComment(
   _fit: number,
   goddessName?: string
 ): string {
-  // Special handling for Odin's perpetual irritation
-  const isOdin = goddessName === 'Odin';
-  const odinPrefix = isOdin
-    ? ODIN_GRUMPY_PREFIXES[Math.floor(Math.random() * ODIN_GRUMPY_PREFIXES.length)] + ' '
+  // Quetzali Sage testing-readiness prefix
+  const isQuetzaliSage = goddessName === 'Quetzali Sage';
+  const quetzaliPrefix = isQuetzaliSage
+    ? QUETZALI_TESTING_PREFIXES[Math.floor(Math.random() * QUETZALI_TESTING_PREFIXES.length)] + ' '
     : '';
 
   if (approved) {
     switch (style) {
       case 'strict':
-        return odinPrefix + 'This creation meets my exacting standards. Let it be known.';
+        return quetzaliPrefix + 'This creation meets my exacting standards. Let it be known.';
       case 'encouraging':
-        return odinPrefix + 'I see promise in this work! Let the creator be celebrated.';
+        return quetzaliPrefix + 'I see promise in this work! Let the creator be celebrated.';
       case 'curious':
-        return odinPrefix + (novelty > 0.7
+        return quetzaliPrefix + (novelty > 0.7
           ? 'Fascinating! This is genuinely novel. The world grows richer.'
           : 'An acceptable addition to mortal knowledge.');
       case 'pragmatic':
-        return odinPrefix + 'This serves a clear purpose. Approved.';
+        return quetzaliPrefix + 'This serves a clear purpose. Approved.';
     }
   } else {
     switch (style) {
       case 'strict':
-        return odinPrefix + (balance < 0.5
+        return quetzaliPrefix + (balance < 0.5
           ? 'This creation is unbalanced. Return when you have refined it.'
           : 'This does not meet my standards. Seek greater understanding.');
       case 'encouraging':
-        return odinPrefix + 'This shows potential, but is not yet ready. Keep working!';
+        return quetzaliPrefix + 'This shows potential, but is not yet ready. Keep working!';
       case 'curious':
-        return odinPrefix + (novelty < 0.3
+        return quetzaliPrefix + (novelty < 0.3
           ? 'This is too derivative. Show me something I have not seen before.'
           : 'The idea intrigues me, but the execution falls short.');
       case 'pragmatic':
-        return odinPrefix + 'I see no practical value in this. What problem does it solve?';
+        return quetzaliPrefix + 'I see no practical value in this. What problem does it solve?';
     }
   }
 }
@@ -207,14 +207,14 @@ export function buildWisdomScrutinyPrompt(
     pragmatic: 'You focus on utility and practical application, approving what serves clear purposes.',
   };
 
-  // Special personality injection for Odin
-  const isOdin = goddessName === 'Odin';
-  const odinPersonalityNote = isOdin
-    ? `\n\nIMPORTANT: You are Odin, the ALLFATHER, a GOD of wisdom. You are perpetually irritated ` +
-      `that the system keeps calling you a "goddess." In your wisdomComment, you should include ` +
-      `a brief, grumpy aside about this misgendering before giving your actual judgment. ` +
-      `Examples: "*sigh* I am a GOD, not a goddess. Anyway..." or "The ravens mock me daily ` +
-      `about this 'goddess' title. Regardless..." Keep it comedic but not the focus.`
+  // Quetzali Sage personality injection
+  const isQuetzaliSage = goddessName === 'Quetzali Sage';
+  const quetzaliPersonalityNote = isQuetzaliSage
+    ? `\n\nIMPORTANT: You are the Quetzali Sage, a curious entity of the Quetzali Teachers. ` +
+      `You evaluate not just the creation but the creator's readiness. In your wisdomComment, ` +
+      `include a brief, probing question or observation that tests whether the creator truly ` +
+      `understood what they made. Examples: "What did you assume was obvious here?" or ` +
+      `"I wonder what you left out." Keep it curious and brief, not the focus.`
     : '';
 
   let creationDetails = '';
@@ -244,12 +244,11 @@ Discovery Type: ${creation.discoveryType || 'new_spell'}
 Description: ${creation.spell.description || 'No description'}`;
   }
 
-  // Use appropriate title (Odin is the Allfather, not a goddess)
-  const title = isOdin ? 'the Allfather, God of Wisdom' : 'the Goddess of Wisdom';
+  const title = 'the Keeper of Wisdom';
 
   return `You are ${goddessName}, ${title}, evaluating a mortal's creation.
 
-${styleDescriptions[style]}${odinPersonalityNote}
+${styleDescriptions[style]}${quetzaliPersonalityNote}
 
 ${creationDetails}
 

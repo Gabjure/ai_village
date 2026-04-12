@@ -31,54 +31,51 @@ export interface WisdomGoddessConfig {
  */
 export const WISDOM_GODDESS_REGISTRY: WisdomGoddessConfig[] = [
   {
-    name: 'Athena',
-    spriteFolder: 'owl-scholar',
-    origin: 'Greco-Classical',
+    name: 'The Archivist',
+    spriteFolder: 'archivist-quill',
+    origin: 'Invisible College / Thornhaven',
     description:
-      'Dignified figure in flowing white robes, owl perched on shoulder, holding scrolls of ancient wisdom',
+      'Ancient figure of unknown age, draped in layered catalogues of pressed vellum, fingers stained with ink that never dries. The quill behind its ear has been writing the same sentence for three centuries.',
     scrutinyStyle: 'strict',
   },
   {
-    name: 'Saraswati',
-    spriteFolder: 'lotus-sage',
-    origin: 'Hindu',
+    name: 'Weaver of Loomspire',
+    spriteFolder: 'loomspire-weaver',
+    origin: 'Loomspire tradition',
     description:
-      'Serene goddess seated on lotus, veena instrument in hand, books floating around her in divine light',
+      'An entity whose form is woven from living thread — each strand a stored question, each knot an answered thing. When it moves, the threads rearrange. No two observers see the same pattern.',
     scrutinyStyle: 'encouraging',
   },
   {
-    name: 'Thoth',
-    spriteFolder: 'ibis-scribe',
-    origin: 'Egyptian',
+    name: 'Draugrn Scribe',
+    spriteFolder: 'draugrn-scribe',
+    origin: 'Deep Underground archivists',
     description:
-      'Ibis-headed deity with reed pen and papyrus, scales of knowledge balanced in ethereal hands',
+      'Pale beyond pale, eyes adapted for reading by mineral glow alone. Carries tablets of compressed stone rather than paper. Its silence is the silence of the deep earth — absolute, and full of things recorded.',
     scrutinyStyle: 'pragmatic',
   },
   {
-    name: 'Odin',
-    spriteFolder: 'one-eyed-wanderer',
-    origin: 'Norse',
+    name: 'Quetzali Sage',
+    spriteFolder: 'quetzali-sage',
+    origin: 'Quetzali Teachers',
     description:
-      'Cloaked wanderer with single burning eye, ravens Huginn and Muninn whispering secrets. ' +
-      'Perpetually irritated at being grouped with "goddesses" in this registry.',
+      'A presence that asks before it answers, and answers only with further questions. Its plumage shifts color with the temperature of an idea. Known to vanish mid-conversation to test whether the seeker will continue without it.',
     scrutinyStyle: 'curious',
-    resentsGoddessTitle: true,
-    preferredTitle: 'Allfather',
   },
   {
-    name: 'Sophia',
-    spriteFolder: 'crystalline-oracle',
-    origin: 'Gnostic',
+    name: 'Anansi-Web Lorekeeper',
+    spriteFolder: 'anansi-lorekeeper',
+    origin: 'Anansi-Web knowledge network',
     description:
-      'Ethereal being of pure light, face shifting between forms, crystalline structures forming her crown',
+      'Distributed presence that speaks through any node in its web. What you address is only one thread; the rest are listening. Warm in the way that patient attention is warm — total, unhurried, already knowing the ending.',
     scrutinyStyle: 'encouraging',
   },
   {
-    name: 'Seshat',
-    spriteFolder: 'star-librarian',
-    origin: 'Egyptian',
+    name: 'Draugrn Archivist',
+    spriteFolder: 'draugrn-archivist',
+    origin: 'Deep Underground archivists',
     description:
-      'Leopard-skin clad goddess with star headdress, notching every discovery into the eternal record',
+      'Senior keeper of the deep stacks, its memory organized by geological stratum. It does not forget — it files. When it rejects a submission, it returns it with the precise notation of what is missing and where the gap began.',
     scrutinyStyle: 'strict',
   },
 ];

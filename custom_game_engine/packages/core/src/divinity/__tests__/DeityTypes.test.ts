@@ -328,24 +328,24 @@ describe('type structures', () => {
   describe('DeityIdentity', () => {
     it('should accept valid identity structure', () => {
       const identity: DeityIdentity = {
-        primaryName: 'Athena',
-        epithets: ['Gray-Eyed', 'Wise One', 'Protector of Heroes'],
+        primaryName: 'The Archivist',
+        epithets: ['Keeper of Catalogues', 'The Undrying Quill', 'Thornhaven Warden'],
         domain: 'wisdom',
-        secondaryDomains: ['war', 'craft'],
+        secondaryDomains: ['preservation', 'scrutiny'],
         perceivedPersonality: createDefaultPersonality(),
         perceivedAlignment: 'benevolent',
         describedForm: {
-          description: 'A tall woman in armor with gray eyes',
+          description: 'Ancient figure draped in layered catalogues of pressed vellum',
           height: 'tall',
           solidity: 'solid',
           luminosity: 'subtle',
-          distinctiveFeatures: ['gray eyes', 'owl companion', 'helmet'],
+          distinctiveFeatures: ['ink-stained fingers', 'eternal quill', 'vellum robes'],
         },
-        symbols: ['owl', 'olive tree', 'aegis'],
-        colors: ['gray', 'silver', 'gold'],
-        sacredAnimals: ['owl', 'snake'],
-        sacredPlants: ['olive'],
-        sacredPlaceTypes: ['citadel', 'library', 'workshop'],
+        symbols: ['quill', 'catalogue', 'pressed vellum'],
+        colors: ['sepia', 'ivory', 'ink-black'],
+        sacredAnimals: [],
+        sacredPlants: [],
+        sacredPlaceTypes: ['library', 'archive', 'scriptorium'],
         traitConfidence: new Map([
           ['domain', 1.0],
           ['alignment', 0.9],
@@ -353,7 +353,7 @@ describe('type structures', () => {
         initiallyBlank: false,
       };
 
-      expect(identity.primaryName).toBe('Athena');
+      expect(identity.primaryName).toBe('The Archivist');
       expect(identity.secondaryDomains).toContain('craft');
       expect(identity.traitConfidence.get('domain')).toBe(1.0);
     });

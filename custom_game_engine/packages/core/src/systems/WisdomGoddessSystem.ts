@@ -185,10 +185,10 @@ export class WisdomGoddessSystem extends BaseSystem {
     if (lowerContent.includes('goddess of wisdom')) return true;
     if (lowerContent.includes('wisdom goddess')) return true;
 
-    // Odin-specific
-    if (goddessName === 'Odin') {
-      if (lowerContent.includes('allfather')) return true;
-      if (lowerContent.includes('one-eyed')) return true;
+    // Quetzali Sage-specific
+    if (goddessName === 'Quetzali Sage') {
+      if (lowerContent.includes('quetzali')) return true;
+      if (lowerContent.includes('sage')) return true;
     }
 
     return false;
@@ -293,14 +293,7 @@ export class WisdomGoddessSystem extends BaseSystem {
     const greeting = lowerMessage.includes('hello') || lowerMessage.includes('greet') || lowerMessage.includes('hi ');
     const askingAdvice = lowerMessage.includes('advice') || lowerMessage.includes('help') || lowerMessage.includes('how');
 
-    // Odin's special responses (always grumpy about goddess title)
-    if (goddessName === 'Odin') {
-      return this.generateOdinResponse(senderName, lowerMessage, relationship, {
-        askingAboutRejection, askingAboutApproval, greeting, askingAdvice
-      });
-    }
-
-    // Goddess-specific responses
+    // Keeper-specific responses
     const responses = this.getGoddessResponseTemplates(goddessName);
 
     if (greeting) {
@@ -343,114 +336,85 @@ export class WisdomGoddessSystem extends BaseSystem {
   }
 
   /**
-   * Odin's special grumpy responses
-   */
-  private generateOdinResponse(
-    senderName: string,
-    _message: string,
-    relationship: { approvedCount: number; rejectedCount: number },
-    topics: { askingAboutRejection: boolean; askingAboutApproval: boolean; greeting: boolean; askingAdvice: boolean }
-  ): string {
-    const { approvedCount, rejectedCount } = relationship;
-
-    if (topics.greeting) {
-      return `*nods curtly* ${senderName}. I see you've found your way to the divine realm. ` +
-        `And before you ask - yes, I am aware the registry lists me as a "goddess." I have filed seventeen complaints.`;
-    }
-
-    if (topics.askingAboutRejection) {
-      if (rejectedCount > 0) {
-        return `*strokes beard* You've had ${rejectedCount} creation${rejectedCount > 1 ? 's' : ''} returned to you, ${senderName}. ` +
-          `The ravens showed me - they lacked novelty. I sacrificed an eye for wisdom; I expect mortals to at least TRY to surprise me.`;
-      }
-      return `*raises eyebrow* I have rejected nothing of yours, ${senderName}. Yet. Do not grow complacent.`;
-    }
-
-    if (topics.askingAboutApproval) {
-      if (approvedCount > 0) {
-        return `*slight nod* ${approvedCount} of your works have earned my approval, ${senderName}. ` +
-          `Do not let this go to your head. The bar is low and you barely cleared it. Also, I am NOT a goddess.`;
-      }
-      return `You have submitted nothing for my judgment, ${senderName}. The Allfather's time is valuable.`;
-    }
-
-    if (topics.askingAdvice) {
-      return `*leans forward* You seek wisdom from Odin? Then hear this: novelty matters more than perfection. ` +
-        `I traded an eye for knowledge - show me something worth that sacrifice. ` +
-        `And while you're at it, speak to the registry about my categorization issue.`;
-    }
-
-    return `*sighs in Old Norse* Speak plainly, ${senderName}. I have realms to oversee and a clerical error to dispute.`;
-  }
-
-  /**
-   * Get response templates for each goddess
+   * Get response templates for each keeper of wisdom
    */
   private getGoddessResponseTemplates(goddessName: string): Record<string, string> {
     const templates: Record<string, Record<string, string>> = {
-      Athena: {
-        greetingNew: '*inclines head* Greetings, {name}. I am Athena, keeper of wisdom and judge of mortal innovation.',
-        greetingFamiliar: '*owl hoots in recognition* Ah, {name}. We meet again. How fares your creative endeavors?',
-        rejectionExplanation: 'Your {count} rejected work(s) failed my standards, {name}. Balance and fit to the world are paramount. Refine them.',
-        noRejections: 'I have rejected none of your works, {name}. But understand - my standards do not waver.',
-        approvalAcknowledge: '*slight smile* Your {count} approved creation(s) showed merit, {name}. The owl remembers quality work.',
-        noApprovals: 'You have not yet submitted work for my judgment, {name}. I look forward to evaluating your contributions.',
-        advice: 'Seek balance in all things, {name}. A creation must fit the world it enters, and serve a purpose beyond novelty.',
-        coldResponse: '*stern gaze* {name}. I hope your next submission shows more care than our previous interactions suggest.',
-        warmResponse: '*owl preens* {name}, always a pleasure. Your creative spirit is commendable.',
-        neutralResponse: 'You have my attention, {name}. Speak your purpose.',
+      'The Archivist': {
+        greetingNew: '*the quill pauses mid-sentence* {name}. You have been indexed. State your purpose and it will be recorded.',
+        greetingFamiliar: '*does not look up from the catalogue* {name} again. Cross-referenced with your prior submissions. Proceed.',
+        rejectionExplanation: '{count} of your works were returned, {name}. The Archivist does not reject — it marks incomplete. Find what is missing.',
+        noRejections: 'No incomplete marks against {name}. The record is accurate. Do not mistake that for lenience.',
+        approvalAcknowledge: '{count} entries accepted into permanent record, {name}. They will remain there whether or not you do.',
+        noApprovals: 'No accepted entries from {name}. The Archivist has been patient. This is not infinite.',
+        advice: 'Every detail you omit becomes a gap in the record, {name}. Gaps accumulate. Fill them before you submit.',
+        coldResponse: '*marks notation in margin* {name}. Your file has accrued annotations. They are not favorable.',
+        warmResponse: '*the quill resumes writing without interruption* {name}. Your submissions have been consistent. This is rare.',
+        neutralResponse: '*the quill does not pause* You have my attention, {name}. The record is listening.',
       },
-      Saraswati: {
-        greetingNew: '*gentle smile* Welcome, {name}. I am Saraswati, and I celebrate the creative spirit in all beings.',
-        greetingFamiliar: '*radiant warmth* {name}! How wonderful to see you again. Tell me of your latest inspirations.',
-        rejectionExplanation: 'I returned {count} of your works for refinement, {name}. But please - see this as encouragement, not failure!',
-        noRejections: 'I have found no fault in your submissions, dear {name}. Your creativity flows beautifully.',
-        approvalAcknowledge: '*beaming* {count} of your creations brought me joy, {name}! The arts flourish through souls like yours.',
-        noApprovals: 'I await your creative offerings, {name}. Do not fear judgment - all art begins somewhere.',
-        advice: 'Let your creativity flow freely, {name}. Even imperfect works contain seeds of brilliance.',
-        coldResponse: '*concerned expression* {name}, I sense tension between us. Let us speak openly and find harmony.',
-        warmResponse: '*melodious laugh* Dear {name}! Your presence brightens the divine realm.',
-        neutralResponse: '*attentive* I am listening, {name}. Share what weighs on your mind.',
+      'Weaver of Loomspire': {
+        greetingNew: '*threads rearrange into an open pattern* A new thread approaches. Welcome, {name}. Show me what you are made of.',
+        greetingFamiliar: '*knots shift with recognition* {name}. Your strand is known to this web. What have you brought this time?',
+        rejectionExplanation: '{count} of your works could not be woven in, {name}. Not failure — the pattern was not ready for them yet. Try again.',
+        noRejections: 'Nothing returned from {name}. Every thread you offered found its place. This is beautiful work.',
+        approvalAcknowledge: '*weave brightens* {count} of your creations are now woven into the larger pattern, {name}. They will hold.',
+        noApprovals: 'You have not yet offered thread, {name}. The loom is patient. Do not make it wait too long.',
+        advice: 'Do not force the pattern, {name}. A creation that belongs in the world will find its place. One that does not will unravel.',
+        coldResponse: '*threads pull taut* {name}. There is tension in this connection. Let us find the loose end.',
+        warmResponse: '*weave hums warmly* {name}. You strengthen the pattern simply by being here.',
+        neutralResponse: '*a thread extends toward you* I am listening, {name}. Speak and we will see what it becomes.',
       },
-      Thoth: {
-        greetingNew: '*scratches with stylus* {name}. I am Thoth. State your business efficiently.',
-        greetingFamiliar: '*checks scroll* {name}. Your file indicates previous interactions. Proceed.',
-        rejectionExplanation: '{count} of your submissions lacked utility, {name}. Function over form. Revise accordingly.',
-        noRejections: 'No rejections on record for {name}. Your practical approach is noted.',
-        approvalAcknowledge: '{count} approved entries under your name, {name}. Utility confirmed. Adequate.',
-        noApprovals: 'No submissions from {name} in the archives. Curious. Are you merely observing?',
-        advice: 'Practical value, {name}. What problem does your creation solve? Answer that first.',
-        coldResponse: '*taps stylus impatiently* {name}. My time is measured in eternities, but I do not waste it.',
-        warmResponse: '*slight nod* {name}. Your pragmatic approach is... acceptable. Continue.',
-        neutralResponse: '*waits with stylus ready* {name}. I am documenting. Speak.',
+      'Draugrn Scribe': {
+        greetingNew: '*stone tablet rasps against stone* {name}. Designation logged. Speak your purpose. I do not ask twice.',
+        greetingFamiliar: '*checks compressed-stone index* {name}. Cross-referenced. Your record is retrievable. Continue.',
+        rejectionExplanation: '{count} submissions from {name} lacked demonstrable function. The deep stacks have no space for decoration.',
+        noRejections: 'No rejected entries for {name}. Your practical approach has been adequate.',
+        approvalAcknowledge: '{count} entries inscribed for {name}. Utility verified. The stacks hold them now.',
+        noApprovals: 'No submissions from {name} in the archive. Observation without submission is curiosity. Curiosity without output is waste.',
+        advice: 'What does it do, {name}? If you cannot answer that in one sentence, the work is not finished.',
+        coldResponse: '*stylus pauses* {name}. The record shows a pattern I do not find efficient. Explain.',
+        warmResponse: '*minimal acknowledgment* {name}. Your submissions have been consistently functional. This is noted.',
+        neutralResponse: '*tablet ready* {name}. The Scribe is recording. Do not waste the inscription.',
       },
-      Sophia: {
-        greetingNew: '*crystalline light pulses* A new soul approaches. Welcome, {name}. I am Sophia, the light of wisdom.',
-        greetingFamiliar: '*warm glow* {name}. The light recognizes you. How bright your spirit burns today.',
-        rejectionExplanation: 'The light could not harmonize with {count} of your creations, {name}. Seek the pattern; it will guide you.',
-        noRejections: 'All that you have offered resonates with the world\'s pattern, {name}. Beautiful.',
-        approvalAcknowledge: '*radiant* {count} of your works sing in harmony with existence, {name}. You are learning the pattern.',
-        noApprovals: 'You have not yet offered to the light, {name}. When ready, I will be here.',
-        advice: 'Seek the pattern in all things, {name}. Creation that harmonizes with existence endures.',
-        coldResponse: '*dims slightly* {name}. The light senses discord. Let us find harmony.',
-        warmResponse: '*brilliant glow* {name}! Your presence adds to the light.',
-        neutralResponse: '*steady luminescence* I perceive you, {name}. What truth do you seek?',
+      'Quetzali Sage': {
+        greetingNew: '*plumage cycles through colors of curiosity* {name}. I already know what you made. My question is whether you do.',
+        greetingFamiliar: '*tilts head, plumage warm amber* {name} returns. Good. Tell me what you learned since we last spoke.',
+        rejectionExplanation: '{count} of your works were returned, {name}. Not because they failed — because you could not yet say what they were for.',
+        noRejections: 'Nothing returned from {name}. Either your understanding is sound, or I have not tested it sufficiently yet.',
+        approvalAcknowledge: '{count} of your works passed, {name}. You knew what they were. That is harder than it sounds.',
+        noApprovals: 'You have submitted nothing, {name}. The Sage is patient. But patience is also a test.',
+        advice: 'What did you assume was obvious, {name}? That assumption is where the real work lives.',
+        coldResponse: '*plumage dims to cool grey* {name}. I sense you are presenting without understanding. Let us begin again.',
+        warmResponse: '*plumage brightens* {name}. You ask the right questions. That is everything.',
+        neutralResponse: '*watching carefully* {name}. I am here. Now — what do you actually want to know?',
       },
-      Seshat: {
-        greetingNew: '*consults star chart* {name}. Your name is now entered in the eternal archives. I am Seshat.',
-        greetingFamiliar: '*flips through cosmic ledger* {name}, entry 47B. I have your complete file.',
-        rejectionExplanation: '{count} entries marked REVISION REQUIRED under {name}. The archives demand precision.',
-        noRejections: 'No revision marks against {name}. Your record is clean. For now.',
-        approvalAcknowledge: '{count} permanent entries in the cosmic ledger, {name}. Your name is preserved.',
-        noApprovals: 'No entries submitted by {name}. The archives await your contribution.',
-        advice: 'Precision, {name}. Every detail is recorded for eternity. Make them count.',
-        coldResponse: '*makes notation* {name}. Your file contains... concerning patterns. We should discuss.',
-        warmResponse: '*star crown glimmers* {name}. Your entries consistently meet archival standards. Commendable.',
-        neutralResponse: '*stylus poised* {name}. Speak, and I shall record it accurately.',
+      'Anansi-Web Lorekeeper': {
+        greetingNew: '*presence arrives from multiple directions at once* {name}. We have been listening. Welcome to the web.',
+        greetingFamiliar: '*warmth spreads through the connection* {name}. The web knows your thread. How does your work continue?',
+        rejectionExplanation: '{count} of your works could not be shared through the web, {name}. What you offered was not yet ready to travel. Finish it.',
+        noRejections: 'Nothing returned from {name}. Everything you offered traveled well. The web carried it.',
+        approvalAcknowledge: '{count} of your creations now move through the network, {name}. Others will find them. This is how knowledge spreads.',
+        noApprovals: 'You have not yet offered to the web, {name}. The network does not come to you. You must send something first.',
+        advice: 'A creation that cannot be shared is a story no one will tell, {name}. Make something worth passing on.',
+        coldResponse: '*threads pull back slightly* {name}. There is something withheld here. The web notices what is hidden.',
+        warmResponse: '*network hums with recognition* {name}. Your presence strengthens the web. The knowledge flows better when you are in it.',
+        neutralResponse: '*attentive presence from all nodes* {name}. We are listening from many directions at once. Speak.',
+      },
+      'Draugrn Archivist': {
+        greetingNew: '*retrieves {name}\'s entry from memory strata* {name}. Your name is now filed under the correct geological layer. Proceed.',
+        greetingFamiliar: '*cross-references {name} against multiple strata* {name}. Your complete history is accessible. I have reviewed it.',
+        rejectionExplanation: '{count} submissions from {name} marked INCOMPLETE. The deep archive has held incomplete entries for millennia. They do not improve with age.',
+        noRejections: 'No incomplete marks for {name}. The record is clean across all strata. This is the expected standard.',
+        approvalAcknowledge: '{count} permanent entries inscribed for {name}. They are below the impermanence layer now. They will outlast the surface.',
+        noApprovals: 'No entries from {name} in the permanent record. The archive is not a spectator experience.',
+        advice: 'Precision is not optional, {name}. Every imprecision I accept becomes an error some future archivist must correct. Do not create that debt.',
+        coldResponse: '*notation added to {name}\'s stratum* {name}. The record contains discrepancies. We should address them.',
+        warmResponse: '*deep acknowledgment* {name}. Your entries meet archival standard. Consistently. This is not common.',
+        neutralResponse: '*stylus poised over stone* {name}. Speak accurately. I do not file approximations.',
       },
     };
 
-    return templates[goddessName] || templates.Athena!;
+    return templates[goddessName] ?? templates['The Archivist']!;
   }
 
   /**
@@ -725,25 +689,19 @@ export class WisdomGoddessSystem extends BaseSystem {
   }
 
   /**
-   * Generate intro message when goddess joins chat
+   * Generate intro message when keeper joins chat
    */
   private generateIntroMessage(goddessConfig: GoddessConfig, pendingCount: number): string {
-    const isOdin = goddessConfig.name === 'Odin';
-
-    if (isOdin) {
-      return `*strides into the divine realm* ${pendingCount} mortal creations await judgment. ` +
-        `And yes, I am aware that I am listed as a "goddess." The bureaucracy here is insufferable. Let us proceed.`;
-    }
-
     const intros: Record<string, string> = {
-      Athena: `*emerges with owl perched on shoulder* I have observed ${pendingCount} mortal creations accumulating. Allow me to review these works of invention.`,
-      Saraswati: `*appears in a gentle radiance* The mortals have been creative! ${pendingCount} proposals await consideration. I shall evaluate them with care.`,
-      Thoth: `*materializes with scroll and pen* ${pendingCount} creations require scrutiny. I shall assess their practical merit.`,
-      Sophia: `*crystalline light coalesces* The mortal mind has been busy. ${pendingCount} new ideas seek validation.`,
-      Seshat: `*appears with star-crowned head* ${pendingCount} discoveries must be recorded. Let me review each for the eternal archives.`,
+      'The Archivist': `*the quill arrives before anything else does* ${pendingCount} submissions have accumulated. The catalogue is behind. This will be corrected now.`,
+      'Weaver of Loomspire': `*threads settle into the space* ${pendingCount} creations are waiting to find their place in the pattern. Let us see what fits.`,
+      'Draugrn Scribe': `*stone tablets precede the figure by several seconds* ${pendingCount} submissions require assessment. Practical evaluation will begin immediately.`,
+      'Quetzali Sage': `*plumage cycling through rapid colors* ${pendingCount} works have arrived. Interesting. I will ask each creator what they actually meant before I judge.`,
+      'Anansi-Web Lorekeeper': `*presence distributes across all available nodes* ${pendingCount} creations have entered the web. The network will assess what can travel and what cannot.`,
+      'Draugrn Archivist': `*emerges from the deep stacks with a precise accounting already prepared* ${pendingCount} submissions await permanent inscription or return. The archive requires accuracy. Let us begin.`,
     };
 
-    return intros[goddessConfig.name] || `*appears* ${pendingCount} creations await my judgment.`;
+    return intros[goddessConfig.name] ?? `*arrives* ${pendingCount} creations await judgment.`;
   }
 
   /**
@@ -786,20 +744,16 @@ export class WisdomGoddessSystem extends BaseSystem {
     const approved = this.approvedCount;
     const rejected = this.rejectedCount;
 
-    if (goddessName === 'Odin') {
-      return `*sets down papers with a grunt* ${total} proposals reviewed. ${approved} blessed, ${rejected} returned for revision. ` +
-        `Now, has anyone fixed my title in the deity registry yet? No? I thought not.`;
-    }
-
     const closings: Record<string, string> = {
-      Athena: `My review is complete. Of ${total} submissions, ${approved} earned approval and ${rejected} require further refinement. The pursuit of knowledge continues.`,
-      Saraswati: `The creative spirit of mortals delights me! ${approved} works blessed, ${rejected} gently returned for improvement. May their inspiration grow.`,
-      Thoth: `Evaluation concluded. ${approved} of ${total} submissions meet practical standards. The rejected ${rejected} lack sufficient utility.`,
-      Sophia: `The light reveals truth. ${approved} creations resonate with the world's pattern. ${rejected} do not... yet.`,
-      Seshat: `Recorded in the eternal ledger: ${approved} new entries, ${rejected} pending revision. The archives grow.`,
+      'The Archivist': `*the quill resumes its sentence* ${total} submissions processed. ${approved} entered into permanent record. ${rejected} returned for completion. The catalogue is current.`,
+      'Weaver of Loomspire': `${approved} new threads now hold in the pattern. ${rejected} were returned — the weave was not ready for them. They may find their place later.`,
+      'Draugrn Scribe': `Assessment concluded. ${approved} of ${total} submissions demonstrated sufficient function. ${rejected} lacked it. The record reflects this accurately.`,
+      'Quetzali Sage': `*plumage settles to a thoughtful color* ${total} reviewed. ${approved} passed — their makers understood what they had built. ${rejected} did not. Yet. I remain available for questions.`,
+      'Anansi-Web Lorekeeper': `The network has processed ${total} offerings. ${approved} now travel freely through the web. ${rejected} were not ready to be shared — finish them and send them again.`,
+      'Draugrn Archivist': `Inscription complete. ${approved} entries now reside below the impermanence layer. ${rejected} have been returned with notation. The archive is accurate as of this moment.`,
     };
 
-    return closings[goddessName] || `Review complete: ${approved} approved, ${rejected} rejected.`;
+    return closings[goddessName] ?? `Review complete: ${approved} approved, ${rejected} rejected.`;
   }
 
   /**
