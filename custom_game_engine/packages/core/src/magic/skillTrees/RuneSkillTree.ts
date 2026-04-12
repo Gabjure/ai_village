@@ -12,7 +12,7 @@
  * - Elder runes vs. common runes
  *
  * Inspired by:
- * - Norse/Germanic runic tradition
+ * - Storm-Kindred runic tradition
  * - Ancient runic traditions across multiple species
  * - Rune magic from various fantasy settings
  * - The concept that writing itself is magical

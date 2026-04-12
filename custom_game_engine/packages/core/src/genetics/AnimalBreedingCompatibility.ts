@@ -180,10 +180,10 @@ export const KNOWN_ANIMAL_HYBRIDS: ReadonlyArray<AnimalHybridDefinition> = [
     lore:
       'When the wolf-pack ranges too far north toward the volcanic wastes, and a fire-spirit walks the snowline, ' +
       'something neither wholly cold nor wholly flame is sometimes whelped. ' +
-      'The Greeks called these Cerberus-kin, guardians of passage; the Norse knew them as the blood of Fenrir mingled with Surtr\'s forge-heat. ' +
+      'The ancients called these Deep Archive Guardian-kin, wardens of passage; the Storm-Kindred knew them as the blood of the Storm-Kindred Beast mingled with volcanic forge-heat. ' +
       'A Hellhound\'s fur smolders at the tips and its tracks melt snow to steam.',
     mythologicalOrigin:
-      'Greek mythology (Cerberus, hounds of Hades) and Norse mythology (Fenrir\'s offspring, Garm). ' +
+      'Multiverse lore (Deep Archive Guardian, hounds of the Deep Archive) and Storm-Kindred tradition (Storm-Kindred Beast offspring, Echo Hall Warden). ' +
       'Fire-wolf hybrids appear across Polynesian and Aztec myth as volcano-guardian canines.',
     rarity: 'rare',
     compatibilityScore: 0.03,

@@ -2,7 +2,7 @@
  * MythologicalRealms - Divine Pocket Dimensions
  *
  * Realms are NOT universes. They're pocket dimensions attached to a parent
- * universe - places like Avalon, Faerie, Olympus, the Underworld.
+ * universe - places like the Veil Shore, Veil Wild, Chorus Spire, the Deep Archive.
  *
  * Key differences from universes:
  * - Inherit physics/magic from parent (with modifications)
@@ -668,20 +668,20 @@ export function createPortal(
 // ============================================================================
 
 export type RealmPreset =
-  | 'olympus'       // Greek celestial court
-  | 'asgard'        // Norse celestial realm
-  | 'heaven'        // Monotheistic paradise
-  | 'hades'         // Greek underworld
-  | 'valhalla'      // Norse warrior afterlife
-  | 'faerie'        // Fae wild realm
-  | 'avalon'        // Celtic otherworld
+  | 'chorus_spire'  // Chorus-Ascendant celestial court
+  | 'storm_seat'    // Storm-Kindred celestial realm
+  | 'chorus_source' // Chorus-Source paradise
+  | 'deep_archive'  // Deep Archive underworld
+  | 'echo_hall'     // Echo Hall warrior afterlife
+  | 'veil_wild'     // Veil-Wild realm
+  | 'veil_shore'    // Veil Shore otherworld
   | 'dreaming'      // Dream realm
   | 'elemental_fire' // Fire plane
   | 'crossroads';   // Liminal deal-making space
 
 export function getRealmPreset(preset: RealmPreset): Partial<RealmCreationConfig> {
   switch (preset) {
-    case 'olympus':
+    case 'chorus_spire':
       return {
         category: 'celestial',
         size: 'kingdom',
@@ -695,7 +695,7 @@ export function getRealmPreset(preset: RealmPreset): Partial<RealmCreationConfig
         ],
       };
 
-    case 'asgard':
+    case 'storm_seat':
       return {
         category: 'celestial',
         size: 'kingdom',
@@ -707,11 +707,11 @@ export function getRealmPreset(preset: RealmPreset): Partial<RealmCreationConfig
           { type: 'identity', requirement: 'norse_worthy', description: 'Only the worthy may enter' },
         ],
         initialLaws: [
-          { type: 'no_violence', enforcement: 'automatic', strength: 0.0, description: 'Violence is permitted in Asgard' },
+          { type: 'no_violence', enforcement: 'automatic', strength: 0.0, description: 'Violence is permitted in Storm-Seat' },
         ],
       };
 
-    case 'heaven':
+    case 'chorus_source':
       return {
         category: 'celestial',
         size: 'infinite',
@@ -728,7 +728,7 @@ export function getRealmPreset(preset: RealmPreset): Partial<RealmCreationConfig
         ],
       };
 
-    case 'hades':
+    case 'deep_archive':
       return {
         category: 'underworld',
         size: 'infinite',
@@ -741,11 +741,11 @@ export function getRealmPreset(preset: RealmPreset): Partial<RealmCreationConfig
         ],
         initialLaws: [
           { type: 'no_exit', enforcement: 'automatic', strength: 0.95, description: 'The dead cannot leave' },
-          { type: 'binding_contracts', enforcement: 'automatic', strength: 1.0, description: 'Oaths on the Styx are absolute' },
+          { type: 'binding_contracts', enforcement: 'automatic', strength: 1.0, description: 'Oaths in the Deep Archive are absolute' },
         ],
       };
 
-    case 'valhalla':
+    case 'echo_hall':
       return {
         category: 'celestial',
         size: 'territory',
@@ -761,7 +761,7 @@ export function getRealmPreset(preset: RealmPreset): Partial<RealmCreationConfig
         ],
       };
 
-    case 'faerie':
+    case 'veil_wild':
       return {
         category: 'wild',
         size: 'infinite',
@@ -771,12 +771,12 @@ export function getRealmPreset(preset: RealmPreset): Partial<RealmCreationConfig
         accessMethods: ['ritual', 'portal', 'invitation', 'dream'],
         initialLaws: [
           { type: 'binding_contracts', enforcement: 'automatic', strength: 1.0, description: 'All deals are binding' },
-          { type: 'truth_binding', enforcement: 'environmental', strength: 0.5, description: 'Fae cannot directly lie' },
+          { type: 'truth_binding', enforcement: 'environmental', strength: 0.5, description: 'Veil-Touched cannot directly lie' },
           { type: 'time_dilation', enforcement: 'automatic', strength: 1.0, description: 'Time flows strangely' },
         ],
       };
 
-    case 'avalon':
+    case 'veil_shore':
       return {
         category: 'liminal',
         size: 'territory',
@@ -900,7 +900,7 @@ export function determineAfterlife(
   // Check death type (battle death → warrior afterlife)
   if (soul.deathType === 'battle') {
     const warriorRealm = availableRealms.find(r =>
-      r.name.toLowerCase().includes('valhalla') ||
+      r.name.toLowerCase().includes('echo hall') ||
       r.name.toLowerCase().includes('warrior')
     );
     if (warriorRealm) {

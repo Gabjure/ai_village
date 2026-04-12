@@ -348,7 +348,7 @@ export const WAR_GOD_POLICY: AfterlifePolicy = createJudgmentPolicy(
     { category: 'betrayal', weight: -30 },
   ],
   {
-    exemplary: 'valhalla',      // Great warriors feast eternally
+    exemplary: 'echo_hall',     // Great warriors feast eternally
     favorable: 'warriors_rest', // Honored dead
     neutral: 'gray_fields',     // Unremarkable afterlife
     unfavorable: 'shame_pits',  // Cowards

@@ -197,7 +197,7 @@ export interface ChatStyle {
 /** Speech quirks for deity personalities */
 export type ChatQuirk =
   | 'royal_we'          // "We are displeased"
-  | 'third_person'      // "Odin speaks"
+  | 'third_person'      // "The Archivist speaks"
   | 'cryptic'           // Riddles and mysteries
   | 'poetic'            // Flowery language
   | 'blunt'             // Very direct

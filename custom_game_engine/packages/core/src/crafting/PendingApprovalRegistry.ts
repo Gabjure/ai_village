@@ -149,7 +149,7 @@ export interface AutoApprovalConfig {
   approvedResearchFields?: string[];
   /** Optional: magic paradigms this deity will approve (for effect creations) */
   approvedParadigms?: string[];
-  /** Name of the Wisdom Goddess to use for tech/effect scrutiny (default: 'Athena') */
+  /** Name of the Wisdom Deity to use for tech/effect scrutiny (default: 'Sha-Ornvel') */
   wisdomGoddessName?: string;
   /** Scrutiny style for the Wisdom Goddess: 'strict' | 'encouraging' | 'curious' | 'pragmatic' */
   wisdomGoddessStyle?: ScrutinyStyle;
@@ -1138,7 +1138,7 @@ REASONING: [One sentence explaining your judgment]`;
    */
   public scrutinizeWithWisdomGoddess(
     creation: PendingCreation,
-    goddessName: string = 'Athena',
+    goddessName: string = 'Sha-Ornvel',
     style?: ScrutinyStyle
   ): ScrutinyResult {
     // Only use wisdom goddess for technologies and effects
@@ -1184,7 +1184,7 @@ REASONING: [One sentence explaining your judgment]`;
    */
   public async scrutinizeWithWisdomGoddessLLM(
     creation: PendingCreation,
-    goddessName: string = 'Athena',
+    goddessName: string = 'Sha-Ornvel',
     style?: ScrutinyStyle
   ): Promise<ScrutinyResult> {
     // Only use wisdom goddess for technologies and effects
@@ -1354,7 +1354,7 @@ REASONING: [One sentence explaining your judgment]`;
     // For recipes, use the regular deity scrutiny
     if (creation.creationType === 'technology' || creation.creationType === 'effect') {
       // Wisdom goddess handles tech and magic scrutiny
-      const goddessName = config.wisdomGoddessName || 'Athena';
+      const goddessName = config.wisdomGoddessName || 'Sha-Ornvel';
       const scrutinyStyle = config.wisdomGoddessStyle;
 
       if (useLLM) {

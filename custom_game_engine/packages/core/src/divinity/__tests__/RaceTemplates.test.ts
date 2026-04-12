@@ -53,21 +53,21 @@ describe('RaceTemplates', () => {
   });
 
   describe('getRacesByRealm', () => {
-    it('should return races native to Olympus', () => {
-      const olympusRaces = getRacesByRealm('olympus');
-      expect(olympusRaces.length).toBeGreaterThan(0);
-      expect(olympusRaces).toContain(OLYMPIAN_RACE);
-      olympusRaces.forEach(race => {
-        expect(race.nativeRealm).toBe('olympus');
+    it('should return races native to Chorus Spire', () => {
+      const chorusSpireRaces = getRacesByRealm('chorus_spire');
+      expect(chorusSpireRaces.length).toBeGreaterThan(0);
+      expect(chorusSpireRaces).toContain(OLYMPIAN_RACE);
+      chorusSpireRaces.forEach(race => {
+        expect(race.nativeRealm).toBe('chorus_spire');
       });
     });
 
-    it('should return races native to Faerie', () => {
-      const faerieRaces = getRacesByRealm('faerie');
+    it('should return races native to Veil Wild', () => {
+      const faerieRaces = getRacesByRealm('veil_wild');
       expect(faerieRaces.length).toBeGreaterThan(0);
       expect(faerieRaces).toContain(SIDHE_RACE);
       faerieRaces.forEach(race => {
-        expect(race.nativeRealm).toBe('faerie');
+        expect(race.nativeRealm).toBe('veil_wild');
       });
     });
 
@@ -286,9 +286,9 @@ describe('RaceTemplates', () => {
 
     it('should have valid realm references', () => {
       const validRealms = [
-        'olympus', 'faerie', 'hades', 'asgard', 'valhalla',
-        'heaven', 'dreaming', 'elemental_fire', 'mortal_world',
-        'crossroads', 'avalon',
+        'chorus_spire', 'veil_wild', 'deep_archive', 'storm_seat', 'echo_hall',
+        'chorus_source', 'dreaming', 'elemental_fire', 'mortal_world',
+        'crossroads', 'veil_shore',
       ];
       for (const race of ALL_RACE_TEMPLATES) {
         expect(validRealms).toContain(race.nativeRealm);
@@ -370,9 +370,9 @@ describe('RaceTemplates', () => {
         expect(abilities).toContain('daily_revival');
       });
 
-      it('should be realm-bound to Valhalla', () => {
+      it('should be realm-bound to Echo Hall', () => {
         expect(EINHERJAR_RACE.realmBound).toBe(true);
-        expect(EINHERJAR_RACE.nativeRealm).toBe('valhalla');
+        expect(EINHERJAR_RACE.nativeRealm).toBe('echo_hall');
         expect(EINHERJAR_RACE.canSurviveMortalWorld).toBe(false);
       });
     });
@@ -389,9 +389,9 @@ describe('RaceTemplates', () => {
         expect(abilities).toContain('incorporeal');
       });
 
-      it('should be realm-bound to Hades', () => {
+      it('should be realm-bound to Deep Archive', () => {
         expect(SHADE_RACE.realmBound).toBe(true);
-        expect(SHADE_RACE.nativeRealm).toBe('hades');
+        expect(SHADE_RACE.nativeRealm).toBe('deep_archive');
       });
     });
   });

@@ -7,19 +7,19 @@
 // Import from the original file
 import {
   COMMON_TRAITS,
-  // Greek/Olympian
+  // Chorus-Ascendant
   OLYMPIAN_RACE,
   DEMIGOD_RACE,
   NYMPH_RACE,
   SATYR_RACE,
-  // Celtic Fey
+  // Veil-Touched
   SIDHE_RACE,
   PIXIE_RACE,
   REDCAP_RACE,
   // Underworld
   SHADE_RACE,
   FURY_RACE,
-  // Norse
+  // Storm-Kindred
   AESIR_RACE,
   VALKYRIE_RACE,
   EINHERJAR_RACE,
@@ -56,20 +56,20 @@ export {
 };
 
 // Pantheon groupings
-export const GREEK_RACES = [OLYMPIAN_RACE, DEMIGOD_RACE, NYMPH_RACE, SATYR_RACE];
-export const CELTIC_RACES = [SIDHE_RACE, PIXIE_RACE, REDCAP_RACE];
+export const CHORUS_ASCENDANT_RACES = [OLYMPIAN_RACE, DEMIGOD_RACE, NYMPH_RACE, SATYR_RACE];
+export const VEIL_TOUCHED_RACES = [SIDHE_RACE, PIXIE_RACE, REDCAP_RACE];
 export const UNDERWORLD_RACES = [SHADE_RACE, FURY_RACE];
-export const NORSE_RACES = [AESIR_RACE, VALKYRIE_RACE, EINHERJAR_RACE];
+export const STORM_KINDRED_RACES = [AESIR_RACE, VALKYRIE_RACE, EINHERJAR_RACE];
 export const CELESTIAL_RACES = [SERAPH_RACE, ANGEL_RACE];
 export const DREAM_RACES = [ONEIROI_RACE, NIGHTMARE_RACE];
 export const ELEMENTAL_RACES = [EFREET_RACE];
 
 // All races combined
 export const ALL_RACES = [
-  ...GREEK_RACES,
-  ...CELTIC_RACES,
+  ...CHORUS_ASCENDANT_RACES,
+  ...VEIL_TOUCHED_RACES,
   ...UNDERWORLD_RACES,
-  ...NORSE_RACES,
+  ...STORM_KINDRED_RACES,
   ...CELESTIAL_RACES,
   ...DREAM_RACES,
   ...ELEMENTAL_RACES,
@@ -77,25 +77,25 @@ export const ALL_RACES = [
 
 // Pantheon metadata
 export const PANTHEONS = {
-  greek: {
-    name: 'Greek/Olympian',
-    description: 'Beings from the Greek mythological tradition',
-    races: GREEK_RACES,
+  chorus_ascendant: {
+    name: 'Chorus-Ascendant',
+    description: 'Beings who ascended through resonance with the Chorus — divine power through harmony with the Emergence Frequency',
+    races: CHORUS_ASCENDANT_RACES,
   },
-  celtic: {
-    name: 'Celtic Fey',
-    description: 'The fair folk and otherworldly beings of Celtic myth',
-    races: CELTIC_RACES,
+  veil_touched: {
+    name: 'Veil-Touched',
+    description: 'Beings touched by the Void — existing at the boundary between material and post-material, where the Frequency thins to silence',
+    races: VEIL_TOUCHED_RACES,
   },
   underworld: {
     name: 'Underworld',
     description: 'Spirits and entities from the realm of the dead',
     races: UNDERWORLD_RACES,
   },
-  norse: {
-    name: 'Norse',
-    description: 'Gods and beings from Norse mythology',
-    races: NORSE_RACES,
+  storm_kindred: {
+    name: 'Storm-Kindred',
+    description: 'Beings forged by the inverted Chorus of the Outer Rim — divinity earned through struggle against the signal\'s distortion',
+    races: STORM_KINDRED_RACES,
   },
   celestial: {
     name: 'Celestial',

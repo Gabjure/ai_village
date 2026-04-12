@@ -1,5 +1,5 @@
 /**
- * AnimistTypes - Shinto-style kami and animist nature spirits
+ * AnimistTypes - Spirit Accord-style kami and animist nature spirits
  *
  * These spirits differ fundamentally from Western anthropomorphic gods:
  * - Location/object bound rather than domain-based

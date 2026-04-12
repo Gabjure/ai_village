@@ -551,22 +551,22 @@ for (const race of ALL_RACE_TEMPLATES) {
 // Legacy Named Exports (for backward compatibility)
 // ============================================================================
 
-// Olympus
+// Chorus-Ascendant races
 export const OLYMPIAN_RACE = RACE_REGISTRY['olympian']!;
 export const DEMIGOD_RACE = RACE_REGISTRY['demigod']!;
 export const NYMPH_RACE = RACE_REGISTRY['nymph']!;
 export const SATYR_RACE = RACE_REGISTRY['satyr']!;
 
-// Faerie
+// Veil-Touched races
 export const SIDHE_RACE = RACE_REGISTRY['sidhe']!;
 export const PIXIE_RACE = RACE_REGISTRY['pixie']!;
 export const REDCAP_RACE = RACE_REGISTRY['redcap']!;
 
-// Hades
+// Deep Archive races
 export const SHADE_RACE = RACE_REGISTRY['shade']!;
 export const FURY_RACE = RACE_REGISTRY['fury']!;
 
-// Asgard
+// Storm-Kindred races
 export const AESIR_RACE = RACE_REGISTRY['aesir']!;
 export const VALKYRIE_RACE = RACE_REGISTRY['valkyrie']!;
 export const EINHERJAR_RACE = RACE_REGISTRY['einherjar']!;
