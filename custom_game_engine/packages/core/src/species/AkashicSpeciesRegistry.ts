@@ -303,7 +303,7 @@ const ETTIN_SPECIES: SpeciesTemplate = {
   speciesId: 'ettin',
   speciesName: 'Ettin',
   commonName: 'Ettin',
-  description: 'Large mutualist humanoids; generation-ship migrants from Kemm-Vor, gentle engineers who form bonds with their ecosystem',
+  description: 'Large mutualist humanoids; gentle engineers who form bonds with their ecosystem and organize around guild-based craft traditions',
   bodyPlanId: 'humanoid_standard',
   innateTraits: [TRAIT_MUTUALIST_BOND, TRAIT_STURDY, TRAIT_LONG_MEMORY],
   compatibleSpecies: ['norn'],
@@ -316,14 +316,14 @@ const ETTIN_SPECIES: SpeciesTemplate = {
   maturityAge: 20,
   gestationPeriod: 90,
   sapient: true,
-  socialStructure: 'family_units',
+  socialStructure: 'guild_based',
   cross_game_compatible: true,
   native_game: 'precursors',
   ecologyProfile: {
     ecologicalRole: 'mutualist',
     diet: 'omnivore',
     biomePreferences: ['plains', 'temperate_forest', 'coast'],
-    socialStructure: 'family_units',
+    socialStructure: 'guild_based',
     activityPattern: 'diurnal',
   },
 };
@@ -688,7 +688,7 @@ const ALFAR_SPECIES: SpeciesTemplate = {
   speciesId: 'alfar',
   speciesName: 'Álfar',
   commonName: 'Álfar',
-  description: 'Small empathic humanoids whose elevated oxytocin overflows outward, shifting the emotions of those nearby; they carry songs, rituals, and stories between species as sacred duty',
+  description: 'Small empathic humanoids whose elevated oxytocin is held behind a biochemical containment gate — they feel everything but share nothing directly; they carry songs, rituals, and stories between species as sacred duty',
   bodyPlanId: 'humanoid_standard',
   innateTraits: [TRAIT_SHEE_DESIGNED, TRAIT_CHORUS_ATTUNED, TRAIT_LONG_MEMORY],
   compatibleSpecies: ['norn', 'mycon', 'rusalyn', 'patupaiarehe'],
@@ -801,35 +801,6 @@ const JOROKAN_SPECIES: SpeciesTemplate = {
     biomePreferences: ['forest_canopy', 'cave', 'ruins'],
     socialStructure: 'archive_colonies',
     activityPattern: 'nocturnal',
-  },
-};
-
-const EGUNGUN_KIN_SPECIES: SpeciesTemplate = {
-  speciesId: 'egungun_kin',
-  speciesName: 'Egungun-Kin',
-  commonName: 'Egungun-Kin',
-  description: 'Medium humanoids who wear the masks of ancestors; conduits between living and dead generations',
-  bodyPlanId: 'humanoid_standard',
-  innateTraits: [TRAIT_ANCESTRAL_ECHO, TRAIT_CHORUS_ATTUNED],
-  compatibleSpecies: ['norn', 'nommo'],
-  mutationRate: 0.014,
-  averageHeight: 170,
-  averageWeight: 65,
-  sizeCategory: 'medium',
-  lifespan: 120,
-  lifespanType: 'long_lived',
-  maturityAge: 15,
-  gestationPeriod: 60,
-  sapient: true,
-  socialStructure: 'ancestral_lineages',
-  cross_game_compatible: true,
-  native_game: 'precursors',
-  ecologyProfile: {
-    ecologicalRole: 'cultural_keystone',
-    diet: 'omnivore',
-    biomePreferences: ['savanna', 'forest', 'village_settlement'],
-    socialStructure: 'ancestral_lineages',
-    activityPattern: 'diurnal',
   },
 };
 
@@ -979,35 +950,6 @@ const ANANSI_WEB_SPECIES: SpeciesTemplate = {
     biomePreferences: ['forest_canopy', 'ruins', 'any'],
     socialStructure: 'story_webs',
     activityPattern: 'nocturnal',
-  },
-};
-
-const MIMI_KIN_SPECIES: SpeciesTemplate = {
-  speciesId: 'mimi_kin',
-  speciesName: 'Mimi-Kin',
-  commonName: 'Mimi-Kin',
-  description: 'Tiny rock-crack humanoids; extraordinarily ancient painters who teach through hidden art',
-  bodyPlanId: 'humanoid_standard',
-  innateTraits: [TRAIT_ADAPTABLE, TRAIT_LONG_MEMORY],
-  compatibleSpecies: [],
-  mutationRate: 0.008,
-  averageHeight: 45,
-  averageWeight: 3,
-  sizeCategory: 'tiny',
-  lifespan: 5000,
-  lifespanType: 'ageless',
-  maturityAge: 200,
-  gestationPeriod: 365,
-  sapient: true,
-  socialStructure: 'ancient_teaching_bands',
-  cross_game_compatible: true,
-  native_game: 'precursors',
-  ecologyProfile: {
-    ecologicalRole: 'cultural_keystone',
-    diet: 'omnivore',
-    biomePreferences: ['rock_shelter', 'escarpment', 'desert'],
-    socialStructure: 'ancient_teaching_bands',
-    activityPattern: 'crepuscular',
   },
 };
 
@@ -1337,35 +1279,6 @@ const DOKKAEBI_RIN_SPECIES: SpeciesTemplate = {
     biomePreferences: ['settlement_edge', 'road', 'ruins'],
     socialStructure: 'opportunistic_bands',
     activityPattern: 'nocturnal',
-  },
-};
-
-const TANIWHA_SPECIES: SpeciesTemplate = {
-  speciesId: 'taniwha',
-  speciesName: 'Taniwha',
-  commonName: 'Taniwha',
-  description: 'Large aquatic-tentacled guardian spirits of waterways; territorial protectors of their domain',
-  bodyPlanId: 'aquatic_tentacled',
-  innateTraits: [TRAIT_AQUATIC_ADAPTED, TRAIT_APEX_PREDATOR, TRAIT_CHORUS_ATTUNED],
-  compatibleSpecies: [],
-  mutationRate: 0.01,
-  averageHeight: 240,
-  averageWeight: 250,
-  sizeCategory: 'large',
-  lifespan: 0,
-  lifespanType: 'ageless',
-  maturityAge: 0,
-  gestationPeriod: 0,
-  sapient: true,
-  socialStructure: 'solitary_guardian',
-  cross_game_compatible: true,
-  native_game: 'precursors',
-  ecologyProfile: {
-    ecologicalRole: 'keystone',
-    diet: 'carnivore',
-    biomePreferences: ['river', 'harbor', 'ocean_trench'],
-    socialStructure: 'solitary_guardian',
-    activityPattern: 'continuous',
   },
 };
 
@@ -1813,11 +1726,8 @@ export function registerAkashicSpecies(): void {
   registerSpecies('nommo', NOMMO_SPECIES);
   registerSpecies('kelpathi', KELPATHI_SPECIES);
   registerSpecies('jorokan', JOROKAN_SPECIES);
-  registerSpecies('egungun_kin', EGUNGUN_KIN_SPECIES);
   registerSpecies('selkieborn', SELKIEBORN_SPECIES);
   registerSpecies('baku_ma', BAKU_MA_SPECIES);
-  registerSpecies('mimi_kin', MIMI_KIN_SPECIES);
-
   // Wave 4 — Learned
   registerSpecies('kitsuri', KITSURI_SPECIES);
   registerSpecies('vaask', VAASK_SPECIES);
@@ -1840,7 +1750,6 @@ export function registerAkashicSpecies(): void {
   registerSpecies('leshyn', LESHYN_SPECIES);
   registerSpecies('lauma_gale', LAUMA_GALE_SPECIES);
   registerSpecies('dokkaebi_rin', DOKKAEBI_RIN_SPECIES);
-  registerSpecies('taniwha', TANIWHA_SPECIES);
   registerSpecies('curupali', CURUPALI_SPECIES);
   registerSpecies('huldryn', HULDRYN_SPECIES);
 
