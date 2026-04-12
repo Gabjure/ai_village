@@ -354,7 +354,7 @@ describe('type structures', () => {
       };
 
       expect(identity.primaryName).toBe('The Archivist');
-      expect(identity.secondaryDomains).toContain('craft');
+      expect(identity.secondaryDomains).toContain('preservation');
       expect(identity.traitConfidence.get('domain')).toBe(1.0);
     });
   });
