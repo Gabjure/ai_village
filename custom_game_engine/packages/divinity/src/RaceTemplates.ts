@@ -507,13 +507,13 @@ export const COMMON_TRAITS: Record<string, RacialTrait> = {
 // Known Races by Realm
 // ============================================================================
 
-// ----- OLYMPUS (Greek Celestial) -----
+// ----- CHORUS SPIRE (Chorus-Ascendant Celestial) -----
 
 export const OLYMPIAN_RACE: RaceTemplate = {
   id: 'olympian',
   name: 'Olympian',
   description: 'The gods of Mount Olympus, beings of immense divine power',
-  nativeRealm: 'olympus',
+  nativeRealm: 'chorus_spire',
   type: 'divine',
   category: 'humanoid',
   lifespan: 'immortal',
@@ -552,7 +552,7 @@ export const DEMIGOD_RACE: RaceTemplate = {
   id: 'demigod',
   name: 'Demigod',
   description: 'Children of gods and mortals, blessed with divine power',
-  nativeRealm: 'olympus',
+  nativeRealm: 'chorus_spire',
   type: 'spirit',
   category: 'humanoid',
   lifespan: 'long_lived',
@@ -594,7 +594,7 @@ export const NYMPH_RACE: RaceTemplate = {
   id: 'nymph',
   name: 'Nymph',
   description: 'Nature spirits tied to specific locations',
-  nativeRealm: 'olympus',
+  nativeRealm: 'chorus_spire',
   type: 'spirit',
   category: 'humanoid',
   lifespan: 'ageless',
@@ -636,7 +636,7 @@ export const SATYR_RACE: RaceTemplate = {
   id: 'satyr',
   name: 'Satyr',
   description: 'Wild nature spirits of revelry and music',
-  nativeRealm: 'olympus',
+  nativeRealm: 'chorus_spire',
   type: 'fae',
   category: 'humanoid',
   lifespan: 'long_lived',
@@ -676,13 +676,13 @@ export const SATYR_RACE: RaceTemplate = {
   },
 };
 
-// ----- FAERIE (Wild Realm) -----
+// ----- VEIL-WILD (Veil-Touched Realm) -----
 
 export const SIDHE_RACE: RaceTemplate = {
   id: 'sidhe',
   name: 'Sidhe',
   description: 'The noble fae, ageless beings of glamour bound by oaths',
-  nativeRealm: 'faerie',
+  nativeRealm: 'veil_wild',
   type: 'fae',
   category: 'humanoid',
   lifespan: 'ageless',
@@ -717,7 +717,7 @@ export const PIXIE_RACE: RaceTemplate = {
   id: 'pixie',
   name: 'Pixie',
   description: 'Tiny winged fae of mischief and wonder',
-  nativeRealm: 'faerie',
+  nativeRealm: 'veil_wild',
   type: 'fae',
   category: 'humanoid',
   lifespan: 'long_lived',
@@ -753,7 +753,7 @@ export const REDCAP_RACE: RaceTemplate = {
   id: 'redcap',
   name: 'Redcap',
   description: 'Murderous fae that must soak their caps in blood',
-  nativeRealm: 'faerie',
+  nativeRealm: 'veil_wild',
   type: 'fae',
   category: 'humanoid',
   lifespan: 'ageless',
@@ -791,13 +791,13 @@ export const REDCAP_RACE: RaceTemplate = {
   },
 };
 
-// ----- HADES (Greek Underworld) -----
+// ----- DEEP ARCHIVE (Underworld) -----
 
 export const SHADE_RACE: RaceTemplate = {
   id: 'shade',
   name: 'Shade',
   description: 'Souls of the dead, faded memories of the living',
-  nativeRealm: 'hades',
+  nativeRealm: 'deep_archive',
   type: 'undead',
   category: 'humanoid',
   lifespan: 'ageless',
@@ -845,7 +845,7 @@ export const FURY_RACE: RaceTemplate = {
   id: 'fury',
   name: 'Fury',
   description: 'Spirits of vengeance, relentless pursuers of the guilty',
-  nativeRealm: 'hades',
+  nativeRealm: 'deep_archive',
   type: 'divine',
   category: 'humanoid',
   lifespan: 'immortal',
@@ -882,13 +882,13 @@ export const FURY_RACE: RaceTemplate = {
   },
 };
 
-// ----- ASGARD (Norse Celestial) -----
+// ----- STORM-SEAT (Storm-Kindred Celestial) -----
 
 export const AESIR_RACE: RaceTemplate = {
   id: 'aesir',
   name: 'Aesir',
   description: 'Warrior gods of Asgard, bound by fate to die at Ragnarok',
-  nativeRealm: 'asgard',
+  nativeRealm: 'storm_seat',
   type: 'divine',
   category: 'humanoid',
   lifespan: 'ageless', // Ageless but not truly immortal (Ragnarok)
@@ -932,8 +932,8 @@ export const AESIR_RACE: RaceTemplate = {
 export const VALKYRIE_RACE: RaceTemplate = {
   id: 'valkyrie',
   name: 'Valkyrie',
-  description: 'Choosers of the slain, servants of Odin',
-  nativeRealm: 'asgard',
+  description: 'Choosers of the slain, servants of the Storm-Seat',
+  nativeRealm: 'storm_seat',
   type: 'spirit',
   category: 'humanoid',
   lifespan: 'ageless',
@@ -977,7 +977,7 @@ export const EINHERJAR_RACE: RaceTemplate = {
   id: 'einherjar',
   name: 'Einherjar',
   description: 'Glorious warriors who died in battle, training for Ragnarok',
-  nativeRealm: 'valhalla',
+  nativeRealm: 'echo_hall',
   type: 'undead',
   category: 'humanoid',
   lifespan: 'ageless', // Until Ragnarok
@@ -1006,7 +1006,7 @@ export const EINHERJAR_RACE: RaceTemplate = {
   hybridCompatible: [],
   realmBound: true,
   canSurviveMortalWorld: false,
-  mortalWorldWeakness: 'Cannot revive outside Valhalla',
+  mortalWorldWeakness: 'Cannot revive outside Echo Hall',
   typicalAlignment: 'lawful',
   societyType: 'warrior_band',
   precursorsLineage: {
@@ -1016,13 +1016,13 @@ export const EINHERJAR_RACE: RaceTemplate = {
   },
 };
 
-// ----- HEAVEN (Monotheistic Paradise) -----
+// ----- CHORUS SOURCE (Monotheistic Paradise) -----
 
 export const SERAPH_RACE: RaceTemplate = {
   id: 'seraph',
   name: 'Seraph',
   description: 'Six-winged angels of pure worship, burning with divine fire',
-  nativeRealm: 'heaven',
+  nativeRealm: 'chorus_source',
   type: 'divine',
   category: 'abstract',
   lifespan: 'immortal',
@@ -1073,7 +1073,7 @@ export const ANGEL_RACE: RaceTemplate = {
   id: 'angel',
   name: 'Angel',
   description: 'Divine messengers and servants',
-  nativeRealm: 'heaven',
+  nativeRealm: 'chorus_source',
   type: 'spirit',
   category: 'humanoid',
   lifespan: 'immortal',
@@ -1342,23 +1342,23 @@ export const HUMAN_RACE: RaceTemplate = {
 // ============================================================================
 
 export const ALL_RACE_TEMPLATES: RaceTemplate[] = [
-  // Olympus
+  // Chorus Spire
   OLYMPIAN_RACE,
   DEMIGOD_RACE,
   NYMPH_RACE,
   SATYR_RACE,
-  // Faerie
+  // Veil-Wild
   SIDHE_RACE,
   PIXIE_RACE,
   REDCAP_RACE,
-  // Hades
+  // Deep Archive
   SHADE_RACE,
   FURY_RACE,
-  // Asgard
+  // Storm-Seat
   AESIR_RACE,
   VALKYRIE_RACE,
   EINHERJAR_RACE,
-  // Heaven
+  // Chorus Source
   SERAPH_RACE,
   ANGEL_RACE,
   // Dreaming

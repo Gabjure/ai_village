@@ -584,13 +584,13 @@ export {
   // Common traits
   COMMON_TRAITS,
 
-  // Greek/Olympian races
+  // Chorus-Ascendant races
   OLYMPIAN_RACE,
   DEMIGOD_RACE,
   NYMPH_RACE,
   SATYR_RACE,
 
-  // Celtic Fey races
+  // Veil-Touched races
   SIDHE_RACE,
   PIXIE_RACE,
   REDCAP_RACE,
@@ -599,7 +599,7 @@ export {
   SHADE_RACE,
   FURY_RACE,
 
-  // Norse races
+  // Storm-Kindred races
   AESIR_RACE,
   VALKYRIE_RACE,
   EINHERJAR_RACE,
@@ -616,10 +616,10 @@ export {
   EFREET_RACE,
 
   // Pantheon groupings
-  GREEK_RACES,
-  CELTIC_RACES,
+  CHORUS_ASCENDANT_RACES,
+  VEIL_TOUCHED_RACES,
   UNDERWORLD_RACES,
-  NORSE_RACES,
+  STORM_KINDRED_RACES,
   CELESTIAL_RACES,
   DREAM_RACES,
   ELEMENTAL_RACES,

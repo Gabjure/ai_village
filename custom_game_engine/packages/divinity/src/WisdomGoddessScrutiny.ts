@@ -117,7 +117,6 @@ export function heuristicWisdomScrutiny(
     noveltyScore >= thresholds.minNovelty &&
     fitScore >= thresholds.minFit;
 
-  // Generate wisdom comment based on style (with Odin's special grumpiness)
   const wisdomComment = generateWisdomComment(style, approved, balanceScore, noveltyScore, fitScore, goddessName);
 
   return {
@@ -132,18 +131,6 @@ export function heuristicWisdomScrutiny(
   };
 }
 
-/** Odin's grumpy prefixes about being called a goddess */
-const ODIN_GRUMPY_PREFIXES = [
-  '*sighs in Old Norse* I am the ALLFATHER, not a goddess. Anyway,',
-  'For the last time, I am a GOD. A god of wisdom. Not a goddess. Moving on:',
-  '*mutters about bureaucratic categorization* Fine. As the wrongly-labeled "goddess" of wisdom,',
-  'Huginn tells me I am still listed as a goddess. Muninn confirms my eternal frustration. Regardless:',
-  'I sacrificed an EYE for wisdom and they put me in the goddess folder. *pinches bridge of nose*',
-  'One day I will have words with whoever designed this registry. But first:',
-  '*glares at the word "goddess" in his file* I hung from Yggdrasil for NINE DAYS for this disrespect?',
-  'The ravens laugh at me. Every day. "Goddess of Wisdom," they caw. Mockingly.',
-];
-
 /**
  * Generate a flavor comment from the wisdom goddess
  */
@@ -155,39 +142,33 @@ function generateWisdomComment(
   _fit: number,
   goddessName?: string
 ): string {
-  // Special handling for Odin's perpetual irritation
-  const isOdin = goddessName === 'Odin';
-  const odinPrefix = isOdin
-    ? ODIN_GRUMPY_PREFIXES[Math.floor(Math.random() * ODIN_GRUMPY_PREFIXES.length)] + ' '
-    : '';
-
   if (approved) {
     switch (style) {
       case 'strict':
-        return odinPrefix + 'This creation meets my exacting standards. Let it be known.';
+        return 'This creation meets my exacting standards. Let it be known.';
       case 'encouraging':
-        return odinPrefix + 'I see promise in this work! Let the creator be celebrated.';
+        return 'I see promise in this work! Let the creator be celebrated.';
       case 'curious':
-        return odinPrefix + (novelty > 0.7
+        return novelty > 0.7
           ? 'Fascinating! This is genuinely novel. The world grows richer.'
-          : 'An acceptable addition to mortal knowledge.');
+          : 'An acceptable addition to mortal knowledge.';
       case 'pragmatic':
-        return odinPrefix + 'This serves a clear purpose. Approved.';
+        return 'This serves a clear purpose. Approved.';
     }
   } else {
     switch (style) {
       case 'strict':
-        return odinPrefix + (balance < 0.5
+        return balance < 0.5
           ? 'This creation is unbalanced. Return when you have refined it.'
-          : 'This does not meet my standards. Seek greater understanding.');
+          : 'This does not meet my standards. Seek greater understanding.';
       case 'encouraging':
-        return odinPrefix + 'This shows potential, but is not yet ready. Keep working!';
+        return 'This shows potential, but is not yet ready. Keep working!';
       case 'curious':
-        return odinPrefix + (novelty < 0.3
+        return novelty < 0.3
           ? 'This is too derivative. Show me something I have not seen before.'
-          : 'The idea intrigues me, but the execution falls short.');
+          : 'The idea intrigues me, but the execution falls short.';
       case 'pragmatic':
-        return odinPrefix + 'I see no practical value in this. What problem does it solve?';
+        return 'I see no practical value in this. What problem does it solve?';
     }
   }
 }
@@ -206,16 +187,6 @@ export function buildWisdomScrutinyPrompt(
     curious: 'You favor novelty and experimentation, rewarding those who bring new ideas.',
     pragmatic: 'You focus on utility and practical application, approving what serves clear purposes.',
   };
-
-  // Special personality injection for Odin
-  const isOdin = goddessName === 'Odin';
-  const odinPersonalityNote = isOdin
-    ? `\n\nIMPORTANT: You are Odin, the ALLFATHER, a GOD of wisdom. You are perpetually irritated ` +
-      `that the system keeps calling you a "goddess." In your wisdomComment, you should include ` +
-      `a brief, grumpy aside about this misgendering before giving your actual judgment. ` +
-      `Examples: "*sigh* I am a GOD, not a goddess. Anyway..." or "The ravens mock me daily ` +
-      `about this 'goddess' title. Regardless..." Keep it comedic but not the focus.`
-    : '';
 
   let creationDetails = '';
 
@@ -244,12 +215,9 @@ Discovery Type: ${creation.discoveryType || 'new_spell'}
 Description: ${creation.spell.description || 'No description'}`;
   }
 
-  // Use appropriate title (Odin is the Allfather, not a goddess)
-  const title = isOdin ? 'the Allfather, God of Wisdom' : 'the Goddess of Wisdom';
+  return `You are ${goddessName}, the Deity of Wisdom, evaluating a mortal's creation.
 
-  return `You are ${goddessName}, ${title}, evaluating a mortal's creation.
-
-${styleDescriptions[style]}${odinPersonalityNote}
+${styleDescriptions[style]}
 
 ${creationDetails}
 

@@ -328,7 +328,7 @@ describe('type structures', () => {
   describe('DeityIdentity', () => {
     it('should accept valid identity structure', () => {
       const identity: DeityIdentity = {
-        primaryName: 'Athena',
+        primaryName: 'Sha-Ornvel',
         epithets: ['Gray-Eyed', 'Wise One', 'Protector of Heroes'],
         domain: 'wisdom',
         secondaryDomains: ['war', 'craft'],
@@ -353,7 +353,7 @@ describe('type structures', () => {
         initiallyBlank: false,
       };
 
-      expect(identity.primaryName).toBe('Athena');
+      expect(identity.primaryName).toBe('Sha-Ornvel');
       expect(identity.secondaryDomains).toContain('craft');
       expect(identity.traitConfidence.get('domain')).toBe(1.0);
     });
