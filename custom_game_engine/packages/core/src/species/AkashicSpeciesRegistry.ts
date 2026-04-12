@@ -56,8 +56,8 @@ const TRAIT_LONG_MEMORY: SpeciesTrait = {
 
 const TRAIT_SHEE_DESIGNED: SpeciesTrait = {
   id: 'shee_designed',
-  name: 'Shee-Designed',
-  description: 'Genetically engineered by the Shee; carries designed traits and potential',
+  name: 'Engineered',
+  description: 'Genetically engineered by ancient architects; carries designed traits and potential',
   category: 'physical',
   skillBonus: { adaptability: 0.2 },
 };
@@ -245,7 +245,7 @@ const NORN_SPECIES: SpeciesTemplate = {
   speciesId: 'norn',
   speciesName: 'Norn',
   commonName: 'Norn',
-  description: 'Small social creatures designed by the Shee as companions; curious and highly adaptable',
+  description: 'Small social creatures designed as companions by ancient engineers; curious and highly adaptable',
   bodyPlanId: 'humanoid_standard',
   innateTraits: [TRAIT_SHEE_DESIGNED, TRAIT_CHORUS_ATTUNED],
   compatibleSpecies: ['grendel', 'ettin'],
@@ -274,7 +274,7 @@ const GRENDEL_SPECIES: SpeciesTemplate = {
   speciesId: 'grendel',
   speciesName: 'Grendel',
   commonName: 'Grendel',
-  description: 'Medium humanoid secondary consumers; evolved independently on Urd Prime before the Shee arrived, territorial and predatory',
+  description: 'Medium humanoid secondary consumers; evolved independently on Urd Prime before the architects arrived, territorial and predatory',
   bodyPlanId: 'humanoid_standard',
   innateTraits: [TRAIT_PACK_HUNTER, TRAIT_KEEN_SENSES],
   compatibleSpecies: ['norn'],
@@ -543,7 +543,7 @@ const NYK_SPECIES: SpeciesTemplate = {
   speciesId: 'nyk',
   speciesName: 'Nyk',
   commonName: 'Nyk',
-  description: 'Small humanoids awakened through contact with latent Shee technology; quick and inventive',
+  description: 'Small humanoids awakened through contact with latent ancient technology; quick and inventive',
   bodyPlanId: 'humanoid_standard',
   innateTraits: [TRAIT_ADAPTABLE, TRAIT_TRICKSTER_MIND],
   compatibleSpecies: ['norn'],
@@ -681,6 +681,35 @@ const DUPPY_SPECIES: SpeciesTemplate = {
     biomePreferences: ['ruins', 'cemetery', 'liminal_spaces'],
     socialStructure: 'solitary',
     activityPattern: 'nocturnal',
+  },
+};
+
+const ALFAR_SPECIES: SpeciesTemplate = {
+  speciesId: 'alfar',
+  speciesName: 'Álfar',
+  commonName: 'Álfar',
+  description: 'Small empathic humanoids whose elevated oxytocin overflows outward, shifting the emotions of those nearby; they carry songs, rituals, and stories between species as sacred duty',
+  bodyPlanId: 'humanoid_standard',
+  innateTraits: [TRAIT_SHEE_DESIGNED, TRAIT_CHORUS_ATTUNED, TRAIT_LONG_MEMORY],
+  compatibleSpecies: ['norn', 'mycon', 'rusalyn', 'patupaiarehe'],
+  mutationRate: 0.015,
+  averageHeight: 95,
+  averageWeight: 27,
+  sizeCategory: 'small',
+  lifespan: 150,
+  lifespanType: 'long_lived',
+  maturityAge: 10,
+  gestationPeriod: 35,
+  sapient: true,
+  socialStructure: 'song_circles',
+  cross_game_compatible: true,
+  native_game: 'precursors',
+  ecologyProfile: {
+    ecologicalRole: 'cultural_keystone',
+    diet: 'herbivore',
+    biomePreferences: ['verdant_shelf', 'forest', 'garden', 'grassland'],
+    socialStructure: 'song_circles',
+    activityPattern: 'diurnal',
   },
 };
 
@@ -1166,7 +1195,7 @@ const PERI_VEIL_SPECIES: SpeciesTemplate = {
   speciesId: 'peri_veil',
   speciesName: 'Peri-Veil',
   commonName: 'Peri-Veil',
-  description: 'Post-material Void-Band beings who transcended too early; perceive reality with exquisite precision but cannot touch it',
+  description: 'Ten-dimensional Void-Band timeline-walkers spanning transcended (post-material) to material-interface (Fae) subtypes; timeline-walking is their defining trait — they perceive branching possibilities simultaneously across all timelines',
   bodyPlanId: 'amorphous',
   innateTraits: [TRAIT_BIOLUMINESCENT, TRAIT_PHANTOM_FORM, TRAIT_CHORUS_ATTUNED],
   compatibleSpecies: [],
@@ -1179,7 +1208,7 @@ const PERI_VEIL_SPECIES: SpeciesTemplate = {
   maturityAge: 0,
   gestationPeriod: 0,
   sapient: true,
-  socialStructure: 'drift_collectives',
+  socialStructure: 'pan_dimensional_courts',
   cross_game_compatible: true,
   native_game: 'precursors',
   ecologyProfile: {
@@ -1498,9 +1527,9 @@ const SACHAMAMA_VEL_SPECIES: SpeciesTemplate = {
   innateTraits: [TRAIT_COLOSSAL_PRESENCE, TRAIT_FOREST_BOND, TRAIT_SERPENTINE_GRACE, TRAIT_LONG_MEMORY, TRAIT_AGELESS],
   compatibleSpecies: [],
   mutationRate: 0.0,
-  averageHeight: 1200,
+  averageHeight: 20000,
   averageWeight: 8000,
-  sizeCategory: 'huge',
+  sizeCategory: 'colossal',
   lifespan: 0,
   lifespanType: 'immortal',
   maturityAge: 0,
@@ -1553,7 +1582,7 @@ const FYLGJA_SPECIES: SpeciesTemplate = {
   commonName: 'Fylgja',
   description: 'Emotional mirror-companions that bond to a single individual and reflect their inner state; they do not obey, they attend',
   bodyPlanId: 'quadruped',
-  innateTraits: [TRAIT_CHORUS_ATTUNED, TRAIT_DREAM_WEAVER, TRAIT_MUTUALIST_BOND, TRAIT_KEEN_SENSES],
+  innateTraits: [TRAIT_CHORUS_ATTUNED, TRAIT_ADAPTABLE, TRAIT_MUTUALIST_BOND, TRAIT_KEEN_SENSES],
   compatibleSpecies: ['norn', 'ettin', 'grendel'],
   mutationRate: 0.01,
   averageHeight: 50,
@@ -1566,7 +1595,7 @@ const FYLGJA_SPECIES: SpeciesTemplate = {
   sapient: true,
   socialStructure: 'bonded_pair',
   cross_game_compatible: true,
-  native_game: 'precursors',
+  native_game: 'mvee',
   ecologyProfile: {
     ecologicalRole: 'mutualist',
     diet: 'omnivore',
@@ -1769,7 +1798,6 @@ export function registerAkashicSpecies(): void {
   // Wave 1 — Primal
   registerSpecies('venthari', VENTHARI_SPECIES);
   registerSpecies('cher_khan', CHER_KHAN_SPECIES);
-  registerSpecies('tikbali', TIKBALI_SPECIES);
   registerSpecies('adzefire', ADZEFIRE_SPECIES);
   registerSpecies('ahuizari', AHUIZARI_SPECIES);
 
@@ -1779,6 +1807,7 @@ export function registerAkashicSpecies(): void {
   registerSpecies('auki_vel', AUKI_VEL_SPECIES);
   registerSpecies('patupaiarehe', PATUPAIAREHE_SPECIES);
   registerSpecies('duppy', DUPPY_SPECIES);
+  registerSpecies('alfar', ALFAR_SPECIES);
 
   // Wave 3 — Spoken
   registerSpecies('nommo', NOMMO_SPECIES);
@@ -1787,12 +1816,12 @@ export function registerAkashicSpecies(): void {
   registerSpecies('egungun_kin', EGUNGUN_KIN_SPECIES);
   registerSpecies('selkieborn', SELKIEBORN_SPECIES);
   registerSpecies('baku_ma', BAKU_MA_SPECIES);
+  registerSpecies('mimi_kin', MIMI_KIN_SPECIES);
 
   // Wave 4 — Learned
   registerSpecies('kitsuri', KITSURI_SPECIES);
   registerSpecies('vaask', VAASK_SPECIES);
   registerSpecies('anansi_web', ANANSI_WEB_SPECIES);
-  registerSpecies('mimi_kin', MIMI_KIN_SPECIES);
   registerSpecies('tengu_ra', TENGU_RA_SPECIES);
   registerSpecies('kappa', KAPPA_SPECIES);
 
@@ -1806,7 +1835,8 @@ export function registerAkashicSpecies(): void {
   registerSpecies('peri_veil', PERI_VEIL_SPECIES);
   registerSpecies('raksha', RAKSHA_SPECIES);
 
-  // Ambient
+  // Ambient — always present aboard per SPECIES_PROGRESSION.md Appendix
+  registerSpecies('tikbali', TIKBALI_SPECIES);
   registerSpecies('leshyn', LESHYN_SPECIES);
   registerSpecies('lauma_gale', LAUMA_GALE_SPECIES);
   registerSpecies('dokkaebi_rin', DOKKAEBI_RIN_SPECIES);
