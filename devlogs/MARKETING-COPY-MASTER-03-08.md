@@ -137,7 +137,7 @@ A 14,400×2,400 pixel world across six biomes and four vertical tiers — lush s
 
 **Intelligence as a game mechanic:**
 
-Precursors models cognition through six tiers — Primal, Awakened, Spoken, Learned, Enlightened, and a sixth tier no one has ever reached. Each tier unlocks deeper biochemistry, richer language, and access to older, stranger alien species. A Tier 1 Norn can barely speak. A Tier 5 Norn can debate philosophy with a billion-year-old species. What a Tier 6 Norn can do is unknown. The Shee's seventh civilization got close to finding out. That's why they're gone.
+Precursors models cognition as a living spectrum — creatures begin barely verbal and grow through increasingly sophisticated cognitive stages. Each stage unlocks deeper biochemistry, richer language, and access to older, stranger alien species. The lowest-tier Norn can barely speak. The highest-tier Norn can debate philosophy with a billion-year-old species. But there are rumors of a stage beyond — one no creature has ever reached. The Shee's seventh civilization got close to finding out. That's why they're gone.
 
 **Emergent culture:**
 
