@@ -745,7 +745,7 @@ export const DIVINE_MONOPOLY_PARADIGM: MagicParadigm = {
   id: 'divine_monopoly',
   name: 'Divine Monopoly',
   description: 'Only gods can use magic - mortals are physically incapable',
-  universeIds: ['olympian_realms', 'god_realms'],
+  universeIds: ['chorus_spire_realms', 'god_realms'],
 
   lore: `In this universe, magic is not a skill to be learned but a property of
 divinity. Only beings of sufficient cosmic significance can manipulate

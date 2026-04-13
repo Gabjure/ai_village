@@ -575,7 +575,7 @@ The aspiring amphitheater architect would do well to remember that acoustic desi
 
 ---
 
-*Though Hermes, God of Messengers, has filed numerous complaints with the Olympian Bureau of Labor Relations about amphitheaters reducing demand for his services. His petition requesting a 15% royalty on all amphitheater revenues remains pending after 2,400 years.
+*Though Vel-Orn, Deity of Messages, has filed numerous complaints with the Chorus Spire Bureau of Labor Relations about amphitheaters reducing demand for their services. Their petition requesting a 15% royalty on all amphitheater revenues remains pending after 2,400 cycles.
 
 †The science of acoustics, derived from the Greek "akoustikos" meaning "of or for hearing," which is itself derived from the older word "akouein," meaning "to hear," which traces back to the even older Proto-Indo-European root that meant "to hear," because ancient peoples were very consistent about their naming conventions when they bothered to write them down.
 

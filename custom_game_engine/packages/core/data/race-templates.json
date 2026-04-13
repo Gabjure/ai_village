@@ -171,8 +171,8 @@
   },
   "races": [
     {
-      "id": "olympian",
-      "name": "Olympian",
+      "id": "spire_ascendant",
+      "name": "Spire Ascendant",
       "description": "The gods of the Chorus Spire, beings of immense divine power",
       "nativeRealm": "chorus_spire",
       "type": "divine",
@@ -292,7 +292,7 @@
         }
       ],
       "canHybridize": true,
-      "hybridCompatible": ["human", "olympian", "satyr"],
+      "hybridCompatible": ["human", "spire_ascendant", "satyr"],
       "realmBound": false,
       "canSurviveMortalWorld": true,
       "mortalWorldWeakness": "Weakens if separated from bound location",
@@ -611,7 +611,7 @@
     {
       "id": "valkyrie",
       "name": "Valkyrie",
-      "description": "Choosers of the slain, servants of Odin",
+      "description": "Choosers of the slain, servants of the Storm-King",
       "nativeRealm": "storm_seat",
       "type": "spirit",
       "category": "humanoid",
@@ -1036,7 +1036,7 @@
         }
       ],
       "canHybridize": true,
-      "hybridCompatible": ["olympian", "demigod", "nymph", "satyr", "sidhe", "efreet", "djinn"],
+      "hybridCompatible": ["spire_ascendant", "demigod", "nymph", "satyr", "sidhe", "efreet", "djinn"],
       "realmBound": false,
       "canSurviveMortalWorld": true,
       "typicalAlignment": "neutral",

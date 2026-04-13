@@ -43,16 +43,16 @@
         }
       ],
       "canHybridize": true,
-      "hybridCompatible": ["olympian", "demigod", "nymph", "satyr", "sidhe", "efreet", "djinn"],
+      "hybridCompatible": ["spire_ascendant", "demigod", "nymph", "satyr", "sidhe", "efreet", "djinn"],
       "realmBound": false,
       "canSurviveMortalWorld": true,
       "typicalAlignment": "neutral",
       "societyType": "various",
       "precursorsLineage": {"precursors_species_id": "human", "emergence_band": "outer_rim", "lineage_note": "Urd Prime native or near-system species — Earth origin"}
     },
-    "olympian": {
-      "id": "olympian",
-      "name": "Olympian",
+    "spire_ascendant": {
+      "id": "spire_ascendant",
+      "name": "Spire Ascendant",
       "description": "The gods of the Chorus Spire, beings of immense divine power",
       "nativeRealm": "chorus_spire",
       "type": "divine",
@@ -250,7 +250,7 @@
   },
   "notes": [
     "Trait IDs like 'shapeshifting', 'divine_beauty', etc. reference entries in common-traits.json",
-    "Full race registry includes: olympian, demigod, nymph, satyr, sidhe, pixie, redcap, shade, fury, aesir, valkyrie, einherjar, seraph, angel, oneiroi, nightmare, efreet, djinn, human",
+    "Full race registry includes: spire_ascendant, demigod, nymph, satyr, sidhe, pixie, redcap, shade, fury, aesir, valkyrie, einherjar, seraph, angel, oneiroi, nightmare, efreet, djinn, human",
     "Body plan definitions can be added to individual races as needed"
   ]
 }

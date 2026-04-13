@@ -552,7 +552,7 @@ for (const race of ALL_RACE_TEMPLATES) {
 // ============================================================================
 
 // Chorus-Ascendant races
-export const OLYMPIAN_RACE = RACE_REGISTRY['olympian']!;
+export const SPIRE_ASCENDANT_RACE = RACE_REGISTRY['spire_ascendant']!;
 export const DEMIGOD_RACE = RACE_REGISTRY['demigod']!;
 export const NYMPH_RACE = RACE_REGISTRY['nymph']!;
 export const SATYR_RACE = RACE_REGISTRY['satyr']!;

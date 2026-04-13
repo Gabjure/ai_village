@@ -14,7 +14,7 @@ import {
   getRaceVulnerabilities,
   HUMAN_RACE,
   SIDHE_RACE,
-  OLYMPIAN_RACE,
+  SPIRE_ASCENDANT_RACE,
   EINHERJAR_RACE,
   EFREET_RACE,
   SHADE_RACE,
@@ -44,7 +44,7 @@ describe('RaceTemplates', () => {
     it('should return race by ID', () => {
       expect(getRaceTemplate('human')).toBe(HUMAN_RACE);
       expect(getRaceTemplate('sidhe')).toBe(SIDHE_RACE);
-      expect(getRaceTemplate('olympian')).toBe(OLYMPIAN_RACE);
+      expect(getRaceTemplate('spire_ascendant')).toBe(SPIRE_ASCENDANT_RACE);
     });
 
     it('should return undefined for unknown race', () => {
@@ -56,7 +56,7 @@ describe('RaceTemplates', () => {
     it('should return races native to Chorus Spire', () => {
       const chorusSpireRaces = getRacesByRealm('chorus_spire');
       expect(chorusSpireRaces.length).toBeGreaterThan(0);
-      expect(chorusSpireRaces).toContain(OLYMPIAN_RACE);
+      expect(chorusSpireRaces).toContain(SPIRE_ASCENDANT_RACE);
       chorusSpireRaces.forEach(race => {
         expect(race.nativeRealm).toBe('chorus_spire');
       });
@@ -81,7 +81,7 @@ describe('RaceTemplates', () => {
     it('should return divine races', () => {
       const divineRaces = getRacesByType('divine');
       expect(divineRaces.length).toBeGreaterThan(0);
-      expect(divineRaces).toContain(OLYMPIAN_RACE);
+      expect(divineRaces).toContain(SPIRE_ASCENDANT_RACE);
       divineRaces.forEach(race => {
         expect(race.type).toBe('divine');
       });
@@ -108,9 +108,9 @@ describe('RaceTemplates', () => {
   });
 
   describe('canHybridize', () => {
-    it('should allow human-olympian hybrids (demigods)', () => {
-      expect(canHybridize('human', 'olympian')).toBe(true);
-      expect(canHybridize('olympian', 'human')).toBe(true);
+    it('should allow human-spire_ascendant hybrids (demigods)', () => {
+      expect(canHybridize('human', 'spire_ascendant')).toBe(true);
+      expect(canHybridize('spire_ascendant', 'human')).toBe(true);
     });
 
     it('should allow human-sidhe hybrids (changelings)', () => {
@@ -218,7 +218,7 @@ describe('RaceTemplates', () => {
     });
 
     it('should deduplicate abilities', () => {
-      const abilities = getRaceAbilities('olympian');
+      const abilities = getRaceAbilities('spire_ascendant');
       const uniqueAbilities = new Set(abilities);
       expect(abilities.length).toBe(uniqueAbilities.size);
     });
@@ -237,7 +237,7 @@ describe('RaceTemplates', () => {
     });
 
     it('should return empty for races without vulnerabilities', () => {
-      const vulnerabilities = getRaceVulnerabilities('olympian');
+      const vulnerabilities = getRaceVulnerabilities('spire_ascendant');
       expect(vulnerabilities.length).toBe(0);
     });
   });

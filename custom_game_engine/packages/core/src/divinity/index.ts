@@ -600,7 +600,7 @@ export {
   COMMON_TRAITS,
 
   // Chorus-Ascendant races
-  OLYMPIAN_RACE,
+  SPIRE_ASCENDANT_RACE,
   DEMIGOD_RACE,
   NYMPH_RACE,
   SATYR_RACE,

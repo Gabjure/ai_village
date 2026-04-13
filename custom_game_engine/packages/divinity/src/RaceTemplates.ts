@@ -509,9 +509,9 @@ export const COMMON_TRAITS: Record<string, RacialTrait> = {
 
 // ----- CHORUS SPIRE (Chorus-Ascendant Celestial) -----
 
-export const OLYMPIAN_RACE: RaceTemplate = {
-  id: 'olympian',
-  name: 'Olympian',
+export const SPIRE_ASCENDANT_RACE: RaceTemplate = {
+  id: 'spire_ascendant',
+  name: 'Spire Ascendant',
   description: 'The gods of the Chorus Spire, beings of immense divine power',
   nativeRealm: 'chorus_spire',
   type: 'divine',
@@ -619,7 +619,7 @@ export const NYMPH_RACE: RaceTemplate = {
     COMMON_TRAITS.divine_beauty!,
   ],
   canHybridize: true,
-  hybridCompatible: ['human', 'olympian', 'satyr'],
+  hybridCompatible: ['human', 'spire_ascendant', 'satyr'],
   realmBound: false,
   canSurviveMortalWorld: true,
   mortalWorldWeakness: 'Weakens if separated from bound location',
@@ -1330,7 +1330,7 @@ export const HUMAN_RACE: RaceTemplate = {
     },
   ],
   canHybridize: true,
-  hybridCompatible: ['olympian', 'demigod', 'nymph', 'satyr', 'sidhe', 'efreet', 'djinn'],
+  hybridCompatible: ['spire_ascendant', 'demigod', 'nymph', 'satyr', 'sidhe', 'efreet', 'djinn'],
   realmBound: false,
   canSurviveMortalWorld: true,
   typicalAlignment: 'neutral',
@@ -1343,7 +1343,7 @@ export const HUMAN_RACE: RaceTemplate = {
 
 export const ALL_RACE_TEMPLATES: RaceTemplate[] = [
   // Chorus Spire
-  OLYMPIAN_RACE,
+  SPIRE_ASCENDANT_RACE,
   DEMIGOD_RACE,
   NYMPH_RACE,
   SATYR_RACE,

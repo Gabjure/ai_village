@@ -157,7 +157,7 @@ export interface BodyComponent extends Component {
   type: 'body';
 
   // Species & Body Plan
-  speciesId?: string;            // e.g., 'human', 'thrakeen', 'olympian'
+  speciesId?: string;            // e.g., 'human', 'thrakeen', 'spire_ascendant'
   bodyPlanId: string;            // e.g., 'humanoid_standard', 'insectoid_4arm'
 
   // Dynamic part list (generated from body plan)
