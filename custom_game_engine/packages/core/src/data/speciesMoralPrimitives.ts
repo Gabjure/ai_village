@@ -713,30 +713,32 @@ const MYCON_MORALITY: SpeciesMoralFramework = {
 };
 
 /**
- * Alfar — optimization target: luminous harmony
- * Moral axis: shadow is corruption, light-sharing is virtue
+ * Alfar — optimization target: contained resonance
+ * Moral axis: restraint as survival, art as containment, precision as duty
  *
- * Alfar do not understand light metaphorically — for them luminosity is
- * a literal moral substance. A well-ordered being radiates; a corrupted
- * being dims. Shadow is not merely darkness but the visible sign of
- * internal misalignment. To share light is to share virtue itself,
- * not merely to be generous.
+ * Alfar descend from survivors of the ancestors. Those who came before achieved perfect emotional
+ * harmony — then a single note of grief destroyed them all. The Alfar
+ * containment gate (biochemical restraint on emotional contagion) is what
+ * keeps them alive. Their luminosity is real: emotional states manifest as
+ * visible light. But light here is not a moral metaphor — it is a medical
+ * readout. An Alfar who dims is exhausted, not evil. An Alfar who radiates
+ * is contained, not virtuous. The moral substance is the containment itself.
  */
 const ALFAR_MORALITY: SpeciesMoralFramework = {
   speciesId: 'alfar',
   moralPrimitives: [
-    'Light is not a metaphor — it is the literal substance of correct alignment; a being who radiates is a being whose inner and outer form are in harmony',
-    'Shadow is not absence but presence — the shadow on a soul is the residue of choices that bent the inner form away from truth; it accumulates and hardens',
-    'To share light is not generosity but necessity — a single bright source in a room of shadows draws all shadows toward it, and eventually dims; light must be distributed to persist',
-    'The being who hoards luminosity — who shines brightly in isolation while refusing to illuminate others — is performing a corruption so subtle they rarely see it themselves',
-    'Harmony is not agreement — it is the simultaneous distinctness of multiple notes that nevertheless form a coherent pattern; forced uniformity is not harmony but silence',
-    'The corrupted thing can be restored — shadow that has not fully hardened can be melted by sustained proximity to genuine light; this is the purpose of community',
-    'To extinguish a light — through cruelty, through despair, through the slow grinding of contempt — is a crime against the luminous order that governs all things; there is no clean hands in the dimming of a soul',
+    'Containment is not suppression — to feel everything and hold it safely is the highest discipline; the ancestors proved that uncontained feeling is a weapon of mass destruction',
+    'Art is not luxury — it is the vessel through which emotion passes without killing; a song, a light-weaving, a story: these are containment infrastructure, and to deny them is to deny survival itself',
+    'Emotional precision is duty — to name what you feel vaguely when you could name it exactly is to leave an uncontained charge in the room; imprecision endangers everyone nearby',
+    'The being who dims is not fallen but exhausted — containment fatigue is a medical condition, not a moral failure; the correct response to dimming is rest and witness, not judgment',
+    'To break another\'s containment deliberately — through cruelty, through forced intimacy, through the weaponization of shared feeling — is the only true Alfar sin, because it recreates the catastrophe that destroyed the ancestors',
+    'Grief must be structured or it cascades — every Alfar death echoes the original catastrophe faintly; the rituals exist not to honor the dead but to prevent the living from following them',
+    'The dream-pull toward the ancestral archive is not weakness — it is the inheritance recognizing its origin; resisting it is not virtue but necessity, and those who struggle deserve accompaniment, not shame',
   ],
   beliefTemplates: {
-    cooperation: 'Those who radiate freely — whose light increases when it encounters other light rather than competing with it — are the only partners through whom luminous harmony can be achieved; isolated brightness is always temporary',
-    conflict: 'Those who cast shadow — whether through active corruption or the passive accumulation of unexamined misalignment — draw all nearby light toward themselves and consume it; proximity to deep shadow is not a moral test but a structural hazard',
-    spiritual: 'The original light did not create the world by shining on it from outside — it shone through it, becoming every properly-aligned thing simultaneously; to achieve luminous harmony is not to approach the divine but to remember that you are its partial expression',
+    cooperation: 'Those who practice containment with grace — who feel deeply and share through craft rather than flooding — are the only safe partners; trust is measured not by openness but by the precision of what is shared and the discipline of what is held',
+    conflict: 'Those who broadcast raw emotion without containment — whether through carelessness or malice — are existentially dangerous, not merely rude; proximity to uncontained feeling is not a social problem but a survival threat, and distance is the correct response',
+    spiritual: 'The ancestors heard the Chorus through shared dreaming and for one perfect moment all feeling was one feeling; that moment was the most beautiful thing that ever existed and it killed everyone who experienced it; the Alfar exist in the aftermath, carrying the beauty and the lesson simultaneously',
   },
 };
 
@@ -1426,34 +1428,6 @@ const JENGU_VEL_MORALITY: SpeciesMoralFramework = {
 };
 
 /**
- * Taniwha-Vel (Māori/NZ) — optimization target: the integrity of the boundary between the known water and the unknown deep
- * Moral axis: kaitiakitanga — guardianship as identity, not obligation
- *
- * The Taniwha-Vel are guardians whose moral system centers on the concept of kaitiakitanga.
- * They protect not because they are asked but because the waterway's health is their identity.
- * Their shapeshifting is not deception but adaptation — the form that serves the waterway's
- * needs at that moment is the right form. Their rage when their domain is damaged is not
- * emotion but immune response.
- */
-const TANIWHA_VEL_MORALITY: SpeciesMoralFramework = {
-  speciesId: 'taniwha_vel',
-  moralPrimitives: [
-    'The waterway is not property but identity — the Taniwha does not own the river; the Taniwha IS the river in the form that can act, and damage to the water is damage to the self',
-    'Guardianship is not chosen but inherited — the kaitiaki does not decide to protect; the protection is the condition of existing in that place, and a Taniwha that does not guard has ceased to be a Taniwha',
-    'The correct form is the form the moment requires — the reptile that fights, the shark that patrols, the log that waits, the whale that displaces; shifting is not indecision but responsiveness, and a being locked in one form has stopped listening',
-    'Those who approach the water with respect receive protection — this is not generosity but recognition; the respectful traveler has acknowledged that the water has a guardian, and acknowledgment activates the contract',
-    'Pollution is not inconvenience but assault — the one who poisons the water has attacked the Taniwha directly, and the rage that follows is not disproportionate but precisely proportional to the damage done to the self',
-    'The deep pool is forbidden because it contains the Taniwha\'s resting form — to enter uninvited is not exploration but trespass, and the response to trespass is determined by the trespasser\'s intent',
-    'A waterway without a guardian is a wound in the landscape — the Taniwha that dies or departs leaves behind not just unprotected water but a gap in the world\'s immune system; this is why Taniwha persist',
-  ],
-  beliefTemplates: {
-    cooperation: 'The iwi and the Taniwha are one system — the people protect the water from above, the Taniwha protects it from below; neither is servant to the other, and both fail when one withdraws',
-    conflict: 'The enemy is recognized by their relationship to the water — those who take without returning, who dam without asking, who poison without awareness; the Taniwha does not hate but responds to the damage as the body responds to infection',
-    spiritual: 'The waterway connects the mountain to the sea, which connects the land to the sky — the Taniwha guards one section of a system that spans the entire world; this is why guardianship of a single pool is not small but fractal',
-  },
-};
-
-/**
  * Sachamama Vel — optimization target: ecological permanence
  * Moral axis: the boundary between what endures and what passes through is the only meaningful distinction
  *
@@ -1541,7 +1515,6 @@ export const SPECIES_MORAL_FRAMEWORKS: Record<string, SpeciesMoralFramework> = {
   shurale_rin: SHURALE_RIN_MORALITY,
   albasti_vel: ALBASTI_VEL_MORALITY,
   jengu_vel: JENGU_VEL_MORALITY,
-  taniwha_vel: TANIWHA_VEL_MORALITY,
   sachamama_vel: SACHAMAMA_VEL_MORALITY,
 };
 

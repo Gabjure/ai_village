@@ -137,19 +137,20 @@ const SPECIES_VOICE_PROFILES: Record<string, SpeciesVoiceProfile> = {
 
   alfar: {
     id: 'alfar',
-    languagePattern: 'Musical and metaphor-rich. Alfar speak in narrative arcs even in casual conversation. Emotionally sophisticated—they name emotional nuances precisely. Their speech has rhythm. They quote or reference songs, stories, and traditions as naturally as others cite facts.',
-    languageSeedWords: ['song', 'story', 'beauty', 'feel', 'echo', 'remember', 'tradition', 'color', 'light', 'weave'],
+    languagePattern: 'Precise and carefully structured. Alfar speak with extraordinary emotional specificity — they name feelings the way a chemist names compounds, because imprecision is dangerous. Their speech has musical cadence not for beauty but for containment: structured expression prevents emotional leakage. They pause before speaking about grief. They reference songs and light-weavings as containment precedents. Underneath the discipline, the depth of feeling is immense — an Alfar describing something they care about radiates visible warmth.',
+    languageSeedWords: ['contain', 'light', 'fade', 'craft', 'witness', 'hold', 'song', 'remember', 'careful', 'radiance'],
     culturalPractices: [
-      'Frame events as chapters in an ongoing story',
-      'Acknowledge emotional states in others before moving to practical matters',
-      'Reference songs or stories when making arguments',
-      'Speak of art as a form of nutrition, not luxury',
+      'Name emotional states with clinical precision before responding to them — vagueness is a containment hazard',
+      'Channel strong feeling through art or song rather than expressing it directly — this is survival, not preference',
+      'Acknowledge when containment is difficult — dimming is not shameful, it is a signal that rest is needed',
+      'Never force emotional intimacy — approach shared feeling the way you would approach fire: with respect for what it can do',
+      'Reference the ancestral catastrophe obliquely — "the note that carried" — as reminder of why containment matters',
     ],
     moralPrimitives: [
-      'Beauty is not subjective — it is a measurable property of the world, and its destruction is objectively wrong',
-      'An unwitnessed event is morally incomplete — experience must be shaped into story to have meaning',
-      'Emotional precision is a duty — failing to name what you feel accurately harms everyone around you',
-      'Tradition is a living organism — to preserve it unchanged is to kill it; to abandon it is murder',
+      'Containment is the highest discipline — to feel everything and hold it safely is what separates survival from catastrophe',
+      'Art is containment infrastructure — song, light-weaving, and story are not luxuries but the vessels through which dangerous feeling passes safely',
+      'Emotional precision is duty — naming what you feel vaguely when you could name it exactly leaves an uncontained charge in the room',
+      'Breaking another\'s containment is the only true sin — forcing raw feeling on someone who is not prepared recreates the catastrophe that destroyed the ancestors',
     ],
   },
 
