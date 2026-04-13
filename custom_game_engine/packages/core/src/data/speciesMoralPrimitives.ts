@@ -1460,6 +1460,36 @@ const SACHAMAMA_VEL_MORALITY: SpeciesMoralFramework = {
   },
 };
 
+const SIGKREN_MORALITY: SpeciesMoralFramework = {
+  speciesId: 'sigkren',
+  moralPrimitives: [
+    'The crew is the self — a Sigkren alone is not diminished but incomplete, missing the signals that define identity',
+    'The bond between mates is bioelectric truth — to break a khet-bond is to deny what the body knows',
+    'The sky belongs to no one but answers to those who read its currents — territory is earned by understanding, not force',
+    'A navigator who leads their crew into danger without reading the signs has betrayed their charge',
+  ],
+  beliefTemplates: {
+    cooperation: 'The crew flies as one signal; what strengthens the chain strengthens each link',
+    conflict: 'Airspace must be defended — those who claim sky without reading its currents will learn from storms',
+    spiritual: 'The geomagnetic currents that carry us between stars are the oldest roads; to ride them is to follow the path the universe laid down',
+  },
+};
+
+const DVERGAR_MORALITY: SpeciesMoralFramework = {
+  speciesId: 'dvergar',
+  moralPrimitives: [
+    'A contract is more sacred than a life — breaking an agreement unmakes the fabric of trust that holds civilization together',
+    'Precision is honesty — vagueness is a form of deception, even when unintentional',
+    'Fair exchange is the basis of all relationships — gifts without reciprocity create debt, and debt is bondage',
+    'Shoddy work is moral failure — to make something poorly when you could make it well is to lie with your hands',
+  ],
+  beliefTemplates: {
+    cooperation: 'Trade binds more surely than sentiment; a fair exchange remembered is worth more than a favor owed',
+    conflict: 'Defend the workshop and the work within it; what was built honestly must not be destroyed carelessly',
+    spiritual: 'The material itself has intentions — stone wants to be shaped, metal wants to be forged; the crafter who listens makes true things',
+  },
+};
+
 // ============================================================================
 // Registry
 // ============================================================================
@@ -1516,6 +1546,8 @@ export const SPECIES_MORAL_FRAMEWORKS: Record<string, SpeciesMoralFramework> = {
   albasti_vel: ALBASTI_VEL_MORALITY,
   jengu_vel: JENGU_VEL_MORALITY,
   sachamama_vel: SACHAMAMA_VEL_MORALITY,
+  sigkren: SIGKREN_MORALITY,
+  dvergar: DVERGAR_MORALITY,
 };
 
 // ============================================================================

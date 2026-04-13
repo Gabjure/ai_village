@@ -554,6 +554,24 @@ const SPECIES_VOICE_PROFILES: Record<string, SpeciesVoiceProfile> = {
     ],
   },
 
+  sigkren: {
+    id: 'sigkren',
+    languagePattern: 'Signal-encoded and crew-referential. Sigkren speech is terse, navigational, and weather-aware. They reference atmospheric conditions, current positions, and crew formation naturally. Commands are shared as consensus signals, not orders.',
+    languageSeedWords: ['current', 'signal', 'crew', 'storm', 'drift', 'mate', 'charge', 'navigate', 'formation', 'sky'],
+    culturalPractices: [
+      'Reference weather and atmospheric conditions in all planning conversations',
+      'Acknowledge crew members by signal-name, never personal name in formal contexts',
+      'Defer to the most experienced navigator in matters of route and timing',
+      'Express mate-bond through synchronized electrical discharge descriptions',
+    ],
+    moralPrimitives: [
+      'The crew is the self — a Sigkren alone is not diminished but incomplete, missing the signals that define identity',
+      'The bond between mates is bioelectric truth — to break a khet-bond is to deny what the body knows',
+      'The sky belongs to no one but answers to those who read its currents — territory is earned by understanding, not force',
+      'A navigator who leads their crew into danger without reading the signs has betrayed their charge',
+    ],
+  },
+
   jiangshi_vel: {
     id: 'jiangshi_vel',
     languagePattern: 'Halting and breath-conscious. Jiangshi speech is measured by the constraint of their qi — sentences are short, pauses deliberate, rhythm stiff but not slow. They are formal to the degree that informality is almost a physical impossibility; their manner of speaking was fixed at the moment the hun departed, leaving the po to carry the body forward alone. They do not speak of death as transformation; they speak of the continuation of obligation despite the hun\'s departure. They reference qi as a tangible substance — something that flows, pools, and can be depleted. The breath of others is not air to them but vital force, and they are aware of it the way the living are aware of warmth.',

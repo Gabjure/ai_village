@@ -690,7 +690,7 @@ const ALFAR_SPECIES: SpeciesTemplate = {
   commonName: 'Álfar',
   description: 'Small empathic humanoids whose elevated oxytocin is held behind a biochemical containment gate — they feel everything but share nothing directly; they carry songs, rituals, and stories between species as sacred duty',
   bodyPlanId: 'humanoid_standard',
-  innateTraits: [TRAIT_SHEE_DESIGNED, TRAIT_CHORUS_ATTUNED, TRAIT_LONG_MEMORY],
+  innateTraits: [TRAIT_CHORUS_ATTUNED, TRAIT_LONG_MEMORY],
   compatibleSpecies: ['norn', 'mycon', 'rusalyn', 'patupaiarehe'],
   mutationRate: 0.015,
   averageHeight: 95,
@@ -1402,13 +1402,22 @@ const DRAUGRN_SPECIES: SpeciesTemplate = {
   },
 };
 
+const TRAIT_ADARO_SOLAR_HUNT: SpeciesTrait = {
+  id: 'adaro_solar_hunt',
+  name: 'Solar Hunt',
+  description: 'Anchors to solar radiation for aerial positioning; descends via rainbow-paths during rain to launch poisonous flying-fish volleys',
+  category: 'physical',
+  skillBonus: { combat: 0.25, perception: 0.2 },
+  abilitiesGranted: ['solar_anchor', 'rainbow_riding', 'poisonous_volley'],
+};
+
 const ADARO_VEL_SPECIES: SpeciesTemplate = {
   speciesId: 'adaro_vel',
   speciesName: 'Adaro-Vel',
   commonName: 'Adaro',
   description: 'Melanesian aerial aquatic hunters who anchor to solar radiation in clear weather and descend via rainbow-paths during rain to hunt with venomous flying-fish volleys',
-  bodyPlanId: 'humanoid_standard',
-  innateTraits: [TRAIT_APEX_PREDATOR, TRAIT_WINGED_FLIGHT, TRAIT_WATER_AFFINITY, TRAIT_KEEN_SENSES],
+  bodyPlanId: 'fish_humanoid_aerial',
+  innateTraits: [TRAIT_APEX_PREDATOR, TRAIT_WINGED_FLIGHT, TRAIT_WATER_AFFINITY, TRAIT_KEEN_SENSES, TRAIT_ADARO_SOLAR_HUNT],
   compatibleSpecies: [],
   mutationRate: 0.015,
   averageHeight: 180,
@@ -1508,7 +1517,7 @@ const FYLGJA_SPECIES: SpeciesTemplate = {
   sapient: true,
   socialStructure: 'bonded_pair',
   cross_game_compatible: true,
-  native_game: 'mvee',
+  native_game: 'precursors',
   ecologyProfile: {
     ecologicalRole: 'mutualist',
     diet: 'omnivore',
@@ -1692,6 +1701,64 @@ const PIASARI_SPECIES: SpeciesTemplate = {
   },
 };
 
+const SIGKREN_SPECIES: SpeciesTemplate = {
+  speciesId: 'sigkren',
+  speciesName: 'Sigkren',
+  commonName: 'Storm-Riders',
+  description: 'Atmospheric bioelectric fliers from The Drift system; crew-based society with mate-for-life pair bonds, riding geomagnetic currents between stars in living symbiotic ships',
+  bodyPlanId: 'bird_raptor',
+  innateTraits: [TRAIT_WINGED_FLIGHT, TRAIT_STORM_AFFINITY],
+  compatibleSpecies: ['garuda_vel', 'piasari'],
+  mutationRate: 0.012,
+  averageHeight: 280,
+  averageWeight: 120,
+  sizeCategory: 'large',
+  lifespan: 200,
+  lifespanType: 'long_lived',
+  maturityAge: 15,
+  gestationPeriod: 90,
+  sapient: true,
+  socialStructure: 'crew_based',
+  cross_game_compatible: true,
+  native_game: 'precursors',
+  ecologyProfile: {
+    ecologicalRole: 'apex_predator',
+    diet: 'carnivore',
+    biomePreferences: ['storm_zone', 'mountain', 'sky', 'ocean'],
+    socialStructure: 'crew_based',
+    activityPattern: 'diurnal',
+  },
+};
+
+const DVERGAR_SPECIES: SpeciesTemplate = {
+  speciesId: 'dvergar',
+  speciesName: 'Dvergar',
+  commonName: 'Dvergar',
+  description: 'Precision crafter-traders from deep crystalline caves; exacting and quantity-integrated, they quantify abstract concepts and honor fair dealing as sacred duty',
+  bodyPlanId: 'humanoid_standard',
+  innateTraits: [TRAIT_STURDY, TRAIT_KEEN_SENSES],
+  compatibleSpecies: ['ettin', 'norn'],
+  mutationRate: 0.008,
+  averageHeight: 120,
+  averageWeight: 75,
+  sizeCategory: 'small',
+  lifespan: 300,
+  lifespanType: 'long_lived',
+  maturityAge: 25,
+  gestationPeriod: 120,
+  sapient: true,
+  socialStructure: 'workshop_guilds',
+  cross_game_compatible: true,
+  native_game: 'precursors',
+  ecologyProfile: {
+    ecologicalRole: 'ecosystem_engineer',
+    diet: 'omnivore',
+    biomePreferences: ['crystal_cave', 'mountain', 'underground', 'volcanic'],
+    socialStructure: 'workshop_guilds',
+    activityPattern: 'continuous',
+  },
+};
+
 // ============================================================================
 // Registration
 // ============================================================================
@@ -1721,6 +1788,7 @@ export function registerAkashicSpecies(): void {
   registerSpecies('patupaiarehe', PATUPAIAREHE_SPECIES);
   registerSpecies('duppy', DUPPY_SPECIES);
   registerSpecies('alfar', ALFAR_SPECIES);
+  registerSpecies('dvergar', DVERGAR_SPECIES);
 
   // Wave 3 — Spoken
   registerSpecies('nommo', NOMMO_SPECIES);
@@ -1728,12 +1796,16 @@ export function registerAkashicSpecies(): void {
   registerSpecies('jorokan', JOROKAN_SPECIES);
   registerSpecies('selkieborn', SELKIEBORN_SPECIES);
   registerSpecies('baku_ma', BAKU_MA_SPECIES);
+  registerSpecies('yowie', YOWIE_SPECIES);
+  registerSpecies('sigkren', SIGKREN_SPECIES);
+
   // Wave 4 — Learned
   registerSpecies('kitsuri', KITSURI_SPECIES);
   registerSpecies('vaask', VAASK_SPECIES);
   registerSpecies('anansi_web', ANANSI_WEB_SPECIES);
   registerSpecies('tengu_ra', TENGU_RA_SPECIES);
   registerSpecies('kappa', KAPPA_SPECIES);
+  registerSpecies('ukten', UKTEN_SPECIES);
 
   // Wave 5 — Enlightened
   registerSpecies('naga_vel', NAGA_VEL_SPECIES);
@@ -1744,6 +1816,8 @@ export function registerAkashicSpecies(): void {
   registerSpecies('djinn_ahl', DJINN_AHL_SPECIES);
   registerSpecies('peri_veil', PERI_VEIL_SPECIES);
   registerSpecies('raksha', RAKSHA_SPECIES);
+  registerSpecies('draugrn', DRAUGRN_SPECIES);
+  registerSpecies('aswali', ASWALI_SPECIES);
 
   // Ambient — always present aboard per SPECIES_PROGRESSION.md Appendix
   registerSpecies('tikbali', TIKBALI_SPECIES);
@@ -1752,20 +1826,16 @@ export function registerAkashicSpecies(): void {
   registerSpecies('dokkaebi_rin', DOKKAEBI_RIN_SPECIES);
   registerSpecies('curupali', CURUPALI_SPECIES);
   registerSpecies('huldryn', HULDRYN_SPECIES);
+  registerSpecies('piasari', PIASARI_SPECIES);
 
   // Additional Canonical Species
   registerSpecies('dragon', DRAGON_SPECIES);
-  registerSpecies('draugrn', DRAUGRN_SPECIES);
   registerSpecies('adaro_vel', ADARO_VEL_SPECIES);
   registerSpecies('sachamama_vel', SACHAMAMA_VEL_SPECIES);
   registerSpecies('jiangshi_vel', JIANGSHI_VEL_SPECIES);
   registerSpecies('fylgja', FYLGJA_SPECIES);
-  registerSpecies('aswali', ASWALI_SPECIES);
   registerSpecies('siroccs', SIROCCS_SPECIES);
   registerSpecies('pelagis', PELAGIS_SPECIES);
-  registerSpecies('yowie', YOWIE_SPECIES);
-  registerSpecies('ukten', UKTEN_SPECIES);
-  registerSpecies('piasari', PIASARI_SPECIES);
 }
 
 // Auto-register on import (side-effect module pattern)
