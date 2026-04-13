@@ -64,7 +64,7 @@ export interface RacialTrait {
 export type RaceType =
   | 'mortal'    // Normal lifespan, can die of old age
   | 'spirit'    // Spiritual beings, ageless but can be destroyed
-  | 'fae'       // Faerie beings, ageless, bound by oaths
+  | 'fae'       // Veil-Wild beings, ageless, bound by oaths
   | 'divine'    // Gods and demigods, immortal
   | 'construct' // Created beings, no natural lifespan
   | 'undead'    // Dead beings, eternal but degrading
@@ -512,7 +512,7 @@ export const COMMON_TRAITS: Record<string, RacialTrait> = {
 export const OLYMPIAN_RACE: RaceTemplate = {
   id: 'olympian',
   name: 'Olympian',
-  description: 'The gods of Mount Olympus, beings of immense divine power',
+  description: 'The gods of the Chorus Spire, beings of immense divine power',
   nativeRealm: 'chorus_spire',
   type: 'divine',
   category: 'humanoid',
@@ -887,11 +887,11 @@ export const FURY_RACE: RaceTemplate = {
 export const AESIR_RACE: RaceTemplate = {
   id: 'aesir',
   name: 'Aesir',
-  description: 'Warrior gods of Asgard, bound by fate to die at Ragnarok',
+  description: 'Warrior gods of the Storm-Seat, bound by fate to face the Final Echo',
   nativeRealm: 'storm_seat',
   type: 'divine',
   category: 'humanoid',
-  lifespan: 'ageless', // Ageless but not truly immortal (Ragnarok)
+  lifespan: 'ageless', // Ageless but not truly immortal (Final Echo)
   innateTraits: [
     COMMON_TRAITS.enhanced_strength!,
     {
@@ -903,7 +903,7 @@ export const AESIR_RACE: RaceTemplate = {
     },
     {
       id: 'ragnarok_doomed',
-      name: 'Ragnarok-Doomed',
+      name: 'Echo-Doomed',
       category: 'spiritual',
       description: 'Will die at the end of all things',
       effects: { abilitiesGranted: ['ragnarok_doomed'] },
@@ -976,11 +976,11 @@ export const VALKYRIE_RACE: RaceTemplate = {
 export const EINHERJAR_RACE: RaceTemplate = {
   id: 'einherjar',
   name: 'Einherjar',
-  description: 'Glorious warriors who died in battle, training for Ragnarok',
+  description: 'Glorious warriors who died in battle, training for the Final Echo',
   nativeRealm: 'echo_hall',
   type: 'undead',
   category: 'humanoid',
-  lifespan: 'ageless', // Until Ragnarok
+  lifespan: 'ageless', // Until the Final Echo
   innateTraits: [
     COMMON_TRAITS.enhanced_strength!,
     COMMON_TRAITS.revive_daily!,
@@ -996,7 +996,7 @@ export const EINHERJAR_RACE: RaceTemplate = {
     },
     {
       id: 'ragnarok_bound',
-      name: 'Ragnarok-Bound',
+      name: 'Echo-Bound',
       category: 'spiritual',
       description: 'Will fight in the final battle',
       effects: { abilitiesGranted: ['ragnarok_bound'] },
