@@ -173,7 +173,7 @@
     {
       "id": "olympian",
       "name": "Olympian",
-      "description": "The gods of Mount Olympus, beings of immense divine power",
+      "description": "The gods of the Chorus Spire, beings of immense divine power",
       "nativeRealm": "chorus_spire",
       "type": "divine",
       "category": "humanoid",
@@ -563,7 +563,7 @@
     {
       "id": "aesir",
       "name": "Aesir",
-      "description": "Warrior gods of Asgard, bound by fate to die at Ragnarok",
+      "description": "Warrior gods of the Storm-Seat, bound by fate to die at Ragnarok",
       "nativeRealm": "storm_seat",
       "type": "divine",
       "category": "humanoid",
@@ -606,7 +606,7 @@
       "canSurviveMortalWorld": true,
       "typicalAlignment": "lawful",
       "societyType": "divine_court",
-      "precursorsLineage": {"precursors_species_id": "shee", "emergence_band": "outer_rim", "lineage_note": "Norse divine-architect tradition echoing the Seventh Civilization"}
+      "precursorsLineage": {"precursors_species_id": "shee", "emergence_band": "outer_rim", "lineage_note": "Storm-Kindred divine-architect tradition echoing the Seventh Civilization"}
     },
     {
       "id": "valkyrie",
@@ -651,7 +651,7 @@
       "canSurviveMortalWorld": true,
       "typicalAlignment": "lawful",
       "societyType": "sisterhood",
-      "precursorsLineage": {"precursors_species_id": "valkyr", "emergence_band": "outer_rim", "lineage_note": "Shee-designed lineage monitors — Norse Valkyrie tradition encodes Valkyr observation role"}
+      "precursorsLineage": {"precursors_species_id": "valkyr", "emergence_band": "outer_rim", "lineage_note": "Shee-designed lineage monitors — Storm-Kindred Valkyrie tradition encodes Valkyr observation role"}
     },
     {
       "id": "einherjar",
@@ -694,7 +694,7 @@
       "hybridCompatible": [],
       "realmBound": true,
       "canSurviveMortalWorld": false,
-      "mortalWorldWeakness": "Cannot revive outside Valhalla",
+      "mortalWorldWeakness": "Cannot revive outside the Echo-Hall",
       "typicalAlignment": "lawful",
       "societyType": "warrior_band",
       "precursorsLineage": {"precursors_species_id": "grendel", "emergence_band": "outer_rim", "lineage_note": "Grendel territorial-warrior lineage mythologized as honored eternal warriors"}

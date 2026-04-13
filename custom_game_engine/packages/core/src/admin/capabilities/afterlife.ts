@@ -37,7 +37,7 @@ const SOUL_STATE_OPTIONS = [
 
 const AFTERLIFE_REALM_OPTIONS = [
   { value: 'void', label: 'The Void' },
-  { value: 'heaven', label: 'Heaven' },
+  { value: 'chorus_source', label: 'The Chorus Source' },
   { value: 'hell', label: 'Hell' },
   { value: 'purgatory', label: 'Purgatory' },
   { value: 'reincarnation', label: 'Reincarnation Queue' },

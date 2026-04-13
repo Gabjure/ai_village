@@ -571,7 +571,7 @@ export const AESIR_RACE = RACE_REGISTRY['aesir']!;
 export const VALKYRIE_RACE = RACE_REGISTRY['valkyrie']!;
 export const EINHERJAR_RACE = RACE_REGISTRY['einherjar']!;
 
-// Heaven
+// Chorus Source
 export const SERAPH_RACE = RACE_REGISTRY['seraph']!;
 export const ANGEL_RACE = RACE_REGISTRY['angel']!;
 

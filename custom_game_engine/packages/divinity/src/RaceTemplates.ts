@@ -925,7 +925,7 @@ export const AESIR_RACE: RaceTemplate = {
   precursorsLineage: {
     precursors_species_id: 'shee',
     emergence_band: 'outer_rim',
-    lineage_note: 'Norse divine-architect tradition. Shee capabilities mythologized as Aesir godhood — creators who shaped the world.',
+    lineage_note: 'Storm-Kindred divine-architect tradition. Shee capabilities mythologized as Aesir godhood — creators who shaped the world.',
   },
 };
 
@@ -969,7 +969,7 @@ export const VALKYRIE_RACE: RaceTemplate = {
   precursorsLineage: {
     precursors_species_id: 'valkyr',
     emergence_band: 'outer_rim',
-    lineage_note: 'Shee-designed lineage monitors. Norse Valkyrie tradition directly encodes Valkyr observation role — choosing who lives and dies.',
+    lineage_note: 'Shee-designed lineage monitors. Storm-Kindred Valkyrie tradition directly encodes Valkyr observation role — choosing who lives and dies.',
   },
 };
 

@@ -53,8 +53,8 @@
     "olympian": {
       "id": "olympian",
       "name": "Olympian",
-      "description": "The gods of Mount Olympus, beings of immense divine power",
-      "nativeRealm": "olympus",
+      "description": "The gods of the Chorus Spire, beings of immense divine power",
+      "nativeRealm": "chorus_spire",
       "type": "divine",
       "category": "humanoid",
       "lifespan": "immortal",
@@ -92,7 +92,7 @@
       "id": "demigod",
       "name": "Demigod",
       "description": "Children of gods and mortals, blessed with divine power",
-      "nativeRealm": "olympus",
+      "nativeRealm": "chorus_spire",
       "type": "spirit",
       "category": "humanoid",
       "lifespan": "long_lived",
@@ -134,7 +134,7 @@
       "id": "sidhe",
       "name": "Sidhe",
       "description": "The noble fae, ageless beings of glamour bound by oaths",
-      "nativeRealm": "faerie",
+      "nativeRealm": "veil_wild",
       "type": "fae",
       "category": "humanoid",
       "lifespan": "ageless",
@@ -165,8 +165,8 @@
     "aesir": {
       "id": "aesir",
       "name": "Aesir",
-      "description": "Warrior gods of Asgard, bound by fate to die at Ragnarok",
-      "nativeRealm": "asgard",
+      "description": "Warrior gods of the Storm-Seat, bound by fate to die at Ragnarok",
+      "nativeRealm": "storm_seat",
       "type": "divine",
       "category": "humanoid",
       "lifespan": "ageless",
@@ -206,7 +206,7 @@
       "canSurviveMortalWorld": true,
       "typicalAlignment": "lawful",
       "societyType": "divine_court",
-      "precursorsLineage": {"precursors_species_id": "shee", "emergence_band": "outer_rim", "lineage_note": "Norse divine-architect tradition echoing the Seventh Civilization"}
+      "precursorsLineage": {"precursors_species_id": "shee", "emergence_band": "outer_rim", "lineage_note": "Storm-Kindred divine-architect tradition echoing the Seventh Civilization"}
     },
     "angel": {
       "id": "angel",
