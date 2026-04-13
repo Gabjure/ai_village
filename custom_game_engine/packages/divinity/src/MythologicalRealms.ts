@@ -704,7 +704,7 @@ export function getRealmPreset(preset: RealmPreset): Partial<RealmCreationConfig
         timeFlow: { type: 'slow', ratio: 0.2 },
         accessMethods: ['ascension', 'invitation', 'pilgrimage', 'death'],
         accessRestrictions: [
-          { type: 'identity', requirement: 'norse_worthy', description: 'Only the worthy may enter' },
+          { type: 'identity', requirement: 'storm_worthy', description: 'Only the worthy may enter' },
         ],
         initialLaws: [
           { type: 'no_violence', enforcement: 'automatic', strength: 0.0, description: 'Violence is permitted in Storm-Seat' },

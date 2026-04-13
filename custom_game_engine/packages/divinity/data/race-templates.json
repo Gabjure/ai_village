@@ -212,7 +212,7 @@
       "id": "angel",
       "name": "Angel",
       "description": "Divine messengers and servants",
-      "nativeRealm": "heaven",
+      "nativeRealm": "chorus_source",
       "type": "spirit",
       "category": "humanoid",
       "lifespan": "immortal",

@@ -67,6 +67,7 @@ export interface GroupPrayerJoinSignals {
   relationshipAffinity?: number;
   relationshipTrust?: number;
   relationshipFamiliarity?: number;
+  mythAwareness?: number;
 }
 
 /**
@@ -149,6 +150,7 @@ export function calculateGroupPrayerJoinChance(signals: GroupPrayerJoinSignals):
     (relationshipFamiliarity * 0.15)
   );
   const biochemistryReadiness = clamp01(0.5 + (oxytocin - cortisol) * 0.5);
+  const mythAwareness = clamp01(signals.mythAwareness ?? 0);
   const isNornLike = (signals.speciesId ?? '').toLowerCase().includes('norn');
   const nornBonus = isNornLike && biochemistryReadiness > 0.55 ? 0.08 : 0;
   const scaffoldingGate = isNornLike
@@ -157,11 +159,12 @@ export function calculateGroupPrayerJoinChance(signals: GroupPrayerJoinSignals):
 
   return clamp01(
     0.05 +
-    (cultureAffinityParticipation * 0.3) +
+    (cultureAffinityParticipation * 0.25) +
     (cultureAffinity * 0.2) +
     (faithScore * 0.15) +
     (socialScaffolding * 0.15) +
     (biochemistryReadiness * 0.15) +
+    (mythAwareness * 0.05) +
     nornBonus
   ) * scaffoldingGate;
 }
@@ -182,11 +185,29 @@ function getSpeciesId(entity: EntityImpl): string {
   return species?.speciesId ?? '';
 }
 
+function getMythAwareness(agent: EntityImpl, world: World): number {
+  const deityId = agent.getComponent(ComponentType.Spiritual)?.believedDeity;
+  if (!deityId) return 0;
+  const deityEntity = world.getEntity(deityId);
+  if (!deityEntity) return 0;
+  const mythComp = deityEntity.getComponent(ComponentType.Mythology) as MythologyComponent | undefined;
+  if (!mythComp) return 0;
+  const traits = getCanonicalTraits(mythComp);
+  if (traits.size === 0) return 0;
+  // More canonical traits = higher myth awareness (capped at 1.0)
+  let totalStrength = 0;
+  for (const [, score] of traits) {
+    totalStrength += Math.abs(score);
+  }
+  return Math.min(1.0, totalStrength / 3);
+}
+
 function getJoinSignals(
   agent: EntityImpl,
   spiritual: SpiritualComponent,
   genetic: GeneticComponent | undefined,
-  relationship: Relationship | undefined
+  relationship: Relationship | undefined,
+  world: World
 ): GroupPrayerJoinSignals {
   const biochemistry = getBiochemistrySignals(agent);
   return {
@@ -199,6 +220,7 @@ function getJoinSignals(
     relationshipAffinity: relationship?.affinity,
     relationshipTrust: relationship?.trust,
     relationshipFamiliarity: relationship?.familiarity,
+    mythAwareness: getMythAwareness(agent, world),
   };
 }
 
@@ -215,10 +237,11 @@ function shouldAgentJoinGroupPrayer(
   agent: EntityImpl,
   leaderId: string,
   spiritual: SpiritualComponent,
-  genetic: GeneticComponent | undefined
+  genetic: GeneticComponent | undefined,
+  world: World
 ): boolean {
   const relationship = getRelationshipToLeader(agent, leaderId);
-  const joinSignals = getJoinSignals(agent, spiritual, genetic, relationship);
+  const joinSignals = getJoinSignals(agent, spiritual, genetic, relationship, world);
   return shouldJoinGroupPrayer(joinSignals);
 }
 
@@ -226,20 +249,22 @@ function getContextJoinSignals(
   agent: EntityImpl,
   leaderId: string,
   spiritual: SpiritualComponent,
-  genetic: GeneticComponent | undefined
+  genetic: GeneticComponent | undefined,
+  world: World
 ): GroupPrayerJoinSignals {
   const relationship = getRelationshipToLeader(agent, leaderId);
-  return getJoinSignals(agent, spiritual, genetic, relationship);
+  return getJoinSignals(agent, spiritual, genetic, relationship, world);
 }
 
 export function calculateJoinChanceForEntity(
   agent: EntityImpl,
   leaderId: string,
   spiritual: SpiritualComponent,
-  genetic: GeneticComponent | undefined
+  genetic: GeneticComponent | undefined,
+  world: World
 ): number {
   return calculateGroupPrayerJoinChance(
-    getContextJoinSignals(agent, leaderId, spiritual, genetic)
+    getContextJoinSignals(agent, leaderId, spiritual, genetic, world)
   );
 }
 
@@ -632,7 +657,7 @@ export class GroupPrayBehavior extends BaseBehavior {
       if (spiritual.faith < 0.2) continue; // Low faith agents won't join
       if (spiritual.crisisOfFaith) continue; // Crisis agents won't join groups
 
-      if (!shouldAgentJoinGroupPrayer(agent as EntityImpl, leader.id, spiritual, genetic)) {
+      if (!shouldAgentJoinGroupPrayer(agent as EntityImpl, leader.id, spiritual, genetic, world)) {
         continue;
       }
 
@@ -1016,7 +1041,7 @@ function gatherParticipantsWithContext(ctx: BehaviorContext): EntityImpl[] {
     if (spiritual.faith < 0.2) continue; // Low faith agents won't join
     if (spiritual.crisisOfFaith) continue; // Crisis agents won't join groups
 
-    if (!shouldJoinGroupPrayer(getContextJoinSignals(agentImpl, ctx.entity.id, spiritual, genetic))) {
+    if (!shouldJoinGroupPrayer(getContextJoinSignals(agentImpl, ctx.entity.id, spiritual, genetic, ctx.world))) {
       continue;
     }
 

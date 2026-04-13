@@ -536,10 +536,26 @@ export interface MiscEvents {
     title: string;
     heroId: EntityId;
     heroName: string;
+    deityId: EntityId;
     achievement: string;
     difficulty: 'minor' | 'notable' | 'heroic' | 'legendary' | 'mythic';
     witnessCount: number;
     timestamp: number;
+  };
+
+  // === Deity Personality Events ===
+  'deity:personality_evolved': {
+    deityId: EntityId;
+    personality: {
+      benevolence: number;
+      interventionism: number;
+      wrathfulness: number;
+      mysteriousness: number;
+      generosity: number;
+      consistency: number;
+      seriousness: number;
+      compassion: number;
+    };
   };
 
   // === Progression Events ===
