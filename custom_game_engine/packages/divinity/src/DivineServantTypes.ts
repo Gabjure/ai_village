@@ -757,7 +757,7 @@ export interface GenerateServantTemplateRequest {
   /** Style hints */
   styleHints?: {
     aesthetic?: string;        // "ethereal", "terrifying", "natural"
-    culturalInfluence?: string; // "norse", "egyptian", "cosmic horror"
+    culturalInfluence?: string; // "storm_kindred", "deep_archive", "void_touched"
     formPreference?: ServantFormCategory;
     complexityLevel?: 'simple' | 'moderate' | 'elaborate';
   };

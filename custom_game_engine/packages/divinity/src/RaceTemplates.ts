@@ -544,7 +544,7 @@ export const OLYMPIAN_RACE: RaceTemplate = {
   precursorsLineage: {
     precursors_species_id: 'shee',
     emergence_band: 'outer_rim',
-    lineage_note: 'Shee-archetype deities manifested through collective cultural memory. Greek divine-architect tradition echoes the Seventh Civilization.',
+    lineage_note: 'Shee-archetype deities manifested through collective cultural memory. Chorus-Ascendant divine-architect tradition echoes the Seventh Civilization.',
   },
 };
 
@@ -628,7 +628,7 @@ export const NYMPH_RACE: RaceTemplate = {
   precursorsLineage: {
     precursors_species_id: 'landvaettir',
     emergence_band: 'outer_rim',
-    lineage_note: 'Location-bound nature spirits. Geological sentinel consciousness expressed through Greek cultural lens.',
+    lineage_note: 'Location-bound nature spirits. Geological sentinel consciousness expressed through Chorus-Ascendant cultural lens.',
   },
 };
 
@@ -709,7 +709,7 @@ export const SIDHE_RACE: RaceTemplate = {
   precursorsLineage: {
     precursors_species_id: 'peri_veil',
     emergence_band: 'void',
-    lineage_note: 'The noble Fae — Peri-Veil who retained material-interface capability. Celtic Aos Si tradition.',
+    lineage_note: 'The noble Fae — Peri-Veil who retained material-interface capability. Veil-Touched Aos Si tradition.',
   },
 };
 
@@ -1153,7 +1153,7 @@ export const ONEIROI_RACE: RaceTemplate = {
   precursorsLineage: {
     precursors_species_id: 'baku_ma',
     emergence_band: 'mid_rim',
-    lineage_note: 'Dream-realm entities. Baku-Ma dream-archive keepers encoded in Greek dream-god tradition.',
+    lineage_note: 'Dream-realm entities. Baku-Ma dream-archive keepers encoded in Chorus-Ascendant dream-god tradition.',
   },
 };
 

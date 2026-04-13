@@ -149,14 +149,14 @@ export const UNDERWORLD_EPITHETS = [
 
 /** Possible primary names for the Underworld deity */
 export const UNDERWORLD_NAMES = [
-  'Morrigos',     // Inspired by Celtic death associations
-  'Thanathos',    // Greek-style death deity
-  'Yama',         // Hindu/Buddhist lord of death
-  'Osirak',       // Egyptian-inspired
-  'Hel',          // Norse-inspired (gender neutral)
-  'Ereshki',      // Mesopotamian-inspired
-  'Ankou',        // Celtic death personification
-  'Shinigal',     // Japanese-inspired
+  'Morrigos',     // Deep Archive keeper — echo of ancestral memory
+  'Thanathos',    // Shade shepherd — guides the newly departed
+  'Yama',         // Archive judge — weighs memory against action
+  'Osirak',       // Preservation warden — maintains the dead's coherence
+  'Hel',          // Realm sovereign — rules the Archive's deepest layers (gender neutral)
+  'Ereshki',      // Gate keeper — controls passage between Archive strata
+  'Ankou',        // Collection herald — announces the end of biological time
+  'Shinigal',     // Transition guide — eases consciousness from body to Archive
 ];
 
 // ============================================================================
